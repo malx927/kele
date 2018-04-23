@@ -1,0 +1,34 @@
+{% load static %}<!DOCTYPE html>
+<html>
+  <head>
+    <title>{% block title %}大眼可乐{% endblock %}</title>
+    <meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    {% block css %}
+	<link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.min.css">
+	<link rel="stylesheet" href="{% static 'wxchat/style/index.css' %}">
+    {% endblock css %}
+    {% block js %}
+    <script type="text/javascript" src="https://res.wx.qq.com/open/libs/weuijs/1.1.3/weui.min.js"></script>
+    {% endblock js %}
+    {% block extra %}{% endblock extra%}
+  </head>
+  <body ontouchstart>
+    {% block container %}
+	<div class="weui-tab" id="tab">
+    {% block tab %}
+        <div class="weui-tab__panel">
+        {% block tabpanel %}{% endblock tabpanel %}
+        </div>
+        <div class="weui-tabbar">
+        {% block tabbar %}{% endblock tabbar %}
+        </div>
+    {% endblock tab %}
+	</div>
+    {% endblock container %}
+  </body>
+  {% block bottomjs %}
+  <script src="{% static 'wxchat/js/wxchat.js' %}"></script>
+  {% endblock bottomjs %}
+</html>
