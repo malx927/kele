@@ -18,7 +18,7 @@ import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://chdv7i.natappfree.cc/wechat'
+APP_URL = 'http://h4ck69.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -232,11 +232,16 @@ def redirectUrl(request,item):
         redirect_url = getUrl(item)
         return  HttpResponseRedirect(redirect_url)
 
-def dogloss(request):
+def dogLoss(request):
     openid = request.session.get('openid',None)
     print(openid)
-    user = get_object_or_404(WxUserinfo,openid=openid)
+    user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
     return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
+
+
+def dogLossAdd(request):
+    return  render(request,template_name='wxchat/dogloss_add.html')
+
 
 
 @csrf_exempt

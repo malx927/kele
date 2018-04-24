@@ -4,7 +4,7 @@ __author__ = 'malxin'
 from django.conf.urls import url
 from django.views.generic import TemplateView
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
-    authlist, dogloss
+    authlist, dogLoss,dogLossAdd
 
 urlpatterns = [
 
@@ -20,7 +20,10 @@ urlpatterns = [
     #用户信息
     url(r'^getuserinfo/$', getUserinfo),
 
-    url(r'^dogloss/$', dogloss),
+    #寻狗
+    url(r'^dogloss/$', dogLoss),
+    url(r'^doglossadd/$', dogLossAdd,name='dog-loss-add'),
+
     url(r'^dogbreed/$', TemplateView.as_view(template_name='wxchat/wxbase.html')),
     url(r'^dogsale/$', TemplateView.as_view(template_name='wxchat/dogsale.html')),
 

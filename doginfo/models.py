@@ -131,6 +131,7 @@ class DogLoss(models.Model):
     sex = models.CharField(verbose_name=u'性别',max_length=10, null=True,blank=True, choices=PAGE_TYPE_CHOICE)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
 
     class Meta:
         verbose_name = u"寻宠登记"
@@ -152,6 +153,7 @@ class DogOwner(models.Model):
     telephone = models.CharField(verbose_name=u'联系电话', max_length=50)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
 
     class Meta:
         verbose_name = u"寻宠主"

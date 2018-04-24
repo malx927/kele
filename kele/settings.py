@@ -209,15 +209,17 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'uploads')
 MEDIA_URL = '/uploads/'
 
 STATICFILES_DIRS = (
-    ("css", os.path.join(STATIC_ROOT, 'css')),
-    ("js", os.path.join(STATIC_ROOT, 'js')),
-    ("images", os.path.join(STATIC_ROOT, 'images')),
-    os.path.join(BASE_DIR, 'static'),
+    # ("css", os.path.join(STATIC_ROOT, 'css')),
+    # ("js", os.path.join(STATIC_ROOT, 'js')),
+    # ("images", os.path.join(STATIC_ROOT, 'images')),
+    os.path.join(BASE_DIR, 'common_static'),
 )
 
 ADMIN_SITE_HEADER = u'大眼可乐公司后台'
