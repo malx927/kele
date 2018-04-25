@@ -55,7 +55,8 @@ weui.uploader('#uploader', {
 });
 
 // 缩略图预览
-document.querySelector('#uploaderFiles').addEventListener('click', function(e){
+
+$('#uploaderFiles').on('click', function(e){
     var target = e.target;
 
     while(!target.classList.contains('weui-uploader__file') && target){
@@ -91,7 +92,7 @@ document.querySelector('#uploaderFiles').addEventListener('click', function(e){
 
 
 
-document.querySelector("#show-actions").addEventListener("click",function(){
+$('#show-actions').on("click",function(){
 	weui.actionSheet([
      {
          label: '拍照',

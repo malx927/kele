@@ -9,11 +9,9 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
 from doginfo.models import Doginfo
-from restapi.accounts.serializers import (
+from .serializers import (
     UserRegisterSerializer,
-    UserLoginSerializer,
-    DoginfoListSerializer,
-    DoginfoCreateSerializer)
+    UserLoginSerializer,)
 from .permissions import NonPermission
 
 __author__ = 'malixin'
@@ -53,13 +51,3 @@ class UserLoginAPIView(APIView):
         else:
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
-
-class DoginfoListAPIView(ListAPIView):
-    permission_classes = [AllowAny]
-    queryset = Doginfo.objects.all()
-    serializer_class = DoginfoListSerializer
-
-class DoginfoCreateAPIView(CreateAPIView):
-
-    queryset = Doginfo.objects.all()
-    serializer_class = DoginfoCreateSerializer

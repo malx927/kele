@@ -3,6 +3,7 @@ from django.conf import settings
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.views.generic import DetailView
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -13,6 +14,8 @@ from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
+from doginfo.models import DogLoss
+from dogtype.models import Dogtype
 from wxchat.models import WxUserinfo
 import datetime
 
@@ -235,14 +238,18 @@ def redirectUrl(request,item):
 def dogLoss(request):
     openid = request.session.get('openid',None)
     print(openid)
-    user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
-    return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
+    # user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
+    # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
+    return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
 
 
 def dogLossAdd(request):
     return  render(request,template_name='wxchat/dogloss_add.html')
 
-
+#寻宠物详细视图
+class DogLossDetailView(DetailView):
+    model = DogLoss
+    template_name = 'wxchat/dogloss_detail.html'
 
 @csrf_exempt
 def getUserinfo(request):
@@ -342,3 +349,25 @@ def auth2(request):
 #         print('---------direct access')
 #         redirect_url = getUrl(item)
 #         return  HttpResponseRedirect(redirect_url)
+
+
+def createTestData(request):
+    curDate = datetime.datetime.now()
+    strDate  = curDate.strftime('%Y-%m-%d')
+    print(strDate)
+    type = Dogtype.objects.get(pk=1)
+    for i in range(1,100):
+        data = {
+            'dog_name':u'大眼可乐--%d'%(i,),
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'lostplace':'龙前街19-2号楼--%d'%(i,),
+            'lostdate':strDate,
+            'ownername':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogLoss.objects.create(**data)
+        #print(data)
+    return HttpResponse('success')

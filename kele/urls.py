@@ -37,4 +37,5 @@ urlpatterns = [
     url(r'^api/token/verify/', verify_jwt_token),
     url(r'^restapi/accounts/', include('restapi.accounts.urls')),
     url(r'^wechat/', include('wxchat.urls')),
+    url(r'^wechat/api/', include('wxchat.api.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

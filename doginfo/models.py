@@ -120,7 +120,7 @@ class Company(models.Model):
 class DogLoss(models.Model):
     dog_name = models.CharField(verbose_name=u'宠物名称', max_length=500)
     typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
-    colors = models.CharField(verbose_name=u'颜色',max_length=1)
+    colors = models.CharField(verbose_name=u'颜色',max_length=24)
     desc = models.CharField(verbose_name=u'特征', max_length=100, blank=True)
     picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True)
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
@@ -136,6 +136,7 @@ class DogLoss(models.Model):
     class Meta:
         verbose_name = u"寻宠登记"
         verbose_name_plural = u'寻宠登记表'
+        ordering = ['-create_time']
 
     def __str__(self):
         return self.dog_name
