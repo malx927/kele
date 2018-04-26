@@ -21,7 +21,7 @@ urlpatterns = [
     url(r'^getuserinfo/$', getUserinfo),
 
     #寻狗
-    url(r'^dogloss/$', dogLoss),
+    url(r'^dogloss/$', dogLoss,name='dog-loss'),
     url(r'^doglossadd/$', dogLossAdd,name='dog-loss-add'),
     url(r'^doglossdetail/(?P<pk>\d+)$', DogLossDetailView.as_view(),name='dog-loss-detail'),
 

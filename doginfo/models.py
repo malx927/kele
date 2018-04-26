@@ -118,13 +118,13 @@ class Company(models.Model):
 
 # 寻宠登记表
 class DogLoss(models.Model):
-    dog_name = models.CharField(verbose_name=u'宠物名称', max_length=500)
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
-    colors = models.CharField(verbose_name=u'颜色',max_length=24)
-    desc = models.CharField(verbose_name=u'特征', max_length=100, blank=True)
-    picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True)
+    dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=500)
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种')
+    colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
+    desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
+    picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True,null=True)
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
-    lostdate = models.DateTimeField(verbose_name=u'丢失时间')
+    lostdate = models.DateField(verbose_name=u'丢失时间')
     ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'主人电话', max_length=50)
     age = models.IntegerField(verbose_name=u'犬龄',null=True,  blank=True)

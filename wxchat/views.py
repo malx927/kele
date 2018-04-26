@@ -3,6 +3,7 @@ from django.conf import settings
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
+from django.urls import reverse
 from django.views.generic import DetailView
 import requests
 import json
@@ -16,12 +17,13 @@ from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
 from doginfo.models import DogLoss
 from dogtype.models import Dogtype
-from wxchat.models import WxUserinfo
+from .models import WxUserinfo
+from .forms import DogLossForm
 import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://h4ck69.natappfree.cc/wechat'
+APP_URL = 'http://37gfzq.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -244,7 +246,19 @@ def dogLoss(request):
 
 
 def dogLossAdd(request):
-    return  render(request,template_name='wxchat/dogloss_add.html')
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        print(request.FILES.get('picture'))
+        form = DogLossForm(request.POST,request.FILES)
+        if form.is_valid():
+            dogloss = form.save(commit=False)
+            dogloss.openid = openid
+            dogloss.save()
+        return HttpResponseRedirect(reverse('dog-loss'))
+    else:
+        form = DogLossForm()
+        return  render(request,'wxchat/dogloss_add.html',{'form':form})
 
 #寻宠物详细视图
 class DogLossDetailView(DetailView):

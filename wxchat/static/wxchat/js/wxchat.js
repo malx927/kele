@@ -12,47 +12,75 @@ weui.tab('#navbar',{
 		}
 });
 
-/* 图片手动上传 */
-var uploadCount = 0;
-var uploadCustomFileList = [];
-weui.uploader('#uploader', {
-   url: '',
-   auto: false,
-   type: 'file',
-   fileVal: 'fileVal',
-   compress: {
-       width: 1600,
-       height: 1600,
-       quality: .8
-   },
-   onBeforeQueued: function(files) {
+///* 图片手动上传 */
+//var uploadCount = 0;
+//var uploadCustomFileList = [];
+//weui.uploader('#uploader', {
+//   url: '',
+//   auto: false,
+//   type: 'file',
+//   fileVal: 'fileVal',
+//   compress: {
+//       width: 1600,
+//       height: 1600,
+//       quality: .8
+//   },
+//   onBeforeQueued: function(files) {
+//
+//       if(["image/jpg", "image/jpeg", "image/png", "image/gif"].indexOf(this.type) < 0){
+//           weui.alert('请上传图片');
+//           return false; // 阻止文件添加
+//       }
+//       if(this.size > 10 * 1024 * 1024){
+//           weui.alert('请上传不超过10M的图片');
+//           return false;
+//       }
+//       if (files.length > 1) { // 防止一下子选择过多文件
+//           weui.alert('最多只能上传1张图片');
+//           return false;
+//       }
+//       if (uploadCount + 1 > 1) {
+//           weui.alert('只能上传1张图片');
+//           return false;
+//       }
+//
+//       ++uploadCount;
+//
+//       // return true; // 阻止默认行为，不插入预览图的框架
+//   },
+//   onQueued: function(){
+//	   uploadCustomFileList.push(this);
+//       $("#id_picture").value= this
+//   }
+//});
 
-       if(["image/jpg", "image/jpeg", "image/png", "image/gif"].indexOf(this.type) < 0){
-           weui.alert('请上传图片');
-           return false; // 阻止文件添加
-       }
-       if(this.size > 10 * 1024 * 1024){
-           weui.alert('请上传不超过10M的图片');
-           return false;
-       }
-       if (files.length > 1) { // 防止一下子选择过多文件
-           weui.alert('最多只能上传1张图片');
-           return false;
-       }
-       if (uploadCount + 1 > 1) {
-           weui.alert('只能上传1张图片');
-           return false;
-       }
+$(function(){
+    var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>',
+        //$gallery = $("#gallery"), $galleryImg = $("#galleryImg"),
+        $uploaderInput = $("#id_picture");
+        $uploaderFiles = $("#uploaderFiles");
 
-       ++uploadCount;
+        $uploaderInput.on("change", function(e){
+            var src, url = window.URL || window.webkitURL || window.mozURL, files = e.target.files;
+            $('#uploaderFiles li').remove();
+            for (var i = 0, len = files.length; i < len; ++i) {
+                var file = files[i];
+                if(file.size > 5 * 1024 * 1024) {
+                    weui.alert('请上传不超过5M的图片');
+                    return false;
+                }
+                if (url) {
+                    src = url.createObjectURL(file);
+                } else {
+                    src = e.target.result;
+                }
 
-       // return true; // 阻止默认行为，不插入预览图的框架
-   },
-   onQueued: function(){
-	   uploadCustomFileList.push(this);
+                $uploaderFiles.append($(tmpl.replace('#url#', src)));
+            }
+        });
 
-   }
-});
+    });
+
 
 // 缩略图预览
 
@@ -73,16 +101,7 @@ $('#uploaderFiles').on('click', function(e){
     var gallery = weui.gallery(url, {
         onDelete: function(){
             weui.confirm('确定删除该图片？', function(){
-                var index;
-                for (var i = 0, len = uploadCustomFileList.length; i < len; ++i) {
-                    var file = uploadCustomFileList[i];
-                    if(file.id == id){
-                        index = i;
-                        break;
-                    }
-                }
-                if(index !== undefined) uploadCustomFileList.splice(index, 1);
-				uploadCount = 0;
+                $("#id_picture").val('');
                 target.remove();
                 gallery.hide();
             });
