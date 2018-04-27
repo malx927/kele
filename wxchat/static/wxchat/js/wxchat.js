@@ -1,16 +1,20 @@
-weui.tab('#tab',{
-		defaultIndex: 0,
-		onChange: function(index){
-			console.log(index);
-		}
-});
+  $(function() {
+    FastClick.attach(document.body);
 
-weui.tab('#navbar',{
-		defaultIndex: 0,
-		onChange: function(index){
-			console.log(index);
-		}
+  });
+
+weui.tab('#tab',{
+        defaultIndex: 0,
+        onChange: function(index){
+            console.log(index);
+        }
 });
+//weui.tab('#navbar',{
+//		defaultIndex: 0,
+//		onChange: function(index){
+//			console.log(index);
+//		}
+//});
 
 ///* 图片手动上传 */
 //var uploadCount = 0;

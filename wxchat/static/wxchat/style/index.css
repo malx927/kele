@@ -57,3 +57,7 @@ html,body{
     width:80px!important;
     height:80px!important;
 }
+
+.weui-tab__panel_active{
+    display: block;
+}

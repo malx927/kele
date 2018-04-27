@@ -15,15 +15,15 @@ from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
-from doginfo.models import DogLoss
+from doginfo.models import DogLoss, DogOwner
 from dogtype.models import Dogtype
 from .models import WxUserinfo
-from .forms import DogLossForm
+from .forms import DogLossForm,DogOwnerForm
 import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://37gfzq.natappfree.cc/wechat'
+APP_URL = 'http://jdesp2.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -244,7 +244,7 @@ def dogLoss(request):
     # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
     return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
 
-
+#寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
@@ -255,7 +255,9 @@ def dogLossAdd(request):
             dogloss = form.save(commit=False)
             dogloss.openid = openid
             dogloss.save()
-        return HttpResponseRedirect(reverse('dog-loss'))
+            return HttpResponseRedirect(reverse('show-info'),{'success':'true'})
+        else:
+            return HttpResponseRedirect(reverse('show-info'),{'success':'false'})
     else:
         form = DogLossForm()
         return  render(request,'wxchat/dogloss_add.html',{'form':form})
@@ -264,6 +266,32 @@ def dogLossAdd(request):
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
+
+#寻宠物主人发布
+def dogOwnerAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        print(request.FILES.get('picture'))
+        form = DogOwnerForm(request.POST,request.FILES)
+        if form.is_valid():
+            dogowner = form.save(commit=False)
+            dogowner.openid = openid
+            dogowner.save()
+        return HttpResponseRedirect(reverse('dog-loss'))
+    else:
+        form = DogOwnerForm()
+        return  render(request,'wxchat/dogowner_add.html',{'form':form})
+
+#寻宠物详细视图
+class DogOwnerDetailView(DetailView):
+    model = DogOwner
+    template_name = 'wxchat/dogowner_detail.html'
+
+
+def ShowInfo(request):
+    success = request.GET.get('success')
+    return render(request,'wxchat/message.html',{"success":success})
 
 @csrf_exempt
 def getUserinfo(request):
@@ -370,7 +398,7 @@ def createTestData(request):
     strDate  = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    for i in range(1,100):
+    for i in range(1,50):
         data = {
             'dog_name':u'大眼可乐--%d'%(i,),
             'typeid':type,
@@ -384,4 +412,16 @@ def createTestData(request):
         }
         DogLoss.objects.create(**data)
         #print(data)
+    for i in range(1,50):
+        data = {
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'findplace':'龙前街19-2号楼--%d'%(i,),
+            'finddate':strDate,
+            'findname':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogOwner.objects.create(**data)
     return HttpResponse('success')

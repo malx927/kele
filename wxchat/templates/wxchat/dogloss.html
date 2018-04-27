@@ -1,63 +1,34 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-{% block title %}寻宠物|寻宠主{% endblock %}
 
 {% block tabpanel %}
-        <div class="weui-tab__content">
+        <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     	<div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">宠物列表<span></div>
-                            <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}" class="weui-btn weui-btn_mini weui-btn_primary r" >发布</a></div>
+                            <div class="weui-flex__item"><span class="title">寻找宠物列表<span></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}" class="weui-btn weui-btn_mini weui-btn_primary r">寻宠发布</a></div>
                         </div>
                 </div>
-                <div class="weui-panel__bd" id="dogloss">
-{#                    <a href="javascript:;" class="weui-media-box weui-media-box_appmsg">#}
-{#                        <div class="weui-media-box__hd">#}
-{#                             <img class="weui-media-box__thumb" src="{% static 'wxchat/images/dog.jpg' %}" alt="">#}
-{#                        </div>#}
-{#                        <div class="weui-media-box__bd">#}
-{#                            <h4 class="weui-media-box__title">标题二</h4>#}
-{#                            <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>#}
-{#                        </div>#}
-{#                    </a>#}
-                </div>
-                <div class="weui-panel__ft" >
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doglossmore">
+                <div class="weui-panel__bd" id="dogloss"></div>
+                <div class="weui-panel__ft">
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doglossmore" style="display: none">
                         <div class="weui-cell__bd">查看更多</div>
                         <span class="weui-cell__ft"></span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="weui-tab__content">
+        <div class="weui-tab__content" id="tab2">
             <div class="weui-panel weui-panel_access">
-                <div class="weui-panel__hd">文字组合列表</div>
-                <div class="weui-panel__bd">
-                    <div class="weui-media-box weui-media-box_text">
-                        <h4 class="weui-media-box__title">标题一</h4>
-                         <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                    <div class="weui-media-box weui-media-box_text">
-                        <h4 class="weui-media-box__title">标题二</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                    <div class="weui-media-box weui-media-box_text">
-                        <h4 class="weui-media-box__title">标题二</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                    <div class="weui-media-box weui-media-box_text">
-                        <h4 class="weui-media-box__title">标题二</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
-                    </div>
-                    <div class="weui-media-box weui-media-box_text">
-                        <h4 class="weui-media-box__title">标题二</h4>
-                        <p class="weui-media-box__desc">由各种物质组成的巨型球状天体，叫做星球。星球有一定的形状，有自己的运行轨道。</p>
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                            <div class="weui-flex__item"><span class="title">寻找宠物主人列表<span></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}" class="weui-btn weui-btn_mini weui-btn_primary r" >寻主发布</a></div>
                     </div>
                 </div>
-                <div class="weui-panel__ft">
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
+                <div class="weui-panel__bd" id="dogowner"></div>
+                <div class="weui-panel__ft" >
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogownermore" style="display: none">
                         <div class="weui-cell__bd">查看更多</div>
                         <span class="weui-cell__ft"></span>
                     </a>
@@ -84,24 +55,30 @@
     {{ block.super }}
     <script type="application/javascript">
      nextUrl = '{% url 'dog-loss-list' %}';
+     dogOwnerUrl = '{% url 'dog-owner-list' %}';
     $(function(){
 
         $('#doglossmore').on('click',function(){
             getDataList( nextUrl );
         });
+
+        $('#dogownermore').on('click',function(){
+            getDogOwnerList( dogOwnerUrl );
+        });
         getDataList( nextUrl );
+        getDogOwnerList(dogOwnerUrl);
     });
     function getDataList(url){
         $.ajax({
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 300,
+          timeout: 500,
           context: $('#dogloss'),
           success: function(data){
               nextUrl = data.next;
-{#              console.log(data.results);#}
               appendItem(data.results);
+              $('#doglossmore').css('display','');
           },
           error: function(xhr, type,error){
               console.log(type);
@@ -119,14 +96,56 @@
                             '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ item.dog_name +'</h4>' +
-                               '<p class="weui-media-box__desc">'+ item.lostplace +'</p>'  +
+                               '<ul class="weui-media-box__info">' +
+								  '<li class="weui-media-box__info__meta">' + item.typename + '</li>' +
+								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">' + item.colors +'</li>' +
+								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">' + item.lostdate +'</li>' +
+								'</ul>' +
+                               '<p class="weui-media-box__desc">地点:'+ item.lostplace +'</p>'  +
                              '</div>' +
                         '</a>';
             $('#dogloss').append( lossitem );
         }) ;
     }
-    $(window).scroll(function(){
-       console.log('aaaaaaaaa');
-    });
+
+    function getDogOwnerList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 500,
+          context: $('#dogowner'),
+          success: function(data){
+              dogOwnerUrl = data.next;
+              appendDogOwnerItem(data.results);
+              $('#dogownermore').css('display','');
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    function appendDogOwnerItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+            if(img_url == null){
+                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+            }
+          lossitem =  '<a  href="/wechat/dogownerdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">品种:'+ item.typename +'</h4>' +
+                               '<ul class="weui-media-box__info">' +
+								  '<li class="weui-media-box__info__meta">颜色:' + item.colors + '</li>' +
+								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">时间:' + item.finddate +'</li>' +
+								'</ul>' +
+                               '<p class="weui-media-box__desc">地点:'+ item.findplace +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#dogowner').append( lossitem );
+        }) ;
+    }
+
     </script>
 {% endblock bottomjs %}

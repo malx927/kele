@@ -126,7 +126,7 @@ class DogLoss(models.Model):
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
     lostdate = models.DateField(verbose_name=u'丢失时间')
     ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
-    telephone = models.CharField(verbose_name=u'主人电话', max_length=50)
+    telephone = models.CharField(verbose_name=u'主人手机', max_length=50)
     age = models.IntegerField(verbose_name=u'犬龄',null=True,  blank=True)
     sex = models.CharField(verbose_name=u'性别',max_length=10, null=True,blank=True, choices=PAGE_TYPE_CHOICE)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -144,12 +144,12 @@ class DogLoss(models.Model):
 
 # 寻宠主
 class DogOwner(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
-    colors = models.CharField(verbose_name=u'颜色',max_length=1)
-    desc = models.CharField(verbose_name=u'特征', max_length=100, blank=True)
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种')
+    colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
+    desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
     picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True)
     findplace = models.CharField(verbose_name=u'发现地点', max_length=100, )
-    finddate = models.DateTimeField(verbose_name=u'发现时间')
+    finddate = models.DateField(verbose_name=u'发现时间')
     findname = models.CharField(verbose_name=u'联系人姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'联系电话', max_length=50)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -157,8 +157,8 @@ class DogOwner(models.Model):
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
 
     class Meta:
-        verbose_name = u"寻宠主"
-        verbose_name_plural = u'寻宠主'
+        verbose_name = u"寻宠物主人"
+        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.typeid.typename + '|' + self.colors

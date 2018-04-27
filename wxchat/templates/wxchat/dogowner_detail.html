@@ -1,18 +1,12 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block container %}
 <div class="weui-panel weui-panel_access">
-    <div class="weui-panel__hd">丢失宠物详细介绍</div>
+    <div class="weui-panel__hd">寻找宠物主人</div>
     <div class="weui-panel__bd">
     {% if object.picture %}
         <img src="{{ object.picture.url }}" width="100%" height="280px">
     {% endif %}
     <div class="weui-form-preview">
-       <div class="weui-form-preview__hd">
-           <div class="weui-form-preview__item">
-               <label class="weui-form-preview__label">昵称:</label>
-               <span class="weui-form-preview__value"> {{ object.dog_name }}</span>
-           </div>
-       </div>
        <div class="weui-form-preview__bd">
            <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">品种:</label>
@@ -28,15 +22,15 @@
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">丢失地址:</label>
-               <span class="weui-form-preview__value">{{ object.lostplace }}</span>
+               <span class="weui-form-preview__value">{{ object.findplace }}</span>
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">丢失时间:</label>
-               <span class="weui-form-preview__value">{{ object.lostdate|date:'Y-m-d'}}</span>
+               <span class="weui-form-preview__value">{{ object.finddate|date:'Y-m-d'}}</span>
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">主人姓名:</label>
-               <span class="weui-form-preview__value">{{ object.ownername }}</span>
+               <span class="weui-form-preview__value">{{ object.findname }}</span>
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">手机号:</label>
