@@ -1,14 +1,14 @@
-  $(function() {
-    FastClick.attach(document.body);
 
+$(function() {
+    //FastClick.attach(document.body);
   });
 
-weui.tab('#tab',{
-        defaultIndex: 0,
-        onChange: function(index){
-            console.log(index);
-        }
-});
+//weui.tab('#tab',{
+//        defaultIndex: 0,
+//        onChange: function(index){
+//            console.log(index);
+//        }
+//});
 //weui.tab('#navbar',{
 //		defaultIndex: 0,
 //		onChange: function(index){

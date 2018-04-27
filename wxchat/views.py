@@ -244,23 +244,26 @@ def dogLoss(request):
     # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
     return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
 
+
 #寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         print('openid=',openid)
-        print(request.FILES.get('picture'))
+        next = request.GET.get('next',None)
+        print(next)
         form = DogLossForm(request.POST,request.FILES)
         if form.is_valid():
             dogloss = form.save(commit=False)
             dogloss.openid = openid
             dogloss.save()
-            return HttpResponseRedirect(reverse('show-info'),{'success':'true'})
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
         else:
-            return HttpResponseRedirect(reverse('show-info'),{'success':'false'})
+            return render(request,'wxchat/message.html', {"success":"false",'next':next})
     else:
         form = DogLossForm()
-        return  render(request,'wxchat/dogloss_add.html',{'form':form})
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogloss_add.html', {'form': form, 'next': next})
 
 #寻宠物详细视图
 class DogLossDetailView(DetailView):
@@ -272,26 +275,25 @@ def dogOwnerAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         print('openid=',openid)
-        print(request.FILES.get('picture'))
+        next = request.GET.get('next',None)
+        print(next)
         form = DogOwnerForm(request.POST,request.FILES)
         if form.is_valid():
             dogowner = form.save(commit=False)
             dogowner.openid = openid
             dogowner.save()
-        return HttpResponseRedirect(reverse('dog-loss'))
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+        else:
+            render(request,'wxchat/message.html', {"success":"false",'next':next})
     else:
         form = DogOwnerForm()
-        return  render(request,'wxchat/dogowner_add.html',{'form':form})
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogowner_add.html',{'form':form,'next': next})
 
 #寻宠物详细视图
 class DogOwnerDetailView(DetailView):
     model = DogOwner
     template_name = 'wxchat/dogowner_detail.html'
-
-
-def ShowInfo(request):
-    success = request.GET.get('success')
-    return render(request,'wxchat/message.html',{"success":success})
 
 @csrf_exempt
 def getUserinfo(request):

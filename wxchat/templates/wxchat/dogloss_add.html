@@ -1,4 +1,9 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+{% endblock extra%}
 {% block container %}
 <div class="weui-cells__title">寻宠登记表</div>
 <form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
