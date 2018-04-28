@@ -6,7 +6,7 @@
 {% endblock extra%}
 {% block container %}
 <div class="weui-cells__title">寻宠登记表</div>
-<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
     <div class="weui-cell">
         <div class="weui-cell__hd"><label class="weui-label">{{ form.dog_name.label }}:</label></div>
@@ -82,3 +82,12 @@
 
 {% endblock container %}
 
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+        function showing(){
+            var wins = weui.loading('处理中...');
+            return true;
+        }
+    </script>
+{% endblock bottomjs %}

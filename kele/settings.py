@@ -202,7 +202,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -236,7 +236,7 @@ REST_FRAMEWORK = {
 
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 20,
 }
 
 JWT_AUTH = {
@@ -267,6 +267,10 @@ JWT_AUTH = {
 
 }
 
-# WeChat
+# 测试号WeChat
 WECHAT_APPID = 'wxbc591183cb175d16'
 WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
+
+# 公众服务号WeChat
+WECHAT_APPID = 'wxad07fe6b357d1f3a'
+WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'

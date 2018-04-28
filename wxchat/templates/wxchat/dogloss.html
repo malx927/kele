@@ -5,7 +5,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     	<div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">寻找宠物列表<span></div>
+                            <div class="weui-flex__item"><span class="title">寻找宠物列表</span></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r">寻宠发布</a></div>
                         </div>
                 </div>
@@ -22,7 +22,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">寻找宠物主人列表<span></div>
+                            <div class="weui-flex__item"><span class="title">寻找宠物主人列表</span></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r" >寻主发布</a></div>
                     </div>
                 </div>
@@ -56,20 +56,25 @@
     <script type="application/javascript">
      nextUrl = '{% url 'dog-loss-list' %}';
      dogOwnerUrl = '{% url 'dog-owner-list' %}';
+    var loading = weui.loading('加载中...');
+     ///缓存滚动条位置
+     $('.weui-tab__panel').scroll(function(){
+            if($(this).scrollTop() !=0 ){
+                sessionStorage.setItem('offsetTop',$(this).scrollTop());
+            }
+    });
 
     $(function(){
-        defIndex = 0;
-        param = location.search;
-        if (param.indexOf("=") != -1) {
-            strs = param.split("=");
-            defIndex = strs[1];
-        }
+
+        defIndex = sessionStorage.getItem('tab');
+        console.log('defindex='+ defIndex);
         weui.tab('#tab',{
-            defaultIndex: defIndex,
+            defaultIndex: defIndex ==null?0:defIndex,
             onChange: function(index){
-{#                console.log(index);#}
-        }
-    });
+                sessionStorage.setItem('tab',index);
+            }
+        });
+
 
         $('#doglossmore').on('click',function(){
             getDataList( nextUrl );
@@ -80,6 +85,7 @@
         });
         getDataList( nextUrl );
         getDogOwnerList(dogOwnerUrl);
+
     });
     function getDataList(url){
         $.ajax({
@@ -92,9 +98,12 @@
               nextUrl = data.next;
               appendItem(data.results);
               $('#doglossmore').css('display','');
+              loading.hide();
+              setScollPos();
           },
           error: function(xhr, type,error){
               console.log(type);
+              loading.hide();
           }
         });
     }
@@ -132,6 +141,7 @@
               dogOwnerUrl = data.next;
               appendDogOwnerItem(data.results);
               $('#dogownermore').css('display','');
+              setScollPos();
           },
           error: function(xhr, type,error){
               console.log(type);
@@ -159,6 +169,10 @@
             $('#dogowner').append( lossitem );
         }) ;
     }
-
+    ////设置滚动条位置
+    function setScollPos(){
+        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+        $('.weui-tab__panel').scrollTop(_offset);
+    }
     </script>
 {% endblock bottomjs %}

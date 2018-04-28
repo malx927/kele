@@ -23,7 +23,7 @@ import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://jdesp2.natappfree.cc/wechat'
+APP_URL = 'http://jjf7pj.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -76,8 +76,8 @@ def saveUserinfo(openid):
         user = client.user.get(openid)
         if 'errcode' not in user:
             sub_time = user.pop('subscribe_time')
-            subscribe_time = datetime.datetime.fromtimestamp(sub_time)
-            WxUserinfo.objects.create(**user, subscribe_time=subscribe_time)
+            sub_time = datetime.datetime.fromtimestamp(sub_time)
+            WxUserinfo.objects.create(**user, subscribe_time=sub_time)
         else:
             print(user)
 
