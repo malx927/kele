@@ -2,7 +2,9 @@
 __author__ = 'malxin'
 
 from django import forms
+from doginfo.models import DogBreed
 from doginfo.models import DogLoss,DogOwner
+
 
 
 #丢宠登记表单
@@ -71,5 +73,43 @@ class DogOwnerForm(forms.ModelForm):
         widgets  = {
             'finddate':forms.TextInput({'class':'weui-input','type':'date'}),
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
+            'desc':forms.Textarea ({'class':'weui-textarea','placeholder':'请输入宠物特征','rows':'3'})
+        }
+
+
+#宠物配种
+class DogBreedForm(forms.ModelForm):
+
+    def __init__(self, *args,**kwargs):
+        super(DogBreedForm,self).__init__(*args,**kwargs)
+        self.fields['name'].widget.attrs['class'] = 'weui-input'
+        self.fields['name'].widget.attrs['placeholder'] = '请输入昵称'
+
+        self.fields['typeid'].widget.attrs['class'] = 'weui-select'
+
+        self.fields['colors'].widget.attrs['class'] = 'weui-input'
+        self.fields['colors'].widget.attrs['placeholder'] = '请输入颜色'
+
+        # self.fields['desc'].widget.attrs['class'] = 'weui-input'
+        # self.fields['desc'].widget.attrs['placeholder'] = '请输入特征'
+
+        self.fields['price'].widget.attrs['class'] = 'weui-input'
+        self.fields['price'].widget.attrs['placeholder'] = '价格区间'
+
+        self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
+        self.fields['picture'].widget.attrs['accept'] = 'image/*'
+
+
+        self.fields['ownername'].widget.attrs['class'] = 'weui-input'
+        self.fields['ownername'].widget.attrs['placeholder'] = '请输入姓名'
+
+
+
+    class Meta:
+        model = DogBreed
+        fields = ['name','typeid','colors','desc','picture','price','ownername','telephone']
+
+        widgets  = {
+            'telephone':forms.NumberInput({'class':'weui-input','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
             'desc':forms.Textarea ({'class':'weui-textarea','placeholder':'请输入宠物特征','rows':'3'})
         }

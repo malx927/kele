@@ -7,12 +7,18 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
+
+from doginfo.models import DogBreed
 from doginfo.models import Doginfo,DogLoss,DogOwner
 from .serializers import (
     DoginfoListSerializer,
     DoginfoCreateSerializer,
     DogLossSerializer,
-    DogLossDetailSerializer, DogOwnerSerializer)
+    DogLossDetailSerializer,
+    DogbreedListSerializer,
+    DogBreedDetailSerializer,
+    DogOwnerSerializer
+)
 
 __author__ = 'malixin'
 
@@ -33,6 +39,20 @@ class DogLossListAPIView(ListAPIView):
     serializer_class = DogLossSerializer
     def get_queryset(self):
         return  DogLoss.objects.filter(is_show=1)
+
+#狗配种
+class DogbreedListAPIView(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = DogBreed.objects.all()
+    serializer_class = DogbreedListSerializer
+    def get_queryset(self):
+        return  DogBreed.objects.filter(is_show=1)
+
+class DogBreedDetailAPIView(RetrieveAPIView):
+    queryset = DogBreed.objects.all()
+    serializer_class = DogBreedDetailSerializer
+    permission_classes = [AllowAny]
+
 
 class DogLossDetailAPIView(RetrieveAPIView):
     queryset = DogLoss.objects.all()

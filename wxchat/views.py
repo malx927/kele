@@ -15,6 +15,13 @@ from wechatpy.utils import check_signature,ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
+from doginfo.models import DogBreed
+from .forms import DogBreedForm
+
+
+# Create your views here.
+WECHAT_TOKEN = 'hello2018'
+APP_URL = 'http://vaesj9.natappfree.cc/wechat'
 from doginfo.models import DogLoss, DogOwner
 from dogtype.models import Dogtype
 from .models import WxUserinfo
@@ -24,6 +31,7 @@ import datetime
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
 APP_URL = 'http://kvpwtu.natappfree.cc/wechat'
+
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -291,6 +299,36 @@ def dogLossAdd(request):
         form = DogLossForm()
         next = request.GET.get('next', '')
         return  render(request,'wxchat/dogloss_add.html', {'form': form, 'next': next})
+
+
+def dogBreed(request):
+    openid = request.session.get('openid',None)
+    print(openid)
+    # user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
+    # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
+    return render(request,template_name='wxchat/dogbreed.html',context={'nickname':'','imgurl':''})
+
+
+def dogBreedAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        print(request.FILES.get('picture'))
+        form = DogBreedForm(request.POST,request.FILES)
+        if form.is_valid():
+            dogbreed = form.save(commit=False)
+            dogbreed.openid = openid
+            dogbreed.showtime =datetime.datetime.now()
+            dogbreed.save()
+        return HttpResponseRedirect(reverse('dog-breed'))
+    else:
+        form = DogBreedForm()
+        return  render(request,'wxchat/dogbreed_add.html',{'form':form})
+
+#配种详细视图
+class DogBreedDetailView(DetailView):
+    model = DogBreed
+    template_name = 'wxchat/dogbreed_detail.html'
 
 #寻宠物详细视图
 class DogLossDetailView(DetailView):
