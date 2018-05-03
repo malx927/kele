@@ -15,15 +15,23 @@ from wechatpy.utils import check_signature
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
-from doginfo.models import DogLoss,DogBreed
-from dogtype.models import Dogtype
-from .models import WxUserinfo
-from .forms import DogLossForm,DogBreedForm
-import datetime
+from doginfo.models import DogBreed
+from .forms import DogBreedForm
+
 
 # Create your views here.
 WECHAT_TOKEN = 'hello2018'
 APP_URL = 'http://vaesj9.natappfree.cc/wechat'
+from doginfo.models import DogLoss, DogOwner
+from dogtype.models import Dogtype
+from .models import WxUserinfo
+from .forms import DogLossForm,DogOwnerForm
+import datetime
+
+# Create your views here.
+WECHAT_TOKEN = 'malixin'
+APP_URL = 'http://jjf7pj.natappfree.cc/wechat'
+
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
@@ -76,8 +84,8 @@ def saveUserinfo(openid):
         user = client.user.get(openid)
         if 'errcode' not in user:
             sub_time = user.pop('subscribe_time')
-            subscribe_time = datetime.datetime.fromtimestamp(sub_time)
-            WxUserinfo.objects.create(**user, subscribe_time=subscribe_time)
+            sub_time = datetime.datetime.fromtimestamp(sub_time)
+            WxUserinfo.objects.create(**user, subscribe_time=sub_time)
         else:
             print(user)
 
@@ -245,21 +253,25 @@ def dogLoss(request):
     return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
 
 
-
+#寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         print('openid=',openid)
-        print(request.FILES.get('picture'))
+        next = request.GET.get('next',None)
+        print(next)
         form = DogLossForm(request.POST,request.FILES)
         if form.is_valid():
             dogloss = form.save(commit=False)
             dogloss.openid = openid
             dogloss.save()
-        return HttpResponseRedirect(reverse('dog-loss'))
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+        else:
+            return render(request,'wxchat/message.html', {"success":"false",'next':next})
     else:
         form = DogLossForm()
-        return  render(request,'wxchat/dogloss_add.html',{'form':form})
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogloss_add.html', {'form': form, 'next': next})
 
 
 def dogBreed(request):
@@ -295,6 +307,31 @@ class DogBreedDetailView(DetailView):
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
+
+#寻宠物主人发布
+def dogOwnerAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        next = request.GET.get('next',None)
+        print(next)
+        form = DogOwnerForm(request.POST,request.FILES)
+        if form.is_valid():
+            dogowner = form.save(commit=False)
+            dogowner.openid = openid
+            dogowner.save()
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+        else:
+            render(request,'wxchat/message.html', {"success":"false",'next':next})
+    else:
+        form = DogOwnerForm()
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogowner_add.html',{'form':form,'next': next})
+
+#寻宠物详细视图
+class DogOwnerDetailView(DetailView):
+    model = DogOwner
+    template_name = 'wxchat/dogowner_detail.html'
 
 @csrf_exempt
 def getUserinfo(request):
@@ -401,7 +438,7 @@ def createTestData(request):
     strDate  = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    for i in range(1,100):
+    for i in range(1,50):
         data = {
             'dog_name':u'大眼可乐--%d'%(i,),
             'typeid':type,
@@ -415,4 +452,16 @@ def createTestData(request):
         }
         DogLoss.objects.create(**data)
         #print(data)
+    for i in range(1,50):
+        data = {
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'findplace':'龙前街19-2号楼--%d'%(i,),
+            'finddate':strDate,
+            'findname':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogOwner.objects.create(**data)
     return HttpResponse('success')

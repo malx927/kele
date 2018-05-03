@@ -28,6 +28,7 @@ class DogLossDetailSerializer(serializers.ModelSerializer):
                   'telephone', 'openid']
 
 
+
 # 宠物配种
 class DogBreedDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -40,10 +41,26 @@ class DogLossSerializer(serializers.ModelSerializer):
     # url = HyperlinkedIdentityField(
     #          view_name='dog-loss-detail'
     #       )
+    typename = serializers.CharField(source='typeid.typename',read_only=True)
     class Meta:
         model = DogLoss
         fields = ['id', 'dog_name', 'typeid', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
+
+
+#寻找宠物主人
+class DogOwnerSerializer(serializers.ModelSerializer):
+    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    class Meta:
+        model = DogOwner
+        fields = ['id','typename','colors','desc','picture','findplace','finddate','findname','telephone']
+
+class DogOwnerDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogOwner
+        fields = ['id','typeid','colors','desc','picture','findplace','finddate','findname','telephone']
+
+
 
 
 class DogtypeSerializer(serializers.ModelSerializer):

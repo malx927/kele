@@ -1,0 +1,36 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block container %}
+<div class="weui-msg">
+{% if success %}
+  <div class="weui-msg__icon-area"><i class="weui-icon-success weui-icon_msg"></i></div>
+  <div class="weui-msg__text-area">
+    <h2 class="weui-msg__title">操作成功</h2>
+    <p class="weui-msg__desc">您提交的信息，我们会尽快审核发布。</p>
+  </div>
+{% else %}
+  <div class="weui-msg__icon-area"><i class="weui-icon-warn weui-icon_msg"></i></div>
+  <div class="weui-msg__text-area">
+    <h2 class="weui-msg__title">操作失败</h2>
+    <p class="weui-msg__desc">清核对您要提交的信息。</p>
+  </div>
+{% endif %}
+  <div class="weui-msg__opr-area">
+    <p class="weui-btn-area">
+      <a href="{{ next }}" class="weui-btn weui-btn_primary">返回</a>
+    </p>
+  </div>
+  <div class="weui-msg__extra-area">
+    <div class="weui-footer">
+      <p class="weui-footer__links">
+        <a href="javascript:void(0);" class="weui-footer__link">辽宁浩天科技有限公司</a>
+      </p>
+        <p class="weui-footer__links">
+        <a href="javascript:void(0);" class="weui-footer__link">大眼可乐宠物联盟</a>
+      </p>
+      <p class="weui-footer__text">Copyright © {% now "Y" %}</p>
+    </div>
+  </div>
+</div>
+{% endblock container %}
+

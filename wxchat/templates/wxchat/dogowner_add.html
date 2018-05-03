@@ -1,14 +1,13 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+{% endblock extra%}
 {% block container %}
-<div class="weui-cells__title">配种登记表</div>
-<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="weui-cells__title">寻找主人登记表</div>
+<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.name }}
-        </div>
-    </div>
     <div class="weui-cell weui-cell_select weui-cell_select-after">
         <div class="weui-cell__hd">
             <label for="" class="weui-label">{{ form.typeid.label }}:</label>
@@ -46,15 +45,21 @@
         </div>
     </div>
     <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.price.label }}:</label></div>
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.findplace.label }}:</label></div>
         <div class="weui-cell__bd">
-            {{ form.price }}
+            {{ form.findplace }}
         </div>
     </div>
     <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ownername.label }}:</label></div>
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.finddate.label }}:</label></div>
         <div class="weui-cell__bd">
-            {{ form.ownername }}
+            {{ form.finddate }}
+        </div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.findname.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.findname }}
         </div>
     </div>
     <div class="weui-cell">
@@ -79,3 +84,4 @@
         }
     </script>
 {% endblock bottomjs %}
+
