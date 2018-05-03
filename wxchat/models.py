@@ -33,3 +33,15 @@ class WxUserinfo(models.Model):
     class Meta:
         verbose_name  = u'微信用户信息'
         verbose_name_plural =verbose_name
+
+
+#微信公众号菜单
+class Menu(models.Model):
+    name = models.CharField(verbose_name='名字',max_length=30)
+
+    class Meta:
+        verbose_name='微信菜单维护'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return  self.name

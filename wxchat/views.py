@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply
-from wechatpy.utils import check_signature
+from wechatpy.utils import check_signature,ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
@@ -23,10 +23,11 @@ import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://jjf7pj.natappfree.cc/wechat'
+APP_URL = 'http://kvpwtu.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
+
 
 
 @csrf_exempt
@@ -47,7 +48,13 @@ def wechat(request):
         msg = parse_message(request.body)
         print(msg.type)
         if msg.type=='text':
-            reply = create_reply('感谢您的关注!', msg)
+            if msg.content == '寻宠':
+                reply = getDogLossList(request,msg)
+            elif msg.content == '寻主':
+                reply = getDogOwnerList(request,msg)
+            else:
+                reply = create_reply('感谢您关注,暂时没有提供此服务', msg)
+
         elif msg.type =='image':
             reply = ImageReply(message=msg)
             reply.media_id = msg.media_id
@@ -58,7 +65,7 @@ def wechat(request):
         elif msg.type == 'event':
             if msg.event == 'subscribe':
                 saveUserinfo(msg.source)
-                reply = create_reply('感谢您的关注!', msg)
+                reply = create_reply('感谢您关注【大眼可乐宠物联盟】\n发送【寻宠】或者【寻主】两个字可以查看到最新发布的寻找宠物和寻找主人的信息', msg)
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
@@ -68,6 +75,29 @@ def wechat(request):
         response = HttpResponse(reply.render(), content_type="application/xml")
         return response
 
+def getDogLossList(request,msg):
+    articles = ArticlesReply(message=msg)
+    dogloss = DogLoss.objects.all()[:8]
+    for dog in dogloss:
+        article = ObjectDict()
+        article.title = dog.title
+        article.description = dog.desc
+        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.url = 'http://' + request.get_host() + dog.get_absolute_url()
+        articles.add_article(article)
+    return articles
+
+def getDogOwnerList(request, msg):
+    articles = ArticlesReply(message=msg)
+    dogowner = DogOwner.objects.all()[:8]
+    for dog in dogowner:
+        article = ObjectDict()
+        article.title = dog.title
+        article.description = dog.desc
+        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.url = 'http://' + request.get_host() + dog.get_absolute_url()
+        articles.add_article(article)
+    return articles
 
 def saveUserinfo(openid):
     counts = WxUserinfo.objects.filter(openid=openid, subscribe=1).count()
@@ -113,7 +143,7 @@ def createMenu(request):
                             {
                                 "type": "view",
                                 "name": "宠物领养",
-                                "url": APP_URL + "/auth2"
+                                "url": APP_URL + "/redirect/dogadopt"
                             },
                             {
                                 "type": "view",
@@ -239,9 +269,6 @@ def redirectUrl(request,item):
 
 def dogLoss(request):
     openid = request.session.get('openid',None)
-    print(openid)
-    # user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
-    # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
     return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
 
 
@@ -294,6 +321,12 @@ def dogOwnerAdd(request):
 class DogOwnerDetailView(DetailView):
     model = DogOwner
     template_name = 'wxchat/dogowner_detail.html'
+
+
+def dogAdopt(request):
+    openid = request.session.get('openid',None)
+    return render(request,template_name='wxchat/dogadoption.html')
+
 
 @csrf_exempt
 def getUserinfo(request):
