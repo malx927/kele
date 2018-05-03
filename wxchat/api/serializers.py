@@ -44,7 +44,7 @@ class DogLossSerializer(serializers.ModelSerializer):
     typename = serializers.CharField(source='typeid.typename',read_only=True)
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid','typename', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
 

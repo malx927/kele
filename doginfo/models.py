@@ -158,7 +158,7 @@ class DogOwner(models.Model):
     class Meta:
         verbose_name = u"寻宠物主人"
         verbose_name_plural = verbose_name
-        ordering = ['-create_time']
+        ordering = ['-id']
 
     def __str__(self):
         return self.typeid.typename + '|' + self.colors

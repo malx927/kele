@@ -28,10 +28,6 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm
 import datetime
 
-# Create your views here.
-WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://jjf7pj.natappfree.cc/wechat'
-
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
