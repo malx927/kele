@@ -303,10 +303,7 @@ def dogLossAdd(request):
 
 def dogBreed(request):
     openid = request.session.get('openid',None)
-    print(openid)
-    # user = get_object_or_404(WxUserinfo,openid=openid,subscribe=1)
-    # return render(request,template_name='wxchat/dogloss.html',context={'nickname':user.nickname,'imgurl':user.headimgurl})
-    return render(request,template_name='wxchat/dogbreed.html',context={'nickname':'','imgurl':''})
+    return render(request,template_name='wxchat/dogbreed.html')
 
 
 def dogBreedAdd(request):
