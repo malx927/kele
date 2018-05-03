@@ -67,7 +67,7 @@ class Doginfo(models.Model):
     dog_code = models.CharField(verbose_name=u'宠物编号', max_length=20,default=defulfs)
     dog_name = models.CharField(verbose_name=u'宠物名称', max_length=50, )
     dog_birthday = models.DateField(verbose_name=u'出生日期',null=True,blank=True )
-    dog_typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    dog_typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     dog_bodytype = models.IntegerField(verbose_name=u'宠物体型',default=0,choices=bodytype_TYPE_CHOICE)
     dog_picture = models.ImageField(verbose_name=u'宠物图片', upload_to='imgs', blank=True)
     dog_color = models.CharField(verbose_name=u'宠物颜色',max_length=10,blank=True)
@@ -119,7 +119,7 @@ class Company(models.Model):
 # 寻宠登记表
 class DogLoss(models.Model):
     dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=500)
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
     picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True,null=True)
@@ -136,7 +136,7 @@ class DogLoss(models.Model):
     class Meta:
         verbose_name = u"寻宠登记"
         verbose_name_plural = u'寻宠登记表'
-        ordering = ['-create_time']
+        ordering = ['-id']
 
     def __str__(self):
         return self.dog_name
@@ -144,7 +144,7 @@ class DogLoss(models.Model):
 
 # 寻宠主
 class DogOwner(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'颜色',max_length=1)
     desc = models.CharField(verbose_name=u'特征', max_length=100, blank=True)
     picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss', blank=True)
@@ -168,9 +168,9 @@ class DogOwner(models.Model):
 
 class Dogfood(models.Model):
     productname = models.CharField(verbose_name=u'产品名称', max_length=50, )
-    dog_brandid = models.ForeignKey(Dogbrand,verbose_name=u'品牌')
+    dog_brandid = models.ForeignKey(Dogbrand,verbose_name=u'品牌',on_delete=models.CASCADE)
     prod_picture = models.ImageField(verbose_name=u'品牌图片', upload_to='imgs', blank=True)
-    dog_typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    dog_typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     dog_age = models.CharField(verbose_name=u'适用犬龄', max_length=20, blank=True)
     sale_url = models.CharField(verbose_name=u'交易网址', max_length=50, blank=True)
     food_models = models.CharField(verbose_name=u'规格', max_length=50, blank=True)
@@ -194,13 +194,13 @@ class DogBreed(models.Model):
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True)
     colors = models.CharField(verbose_name=u'颜色', max_length=10 )
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True)
     picture =models.ImageField(verbose_name=u'图片',  upload_to='breed', blank=True)
     price  = models.CharField(verbose_name=u'价格区间', max_length=100)
     ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100)
     telephone = models.CharField(verbose_name=u'电话', max_length=50 )
-    showtime = models.DateTimeField(verbose_name=u'显示时间',blank=True)
+    showtime = models.DateTimeField(verbose_name=u'显示时间',blank=True,null=True)
     create_time = models.DateTimeField(verbose_name=u'添加时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     class Meta:

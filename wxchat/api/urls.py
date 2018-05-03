@@ -8,11 +8,15 @@ from .views import (
     DoginfoCreateAPIView,
     DogLossListAPIView,
     DogLossDetailAPIView,
+    DogbreedListAPIView,
+    DogBreedDetailAPIView,
 )
 
 urlpatterns = [
     url(r'^doginfolist/$', DoginfoListAPIView.as_view(), name='doginfolist'),
     url(r'^doginfocreate/$', DoginfoCreateAPIView.as_view(), name='doginfocreate'),
     url(r'^doglosslist/$', DogLossListAPIView.as_view(), name='dog-loss-list'),
+    url(r'^dogbreedlist/$', DogbreedListAPIView.as_view(), name='dog-breed-list'),
     url(r'^doglossdetail/(?P<pk>\d+)/$', DogLossDetailAPIView.as_view(), name='api-dog-loss-detail'),
+    url(r'^dogbreeddetail/(?P<pk>\d+)/$', DogBreedDetailAPIView.as_view(), name='api-dog-breed-detail'),
 ]

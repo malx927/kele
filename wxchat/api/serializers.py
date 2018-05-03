@@ -1,16 +1,17 @@
-#-*-coding:utf-8-*-
+# -*-coding:utf-8-*-
 
 import datetime
 from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import Doginfo,DogLoss,DogOwner,DogBreed
+from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed
 from doginfo.models import (
     PAGE_TYPE_CHOICE,
     Vaccine_TYPE_CHOICE,
     Type_TYPE_CHOICE,
-    bodytype_TYPE_CHOICE
+    bodytype_TYPE_CHOICE,
+    TYPE_SEX_CHOICE,
 )
 from dogtype.models import Dogtype
 
@@ -19,12 +20,20 @@ __author__ = 'malixin'
 from rest_framework import serializers
 
 
-#宠物丢失
+# 宠物丢失
 class DogLossDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogLoss
-        fields = ['id','dog_name','typeid','colors','desc','picture','lostplace','lostdate','ownername','telephone','openid']
+        fields = ['id', 'dog_name', 'typeid', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
+                  'telephone', 'openid']
 
+
+# 宠物配种
+class DogBreedDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogBreed
+        fields = ['id', 'name', 'typeid', 'colors', 'desc', 'picture', 'price', 'showtime', 'ownername',
+                  'telephone']
 
 
 class DogLossSerializer(serializers.ModelSerializer):
@@ -33,21 +42,23 @@ class DogLossSerializer(serializers.ModelSerializer):
     #       )
     class Meta:
         model = DogLoss
-        fields = ['id','dog_name','typeid','colors','desc','picture','lostplace','lostdate','ownername','telephone','openid']
+        fields = ['id', 'dog_name', 'typeid', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
+                  'telephone', 'openid']
 
 
 class DogtypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Dogtype
-        fields = ['id','typename']
+        fields = ['id', 'typename']
 
 
-#狗信息查询
+# 狗信息查询
 class DoginfoListSerializer(serializers.ModelSerializer):
     dogtype = DogtypeSerializer(read_only=True)
     bodytype = SerializerMethodField()
     dogsex = SerializerMethodField()
     sterilization = SerializerMethodField()
+
     class Meta:
         model = Doginfo
         fields = [
@@ -65,19 +76,44 @@ class DoginfoListSerializer(serializers.ModelSerializer):
             'Insect',
         ]
 
-    def get_bodytype(self,obj):
+    def get_bodytype(self, obj):
         return bodytype_TYPE_CHOICE[obj.dog_bodytype][1]
 
-    def get_dogsex(self,obj):
+    def get_dogsex(self, obj):
         return PAGE_TYPE_CHOICE[obj.dog_sex][1]
 
-    def get_sterilization(self,obj):
+    def get_sterilization(self, obj):
         return Vaccine_TYPE_CHOICE[obj.sterilization][1]
 
 
+# 狗配种
+class DogbreedListSerializer(serializers.ModelSerializer):
+    dogsex = SerializerMethodField()
+
+    class Meta:
+        model = DogBreed
+        fields = [
+            'id',
+            'name',
+            'ages',
+            'dogsex',
+            'colors',
+            'typeid',
+            'desc',
+            'picture',
+            'price',
+            'ownername',
+            'telephone',
+            'showtime',
+            'create_time',
+            'is_show',
+        ]
+
+    def get_dogsex(self, obj):
+        return TYPE_SEX_CHOICE[1][1]
+
 
 class DoginfoCreateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Doginfo
         fields = [
@@ -98,6 +134,3 @@ class DoginfoCreateSerializer(serializers.ModelSerializer):
             'vaccine',
 
         ]
-
-
-
