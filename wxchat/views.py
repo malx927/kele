@@ -19,9 +19,6 @@ from doginfo.models import DogBreed
 from .forms import DogBreedForm
 
 
-# Create your views here.
-WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://vaesj9.natappfree.cc/wechat'
 from doginfo.models import DogLoss, DogOwner
 from dogtype.models import Dogtype
 from .models import WxUserinfo
@@ -30,12 +27,11 @@ import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://kvpwtu.natappfree.cc/wechat'
+APP_URL = 'http://yzvc7w.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
-
 
 
 @csrf_exempt
@@ -90,7 +86,7 @@ def getDogLossList(request,msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -102,7 +98,7 @@ def getDogOwnerList(request, msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -136,82 +132,87 @@ def createMenu(request):
     resp = client.menu.create({
                 "button":[
                     {
-                        "name":"特色服务",
+                        "name":"互助服务",
                         "sub_button":[
                             {
                                 "type": "view",
-                                "name": "寻宠物",
+                                "name": "寻犬",
                                 "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物配种",
+                                "name": "配种",
                                 "url": APP_URL + "/redirect/dogbreed"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物领养",
+                                "name": "领养",
                                 "url": APP_URL + "/redirect/dogadopt"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物买卖",
+                                "name": "买卖",
                                 "url": APP_URL + "/redirect/dogsale"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物寄养",
-                                "url": "http://www.qq.com"
+                                "name": "新手课堂",
+                                "url": APP_URL + "/redirect/dogloss"
                             }
                         ]
                     },
                     {
-                        "name":"产品",
+                        "name":"宠物社区",
                         "sub_button":[
                             {
                                 "type": "view",
-                                "name": "狗粮",
-                                "url": "http://www.soso.com/"
+                                "name": "寄养",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物零食",
-                                "url": "http://v.qq.com/"
+                                "name": "洗澡",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物器具",
-                                "url": "http://v.qq.com/"
+                                "name": "训犬",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "营养品",
-                                "url": "http://v.qq.com/"
+                                "name": "合作医院",
+                                "url": APP_URL + "/redirect/dogloss"
+                            },
+                            {
+                                "type": "view",
+                                "name": "宠物相关",
+                                "url": APP_URL + "/redirect/dogloss"
                             }
                         ]
                     },
                     {
-                        "name":"其他服务",
+                        "name":"我的联盟",
                         "sub_button":[
                             {
                                 "type": "view",
-                                "name": "宠物洗澡",
-                                "url": "http://www.soso.com/"
+                                "name": "每日签到",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物美容",
-                                "url": "http://v.qq.com/"
+                                "name": "联盟卡",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物保健",
-                                "url": "http://v.qq.com/"
+                                "name": "一键导航",
+                                "url": APP_URL + "/redirect/dogloss"
                             },
                             {
                                 "type": "view",
-                                "name": "宠物医疗",
-                                "url": "http://v.qq.com/"
+                                "name": "小程序",
+                                "url": APP_URL + "/redirect/dogloss"
                             }
                         ]
                     }

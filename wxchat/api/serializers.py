@@ -5,6 +5,8 @@ from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
+from easy_thumbnails.files import get_thumbnailer
+
 from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed
 from doginfo.models import (
     PAGE_TYPE_CHOICE,
@@ -13,6 +15,7 @@ from doginfo.models import (
     bodytype_TYPE_CHOICE,
     TYPE_SEX_CHOICE,
 )
+
 from dogtype.models import Dogtype
 
 __author__ = 'malixin'
@@ -42,25 +45,40 @@ class DogLossSerializer(serializers.ModelSerializer):
     #          view_name='dog-loss-detail'
     #       )
     typename = serializers.CharField(source='typeid.typename',read_only=True)
+    thumb_url = serializers.SerializerMethodField()
+
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'typename','colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid', 'typename','colors', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return None
+       #  options = {'size': (1600, 1200), 'crop': True}
+       #  thumburl = get_thumbnailer(obj.picture).get_thumbnail(options).url
+       #  return thumburl
 
 #寻找宠物主人
 class DogOwnerSerializer(serializers.ModelSerializer):
     typename = serializers.CharField(source='typeid.typename',read_only=True)
+    thumb_url = serializers.SerializerMethodField()
     class Meta:
         model = DogOwner
-        fields = ['id','typename','colors','desc','picture','findplace','finddate','findname','telephone']
+        fields = ['id','typename','colors','desc','picture','thumb_url','findplace','finddate','findname','telephone']
+
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return None
 
 class DogOwnerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogOwner
         fields = ['id','typeid','colors','desc','picture','findplace','finddate','findname','telephone']
-
-
 
 
 class DogtypeSerializer(serializers.ModelSerializer):

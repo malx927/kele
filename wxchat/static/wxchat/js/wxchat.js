@@ -69,8 +69,8 @@ $(function(){
             $('#uploaderFiles li').remove();
             for (var i = 0, len = files.length; i < len; ++i) {
                 var file = files[i];
-                if(file.size > 5 * 1024 * 1024) {
-                    weui.alert('请上传不超过5M的图片');
+                if(file.size > 2 * 1024 * 1024) {
+                    weui.alert('请上传不超过2M的图片');
                     return false;
                 }
                 if (url) {
