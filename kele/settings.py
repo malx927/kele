@@ -270,7 +270,7 @@ JWT_AUTH = {
 
 THUMBNAIL_ALIASES = {
     '': {
-        'avatar': {'size': (800, 800), 'crop':True},
+        'avatar': {'size': (720,1280), 'crop':True},
     },
 
 }
