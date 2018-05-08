@@ -4,6 +4,23 @@
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                            <div class="weui-flex__item"><span class="title">出售宠物信息</span></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r" >出售发布</a></div>
+                    </div>
+                </div>
+                <div class="weui-panel__bd" id="dogsale"></div>
+                <div class="weui-panel__ft" >
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogsalemore" style="display: none">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="weui-tab__content" id="tab2">
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
                     	<div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">求购宠物信息</span></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-buy-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r">求购发布</a></div>
@@ -20,36 +37,20 @@
                 </div>
             </div>
         </div>
-        <div class="weui-tab__content" id="tab2">
-            <div class="weui-panel weui-panel_access">
-                <div class="weui-panel__hd">
-                    <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">出售宠物信息</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r" >出售发布</a></div>
-                    </div>
-                </div>
-                <div class="weui-panel__bd" id="dogsale"></div>
-                <div class="weui-panel__ft" >
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogsalemore" style="display: none">
-                        <div class="weui-cell__bd">查看更多</div>
-                        <span class="weui-cell__ft"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
+
 {% endblock tabpanel %}
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">'
                 <img src="{% static 'wxchat/images/icon_nav_button.png' %}" alt="">
             </div>
-            <p class="weui-tabbar__label">宠物求购</p>
+            <p class="weui-tabbar__label">宠物出售</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
                 <img src="{% static 'wxchat/images/icon_nav_msg.png' %}" alt="">
             </div>
-            <p class="weui-tabbar__label">宠物出售</p>
+            <p class="weui-tabbar__label">宠物求购</p>
         </a>
 
 {% endblock tabbar %}
