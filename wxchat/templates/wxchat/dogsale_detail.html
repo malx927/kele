@@ -19,6 +19,10 @@
                    <span class="weui-form-preview__value">{{ object.colors }}</span>
                </div>
                 <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">狗龄:</label>
+                   <span class="weui-form-preview__value">{{ object.ages|default_if_none:'' }}</span>
+               </div>
+                <div class="weui-form-preview__item">
                    <label class="weui-form-preview__label">特点:</label>
                    <span class="weui-form-preview__value">{{ object.desc }}</span>
                </div>

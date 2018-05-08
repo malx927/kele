@@ -298,7 +298,7 @@ class DogBuy(models.Model):
 class DogSale(models.Model):
     typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
     colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
-    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
     picture =models.ImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
