@@ -274,3 +274,45 @@ class DogDelivery(models.Model):
         return self.name
 
 
+#宠物求购
+class DogBuy(models.Model):
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
+    price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
+    buyname = models.CharField(verbose_name=u'姓名', max_length=20)
+    telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    class Meta:
+        verbose_name = u'宠物求购'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+    def __str__(self):
+        return self.typeid.typename + "[" +self.colors + "]"
+
+#宠物出售
+class DogSale(models.Model):
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
+    desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
+    picture =models.ImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
+    price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
+    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
+    telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+    class Meta:
+        verbose_name = u'宠物出售'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+    def __str__(self):
+        return self.typeid.typename + "[" +self.colors + "]"

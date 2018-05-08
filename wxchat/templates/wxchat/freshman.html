@@ -1,0 +1,96 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'startRecord',
+            'stopRecord',
+            'onVoiceRecordEnd',
+            'playVoice',
+            'pauseVoice',
+            'stopVoice',
+            'onVoicePlayEnd',
+            'uploadVoice',
+            'downloadVoice',
+            'chooseImage',
+            'previewImage',
+            'uploadImage',
+            'downloadImage',
+            'translateVoice',
+            'getNetworkType',
+            'openLocation',
+            'getLocation',
+            'closeWindow',
+            'scanQRCode',
+            'chooseWXPay',
+            'openProductSpecificView',
+            'addCard',
+            'chooseCard',
+            'openCard',
+        ]
+    });
+    wx.ready(function () {
+        $('#checkJsApi').on('click',function(){
+            wx.checkJsApi({
+              jsApiList: [
+                'getNetworkType',
+                'previewImage'
+              ],
+              success: function (res) {
+                alert(JSON.stringify(res));
+              }
+            });
+      });
+
+    $('#getNetworkType').on('click',function(){
+        wx.getNetworkType({
+              success: function (res) {
+                alert(res.networkType);
+              },
+              fail: function (res) {
+                alert(JSON.stringify(res));
+              }
+            });
+    });
+    $("#scanQRCode0").on('click',function(){
+        wx.scanQRCode({
+            needResult: 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                //alert(result)
+            }
+        });
+    })
+
+    $("#scanQRCode1").on('click',function(){
+        wx.scanQRCode({
+            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
+            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
+            success: function (res) {
+                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
+                alert(result)
+            }
+        });
+    })
+});
+</script>
+
+
+{% endblock extra%}
+{% block container %}
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
+        <a class="weui-btn weui-btn_primary"  id="getNetworkType">网络状态</a>
+        <a class="weui-btn weui-btn_primary"  id="scanQRCode0">二维码0</a>
+        <a class="weui-btn weui-btn_primary"  id="scanQRCode1">二维码1</a>
+        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
+        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
+    </div>
+{% endblock container %}

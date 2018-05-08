@@ -7,7 +7,7 @@ from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
 from easy_thumbnails.files import get_thumbnailer
 
-from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed
+from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed,DogBuy,DogSale
 from doginfo.models import (
     PAGE_TYPE_CHOICE,
     Vaccine_TYPE_CHOICE,
@@ -169,3 +169,17 @@ class DoginfoCreateSerializer(serializers.ModelSerializer):
             'vaccine',
 
         ]
+
+
+class DogBuySerializer(serializers.ModelSerializer):
+    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    class Meta:
+        model = DogBuy
+        fields = ['id', 'typeid', 'typename','colors','ages','sex','price','buyname','telephone']
+
+
+class DogSaleSerializer(serializers.ModelSerializer):
+    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    class Meta:
+        model = DogSale
+        fields = ['id', 'typeid', 'typename','colors','ages','desc','sex','price','picture','ownername','telephone']

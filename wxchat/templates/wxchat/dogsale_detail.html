@@ -1,0 +1,46 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+<div class="weui-panel weui-panel_access">
+    <div class="weui-panel__hd">出售宠物详情</div>
+    <div class="weui-panel__bd">
+    {% if object.picture %}
+        <img src="{{ object.picture.url }}" width="100%" height="280px">
+    {% endif %}
+        <div class="weui-form-preview">
+           <div class="weui-form-preview__hd">
+               <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">品种:</label>
+                   <span class="weui-form-preview__value">{{ object.typeid.typename }}</span>
+               </div>
+           </div>
+            <div class="weui-form-preview__bd">
+               <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">颜色:</label>
+                   <span class="weui-form-preview__value">{{ object.colors }}</span>
+               </div>
+                <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">特点:</label>
+                   <span class="weui-form-preview__value">{{ object.desc }}</span>
+               </div>
+               <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">价格区间:</label>
+                   <span class="weui-form-preview__value">{{ object.price }}</span>
+               </div>
+                <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">主人姓名:</label>
+                   <span class="weui-form-preview__value">{{ object.ownername }}</span>
+               </div>
+                <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">联系方式:</label>
+                   <span class="weui-form-preview__value">{{ object.telephone }}</span>
+               </div>
+           </div>
+           <div class="weui-form-preview__ft">
+               <a class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:window.history.back(-1)">返回</a>
+           </div>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}
+

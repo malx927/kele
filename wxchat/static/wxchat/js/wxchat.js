@@ -151,3 +151,7 @@ $('#show-actions').on("click",function(){
 	 });
 });
 
+function showing(){
+    var wins = weui.loading('处理中...');
+    return true;
+}
