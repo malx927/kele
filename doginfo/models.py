@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from django.urls import reverse
+from easy_thumbnails.fields import ThumbnailerImageField
 
 __author__ = 'yy'
 
@@ -122,7 +123,8 @@ class DogLoss(models.Model):
     typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
-    picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True)
+    picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True,max_length=200)
+    # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True)
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
     lostdate = models.DateField(verbose_name=u'丢失时间')
     ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
@@ -154,7 +156,8 @@ class DogOwner(models.Model):
     typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
-    picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
+    picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
+    # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
     findplace = models.CharField(verbose_name=u'发现地点', max_length=100, )
     finddate = models.DateField(verbose_name=u'发现时间')
     findname = models.CharField(verbose_name=u'联系人姓名', max_length=20)
@@ -232,7 +235,7 @@ class DogBreed(models.Model):
 class DogAdoption(models.Model):
     name = models.CharField(verbose_name=u'领养人',max_length=50)
     telephone = models.CharField(verbose_name=u'电话',max_length=20)
-    record = models.CharField(verbose_name='饲养宠物记录',max_length=100,blank=True,null=True)
+    record = models.CharField(verbose_name='饲养记录',max_length=100,blank=True,null=True)
     requirement = models.CharField(verbose_name='对宠物要求',max_length=200)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
@@ -271,3 +274,45 @@ class DogDelivery(models.Model):
         return self.name
 
 
+#宠物求购
+class DogBuy(models.Model):
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
+    price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
+    buyname = models.CharField(verbose_name=u'姓名', max_length=20)
+    telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    class Meta:
+        verbose_name = u'宠物求购'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+    def __str__(self):
+        return self.typeid.typename + "[" +self.colors + "]"
+
+#宠物出售
+class DogSale(models.Model):
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True,default='')
+    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
+    desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
+    picture =models.ImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
+    price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
+    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
+    telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+    class Meta:
+        verbose_name = u'宠物出售'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+    def __str__(self):
+        return self.typeid.typename + "[" +self.colors + "]"

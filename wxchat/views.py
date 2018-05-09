@@ -1,4 +1,5 @@
 # coding=utf-8
+import random,string,time
 from django.conf import settings
 
 from django.http import HttpResponse, HttpResponseRedirect
@@ -13,23 +14,31 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from wechatpy import parse_message, create_reply, WeChatClient
-from wechatpy.oauth import WeChatOAuth, WeChatOAuthException
-from doginfo.models import DogBreed,DogDelivery,DogAdoption
-from .forms import DogBreedForm,DogadoptForm,DogdeliveryForm
+from doginfo.models import DogDelivery,DogAdoption
+from .forms import DogadoptForm,DogdeliveryForm
+from wechatpy import parse_message,create_reply, WeChatClient
+from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
+from wechatpy.client.api import WeChatJSAPI
+from doginfo.models import DogBreed, DogBuy, DogSale
+from .forms import DogBreedForm, DogSaleForm
 
-
-# Create your views here.
-WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://5iqhj6.natappfree.cc/wechat'
 from doginfo.models import DogLoss, DogOwner
 from dogtype.models import Dogtype
 from .models import WxUserinfo
-from .forms import DogLossForm, DogOwnerForm
+from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
+
+
+#60.23.152.71
+# Create your views here.
+WECHAT_TOKEN = 'malixin'
+APP_URL = 'http://5iqhj6.natappfree.cc/wechat'
+
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
+
+client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
 
 
 @csrf_exempt
@@ -65,6 +74,7 @@ def wechat(request):
             reply.media_id = msg.media_id
             reply.content = '语音信息'
         elif msg.type == 'event':
+            print('eventkey=',msg.event)
             if msg.event == 'subscribe':
                 saveUserinfo(msg.source)
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】\n发送【寻宠】或者【寻主】两个字可以查看到最新发布的寻找宠物和寻找主人的信息', msg)
@@ -85,7 +95,7 @@ def getDogLossList(request, msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -98,7 +108,7 @@ def getDogOwnerList(request, msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture.url
+        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -107,7 +117,6 @@ def getDogOwnerList(request, msg):
 def saveUserinfo(openid):
     counts = WxUserinfo.objects.filter(openid=openid, subscribe=1).count()
     if counts == 0:
-        client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
         user = client.user.get(openid)
         if 'errcode' not in user:
             sub_time = user.pop('subscribe_time')
@@ -129,104 +138,113 @@ def unSubUserinfo(openid):
 
 @csrf_exempt
 def createMenu(request):
-    client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+    print('createMenu',client.access_token)
     resp = client.menu.create({
         "button": [
             {
-                "name": "特色服务",
-                "sub_button": [
+                "name":"互助服务",
+                "sub_button":[
                     {
                         "type": "view",
-                        "name": "寻宠物",
+                        "name": "寻犬",
                         "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物配种",
+                        "name": "配种",
                         "url": APP_URL + "/redirect/dogbreed"
                     },
                     {
                         "type": "view",
-                        "name": "宠物领养",
+                        "name": "领养",
                         "url": APP_URL + "/redirect/dogadopt"
                     },
                     {
                         "type": "view",
-                        "name": "宠物买卖",
-                        "url": APP_URL + "/redirect/dogsale"
+                        "name": "买卖",
+                        "url": APP_URL + "/redirect/dogtrade"
                     },
                     {
                         "type": "view",
-                        "name": "宠物寄养",
-                        "url": "http://www.qq.com"
+                        "name": "新手课堂",
+                        "url": APP_URL + "/redirect/freshman"
                     }
                 ]
             },
             {
-                "name": "产品",
-                "sub_button": [
+                "name":"宠物社区",
+                "sub_button":[
                     {
                         "type": "view",
-                        "name": "狗粮",
-                        "url": "http://www.soso.com/"
+                        "name": "寄养",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物零食",
-                        "url": "http://v.qq.com/"
+                        "name": "洗澡",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物器具",
-                        "url": "http://v.qq.com/"
+                        "name": "训犬",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "营养品",
-                        "url": "http://v.qq.com/"
+                        "name": "合作医院",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "宠物相关",
+                        "url": APP_URL + "/redirect/dogloss"
                     }
                 ]
             },
             {
-                "name": "其他服务",
-                "sub_button": [
+                "name":"我的联盟",
+                "sub_button":[
                     {
                         "type": "view",
-                        "name": "宠物洗澡",
-                        "url": "http://www.soso.com/"
+                        "name": "每日签到",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物美容",
-                        "url": "http://v.qq.com/"
+                        "name": "联盟卡",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物保健",
-                        "url": "http://v.qq.com/"
+                        "name": "一键导航",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
                         "type": "view",
-                        "name": "宠物医疗",
-                        "url": "http://v.qq.com/"
+                        "name": "小程序",
+                        "url": APP_URL + "/redirect/dogloss"
                     }
                 ]
+
             }
         ]
     })
     return HttpResponse(json.dumps(resp))
 
 
+
 @csrf_exempt
 def deleteMenu(request):
-    client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+    print('deleteMenu',client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
 
 
+
 @csrf_exempt
 def getMenu(request):
-    client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+    #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+    print('getMenu',client.access_token)
     resp = client.menu.get()
     # print(resp)
     return HttpResponse(json.dumps(resp, ensure_ascii=False))
@@ -423,6 +441,80 @@ def DogdeliveryAdd(request):
         next = request.GET.get('next', '')
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
+#宠物交易
+def dogTrade(request):
+    openid = request.session.get('openid',None)
+    return render(request,template_name='wxchat/dogtrade.html')
+
+#宠物求购
+def dogBuyAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        next = request.GET.get('next',None)
+        form = DogBuyForm(request.POST)
+        if form.is_valid():
+            dogbuy = form.save(commit=False)
+            dogbuy.openid = openid
+            dogbuy.save()
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+        else:
+            return render(request,'wxchat/message.html', {"success":"false",'next':next})
+    else:
+        form = DogBuyForm()
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogbuy_add.html', {'form': form, 'next': next})
+
+#宠物求购
+def dogSaleAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=',openid)
+        next = request.GET.get('next',None)
+        form = DogSaleForm(request.POST,request.FILES)
+        if form.is_valid():
+            dogsale = form.save(commit=False)
+            dogsale.openid = openid
+            dogsale.save()
+            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+        else:
+            return render(request,'wxchat/message.html', {"success":"false",'next':next})
+    else:
+        form = DogSaleForm()
+        next = request.GET.get('next', '')
+        return  render(request,'wxchat/dogsale_add.html', {'form': form, 'next': next})
+
+#求购详情
+class DogBuyDetailView(DetailView):
+    model = DogBuy
+    template_name = 'wxchat/dogbuy_detail.html'
+
+
+#出售详情
+class DogSaleDetailView(DetailView):
+    model = DogSale
+    template_name = 'wxchat/dogsale_detail.html'
+
+
+
+#新手学堂
+def freshMan(request):
+    jsApi = WeChatJSAPI(client)
+    ticket = jsApi.get_jsapi_ticket()
+    noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+    timestamp = int(time.time())
+    url = request.build_absolute_uri()
+    print(url)
+    signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+
+    signPackage = {
+        "appId":settings.WECHAT_APPID,
+        "nonceStr":noncestr,
+        "timestamp":timestamp,
+        "url":url,
+        "signature":signature
+    }
+    return render(request,template_name='wxchat/freshman.html',context={'sign':signPackage})
 
 @csrf_exempt
 def getUserinfo(request):
@@ -531,30 +623,54 @@ def createTestData(request):
     strDate = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    for i in range(1, 50):
+    # for i in range(1,50):
+    #     data = {
+    #         'dog_name':u'大眼可乐--%d'%(i,),
+    #         'typeid':type,
+    #         'colors':u'金毛--%d'%(i,),
+    #         'desc':u'大眼可乐描述--%d'%(i,),
+    #         'picture':'wxchat/images/dog.jpg',
+    #         'lostplace':'龙前街19-2号楼--%d'%(i,),
+    #         'lostdate':strDate,
+    #         'ownername':'张三--%d' %(i,),
+    #         'telephone':'123456789',
+    #     }
+    #     DogLoss.objects.create(**data)
+    #     #print(data)
+    # for i in range(1,50):
+    #     data = {
+    #         'typeid':type,
+    #         'colors':u'金毛--%d'%(i,),
+    #         'desc':u'大眼可乐描述--%d'%(i,),
+    #         'picture':'wxchat/images/dog.jpg',
+    #         'findplace':'龙前街19-2号楼--%d'%(i,),
+    #         'finddate':strDate,
+    #         'findname':'张三--%d' %(i,),
+    #         'telephone':'123456789',
+    #     }
+    #     DogOwner.objects.create(**data)
+
+    #
+    # for i in range(1,50):
+    #     data = {
+    #         'typeid':type,
+    #         'colors':u'金毛--%d'%(i,),
+    #         'price':u'1000-5000元--%d'%(i,),
+    #         'buyname':'张三--%d'%(i,),
+    #         'telephone':'123456789',
+    #     }
+    #     DogBuy.objects.create(**data)
+
+    for i in range(1,50):
         data = {
-            'dog_name': u'大眼可乐--%d' % (i,),
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/dog.jpg',
-            'lostplace': '龙前街19-2号楼--%d' % (i,),
-            'lostdate': strDate,
-            'ownername': '张三--%d' % (i,),
-            'telephone': '123456789',
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'price':u'1000-5000元--%d'%(i,),
+            'desc':u'能歌善舞--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'ownername':'张三--%d'%(i,),
+            'telephone':'123456789',
         }
-        DogLoss.objects.create(**data)
-        # print(data)
-    for i in range(1, 50):
-        data = {
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/dog.jpg',
-            'findplace': '龙前街19-2号楼--%d' % (i,),
-            'finddate': strDate,
-            'findname': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogOwner.objects.create(**data)
+        DogSale.objects.create(**data)
+
     return HttpResponse('success')

@@ -2,6 +2,15 @@ html,body{
 	height:100%;
 }
 
+a:active {
+    background-color: #ececec;
+}
+
+a{
+    color: #000;
+    webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
 .placeholder {
     margin: 5px;
     padding: 0 10px;

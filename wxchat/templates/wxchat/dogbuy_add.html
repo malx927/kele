@@ -1,14 +1,13 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+{% endblock extra%}
 {% block container %}
-<div class="weui-cells__title">配种登记表</div>
-<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="weui-cells__title">求购登记表</div>
+<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.name }}
-        </div>
-    </div>
     <div class="weui-cell weui-cell_select weui-cell_select-after">
         <div class="weui-cell__hd">
             <label for="" class="weui-label">{{ form.typeid.label }}:</label>
@@ -24,25 +23,9 @@
         </div>
     </div>
     <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ages.label }}:</label></div>
         <div class="weui-cell__bd">
-            {{ form.desc }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">{{ form.picture.label }}:</label></div>
-        <div class="weui-cell__bd">
-            <div class="weui-uploader">
-                 <div class="weui-uploader__bd">
-                     <ul class="weui-uploader__files" id="uploaderFiles"></ul>
-                     <div class="weui-uploader__input-box">
-                         {{ form.picture }}
-                     </div>
-                 </div>
-            </div>
-        </div>
-        <div class="weui-cell__ft">
-            <div class="weui-cells__tips"></div>
+            {{ form.ages }}
         </div>
     </div>
     <div class="weui-cell">
@@ -52,9 +35,9 @@
         </div>
     </div>
     <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ownername.label }}:</label></div>
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.buyname.label }}:</label></div>
         <div class="weui-cell__bd">
-            {{ form.ownername }}
+            {{ form.buyname }}
         </div>
     </div>
     <div class="weui-cell">

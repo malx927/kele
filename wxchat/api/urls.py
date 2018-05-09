@@ -14,6 +14,9 @@ from .views import (
     DogadoptListAPIView,
     DogdeliveryListAPIView,
     DogdeliveryDeliveryAPIView,
+    DogBuyListAPIView,
+    DogSaleListAPIView,
+
 )
 
 urlpatterns = [
@@ -27,5 +30,8 @@ urlpatterns = [
     url(r'^dogadoptlist/$', DogadoptListAPIView.as_view(), name='dog-adopt-list'),
     url(r'^dogdeliverylist/$', DogdeliveryListAPIView.as_view(), name='dog-delivery-list'),
     url(r'^dogdeliverydetail/(?P<pk>\d+)/$', DogdeliveryDeliveryAPIView.as_view(), name='api-dog-delivery-detail'),
+    url(r'^dogbuylist/$', DogBuyListAPIView.as_view(), name='dog-buy-list'),
+    url(r'^dogsalelist/$', DogSaleListAPIView.as_view(), name='dog-sale-list'),
+
 ]
 

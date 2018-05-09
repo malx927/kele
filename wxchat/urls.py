@@ -3,10 +3,15 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
-    authlist, dogLoss, dogLossAdd, createTestData, DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
-    DogOwnerDetailView, dogOwnerAdd, dogAdopt
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView
+from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
+    authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
+    DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
+from wxchat.views import freshMan,dogTrade
+
+
+
+
 
 urlpatterns = [
 
@@ -38,11 +43,24 @@ urlpatterns = [
     url(r'^dogdeliveryadd/$', DogdeliveryAdd, name='dog-delivery-add'),
     url(r'^dogdeliverydetail/(?P<pk>\d+)$', DogdeliveryDetailView.as_view(), name='dog-delivery-detail'),
 
-    # 配种
-    url(r'^dogbreed/$', dogBreed, name='dog-breed'),
-    url(r'^dogbreedadd/$', dogBreedAdd, name='dog-breed-add'),
-    url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(), name='dog-breed-detail'),
-    url(r'^dogsale/$', TemplateView.as_view(template_name='wxchat/dogsale.html')),
+
+    #配种
+    url(r'^dogbreed/$', dogBreed,name='dog-breed'),
+    url(r'^dogbreedadd/$', dogBreedAdd,name='dog-breed-add'),
+    url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(),name='dog-breed-detail'),
+
+    #新手学堂
+    url(r'^freshman/$', freshMan,name='fresh-man'),
+
+    #宠物求购
+    url(r'^dogtrade/$', dogTrade,name='dog-trade'),
+    url(r'^dogbuyadd/$', dogBuyAdd,name='dog-buy-add'),
+    url(r'^dogbuydetail/(?P<pk>\d+)$', DogBuyDetailView.as_view(),name='dog-buy-detail'),
+    #宠物销售
+    url(r'^dogsaleadd/$', dogSaleAdd,name='dog-sale-add'),
+    url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(),name='dog-sale-detail'),
+    #宠物出售
+
 
     # 网页授权测试
     url(r'^auth2/$', auth2),

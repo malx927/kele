@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'easy_thumbnails',
     'ckeditor',
     'ckeditor_uploader',
     'wechatpy',
@@ -266,6 +267,14 @@ JWT_AUTH = {
     'JWT_AUTH_COOKIE': None,
 
 }
+
+THUMBNAIL_ALIASES = {
+    '': {
+        'avatar': {'size': (720,1280), 'crop':True},
+    },
+
+}
+THUMBNAIL_SUBDIR = 'thumbs'
 
 # 测试号WeChat
 WECHAT_APPID = 'wxbc591183cb175d16'
