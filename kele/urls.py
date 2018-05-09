@@ -30,6 +30,7 @@ admin.site.site_title = u'大眼可乐后台'
 urlpatterns = [
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLSc
+    url(r'^admin/menu/', TemplateView.as_view(template_name='admin/wxchat/menu/change_list.html')),
     url(r'^admin/', admin.site.urls),
     url(r'^register/', register),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),

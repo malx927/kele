@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed
+from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed, DogAdoption, DogDelivery
 from doginfo.models import (
     PAGE_TYPE_CHOICE,
     Vaccine_TYPE_CHOICE,
@@ -28,7 +28,6 @@ class DogLossDetailSerializer(serializers.ModelSerializer):
                   'telephone', 'openid']
 
 
-
 # 宠物配种
 class DogBreedDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,30 +36,54 @@ class DogBreedDetailSerializer(serializers.ModelSerializer):
                   'telephone']
 
 
+# 宠物领养
+class DogadoptDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogAdoption
+        fields = ['id', 'name', 'record', 'requirement', 'telephone']
+
+
+# 宠物送养
+class DogdeliverySerializer(serializers.ModelSerializer):
+    typename = serializers.CharField(source='typeid.typename', read_only=True)
+    class Meta:
+        model = DogDelivery
+        fields = ['id', 'name', 'typeid', 'typename', 'colors', 'ages', 'sex', 'desc', 'picture', 'ownername',
+                  'telephone']
+
+
+class DogdeliveryDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogDelivery
+        fields = ['id', 'name', 'typeid', 'colors', 'ages', 'sex', 'desc', 'picture', 'ownername', 'telephone']
+
+
 class DogLossSerializer(serializers.ModelSerializer):
     # url = HyperlinkedIdentityField(
     #          view_name='dog-loss-detail'
     #       )
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    typename = serializers.CharField(source='typeid.typename', read_only=True)
+
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid','typename', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
-                  'telephone', 'openid']
+
+        fields = ['id', 'dog_name', 'typeid', 'typename', 'colors', 'desc', 'picture', 'lostplace', 'lostdate',
+                  'ownername', ]
 
 
-#寻找宠物主人
+# 寻找宠物主人
 class DogOwnerSerializer(serializers.ModelSerializer):
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    typename = serializers.CharField(source='typeid.typename', read_only=True)
+
     class Meta:
         model = DogOwner
-        fields = ['id','typename','colors','desc','picture','findplace','finddate','findname','telephone']
+        fields = ['id', 'typename', 'colors', 'desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
+
 
 class DogOwnerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogOwner
-        fields = ['id','typeid','colors','desc','picture','findplace','finddate','findname','telephone']
-
-
+        fields = ['id', 'typeid', 'colors', 'desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
 
 
 class DogtypeSerializer(serializers.ModelSerializer):
@@ -128,6 +151,21 @@ class DogbreedListSerializer(serializers.ModelSerializer):
 
     def get_dogsex(self, obj):
         return TYPE_SEX_CHOICE[1][1]
+
+
+# 宠物领养
+class DogadoptListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DogAdoption
+        fields = [
+            'id',
+            'name',
+            'record',
+            'requirement',
+            'telephone',
+            'create_time',
+            'is_show',
+        ]
 
 
 class DoginfoCreateSerializer(serializers.ModelSerializer):

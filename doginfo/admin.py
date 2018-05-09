@@ -3,7 +3,7 @@ __author__ = 'yy'
 
 from django.contrib import admin
 
-from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss
+from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss,DogAdoption,DogDelivery
 
 
 # Register your models here.
@@ -11,7 +11,7 @@ from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss
 
 # 宠物简介
 class DoginfoAdmin(admin.ModelAdmin):
-    list_display = ('dog_code','dog_name', 'dog_color', 'owner_address', 'owner_telephone', 'remarks',
+    list_display = ('dog_code','dog_name', 'dog_color', 'owner_address', 'owner_telephone', 'remarks','dog_picture',
     'create_time')
     list_display_links = ('dog_code',)
     search_fields = ('dog_name', 'owner_telephone','dog_code')
@@ -55,6 +55,24 @@ class DogOwnerAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 admin.site.register(DogOwner, DogOwnerAdmin)
+
+
+#宠物领养
+class DogAdoptionAdmin(admin.ModelAdmin):
+    list_display = ('name','telephone','record','requirement','create_time','is_show')
+    list_per_page = 50
+
+admin.site.register(DogAdoption, DogAdoptionAdmin)
+
+#宠物送养
+class DogDeliveryAdmin(admin.ModelAdmin):
+    list_display = ('name','typeid','colors','ages','sex','ownername','telephone','create_time','is_show')
+    list_per_page = 50
+
+admin.site.register(DogDelivery, DogDeliveryAdmin)
+
+
+
 
 # 宠物训练
 # class TrainAdmin(admin.ModelAdmin):
