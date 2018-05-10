@@ -11,8 +11,12 @@ from .views import (
     DogbreedListAPIView,
     DogBreedDetailAPIView,
     DogOwnerListAPIView,
+    DogadoptListAPIView,
+    DogdeliveryListAPIView,
+    DogdeliveryDeliveryAPIView,
     DogBuyListAPIView,
     DogSaleListAPIView,
+
 )
 
 urlpatterns = [
@@ -23,7 +27,11 @@ urlpatterns = [
     url(r'^doglossdetail/(?P<pk>\d+)/$', DogLossDetailAPIView.as_view(), name='api-dog-loss-detail'),
     url(r'^dogbreeddetail/(?P<pk>\d+)/$', DogBreedDetailAPIView.as_view(), name='api-dog-breed-detail'),
     url(r'^dogownerlist/$', DogOwnerListAPIView.as_view(), name='dog-owner-list'),
+    url(r'^dogadoptlist/$', DogadoptListAPIView.as_view(), name='dog-adopt-list'),
+    url(r'^dogdeliverylist/$', DogdeliveryListAPIView.as_view(), name='dog-delivery-list'),
+    url(r'^dogdeliverydetail/(?P<pk>\d+)/$', DogdeliveryDeliveryAPIView.as_view(), name='api-dog-delivery-detail'),
     url(r'^dogbuylist/$', DogBuyListAPIView.as_view(), name='dog-buy-list'),
     url(r'^dogsalelist/$', DogSaleListAPIView.as_view(), name='dog-sale-list'),
+
 ]
 

@@ -12,8 +12,10 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply
-from wechatpy.utils import check_signature,ObjectDict
+from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
+from doginfo.models import DogDelivery,DogAdoption
+from .forms import DogadoptForm,DogdeliveryForm
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
 from wechatpy.client.api import WeChatJSAPI
@@ -37,13 +39,14 @@ APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
 
+
 @csrf_exempt
 def wechat(request):
-    if request.method =='GET':
-        signature = request.GET.get('signature',None)
-        timestamp = request.GET.get('timestamp',None)
-        nonce = request.GET.get('nonce',None)
-        echostr = request.GET.get('echostr',None)
+    if request.method == 'GET':
+        signature = request.GET.get('signature', None)
+        timestamp = request.GET.get('timestamp', None)
+        nonce = request.GET.get('nonce', None)
+        echostr = request.GET.get('echostr', None)
 
         try:
             check_signature(WECHAT_TOKEN, signature, timestamp, nonce)
@@ -51,18 +54,18 @@ def wechat(request):
             echostr = 'error'
 
         return HttpResponse(echostr)
-    elif request.method =='POST':
+    elif request.method == 'POST':
         msg = parse_message(request.body)
         print(msg.type)
-        if msg.type=='text':
+        if msg.type == 'text':
             if msg.content == '寻宠':
-                reply = getDogLossList(request,msg)
+                reply = getDogLossList(request, msg)
             elif msg.content == '寻主':
-                reply = getDogOwnerList(request,msg)
+                reply = getDogOwnerList(request, msg)
             else:
                 reply = create_reply('感谢您关注,暂时没有提供此服务', msg)
 
-        elif msg.type =='image':
+        elif msg.type == 'image':
             reply = ImageReply(message=msg)
             reply.media_id = msg.media_id
         elif msg.type == 'voice':
@@ -83,7 +86,8 @@ def wechat(request):
         response = HttpResponse(reply.render(), content_type="application/xml")
         return response
 
-def getDogLossList(request,msg):
+
+def getDogLossList(request, msg):
     articles = ArticlesReply(message=msg)
     dogloss = DogLoss.objects.all()[:8]
     for dog in dogloss:
@@ -94,6 +98,7 @@ def getDogLossList(request,msg):
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
+
 
 def getDogOwnerList(request, msg):
     articles = ArticlesReply(message=msg)
@@ -106,6 +111,7 @@ def getDogOwnerList(request, msg):
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
+
 
 def saveUserinfo(openid):
     counts = WxUserinfo.objects.filter(openid=openid, subscribe=1).count()
@@ -121,7 +127,7 @@ def saveUserinfo(openid):
 
 def unSubUserinfo(openid):
     try:
-        user = WxUserinfo.objects.get(openid=openid,subscribe=1)
+        user = WxUserinfo.objects.get(openid=openid, subscribe=1)
         if user:
             user.subscribe = 0
             user.save()
@@ -133,106 +139,113 @@ def unSubUserinfo(openid):
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
-                "button":[
+        "button": [
+            {
+                "name":"互助服务",
+                "sub_button":[
                     {
-                        "name":"互助服务",
-                        "sub_button":[
-                            {
-                                "type": "view",
-                                "name": "寻犬",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "配种",
-                                "url": APP_URL + "/redirect/dogbreed"
-                            },
-                            {
-                                "type": "view",
-                                "name": "领养",
-                                "url": APP_URL + "/redirect/dogadopt"
-                            },
-                            {
-                                "type": "view",
-                                "name": "买卖",
-                                "url": APP_URL + "/redirect/dogtrade"
-                            },
-                            {
-                                "type": "view",
-                                "name": "新手课堂",
-                                "url": APP_URL + "/redirect/freshman"
-                            }
-                        ]
+                        "type": "view",
+                        "name": "寻犬",
+                        "url": APP_URL + "/redirect/dogloss"
                     },
                     {
-                        "name":"宠物社区",
-                        "sub_button":[
-                            {
-                                "type": "view",
-                                "name": "寄养",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "洗澡",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "训犬",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "合作医院",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "宠物相关",
-                                "url": APP_URL + "/redirect/dogloss"
-                            }
-                        ]
+                        "type": "view",
+                        "name": "配种",
+                        "url": APP_URL + "/redirect/dogbreed"
                     },
                     {
-                        "name":"我的联盟",
-                        "sub_button":[
-                            {
-                                "type": "view",
-                                "name": "每日签到",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "联盟卡",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "一键导航",
-                                "url": APP_URL + "/redirect/dogloss"
-                            },
-                            {
-                                "type": "view",
-                                "name": "小程序",
-                                "url": APP_URL + "/redirect/dogloss"
-                            }
-                        ]
+                        "type": "view",
+                        "name": "领养",
+                        "url": APP_URL + "/redirect/dogadopt"
+                    },
+                    {
+                        "type": "view",
+                        "name": "买卖",
+                        "url": APP_URL + "/redirect/dogtrade"
+                    },
+                    {
+                        "type": "view",
+                        "name": "新手课堂",
+                        "url": APP_URL + "/redirect/freshman"
                     }
                 ]
-            })
+            },
+            {
+                "name":"宠物社区",
+                "sub_button":[
+                    {
+                        "type": "view",
+                        "name": "寄养",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "洗澡",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "训犬",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "合作医院",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "宠物相关",
+                        "url": APP_URL + "/redirect/dogloss"
+                    }
+                ]
+            },
+            {
+                "name":"我的联盟",
+                "sub_button":[
+                    {
+                        "type": "view",
+                        "name": "每日签到",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "联盟卡",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "一键导航",
+                        "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "小程序",
+                        "url": APP_URL + "/redirect/dogloss"
+                    }
+                ]
+
+            }
+        ]
+    })
     return HttpResponse(json.dumps(resp))
 
+
+
+@csrf_exempt
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
 
+
+
+@csrf_exempt
 def getMenu(request):
     #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
     print('getMenu',client.access_token)
     resp = client.menu.get()
-    #print(resp)
+    # print(resp)
     return HttpResponse(json.dumps(resp, ensure_ascii=False))
 
 
@@ -242,28 +255,29 @@ def getUrl(item):
     else:
         return APP_URL + '/' + item
 
+
 @csrf_exempt
-def redirectUrl(request,item):
+def redirectUrl(request, item):
     code = request.GET.get('code', None)
-    openid  = request.session.get('openid',None)
-    print('code=',code)
-    print('openid=',openid)
+    openid = request.session.get('openid', None)
+    print('code=', code)
+    print('openid=', openid)
     if openid is None:
         if code is None:
-            redirect_url = '%s/redirect/%s' % (APP_URL,item)
-            webchatOAuth = WeChatOAuth(APPID,APPSECRET,redirect_url,'snsapi_userinfo')
+            redirect_url = '%s/redirect/%s' % (APP_URL, item)
+            webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
             authorize_url = webchatOAuth.authorize_url
             print(authorize_url)
             return HttpResponseRedirect(authorize_url)
         else:
-            webchatOAuth = WeChatOAuth(APPID,APPSECRET,'','snsapi_userinfo')
+            webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
             res = webchatOAuth.fetch_access_token(code)
             print(res)
             if 'errcode' in res:
                 return HttpResponse(json.dumps(res))
             else:
                 open_id = webchatOAuth.open_id
-                count = WxUserinfo.objects.filter(openid=open_id,subscribe=1).count()
+                count = WxUserinfo.objects.filter(openid=open_id, subscribe=1).count()
                 if count == 0:
                     userinfo = webchatOAuth.get_user_info()
                     print(userinfo)
@@ -272,98 +286,159 @@ def redirectUrl(request,item):
 
                 request.session['openid'] = open_id
                 redirect_url = getUrl(item)
-                return  HttpResponseRedirect( redirect_url )
+                return HttpResponseRedirect(redirect_url)
     else:
         print('---------direct access')
         redirect_url = getUrl(item)
-        return  HttpResponseRedirect(redirect_url)
+        return HttpResponseRedirect(redirect_url)
+
 
 def dogLoss(request):
-    openid = request.session.get('openid',None)
-    return render(request,template_name='wxchat/dogloss.html',context={'nickname':'','imgurl':''})
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
 
 
-#寻宠物发布
+# 寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
-        print('openid=',openid)
-        next = request.GET.get('next',None)
+        print('openid=', openid)
+        next = request.GET.get('next', None)
         print(next)
-        form = DogLossForm(request.POST,request.FILES)
+        form = DogLossForm(request.POST, request.FILES)
         if form.is_valid():
             dogloss = form.save(commit=False)
             dogloss.openid = openid
             dogloss.save()
-            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            return render(request,'wxchat/message.html', {"success":"false",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogLossForm()
         next = request.GET.get('next', '')
-        return  render(request,'wxchat/dogloss_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next})
 
 
 def dogBreed(request):
-    openid = request.session.get('openid',None)
-    return render(request,template_name='wxchat/dogbreed.html')
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/dogbreed.html')
 
 
 def dogBreedAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
-        print('openid=',openid)
+        print('openid=', openid)
         print(request.FILES.get('picture'))
-        form = DogBreedForm(request.POST,request.FILES)
+        form = DogBreedForm(request.POST, request.FILES)
         if form.is_valid():
             dogbreed = form.save(commit=False)
             dogbreed.openid = openid
-            dogbreed.showtime =datetime.datetime.now()
+            dogbreed.showtime = datetime.datetime.now()
             dogbreed.save()
         return HttpResponseRedirect(reverse('dog-breed'))
     else:
         form = DogBreedForm()
-        return  render(request,'wxchat/dogbreed_add.html',{'form':form})
+        return render(request, 'wxchat/dogbreed_add.html', {'form': form})
 
-#配种详细视图
+
+# 配种详细视图
 class DogBreedDetailView(DetailView):
     model = DogBreed
     template_name = 'wxchat/dogbreed_detail.html'
 
-#寻宠物详细视图
+
+# 寻宠物详细视图
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
 
-#寻宠物主人发布
+
+# 寻宠物主人发布
 def dogOwnerAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
-        print('openid=',openid)
-        next = request.GET.get('next',None)
+        print('openid=', openid)
+        next = request.GET.get('next', None)
         print(next)
-        form = DogOwnerForm(request.POST,request.FILES)
+        form = DogOwnerForm(request.POST, request.FILES)
         if form.is_valid():
             dogowner = form.save(commit=False)
             dogowner.openid = openid
             dogowner.save()
-            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            render(request,'wxchat/message.html', {"success":"false",'next':next})
+            render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogOwnerForm()
         next = request.GET.get('next', '')
-        return  render(request,'wxchat/dogowner_add.html',{'form':form,'next': next})
+        return render(request, 'wxchat/dogowner_add.html', {'form': form, 'next': next})
 
-#寻宠物详细视图
+
+# 寻宠物详细视图
 class DogOwnerDetailView(DetailView):
     model = DogOwner
     template_name = 'wxchat/dogowner_detail.html'
 
-
+#宠物领养
 def dogAdopt(request):
-    openid = request.session.get('openid',None)
-    return render(request,template_name='wxchat/dogadoption.html')
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/dogadoption.html')
+
+
+#领养宠物详细视图
+class DogAdoptDetailView(DetailView):
+    model = DogAdoption
+    template_name = 'wxchat/dogadoption_detail.html'
+
+
+#领养宠物发布
+def dogadoptAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=', openid)
+        next = request.GET.get('next', None)
+        print(next)
+        form = DogadoptForm(request.POST, request.FILES)
+        if form.is_valid():
+            dogowner = form.save(commit=False)
+            dogowner.openid = openid
+            dogowner.save()
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
+        else:
+            render(request, 'wxchat/message.html', {"success": "false", 'next': next})
+    else:
+        form = DogadoptForm()
+        next = request.GET.get('next', '')
+        return render(request, 'wxchat/dogadopt_add.html', {'form': form, 'next': next})
+
+
+
+
+#送养宠物详细视图
+class DogdeliveryDetailView(DetailView):
+    model = DogDelivery
+    template_name = 'wxchat/dogdelivery_detail.html'
+
+
+#送养宠物发布
+def DogdeliveryAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        print('openid=', openid)
+        next = request.GET.get('next', None)
+        print(next)
+        form = DogdeliveryForm(request.POST, request.FILES)
+        if form.is_valid():
+            dogowner = form.save(commit=False)
+            dogowner.openid = openid
+            dogowner.save()
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
+        else:
+            render(request, 'wxchat/message.html', {"success": "false", 'next': next})
+    else:
+        form = DogdeliveryForm()
+        next = request.GET.get('next', '')
+        return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
 #宠物交易
 def dogTrade(request):
@@ -455,14 +530,15 @@ def getUserinfo(request):
     access_token = json_data['access_token']
     open_id = json_data['openid']
 
-    userinfo_url='https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang=zh_CN'
-    userinfo_url = userinfo_url.format(access_token,open_id)
+    userinfo_url = 'https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang=zh_CN'
+    userinfo_url = userinfo_url.format(access_token, open_id)
     resp = requests.get(userinfo_url)
     result = json.loads(resp.content.decode('utf-8', 'ignore'), strict=False)
     print(type(result))
     return HttpResponse("sucess")
 
-#网页授权
+
+# 网页授权
 def authlist(request):
     appid = settings.WECHAT_APPID
     appsecret = settings.WECHAT_SECRET
@@ -476,24 +552,25 @@ def authlist(request):
     access_token = json_data['access_token']
     open_id = json_data['openid']
 
-    count = WxUserinfo.objects.filter(openid=open_id,subscribe=1).count()
+    count = WxUserinfo.objects.filter(openid=open_id, subscribe=1).count()
     if count == 0:
-        userinfo_url='https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang=zh_CN'
-        userinfo_url = userinfo_url.format(access_token,open_id)
+        userinfo_url = 'https://api.weixin.qq.com/sns/userinfo?access_token={0}&openid={1}&lang=zh_CN'
+        userinfo_url = userinfo_url.format(access_token, open_id)
         resp_user = requests.get(userinfo_url)
         resp_userinfo = json.loads(resp_user.content.decode('utf-8', 'ignore'), strict=False)
         print(resp_userinfo)
         resp_userinfo.pop('privilege')
         WxUserinfo.objects.create(**resp_userinfo)
 
-    return  HttpResponse("success.....")
+    return HttpResponse("success.....")
+
 
 @csrf_exempt
 def auth2(request):
     appid = settings.WECHAT_APPID
     redirect_url = getUrl('authlist')
-    weburl ='https://open.weixin.qq.com/connect/oauth2/authorize?appid={0}&redirect_uri={1}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'
-    weburl = weburl.format(appid,redirect_url)
+    weburl = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid={0}&redirect_uri={1}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect'
+    weburl = weburl.format(appid, redirect_url)
     return HttpResponseRedirect(weburl)
 
 
@@ -542,7 +619,7 @@ def auth2(request):
 
 def createTestData(request):
     curDate = datetime.datetime.now()
-    strDate  = curDate.strftime('%Y-%m-%d')
+    strDate = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
     # for i in range(1,50):

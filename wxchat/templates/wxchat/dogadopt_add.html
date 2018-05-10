@@ -1,0 +1,51 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block container %}
+<div class="weui-cells__title">领养宠物登记表</div>
+<form action="" method="post" enctype="multipart/form-data">{% csrf_token %}
+<div class="weui-cells weui-cells_form" id="uploader">
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.name }}
+        </div>
+    </div>
+    <div class="weui-cell weui-cell_select weui-cell_select-after">
+        <div class="weui-cell__hd">
+            <label for="" class="weui-label">{{ form.record.label }}:</label>
+        </div>
+        <div class="weui-cell__bd">
+              {{ form.record }}
+        </div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.requirement.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.requirement }}
+        </div>
+    </div>
+        <div class="weui-cell__ft">
+            <div class="weui-cells__tips"></div>
+        </div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.telephone }}
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+    </div>
+</div>
+</form>
+
+{% endblock container %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+        function showing(){
+            var wins = weui.loading('处理中...');
+            return true;
+        }
+    </script>
+{% endblock bottomjs %}

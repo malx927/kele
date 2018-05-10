@@ -138,7 +138,7 @@ class DogLoss(models.Model):
     class Meta:
         verbose_name = u"寻宠登记"
         verbose_name_plural = u'寻宠登记表'
-        ordering = ['-id']
+        ordering = ['-create_time']
 
 
     def __str__(self):
@@ -206,7 +206,7 @@ class Dogfood(models.Model):
     def __str__(self):
         return self.productname
 
-
+#宠物配种
 class DogBreed(models.Model):
     name = models.CharField(verbose_name=u'名称', max_length=50)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE)
@@ -235,7 +235,7 @@ class DogBreed(models.Model):
 class DogAdoption(models.Model):
     name = models.CharField(verbose_name=u'领养人',max_length=50)
     telephone = models.CharField(verbose_name=u'电话',max_length=20)
-    record = models.CharField(verbose_name='饲养宠物记录',max_length=100,blank=True,null=True)
+    record = models.CharField(verbose_name='饲养记录',max_length=100,blank=True,null=True)
     requirement = models.CharField(verbose_name='对宠物要求',max_length=200)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
@@ -253,7 +253,7 @@ class DogAdoption(models.Model):
 
 class DogDelivery(models.Model):
     name = models.CharField(verbose_name='昵称',max_length=50)
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
