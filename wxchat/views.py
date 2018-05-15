@@ -31,8 +31,8 @@ import datetime
 
 #60.23.152.71
 # Create your views here.
-WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://5iqhj6.natappfree.cc/wechat'
+WECHAT_TOKEN = 'hello2018'
+APP_URL = 'http://jex4fc.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID

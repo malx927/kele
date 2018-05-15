@@ -276,7 +276,7 @@ class DogDelivery(models.Model):
 
 #宠物求购
 class DogBuy(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
@@ -296,7 +296,7 @@ class DogBuy(models.Model):
 
 #宠物出售
 class DogSale(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种')
+    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
     colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
