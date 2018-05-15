@@ -31,7 +31,7 @@ import datetime
 
 # Create your views here.
 WECHAT_TOKEN = 'malixin'
-APP_URL = 'http://vwwb85.natappfree.cc/wechat'
+APP_URL = 'http://iz4j33.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID
@@ -622,54 +622,54 @@ def createTestData(request):
     strDate = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    # for i in range(1,50):
-    #     data = {
-    #         'dog_name':u'大眼可乐--%d'%(i,),
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'desc':u'大眼可乐描述--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
-    #         'lostplace':'龙前街19-2号楼--%d'%(i,),
-    #         'lostdate':strDate,
-    #         'ownername':'张三--%d' %(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogLoss.objects.create(**data)
-    #     #print(data)
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'desc':u'大眼可乐描述--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
-    #         'findplace':'龙前街19-2号楼--%d'%(i,),
-    #         'finddate':strDate,
-    #         'findname':'张三--%d' %(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogOwner.objects.create(**data)
+    for i in range(1,50):
+        data = {
+            'dog_name':u'大眼可乐--%d'%(i,),
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'lostplace':'龙前街19-2号楼--%d'%(i,),
+            'lostdate':strDate,
+            'ownername':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogLoss.objects.create(**data)
+        #print(data)
+    for i in range(1,50):
+        data = {
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'findplace':'龙前街19-2号楼--%d'%(i,),
+            'finddate':strDate,
+            'findname':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogOwner.objects.create(**data)
 
-    #
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'price':u'1000-5000元--%d'%(i,),
-    #         'buyname':'张三--%d'%(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogBuy.objects.create(**data)
 
     for i in range(1,50):
         data = {
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'price':u'1000-5000元--%d'%(i,),
-            'desc':u'能歌善舞--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
-            'ownername':'张三--%d'%(i,),
+            'buyname':'张三--%d'%(i,),
             'telephone':'123456789',
         }
-        DogSale.objects.create(**data)
+        DogBuy.objects.create(**data)
+
+    # for i in range(1,50):
+    #     data = {
+    #         'typeid':type,
+    #         'colors':u'金毛--%d'%(i,),
+    #         'price':u'1000-5000元--%d'%(i,),
+    #         'desc':u'能歌善舞--%d'%(i,),
+    #         'picture':'wxchat/images/dog.jpg',
+    #         'ownername':'张三--%d'%(i,),
+    #         'telephone':'123456789',
+    #     }
+    #     DogSale.objects.create(**data)
 
     return HttpResponse('success')

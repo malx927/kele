@@ -17,3 +17,15 @@ class Dogtype(models.Model):
 
     def __str__(self):
         return self.typename
+
+
+class AreaCode(models.Model):
+     code = models.CharField(verbose_name=u'地区编码',max_length=18)
+     name = models.CharField(verbose_name=u'地区名称',max_length=50)
+
+     class Meta:
+         verbose_name=u'地区编码表'
+         verbose_name_plural = verbose_name
+
+     def __str__(self):
+         return  self.name
