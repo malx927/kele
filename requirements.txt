@@ -6,3 +6,4 @@ easy-thumbnails==2.5
 django-jet==1.0.7
 PyMySQL==0.8.0
 
+
