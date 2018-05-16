@@ -191,7 +191,7 @@ CKEDITOR_CONFIGS = {
 }
 CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static1')
+#STATIC_ROOT = os.path.join(BASE_DIR, 'static1')
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -279,6 +279,6 @@ THUMBNAIL_SUBDIR = 'thumbs'
 # 测试号WeChat
 #WECHAT_APPID = 'wxbc591183cb175d16'
 WECHAT_APPID = 'wxad07fe6b357d1f3a'
-WECHAT_SECRET = '3b162faee0b6ee746a8a2ecap9bb27818'
+WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
 #WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
 

@@ -39,7 +39,6 @@ APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
 
-
 @csrf_exempt
 def wechat(request):
     if request.method == 'GET':
