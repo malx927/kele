@@ -30,7 +30,7 @@ import datetime
 
 
 # Create your views here.
-WECHAT_TOKEN = 'malixin'
+WECHAT_TOKEN = 'dayankele123'
 APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
 
 
