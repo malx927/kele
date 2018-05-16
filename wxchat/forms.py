@@ -184,6 +184,9 @@ class DogBuyForm(forms.ModelForm):
         self.fields['colors'].widget.attrs['class'] = 'weui-input'
         self.fields['colors'].widget.attrs['placeholder'] = '请输入颜色'
 
+        self.fields['ages'].widget.attrs['class'] = 'weui-input'
+        self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
+
         self.fields['price'].widget.attrs['class'] = 'weui-input'
         self.fields['price'].widget.attrs['placeholder'] = '请输入价格区间'
 
@@ -194,7 +197,7 @@ class DogBuyForm(forms.ModelForm):
 
     class Meta:
         model = DogBuy
-        fields = ['typeid','colors','price','buyname','telephone']
+        fields = ['typeid','colors','ages','price','buyname','telephone']
         widgets  = {
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
         }
