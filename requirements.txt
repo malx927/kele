@@ -4,5 +4,7 @@ Pillow==5.1.0
 wechatpy==1.7.0
 easy-thumbnails==2.5
 django-jet==1.0.7
+
 PyMySQL==0.8.0
+
 
