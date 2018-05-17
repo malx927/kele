@@ -73,7 +73,7 @@
           context: $('#dogbreed'),
           success: function(data){
               nextUrl = data.next;
-{#            appendItem(data.results);
+              appendItem(data.results);
               $('#dogbreedmore').css('display','');
               setScollPos();
           },
