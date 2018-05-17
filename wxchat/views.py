@@ -113,15 +113,15 @@ def getDogOwnerList(request, msg):
 
 
 def saveUserinfo(openid):
-    counts = WxUserinfo.objects.filter(openid=openid, subscribe=1).count()
-    if counts == 0:
-        user = client.user.get(openid)
-        if 'errcode' not in user:
-            sub_time = user.pop('subscribe_time')
-            sub_time = datetime.datetime.fromtimestamp(sub_time)
-            WxUserinfo.objects.create(**user, subscribe_time=sub_time)
-        else:
-            print(user)
+    user = client.user.get(openid)
+    if 'errcode' not in user:
+        sub_time = user.pop('subscribe_time')
+        sub_time = datetime.datetime.fromtimestamp(sub_time)
+        user['subscribe_time'] = sub_time
+        WxUserinfo.objects.update_or_create(defaults=user,openid=openid)
+        #WxUserinfo.objects.create(**user, subscribe_time=sub_time)
+    else:
+        print(user)
 
 
 def unSubUserinfo(openid):
