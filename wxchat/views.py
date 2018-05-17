@@ -1,6 +1,7 @@
 # coding=utf-8
 import random,string,time
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -28,10 +29,10 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
-
 # Create your views here.
 WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
+#APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
+APP_URL = 'http://6icaxp.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID
@@ -134,7 +135,7 @@ def unSubUserinfo(openid):
         pass
 
 
-@csrf_exempt
+@login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -230,8 +231,7 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-
-@csrf_exempt
+@login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
@@ -239,7 +239,7 @@ def deleteMenu(request):
 
 
 
-@csrf_exempt
+@login_required
 def getMenu(request):
     #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
     print('getMenu',client.access_token)
@@ -572,6 +572,21 @@ def auth2(request):
     weburl = weburl.format(appid, redirect_url)
     return HttpResponseRedirect(weburl)
 
+#获取用户openid列表
+@login_required
+def updateUserinfo(request):
+    userid_list = client.user.get_followers()
+    if 'errcode' not in userid_list and userid_list['count'] > 0:
+        openid_list = userid_list['data']['openid']
+        userinfo_lists = client.user.get_batch( openid_list )
+        for user in userinfo_lists:
+            sub_time = user.pop('subscribe_time')
+            sub_time = datetime.datetime.fromtimestamp(sub_time).strftime('%Y-%m-%d %H:%M:%S')
+            user['subscribe_time'] = sub_time
+            WxUserinfo.objects.update_or_create(defaults=user,openid=user['openid'])
+        return HttpResponse(json.dumps(userinfo_lists,ensure_ascii=False))
+    else:
+        return  HttpResponse(json.dumps(userid_list,ensure_ascii=False))
 
 # @csrf_exempt
 # def redirectUrl(request,item):
