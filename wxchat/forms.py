@@ -2,7 +2,7 @@
 __author__ = 'malxin'
 
 from django import forms
-
+from django.forms import ModelChoiceField
 from doginfo.models import DogDelivery,DogAdoption
 from doginfo.models import DogBreed, DogBuy, DogSale
 from doginfo.models import DogLoss,DogOwner
@@ -13,6 +13,7 @@ from doginfo.models import DogLoss,DogOwner
 class DogLossForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DogLossForm, self).__init__(*args, **kwargs)
+        self.fields['typeid'].empty_label = '无选项请联系客服'
         self.fields['dog_name'].widget.attrs['class'] = 'weui-input'
         self.fields['dog_name'].widget.attrs['placeholder'] = '请输入昵称'
 
@@ -32,6 +33,8 @@ class DogLossForm(forms.ModelForm):
 
         self.fields['ownername'].widget.attrs['class'] = 'weui-input'
         self.fields['ownername'].widget.attrs['placeholder'] = '请输入姓名'
+
+
 
     class Meta:
         model = DogLoss
@@ -186,6 +189,9 @@ class DogBuyForm(forms.ModelForm):
         self.fields['colors'].widget.attrs['class'] = 'weui-input'
         self.fields['colors'].widget.attrs['placeholder'] = '请输入颜色'
 
+        self.fields['ages'].widget.attrs['class'] = 'weui-input'
+        self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
+
         self.fields['price'].widget.attrs['class'] = 'weui-input'
         self.fields['price'].widget.attrs['placeholder'] = '请输入价格区间'
 
@@ -196,7 +202,7 @@ class DogBuyForm(forms.ModelForm):
 
     class Meta:
         model = DogBuy
-        fields = ['typeid','colors','price','buyname','telephone']
+        fields = ['typeid','colors','ages','price','buyname','telephone']
         widgets  = {
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
         }

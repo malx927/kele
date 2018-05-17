@@ -1,6 +1,7 @@
 # coding=utf-8
 import random,string,time
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -28,16 +29,16 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
-
-# Create your views here.
 WECHAT_TOKEN = 'hello2018'
 APP_URL = 'http://tikaua.natappfree.cc/wechat'
+
+
+
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
-
 
 @csrf_exempt
 def wechat(request):
@@ -113,15 +114,15 @@ def getDogOwnerList(request, msg):
 
 
 def saveUserinfo(openid):
-    counts = WxUserinfo.objects.filter(openid=openid, subscribe=1).count()
-    if counts == 0:
-        user = client.user.get(openid)
-        if 'errcode' not in user:
-            sub_time = user.pop('subscribe_time')
-            sub_time = datetime.datetime.fromtimestamp(sub_time)
-            WxUserinfo.objects.create(**user, subscribe_time=sub_time)
-        else:
-            print(user)
+    user = client.user.get(openid)
+    if 'errcode' not in user:
+        sub_time = user.pop('subscribe_time')
+        sub_time = datetime.datetime.fromtimestamp(sub_time)
+        user['subscribe_time'] = sub_time
+        WxUserinfo.objects.update_or_create(defaults=user,openid=openid)
+        #WxUserinfo.objects.create(**user, subscribe_time=sub_time)
+    else:
+        print(user)
 
 
 def unSubUserinfo(openid):
@@ -134,7 +135,7 @@ def unSubUserinfo(openid):
         pass
 
 
-@csrf_exempt
+@login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -230,8 +231,7 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-
-@csrf_exempt
+@login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
@@ -239,7 +239,7 @@ def deleteMenu(request):
 
 
 
-@csrf_exempt
+@login_required
 def getMenu(request):
     #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
     print('getMenu',client.access_token)
@@ -572,6 +572,21 @@ def auth2(request):
     weburl = weburl.format(appid, redirect_url)
     return HttpResponseRedirect(weburl)
 
+#获取用户openid列表
+@login_required
+def updateUserinfo(request):
+    userid_list = client.user.get_followers()
+    if 'errcode' not in userid_list and userid_list['count'] > 0:
+        openid_list = userid_list['data']['openid']
+        userinfo_lists = client.user.get_batch( openid_list )
+        for user in userinfo_lists:
+            sub_time = user.pop('subscribe_time')
+            sub_time = datetime.datetime.fromtimestamp(sub_time).strftime('%Y-%m-%d %H:%M:%S')
+            user['subscribe_time'] = sub_time
+            WxUserinfo.objects.update_or_create(defaults=user,openid=user['openid'])
+        return HttpResponse(json.dumps(userinfo_lists,ensure_ascii=False))
+    else:
+        return  HttpResponse(json.dumps(userid_list,ensure_ascii=False))
 
 # @csrf_exempt
 # def redirectUrl(request,item):
@@ -621,54 +636,54 @@ def createTestData(request):
     strDate = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    # for i in range(1,50):
-    #     data = {
-    #         'dog_name':u'大眼可乐--%d'%(i,),
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'desc':u'大眼可乐描述--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
-    #         'lostplace':'龙前街19-2号楼--%d'%(i,),
-    #         'lostdate':strDate,
-    #         'ownername':'张三--%d' %(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogLoss.objects.create(**data)
-    #     #print(data)
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'desc':u'大眼可乐描述--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
-    #         'findplace':'龙前街19-2号楼--%d'%(i,),
-    #         'finddate':strDate,
-    #         'findname':'张三--%d' %(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogOwner.objects.create(**data)
+    for i in range(1,50):
+        data = {
+            'dog_name':u'大眼可乐--%d'%(i,),
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'lostplace':'龙前街19-2号楼--%d'%(i,),
+            'lostdate':strDate,
+            'ownername':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogLoss.objects.create(**data)
+        #print(data)
+    for i in range(1,50):
+        data = {
+            'typeid':type,
+            'colors':u'金毛--%d'%(i,),
+            'desc':u'大眼可乐描述--%d'%(i,),
+            'picture':'wxchat/images/dog.jpg',
+            'findplace':'龙前街19-2号楼--%d'%(i,),
+            'finddate':strDate,
+            'findname':'张三--%d' %(i,),
+            'telephone':'123456789',
+        }
+        DogOwner.objects.create(**data)
 
-    #
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'price':u'1000-5000元--%d'%(i,),
-    #         'buyname':'张三--%d'%(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogBuy.objects.create(**data)
 
     for i in range(1,50):
         data = {
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'price':u'1000-5000元--%d'%(i,),
-            'desc':u'能歌善舞--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
-            'ownername':'张三--%d'%(i,),
+            'buyname':'张三--%d'%(i,),
             'telephone':'123456789',
         }
-        DogSale.objects.create(**data)
+        DogBuy.objects.create(**data)
+
+    # for i in range(1,50):
+    #     data = {
+    #         'typeid':type,
+    #         'colors':u'金毛--%d'%(i,),
+    #         'price':u'1000-5000元--%d'%(i,),
+    #         'desc':u'能歌善舞--%d'%(i,),
+    #         'picture':'wxchat/images/dog.jpg',
+    #         'ownername':'张三--%d'%(i,),
+    #         'telephone':'123456789',
+    #     }
+    #     DogSale.objects.create(**data)
 
     return HttpResponse('success')

@@ -92,7 +92,7 @@
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 500,
+          timeout: 5000,
           context: $('#dogloss'),
           success: function(data){
               nextUrl = data.next;
@@ -135,7 +135,7 @@
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 500,
+          timeout: 5000,
           context: $('#dogowner'),
           success: function(data){
               dogOwnerUrl = data.next;
