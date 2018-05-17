@@ -74,7 +74,11 @@
           success: function(data){
               nextUrl = data.next;
               appendItem(data.results);
-              $('#dogbreedmore').css('display','');
+              if(nextUrl == null)
+                $('#dogbreedmore').css('display','none');
+              else
+                 $('#dogbreedmore').css('display','');
+              loading.hide();
               setScollPos();
           },
           error: function(xhr, type,error){

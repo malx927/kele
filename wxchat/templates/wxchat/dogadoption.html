@@ -97,7 +97,10 @@
           success: function(data){
               nextUrl = data.next;
               appendItem(data.results);
-              $('#doglossmore').css('display','');
+              if(nextUrl == null)
+                $('#doglossmore').css('display','none');
+              else
+                 $('#doglossmore').css('display','');
               loading.hide();
               setScollPos();
           },
@@ -137,7 +140,11 @@
           success: function(data){
               dogdeliveryUrl = data.next;
               appenddeliveryItem(data.results);
-              $('#dogdeliverymore').css('display','');
+              if(dogdeliveryUrl == null)
+                $('#dogdeliverymore').css('display','none');
+              else
+                 $('#dogdeliverymore').css('display','');
+              loading.hide();
               setScollPos();
           },
           error: function(xhr, type,error){
