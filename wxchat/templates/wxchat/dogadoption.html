@@ -92,7 +92,7 @@
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 500,
+          timeout: 5000,
           context: $('#dogadopt'),
           success: function(data){
               nextUrl = data.next;
@@ -120,6 +120,7 @@
                                '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
                                '<ul class="weui-media-box__info">' +
 								  '<li class="weui-media-box__info__meta">' + item.record + '</li>' +
+                                '</ul>' +
                              '</div>' +
                         '</a>';
             $('#dogadopt').append( lossitem );
@@ -131,7 +132,7 @@
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 500,
+          timeout: 5000,
           context: $('#dogdelivery'),
           success: function(data){
               dogdeliveryUrl = data.next;

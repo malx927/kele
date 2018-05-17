@@ -29,11 +29,9 @@ from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
 
-#60.23.152.71
 # Create your views here.
 WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://jex4fc.natappfree.cc/wechat'
-
+APP_URL = 'http://tikaua.natappfree.cc/wechat'
 
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET

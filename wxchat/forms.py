@@ -123,11 +123,8 @@ class DogadoptForm(forms.ModelForm):
         self.fields['name'].widget.attrs['class'] = 'weui-input'
         self.fields['name'].widget.attrs['placeholder'] = '请输入领养人姓名'
 
-        self.fields['record'].widget.attrs['class'] = 'weui-input'
-        self.fields['record'].widget.attrs['placeholder'] = '请输入饲养宠物记录'
-
-        self.fields['requirement'].widget.attrs['class'] = 'weui-input'
-        self.fields['requirement'].widget.attrs['placeholder'] = '请输入对宠物要求'
+        # self.fields['record'].widget.attrs['class'] = 'weui-input'
+        # self.fields['record'].widget.attrs['placeholder'] = '请输入饲养宠物记录'
 
 
     class Meta:
@@ -137,6 +134,8 @@ class DogadoptForm(forms.ModelForm):
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',
                  'maxlength': '11'}),
+            'record': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入饲养宠物记录', 'rows': '3'}),
+            'requirement': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入对宠物要求', 'rows': '3'}),
         }
 
 
@@ -153,14 +152,20 @@ class DogdeliveryForm(forms.ModelForm):
         self.fields['colors'].widget.attrs['class'] = 'weui-input'
         self.fields['colors'].widget.attrs['placeholder'] = '请输入颜色'
 
-        self.fields['ages'].widget.attrs['class'] = 'weui-input'
-        self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
+        # self.fields['ages'].widget.attrs['class'] = 'weui-input'
+        # self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
+
+        self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
+        self.fields['picture'].widget.attrs['accept'] = 'image/*'
 
         self.fields['sex'].widget.attrs['class'] = 'weui-select'
 
+        self.fields['ownername'].widget.attrs['class'] = 'weui-input'
+        self.fields['ownername'].widget.attrs['placeholder'] = '请输入姓名'
+
     class Meta:
         model = DogDelivery
-        fields = ['name','typeid', 'colors','sex','ages', 'desc', 'picture', 'ownername','telephone']
+        fields = ['name','typeid', 'colors','sex', 'desc', 'picture', 'ownername','telephone']
         widgets = {
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',

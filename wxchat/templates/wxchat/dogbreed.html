@@ -16,25 +16,14 @@
 
                 </div>
                 <div class="weui-panel__ft" >
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doglossmore">
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogbreedmore">
                         <div class="weui-cell__bd">查看更多</div>
                         <span class="weui-cell__ft"></span>
                     </a>
                 </div>
             </div>
         </div>
-        <div class="weui-tab__content">
-            <div class="weui-panel weui-panel_access">
 
-
-                <div class="weui-panel__ft">
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link">
-                        <div class="weui-cell__bd">查看更多</div>
-                        <span class="weui-cell__ft"></span>
-                    </a>
-                </div>
-            </div>
-        </div>
 {% endblock tabpanel %}
  {% block tabbar %}
 {#        <a href="#tab1" class="weui-tabbar__item">#}
@@ -80,12 +69,13 @@
           type: 'GET',
           url: url,
           dataType: 'json',
-          timeout: 300,
+          timeout: 5000,
           context: $('#dogbreed'),
           success: function(data){
               nextUrl = data.next;
-{#              console.log(data.results);#}
-              appendItem(data.results);
+{#            appendItem(data.results);
+              $('#dogbreedmore').css('display','');
+              setScollPos();
           },
           error: function(xhr, type,error){
               console.log(type);

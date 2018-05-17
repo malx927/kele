@@ -316,3 +316,33 @@ class DogSale(models.Model):
 
     def __str__(self):
         return self.typeid.typename + "[" +self.colors + "]"
+
+#训犬 行为纠正
+class DogBehavior(models.Model):
+    name = models.CharField(verbose_name=u'项目名称', max_length=50)
+    price = models.CharField(verbose_name=u'价格', max_length=50)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+
+    class Meta:
+        verbose_name = u'宠物行为纠正'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+
+
+#训犬 技能培训
+class DogSkill(models.Model):
+    name = models.CharField(verbose_name=u'项目名称', max_length=50)
+    price = models.CharField(verbose_name=u'价格', max_length=50)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+
+    class Meta:
+        verbose_name = u'宠物技能培训'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
