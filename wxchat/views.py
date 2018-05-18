@@ -30,7 +30,7 @@ from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
 WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://tikaua.natappfree.cc/wechat'
+APP_URL = 'http://6icaxp.natappfree.cc/wechat'
 
 
 
