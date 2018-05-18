@@ -12,7 +12,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
-from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply
+from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from doginfo.models import DogDelivery,DogAdoption
@@ -29,10 +29,9 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
-WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://tikaua.natappfree.cc/wechat'
-
-
+WECHAT_TOKEN = 'dayankele123'
+APP_URL = 'http://upvjvv.natappfree.cc/wechat'
+#APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID
@@ -63,7 +62,7 @@ def wechat(request):
             elif msg.content == '寻主':
                 reply = getDogOwnerList(request, msg)
             else:
-                reply = create_reply('感谢您关注,暂时没有提供此服务', msg)
+                reply = TransferCustomerServiceReply(message=msg)
 
         elif msg.type == 'image':
             reply = ImageReply(message=msg)
