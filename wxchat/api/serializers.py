@@ -80,9 +80,12 @@ class DogLossSerializer(serializers.ModelSerializer):
             return obj.picture['avatar'].url
         else:
             return None
-       #  options = {'size': (1600, 1200), 'crop': True}
-       #  thumburl = get_thumbnailer(obj.picture).get_thumbnail(options).url
-       #  return thumburl
+        # if obj.picture:
+        #     options = {'size': (1600, 1200), 'crop': True}
+        #     thumburl = get_thumbnailer(obj.picture).get_thumbnail(options).url
+        #     return thumburl
+        # else:
+        #     return  None
 
 # 寻找宠物主人
 class DogOwnerSerializer(serializers.ModelSerializer):

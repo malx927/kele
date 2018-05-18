@@ -29,10 +29,10 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
-# Create your views here.
-WECHAT_TOKEN = 'dayankele123'
-#APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
-APP_URL = 'http://6icaxp.natappfree.cc/wechat'
+WECHAT_TOKEN = 'hello2018'
+APP_URL = 'http://tikaua.natappfree.cc/wechat'
+
+
 
 
 APPID = settings.WECHAT_APPID
