@@ -270,7 +270,6 @@ def redirectUrl(request, item):
         else:
             webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
             res = webchatOAuth.fetch_access_token(code)
-            print(res)
             if 'errcode' in res:
                 return HttpResponse(json.dumps(res))
             else:
@@ -283,6 +282,8 @@ def redirectUrl(request, item):
                     WxUserinfo.objects.create(**userinfo)
 
                 request.session['openid'] = open_id
+                userinf = get_object_or_404(WxUserinfo,openid=open_id)
+                request.session['nickname'] = userinf.nickname
                 redirect_url = getUrl(item)
                 return HttpResponseRedirect(redirect_url)
     else:
@@ -300,13 +301,14 @@ def dogLoss(request):
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
-        print('openid=', openid)
+        nickname = request.session.get('nickname')
+        print('openid=', openid,nickname)
         next = request.GET.get('next', None)
-        print(next)
         form = DogLossForm(request.POST, request.FILES)
         if form.is_valid():
             dogloss = form.save(commit=False)
             dogloss.openid = openid
+            dogloss.nickname = nickname
             dogloss.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
@@ -325,12 +327,14 @@ def dogBreed(request):
 def dogBreedAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=', openid)
         print(request.FILES.get('picture'))
         form = DogBreedForm(request.POST, request.FILES)
         if form.is_valid():
             dogbreed = form.save(commit=False)
             dogbreed.openid = openid
+            dogbreed.nickname = nickname
             dogbreed.showtime = datetime.datetime.now()
             dogbreed.save()
         return HttpResponseRedirect(reverse('dog-breed'))
@@ -355,13 +359,14 @@ class DogLossDetailView(DetailView):
 def dogOwnerAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=', openid)
         next = request.GET.get('next', None)
-        print(next)
         form = DogOwnerForm(request.POST, request.FILES)
         if form.is_valid():
             dogowner = form.save(commit=False)
             dogowner.openid = openid
+            dogowner.nickname = nickname
             dogowner.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
@@ -393,6 +398,7 @@ class DogAdoptDetailView(DetailView):
 def dogadoptAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=', openid)
         next = request.GET.get('next', None)
         print(next)
@@ -400,6 +406,7 @@ def dogadoptAdd(request):
         if form.is_valid():
             dogowner = form.save(commit=False)
             dogowner.openid = openid
+            dogowner.nickname = nickname
             dogowner.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
@@ -422,6 +429,7 @@ class DogdeliveryDetailView(DetailView):
 def DogdeliveryAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=', openid)
         next = request.GET.get('next', None)
         print(next)
@@ -429,6 +437,7 @@ def DogdeliveryAdd(request):
         if form.is_valid():
             dogowner = form.save(commit=False)
             dogowner.openid = openid
+            dogowner.nickname = nickname
             dogowner.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
@@ -447,12 +456,14 @@ def dogTrade(request):
 def dogBuyAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=',openid)
         next = request.GET.get('next',None)
         form = DogBuyForm(request.POST)
         if form.is_valid():
             dogbuy = form.save(commit=False)
             dogbuy.openid = openid
+            dogbuy.nickname = nickname
             dogbuy.save()
             return render(request,'wxchat/message.html', {"success":"true",'next':next})
         else:
@@ -466,12 +477,14 @@ def dogBuyAdd(request):
 def dogSaleAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
         print('openid=',openid)
         next = request.GET.get('next',None)
         form = DogSaleForm(request.POST,request.FILES)
         if form.is_valid():
             dogsale = form.save(commit=False)
             dogsale.openid = openid
+            dogsale.nickname = nickname
             dogsale.save()
             return render(request,'wxchat/message.html', {"success":"true",'next':next})
         else:
@@ -629,6 +642,23 @@ def updateUserinfo(request):
 #         redirect_url = getUrl(item)
 #         return  HttpResponseRedirect(redirect_url)
 
+def freshMan_bak(request):
+    jsApi = WeChatJSAPI(client)
+    ticket = jsApi.get_jsapi_ticket()
+    noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+    timestamp = int(time.time())
+    url = request.build_absolute_uri()
+    print(url)
+    signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+
+    signPackage = {
+        "appId":settings.WECHAT_APPID,
+        "nonceStr":noncestr,
+        "timestamp":timestamp,
+        "url":url,
+        "signature":signature
+    }
+    return render(request,template_name='wxchat/freshman.html',context={'sign':signPackage})
 
 def createTestData(request):
     curDate = datetime.datetime.now()
