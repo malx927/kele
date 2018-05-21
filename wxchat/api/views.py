@@ -23,9 +23,10 @@ from .serializers import (
     DogdeliverySerializer,
     DogdeliveryDetailSerializer,
     DogBuySerializer,
-    DogSaleSerializer
-
+    DogSaleSerializer,
+    SwiperImageListSerializer
 )
+from wxchat.models import SwiperImage
 
 __author__ = 'malixin'
 
@@ -114,3 +115,9 @@ class DogSaleListAPIView(ListAPIView):
     def get_queryset(self):
         return  DogSale.objects.filter(is_show=1)
 
+class SwiperImageListAPIView(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = SwiperImage.objects.all()
+    serializer_class = SwiperImageListSerializer
+    def get_queryset(self):
+        return  SwiperImage.objects.filter(is_show=1)
