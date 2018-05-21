@@ -86,7 +86,6 @@ class DogBuyAdmin(admin.ModelAdmin):
 admin.site.register(DogBuy, DogBuyAdmin)
 
 
-
 # 宠物训练
 # class TrainAdmin(admin.ModelAdmin):
 #     list_display = ('train', 'leisure', 'create_time')

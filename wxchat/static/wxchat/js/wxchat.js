@@ -1,7 +1,49 @@
 
-$(function() {
-    //FastClick.attach(document.body);
-  });
+//$(function() {
+//    //FastClick.attach(document.body);
+//
+//});
+
+
+function setImageUrl(){
+    $.ajax({
+      type: 'GET',
+      url: '/wechat/api/swiperimagelist',
+      dataType: 'json',
+      timeout: 5000,
+      context: $('.swiper-wrapper'),
+      success: function(data){
+        console.log(data);
+        imgList ='';
+          $.each(data.results,function(index,item){
+              imgList += '<div class="swiper-slide"><img src="'+ item.image +'"></div>';
+
+          });
+          $('.swiper-wrapper').append(imgList);
+          var mySwiper = new Swiper ('.swiper-container', {
+                initialSlide :0,
+                direction: 'horizontal',
+                speed:2000,
+                autoplay : {
+                    delay:3000,
+                    disableOnInteraction: false,
+                },
+                loop: true,
+                pagination: {
+                    el: '.swiper-pagination',
+                    clickable :true,
+                  },
+                observer:true,
+                observeParents:true,
+        });
+
+      },
+      error: function(xhr, type,error){
+          console.log(type,error);
+      }
+    });
+}
+
 
 //weui.tab('#tab',{
 //        defaultIndex: 0,

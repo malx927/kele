@@ -45,3 +45,17 @@ class Menu(models.Model):
 
     def __str__(self):
         return  self.name
+
+
+class SwiperImage(models.Model):
+    name = models.CharField(verbose_name='图片名称',max_length=40)
+    image = models.ImageField(verbose_name='图片地址', upload_to='swiper')
+    url = models.CharField(verbose_name='跳转地址',max_length=120)
+    is_show = models.BooleanField(verbose_name='是否显示',default=True)
+
+    class Meta:
+        verbose_name = '轮播图片'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return  self.name

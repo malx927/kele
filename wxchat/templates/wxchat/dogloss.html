@@ -1,5 +1,14 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-
+{% block swiper %}
+	<div class="swiper-container">
+		<div class="swiper-wrapper">
+{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/a.jpg"></div>#}
+{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/b.jpg"></div>#}
+{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/c.jpg"></div>#}
+		</div>
+		<div class="swiper-pagination"></div>
+	</div>
+{% endblock swiper %}
 {% block tabpanel %}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
@@ -56,6 +65,7 @@
     <script type="application/javascript">
      nextUrl = '{% url 'dog-loss-list' %}';
      dogOwnerUrl = '{% url 'dog-owner-list' %}';
+
     var loading = weui.loading('加载中...');
      ///缓存滚动条位置
      $('.weui-tab__panel').scroll(function(){
@@ -65,6 +75,7 @@
     });
 
     $(function(){
+        setImageUrl();
 
         defIndex = sessionStorage.getItem('tab');
         console.log('defindex='+ defIndex);
@@ -174,5 +185,8 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
+
+
+
     </script>
 {% endblock bottomjs %}

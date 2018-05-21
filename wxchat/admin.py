@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import WxUserinfo,Menu
+from .models import WxUserinfo,Menu,SwiperImage
 
 
 class WxUserinfoAdmin(admin.ModelAdmin):
@@ -14,3 +14,10 @@ class MenuAdmin(admin.ModelAdmin):
     list_display = ['name']
 
 admin.site.register(Menu,MenuAdmin)
+
+#图片轮播
+class SwiperImageAdmin(admin.ModelAdmin):
+    list_display = ('name','image','url','is_show')
+    list_per_page = 50
+
+admin.site.register(SwiperImage, SwiperImageAdmin)
