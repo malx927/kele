@@ -17,6 +17,9 @@ from doginfo.models import (
     TYPE_SEX_CHOICE,
 )
 
+from wxchat.models import SwiperImage
+
+
 from dogtype.models import Dogtype
 
 __author__ = 'malixin'
@@ -229,7 +232,20 @@ class DogSaleSerializer(serializers.ModelSerializer):
         fields = ['id', 'typeid', 'typename','colors','ages','desc','sex','price','picture','ownername','telephone']
 
 
+#新手课堂
 class DogfreshmanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Freshman
         fields = ['id', 'name', 'picture_title','picture','desc','prod_desc',]
+
+#图片轮播
+class SwiperImageListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SwiperImage
+        fields = [
+            'id',
+            'name',
+            'image',
+            'url'
+        ]
+

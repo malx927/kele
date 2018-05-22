@@ -8,6 +8,7 @@
 
     {% block css %}
 	<link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.2/weui.css">
+	<link rel="stylesheet" href="{% static 'wxchat/style/swiper.min.css' %}">
 	<link rel="stylesheet" href="{% static 'wxchat/style/index.css' %}">
     {% endblock css %}
     {% block js %}
@@ -15,12 +16,14 @@
     <script type="text/javascript" src="{% static 'wxchat/js/weui.js' %}"></script>
     <script type="text/javascript" src="{% static 'wxchat/js/zepto.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'wxchat/js/fastclick.js' %}"></script>
+    <script type="text/javascript" src="{% static 'wxchat/js/swiper.min.js' %}"></script>
     {% endblock js %}
     {% block extra %}{% endblock extra%}
   </head>
   <body ontouchstart>
     {% block container %}
 	<div class="weui-tab" id="tab">
+    {% block swiper %}{% endblock swiper %}
     {% block tab %}
         <div class="weui-tab__panel">
         {% block tabpanel %}{% endblock tabpanel %}

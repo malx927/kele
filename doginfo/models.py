@@ -134,6 +134,7 @@ class DogLoss(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
 
     class Meta:
         verbose_name = u"寻宠登记"
@@ -165,6 +166,7 @@ class DogOwner(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
 
     class Meta:
         verbose_name = u"寻宠物主人"
@@ -222,6 +224,7 @@ class DogBreed(models.Model):
     create_time = models.DateTimeField(verbose_name=u'添加时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
 
     class Meta:
         verbose_name = u"宠物配种"
@@ -241,6 +244,8 @@ class DogAdoption(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
+
     class Meta:
         verbose_name =u'宠物领养'
         verbose_name_plural = verbose_name
@@ -265,6 +270,7 @@ class DogDelivery(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
 
     class Meta:
         verbose_name = u'宠物送养'
@@ -287,6 +293,8 @@ class DogBuy(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
+
     class Meta:
         verbose_name = u'宠物求购'
         verbose_name_plural = verbose_name
@@ -309,6 +317,7 @@ class DogSale(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+    nickname = models.CharField(verbose_name='昵称',max_length=64,null=True,blank=True)
 
     class Meta:
         verbose_name = u'宠物出售'
@@ -325,7 +334,6 @@ class DogBehavior(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
-
 
     class Meta:
         verbose_name = u'宠物行为纠正'
