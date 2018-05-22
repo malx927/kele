@@ -347,3 +347,23 @@ class DogSkill(models.Model):
         verbose_name = u'宠物技能培训'
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
+
+
+
+#新手课堂
+class Freshman(models.Model):
+    name = models.CharField(verbose_name=u'名称', max_length=50)
+    picture_title = models.CharField(verbose_name=u'图片标题', max_length=50)
+    picture = models.ImageField(verbose_name=u'图片',  upload_to='new/%Y%m%d/', blank=True,null=True)
+    desc = models.CharField(verbose_name=u'简介', max_length=200)
+    prod_desc = RichTextField(verbose_name=u'内容', max_length=2000)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+
+    class Meta:
+        verbose_name = u'新手课堂'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']

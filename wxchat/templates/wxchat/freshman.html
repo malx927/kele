@@ -1,96 +1,112 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-{% block extra %}
-<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
-<script>
-    wx.config({
-        debug: false,
-        appId: '{{ sign.appId }}',
-        timestamp:'{{ sign.timestamp }}',
-        nonceStr: '{{ sign.nonceStr }}',
-        signature: '{{ sign.signature }}',
-        jsApiList: [
-            'startRecord',
-            'stopRecord',
-            'onVoiceRecordEnd',
-            'playVoice',
-            'pauseVoice',
-            'stopVoice',
-            'onVoicePlayEnd',
-            'uploadVoice',
-            'downloadVoice',
-            'chooseImage',
-            'previewImage',
-            'uploadImage',
-            'downloadImage',
-            'translateVoice',
-            'getNetworkType',
-            'openLocation',
-            'getLocation',
-            'closeWindow',
-            'scanQRCode',
-            'chooseWXPay',
-            'openProductSpecificView',
-            'addCard',
-            'chooseCard',
-            'openCard',
-        ]
-    });
-    wx.ready(function () {
-        $('#checkJsApi').on('click',function(){
-            wx.checkJsApi({
-              jsApiList: [
-                'getNetworkType',
-                'previewImage'
-              ],
-              success: function (res) {
-                alert(JSON.stringify(res));
-              }
-            });
-      });
+{% block title %}新手课堂{% endblock %}
 
-    $('#getNetworkType').on('click',function(){
-        wx.getNetworkType({
-              success: function (res) {
-                alert(res.networkType);
-              },
-              fail: function (res) {
-                alert(JSON.stringify(res));
-              }
-            });
+{% block tabpanel %}
+        <div class="weui-tab__content">
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    	<div class="weui-flex">
+                            <div class="weui-flex__item"><span class="title">新手课堂列表<span></div>
+                            <div class="weui-flex__item"></div>
+                            <div class="weui-flex__item"></div>
+{#                            <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}" class="weui-btn weui-btn_mini weui-btn_primary r" >添加</a></div>#}
+                        </div>
+                </div>
+                <div class="weui-panel__bd" id="freshman">
+
+                </div>
+                <div class="weui-panel__ft" >
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="freshmanmore">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock tabpanel %}
+ {% block tabbar %}
+{#        <a href="#tab1" class="weui-tabbar__item">#}
+{#            <div class="weui-tabbar__icon">'#}
+{#                <img src="{% static 'wxchat/images/icon_nav_button.png' %}" alt="">#}
+{#            </div>#}
+{#            <p class="weui-tabbar__label">寻宠物</p>#}
+{#        </a>#}
+{#        <a href="#tab2" class="weui-tabbar__item">#}
+{#            <div class="weui-tabbar__icon">#}
+{#                <img src="{% static 'wxchat/images/icon_nav_msg.png' %}" alt="">#}
+{#            </div>#}
+{#            <p class="weui-tabbar__label">寻宠主</p>#}
+{#        </a>#}
+
+{% endblock tabbar %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+     nextUrl = '{% url 'dog-freshman-list' %}';
+{#     var loading = weui.loading('加载中...');#}
+     ///缓存滚动条位置
+     $('.weui-tab__panel').scroll(function(){
+            if($(this).scrollTop() !=0 ){
+                sessionStorage.setItem('offsetTop',$(this).scrollTop());
+            }
     });
-    $("#scanQRCode0").on('click',function(){
-        wx.scanQRCode({
-            needResult: 0, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
-            success: function (res) {
-                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
-                //alert(result)
+    $(function(){
+        weui.tab('#tab',{
+            defaultIndex: 0,
+            onChange: function(index){
+                sessionStorage.setItem('tab',index);
             }
         });
-    })
 
-    $("#scanQRCode1").on('click',function(){
-        wx.scanQRCode({
-            needResult: 1, // 默认为0，扫描结果由微信处理，1则直接返回扫描结果，
-            scanType: ["qrCode","barCode"], // 可以指定扫二维码还是一维码，默认二者都有
-            success: function (res) {
-                var result = res.resultStr; // 当needResult 为 1 时，扫码返回的结果
-                alert(result)
-            }
+        $('#freshmanmore').on('click',function(){
+            getDataList( nextUrl );
         });
-    })
-});
-</script>
+        getDataList( nextUrl );
+    });
+    function getDataList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#freshman'),
+          success: function(data){
+              nextUrl = data.next;
+              appendItem(data.results);
+              if(nextUrl == null)
+                $('#freshmanmore').css('display','none');
+              else
+                 $('#dfreshmanmore').css('display','');
+              loading.hide();
+              setScollPos();
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
 
-
-{% endblock extra%}
-{% block container %}
-    <div class="weui-btn-area">
-        <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
-        <a class="weui-btn weui-btn_primary"  id="getNetworkType">网络状态</a>
-        <a class="weui-btn weui-btn_primary"  id="scanQRCode0">二维码0</a>
-        <a class="weui-btn weui-btn_primary"  id="scanQRCode1">二维码1</a>
-        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
-        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
-    </div>
-{% endblock container %}
+    function appendItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+            if(img_url == null){
+                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+            }
+          lossitem =  '<a href="/wechat/freshmandetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
+                               '<p class="weui-media-box__desc">'+ item.desc +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#freshman').append( lossitem );
+        }) ;
+    }
+    ////设置滚动条位置
+    function setScollPos(){
+        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+        $('.weui-tab__panel').scrollTop(_offset);
+    }
+    </script>
+{% endblock bottomjs %}

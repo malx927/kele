@@ -15,7 +15,7 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from doginfo.models import DogDelivery,DogAdoption
+from doginfo.models import DogDelivery,DogAdoption,Freshman
 from .forms import DogadoptForm,DogdeliveryForm
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
@@ -30,8 +30,7 @@ from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
 WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://6icaxp.natappfree.cc/wechat'
-
+APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
 
 
 
@@ -327,6 +326,7 @@ def dogBreedAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         print('openid=', openid)
+        next = request.GET.get('next', None)
         print(request.FILES.get('picture'))
         form = DogBreedForm(request.POST, request.FILES)
         if form.is_valid():
@@ -334,10 +334,13 @@ def dogBreedAdd(request):
             dogbreed.openid = openid
             dogbreed.showtime = datetime.datetime.now()
             dogbreed.save()
-        return HttpResponseRedirect(reverse('dog-breed'))
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
+        else:
+            return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogBreedForm()
-        return render(request, 'wxchat/dogbreed_add.html', {'form': form})
+        next = request.GET.get('next', '')
+        return render(request, 'wxchat/dogbreed_add.html', {'form': form,'next': next})
 
 
 # 配种详细视图
@@ -439,6 +442,32 @@ def DogdeliveryAdd(request):
         next = request.GET.get('next', '')
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
+#新手课堂
+def freshman(request):
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/freshman.html')
+
+
+#新手课堂详情
+class FreshmanDetailView(DetailView):
+    # dsf=
+    model = Freshman
+
+    template_name = 'wxchat/freashman_detail.html'
+    # def get(self, request, *args, **kwargs):
+    #     # 覆写 get 方法的目的是因为每当文章被访问一次，就得将文章阅读量 +1
+    #     # get 方法返回的是一个 HttpResponse 实例
+    #     # 之所以需要先调用父类的 get 方法，是因为只有当 get 方法被调用后，
+    #     # 才有 self.object 属性，其值为 Post 模型实例，即被访问的文章 post
+    #     response = super(FreshmanDetailView, self).get(request, *args, **kwargs)
+    #
+    #     # 将文章阅读量 +1
+    #     # 注意 self.object 的值就是被访问的文章 post
+    #     self.object.increase_views()
+    #
+    #     # 视图必须返回一个 HttpResponse 对象
+    #     return response
+
 #宠物交易
 def dogTrade(request):
     openid = request.session.get('openid',None)
@@ -493,26 +522,6 @@ class DogSaleDetailView(DetailView):
     model = DogSale
     template_name = 'wxchat/dogsale_detail.html'
 
-
-
-#新手学堂
-def freshMan(request):
-    jsApi = WeChatJSAPI(client)
-    ticket = jsApi.get_jsapi_ticket()
-    noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
-    timestamp = int(time.time())
-    url = request.build_absolute_uri()
-    print(url)
-    signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
-
-    signPackage = {
-        "appId":settings.WECHAT_APPID,
-        "nonceStr":noncestr,
-        "timestamp":timestamp,
-        "url":url,
-        "signature":signature
-    }
-    return render(request,template_name='wxchat/freshman.html',context={'sign':signPackage})
 
 @csrf_exempt
 def getUserinfo(request):

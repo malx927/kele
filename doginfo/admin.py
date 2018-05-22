@@ -3,7 +3,7 @@ __author__ = 'yy'
 
 from django.contrib import admin
 
-from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss,DogAdoption,DogDelivery, DogBuy, DogSale
+from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss,DogAdoption,DogDelivery, DogBuy, DogSale,Freshman
 
 
 # Register your models here.
@@ -86,8 +86,12 @@ class DogBuyAdmin(admin.ModelAdmin):
 
 admin.site.register(DogBuy, DogBuyAdmin)
 
-
-
+#新手课堂
+class FreshamnAdmin(admin.ModelAdmin):
+    list_display = ('name', 'desc', 'create_time')
+    list_display_links = ('name',)
+    list_per_page = 50
+admin.site.register(Freshman, FreshamnAdmin)
 # 宠物训练
 # class TrainAdmin(admin.ModelAdmin):
 #     list_display = ('train', 'leisure', 'create_time')
