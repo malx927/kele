@@ -125,7 +125,7 @@ def saveUserinfo(openid):
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
         WxUserinfo.objects.update_or_create(defaults=user,openid=openid)
-        #WxUserinfo.objects.create(**user, subscribe_time=sub_time)
+        # WxUserinfo.objects.create(**user, subscribe_time=sub_time)
     else:
         print(user)
 
@@ -357,12 +357,22 @@ def dogBreedAdd(request):
 class DogBreedDetailView(DetailView):
     model = DogBreed
     template_name = 'wxchat/dogbreed_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogBreedDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 
 # 寻宠物详细视图
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogLossDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 
 # 寻宠物主人发布
@@ -391,6 +401,12 @@ def dogOwnerAdd(request):
 class DogOwnerDetailView(DetailView):
     model = DogOwner
     template_name = 'wxchat/dogowner_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogOwnerDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
+
 
 #宠物领养
 def dogAdopt(request):
@@ -398,11 +414,15 @@ def dogAdopt(request):
     return render(request, template_name='wxchat/dogadoption.html')
 
 
-#领养宠物详细视图
+#领养宠物详情
 class DogAdoptDetailView(DetailView):
     model = DogAdoption
     template_name = 'wxchat/dogadoption_detail.html'
-
+    def get(self, request, *args, **kwargs):
+        response = super(DogAdoptDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 #领养宠物发布
 def dogadoptAdd(request):
@@ -429,11 +449,15 @@ def dogadoptAdd(request):
 
 
 
-#送养宠物详细视图
+#送养宠物详情
 class DogdeliveryDetailView(DetailView):
     model = DogDelivery
     template_name = 'wxchat/dogdelivery_detail.html'
-
+    def get(self, request, *args, **kwargs):
+        response = super(DogdeliveryDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 #送养宠物发布
 def DogdeliveryAdd(request):
@@ -465,23 +489,20 @@ def freshman(request):
 
 #新手课堂详情
 class FreshmanDetailView(DetailView):
-    # dsf=
     model = Freshman
-
     template_name = 'wxchat/freashman_detail.html'
-    # def get(self, request, *args, **kwargs):
-    #     # 覆写 get 方法的目的是因为每当文章被访问一次，就得将文章阅读量 +1
-    #     # get 方法返回的是一个 HttpResponse 实例
-    #     # 之所以需要先调用父类的 get 方法，是因为只有当 get 方法被调用后，
-    #     # 才有 self.object 属性，其值为 Post 模型实例，即被访问的文章 post
-    #     response = super(FreshmanDetailView, self).get(request, *args, **kwargs)
-    #
-    #     # 将文章阅读量 +1
-    #     # 注意 self.object 的值就是被访问的文章 post
-    #     self.object.increase_views()
-    #
-    #     # 视图必须返回一个 HttpResponse 对象
-    #     return response
+    def get(self, request, *args, **kwargs):
+        # 覆写 get 方法的目的是因为每当文章被访问一次，就得将文章阅读量 +1
+        # get 方法返回的是一个 HttpResponse 实例
+        # 之所以需要先调用父类的 get 方法，是因为只有当 get 方法被调用后，
+        # 才有 self.object 属性，其值为 Post 模型实例，即被访问的文章 post
+        response = super(FreshmanDetailView, self).get(request, *args, **kwargs)
+        # 将文章阅读量 +1
+        # 注意 self.object 的值就是被访问的文章 post
+        self.object.click +=1
+        self.object.save()
+        # 视图必须返回一个 HttpResponse 对象
+        return response
 
 #宠物交易
 def dogTrade(request):
@@ -534,12 +555,22 @@ def dogSaleAdd(request):
 class DogBuyDetailView(DetailView):
     model = DogBuy
     template_name = 'wxchat/dogbuy_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogBuyDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 
 #出售详情
 class DogSaleDetailView(DetailView):
     model = DogSale
     template_name = 'wxchat/dogsale_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogSaleDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
 
 
 @csrf_exempt
