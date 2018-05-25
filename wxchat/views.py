@@ -30,12 +30,12 @@ from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
 
-WECHAT_TOKEN = 'hello2018'
-APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
+# WECHAT_TOKEN = 'hello2018'
+# APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
 
 
-# WECHAT_TOKEN = 'dayankele123'
-# APP_URL = 'http://niymf6.natappfree.cc/wechat'
+WECHAT_TOKEN = 'dayankele123'
+APP_URL = 'http://ycinry.natappfree.cc/wechat'
 #APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
 
 
@@ -170,8 +170,8 @@ def createMenu(request):
                     },
                     {
                         "type": "view",
-                        "name": "新手课堂",
-                        "url": APP_URL + "/redirect/freshman"
+                        "name": "宠物共享",
+                        "url": APP_URL + "/redirect/dogshare"
                     }
                 ]
             },
@@ -180,18 +180,8 @@ def createMenu(request):
                 "sub_button":[
                     {
                         "type": "view",
-                        "name": "寄养",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "洗澡",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "训犬",
-                        "url": APP_URL + "/redirect/dogloss"
+                        "name": "乐园服务",
+                        "url": APP_URL + "/redirect/dogservice"
                     },
                     {
                         "type": "view",
@@ -202,6 +192,11 @@ def createMenu(request):
                         "type": "view",
                         "name": "宠物相关",
                         "url": APP_URL + "/redirect/dogloss"
+                    },
+                    {
+                        "type": "view",
+                        "name": "新手课堂",
+                        "url": APP_URL + "/redirect/freshman"
                     }
                 ]
             },
