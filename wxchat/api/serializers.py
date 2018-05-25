@@ -5,7 +5,7 @@ from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import DogAdoption, DogDelivery
+from doginfo.models import DogAdoption, DogDelivery,Freshman
 from easy_thumbnails.files import get_thumbnailer
 
 from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed,DogBuy,DogSale
@@ -232,6 +232,12 @@ class DogSaleSerializer(serializers.ModelSerializer):
         fields = ['id', 'typeid', 'typename','colors','ages','desc','sex','price','picture','ownername','telephone']
 
 
+#新手课堂
+class DogfreshmanSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Freshman
+        fields = ['id', 'name', 'picture_title','picture','desc','prod_desc',]
+
 #图片轮播
 class SwiperImageListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -242,3 +248,4 @@ class SwiperImageListSerializer(serializers.ModelSerializer):
             'image',
             'url'
         ]
+

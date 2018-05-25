@@ -1,0 +1,23 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd" style="font-weight: bold">新手课堂详情</div>
+        <div class="weui-panel__bd">
+            {% if object.picture %}
+                <img src="{{ object.picture.url }}" width="100%" height="280px">
+                {#        <img src="{{ object.picture.url }}" width="100%" height="280px">#}
+            {% endif %}
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd">
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value" style="text-align: center"> {{ object.name }}</span>
+                        <p>{{ object.prod_desc }}</p>
+                    </div>
+                </div>
+            </div>
+{#        <div>阅读量:{{ object.click }}</div>#}
+        </div>
+    </div>
+
+{% endblock container %}
+

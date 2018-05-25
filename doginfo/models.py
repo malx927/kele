@@ -83,6 +83,7 @@ class Doginfo(models.Model):
     Insect = models.DateField(verbose_name=u'驱虫日期', blank=True, null=True)
     vaccine = models.DateField(verbose_name=u'注射疫苗日期', blank=True, null=True)
     remarks = models.TextField(verbose_name=u'备注', max_length=1000, blank=True)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -131,6 +132,7 @@ class DogLoss(models.Model):
     telephone = models.CharField(verbose_name=u'主人手机', max_length=50)
     age = models.IntegerField(verbose_name=u'犬龄',null=True,  blank=True)
     sex = models.CharField(verbose_name=u'性别',max_length=10, null=True,blank=True, choices=PAGE_TYPE_CHOICE)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -163,6 +165,7 @@ class DogOwner(models.Model):
     finddate = models.DateField(verbose_name=u'发现时间')
     findname = models.CharField(verbose_name=u'联系人姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'联系电话', max_length=50)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -198,6 +201,7 @@ class Dogfood(models.Model):
     netweight = models.CharField(verbose_name=u'净含量', max_length=50, blank=True)
     dog_desc = RichTextField(verbose_name=u'简介', max_length=2000)
     prod_desc = RichTextField(verbose_name=u'产品介绍', max_length=2000)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -220,6 +224,7 @@ class DogBreed(models.Model):
     price  = models.CharField(verbose_name=u'价格区间', max_length=100)
     ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100)
     telephone = models.CharField(verbose_name=u'电话', max_length=50 )
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     showtime = models.DateTimeField(verbose_name=u'显示时间',blank=True,null=True)
     create_time = models.DateTimeField(verbose_name=u'添加时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
@@ -241,6 +246,7 @@ class DogAdoption(models.Model):
     telephone = models.CharField(verbose_name=u'电话',max_length=20)
     record = models.CharField(verbose_name='饲养记录',max_length=100,blank=True,null=True)
     requirement = models.CharField(verbose_name='对宠物要求',max_length=200)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -267,6 +273,7 @@ class DogDelivery(models.Model):
     picture =models.ImageField(verbose_name=u'照片',  upload_to='delivery/%Y%m%d/', blank=True,null=True)
     ownername = models.CharField(verbose_name=u'狗主姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -290,6 +297,7 @@ class DogBuy(models.Model):
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
     buyname = models.CharField(verbose_name=u'姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -314,6 +322,7 @@ class DogSale(models.Model):
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
     ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
@@ -353,5 +362,25 @@ class DogSkill(models.Model):
 
     class Meta:
         verbose_name = u'宠物技能培训'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+
+
+#新手课堂
+class Freshman(models.Model):
+    name = models.CharField(verbose_name=u'名称', max_length=50)
+    picture_title = models.CharField(verbose_name=u'图片标题', max_length=50)
+    picture = models.ImageField(verbose_name=u'图片',  upload_to='new/%Y%m%d/', blank=True,null=True)
+    desc = models.CharField(verbose_name=u'简介', max_length=200)
+    prod_desc = RichTextField(verbose_name=u'内容', max_length=2000)
+    click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+
+    class Meta:
+        verbose_name = u'新手课堂'
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
