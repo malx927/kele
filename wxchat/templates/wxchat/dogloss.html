@@ -1,13 +1,11 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block swiper %}
-	<div class="swiper-container">
-		<div class="swiper-wrapper">
-{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/a.jpg"></div>#}
-{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/b.jpg"></div>#}
-{#            <div class="swiper-slide"><img src="http://127.0.0.1/uploads/swiper/c.jpg"></div>#}
-		</div>
-		<div class="swiper-pagination"></div>
-	</div>
+{#  <video width="100%" height="240" src="http://video.hld.gov.cn/2018/2018.5.15公开日.mp4" autoplay="autoplay"  controls="" x5-playsinline="" playsinline="" webkit-playsinline="" poster="" preload="auto"></video>#}
+ <div class="swiper-container">
+    <div class="swiper-wrapper">
+    </div>
+    <div class="swiper-pagination"></div>
+ </div>
 {% endblock swiper %}
 {% block tabpanel %}
         <div class="weui-tab__content" id="tab1">
@@ -47,13 +45,13 @@
 {% endblock tabpanel %}
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">'
+            <div class="weui-tabbar__icon">寻宠物
                 <img src="{% static 'wxchat/images/icon_nav_button.png' %}" alt="">
             </div>
             <p class="weui-tabbar__label">寻宠物</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">
+            <div class="weui-tabbar__icon">寻宠主
                 <img src="{% static 'wxchat/images/icon_nav_msg.png' %}" alt="">
             </div>
             <p class="weui-tabbar__label">寻宠主</p>

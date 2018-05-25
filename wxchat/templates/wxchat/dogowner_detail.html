@@ -3,10 +3,12 @@
 <div class="weui-panel weui-panel_access">
     <div class="weui-panel__hd">寻找宠物主人</div>
     <div class="weui-panel__bd">
-    {% if object.picture %}
-        <img src="{{ object.picture.avatar.url }}" width="100%" height="280px">
+     <div class="detail_header">
+     {% if object.picture %}
+        <a href="{{ object.picture.url }}"><img src="{{ object.picture.url }}" ></a>
     {% endif %}
-    <div class="weui-form-preview">
+     </div>
+     <div class="weui-form-preview">
        <div class="weui-form-preview__bd">
            <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">品种:</label>
