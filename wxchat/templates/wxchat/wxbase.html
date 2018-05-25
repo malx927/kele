@@ -23,9 +23,9 @@
   <body ontouchstart>
     {% block container %}
 	<div class="weui-tab" id="tab">
-    {% block swiper %}{% endblock swiper %}
     {% block tab %}
         <div class="weui-tab__panel">
+        {% block swiper %}{% endblock swiper %}
         {% block tabpanel %}{% endblock tabpanel %}
         </div>
         <div class="weui-tabbar">
