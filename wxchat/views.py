@@ -29,15 +29,13 @@ from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 
-
 # WECHAT_TOKEN = 'hello2018'
 # APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
 
-
 WECHAT_TOKEN = 'dayankele123'
 APP_URL = 'http://ycinry.natappfree.cc/wechat'
-#APP_URL = 'http://3i5cqs.natappfree.cc/wechat'
 
+#APP_URL = 'http://myk5vg.natappfree.cc/wechat'
 
 
 APPID = settings.WECHAT_APPID

@@ -11,8 +11,7 @@ from doginfo.models import  Company, DogOwner ,Doginfo, DogBreed,DogLoss,DogAdop
 
 # 宠物简介
 class DoginfoAdmin(admin.ModelAdmin):
-    list_display = ('dog_code','dog_name', 'dog_color', 'owner_address', 'owner_telephone', 'remarks','dog_picture',
-    'create_time')
+    list_display = ('dog_code','dog_name', 'dog_color', 'owner_address', 'owner_telephone', 'remarks','dog_picture','create_time')
     list_display_links = ('dog_code',)
     search_fields = ('dog_name', 'owner_telephone','dog_code')
     ordering = ("-create_time",)
