@@ -157,6 +157,18 @@ $('#uploaderFiles').on('click', function(e){
 });
 
 
+$('.detail_header').on('click', function(e){
+    var target = e.target;
+
+    if(!target) return;
+
+    var url = target.getAttribute('src') || '';
+
+    if(!url) return;
+    var gallery = weui.gallery(url);
+    $('.weui-gallery__del').remove();
+    $('.weui-gallery span').html('');
+});
 
 $('#show-actions').on("click",function(){
 	weui.actionSheet([

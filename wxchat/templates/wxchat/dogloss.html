@@ -14,7 +14,8 @@
                 <div class="weui-panel__hd">
                     	<div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找宠物列表</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r">寻宠发布</a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r">寻宠发布</a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >寻主发布</a></div>
                         </div>
                 </div>
                 <div class="weui-panel__bd" id="dogloss"></div>
@@ -31,7 +32,6 @@
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找宠物主人列表</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_primary r" >寻主发布</a></div>
                     </div>
                 </div>
                 <div class="weui-panel__bd" id="dogowner"></div>
