@@ -32,12 +32,9 @@ import datetime
 # WECHAT_TOKEN = 'hello2018'
 # APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
 
-WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://3zxguq.natappfree.cc/wechat'
 
-#APP_URL = 'http://myk5vg.natappfree.cc/wechat'
-
-
+WECHAT_TOKEN = settings.WECHAT_TOKEN
+APP_URL = settings.APP_URL
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
