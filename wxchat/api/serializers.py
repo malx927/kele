@@ -31,7 +31,7 @@ from rest_framework import serializers
 class DogLossDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'colors', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid',  'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
 
@@ -39,7 +39,7 @@ class DogLossDetailSerializer(serializers.ModelSerializer):
 class DogBreedDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogBreed
-        fields = ['id', 'name', 'typeid', 'colors', 'desc', 'picture', 'price', 'showtime', 'ownername',
+        fields = ['id', 'name', 'typeid',  'desc', 'picture', 'price', 'showtime', 'ownername',
                   'telephone']
 
 
@@ -55,28 +55,32 @@ class DogdeliverySerializer(serializers.ModelSerializer):
     typename = serializers.CharField(source='typeid.typename', read_only=True)
     class Meta:
         model = DogDelivery
-        fields = ['id', 'name', 'typeid', 'typename', 'colors', 'ages', 'sex', 'desc', 'picture', 'ownername',
+        fields = ['id', 'name', 'typeid', 'typename', 'ages', 'sex', 'desc', 'picture', 'ownername',
                   'telephone']
 
 
 class DogdeliveryDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogDelivery
-        fields = ['id', 'name', 'typeid', 'colors', 'ages', 'sex', 'desc', 'picture', 'ownername', 'telephone']
+        fields = ['id', 'name', 'typeid', 'ages', 'sex', 'desc', 'picture', 'ownername', 'telephone']
 
 
 class DogLossSerializer(serializers.ModelSerializer):
     # url = HyperlinkedIdentityField(
     #          view_name='dog-loss-detail'
     #       )
-
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
     thumb_url = serializers.SerializerMethodField()
-
+    lostdate = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'typename','colors', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
+
+    def get_lostdate(self,obj):
+        if obj.lostdate:
+            return obj.lostdate.strftime('%Y-%m-%d %H:%M')
+        else:
+            return None
 
     def get_thumb_url(self,obj):
         if obj.picture:
@@ -92,12 +96,17 @@ class DogLossSerializer(serializers.ModelSerializer):
 
 # 寻找宠物主人
 class DogOwnerSerializer(serializers.ModelSerializer):
-
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
     thumb_url = serializers.SerializerMethodField()
+    finddate = serializers.SerializerMethodField()
     class Meta:
         model = DogOwner
-        fields = ['id','typename','colors','desc','picture','thumb_url','findplace','finddate','findname','telephone']
+        fields = ['id','typeid','desc','picture','thumb_url','findplace','finddate','findname','telephone']
+
+    def get_finddate(self,obj):
+        if obj.finddate:
+            return obj.finddate.strftime('%Y-%m-%d %H:%M')
+        else:
+            return None
 
     def get_thumb_url(self,obj):
         if obj.picture:
@@ -109,7 +118,7 @@ class DogOwnerSerializer(serializers.ModelSerializer):
 class DogOwnerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogOwner
-        fields = ['id', 'typeid', 'colors', 'desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
+        fields = ['id', 'typeid','desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
 
 
 
@@ -163,17 +172,14 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'id',
             'name',
             'ages',
+            'birth',
             'dogsex',
-            'colors',
             'typeid',
             'desc',
             'picture',
             'price',
             'ownername',
             'telephone',
-            'showtime',
-            'create_time',
-            'is_show',
         ]
 
     def get_dogsex(self, obj):
@@ -219,17 +225,16 @@ class DoginfoCreateSerializer(serializers.ModelSerializer):
 
 
 class DogBuySerializer(serializers.ModelSerializer):
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
+    # typename = serializers.CharField(source='typeid.typename',read_only=True)
     class Meta:
         model = DogBuy
-        fields = ['id', 'typeid', 'typename','colors','ages','sex','price','buyname','telephone']
+        fields = ['id', 'typeid', 'ages','sex','price','buyname','telephone']
 
 
 class DogSaleSerializer(serializers.ModelSerializer):
-    typename = serializers.CharField(source='typeid.typename',read_only=True)
     class Meta:
         model = DogSale
-        fields = ['id', 'typeid', 'typename','colors','ages','desc','sex','price','picture','ownername','telephone']
+        fields = ['id', 'typeid', 'ages','desc','sex','price','picture','ownername','telephone']
 
 
 #新手课堂

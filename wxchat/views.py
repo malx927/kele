@@ -33,7 +33,7 @@ import datetime
 # APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
 
 WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://ycinry.natappfree.cc/wechat'
+APP_URL = 'http://3zxguq.natappfree.cc/wechat'
 
 #APP_URL = 'http://myk5vg.natappfree.cc/wechat'
 
@@ -309,9 +309,10 @@ def dogLossAdd(request):
             dogloss.openid = openid
             dogloss.nickname = nickname
             dogloss.save()
+            print(dogloss.lostdate)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
+            return render(request, 'wxchat/dogloss_add.html', {"success": "false", 'form': form})
     else:
         form = DogLossForm()
         next = request.GET.get('next', '')
@@ -381,8 +382,10 @@ def dogOwnerAdd(request):
             dogowner.openid = openid
             dogowner.nickname = nickname
             dogowner.save()
+            print('$$$$$$$$$$$$$$$$$$$$$$$')
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
+            print('----------------------')
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogOwnerForm()

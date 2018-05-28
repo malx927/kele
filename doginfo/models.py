@@ -121,17 +121,16 @@ class Company(models.Model):
 # 寻宠登记表
 class DogLoss(models.Model):
     dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=500)
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种',on_delete=models.CASCADE)
-    colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
     picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True,max_length=200)
     # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True)
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
-    lostdate = models.DateField(verbose_name=u'丢失时间')
-    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
+    lostdate = models.DateTimeField(verbose_name=u'丢失时间')
+    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'主人手机', max_length=50)
     age = models.IntegerField(verbose_name=u'犬龄',null=True,  blank=True)
-    sex = models.CharField(verbose_name=u'性别',max_length=10, null=True,blank=True, choices=PAGE_TYPE_CHOICE)
+    sex = models.CharField(verbose_name=u'性别',max_length=10, null=True,blank=True, choices=TYPE_SEX_CHOICE)
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
@@ -156,14 +155,13 @@ class DogLoss(models.Model):
 
 # 寻宠主
 class DogOwner(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'宠物品种',on_delete=models.CASCADE)
-    colors = models.CharField(verbose_name=u'宠物颜色',max_length=24)
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
     picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
     # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
     findplace = models.CharField(verbose_name=u'发现地点', max_length=100, )
-    finddate = models.DateField(verbose_name=u'发现时间')
-    findname = models.CharField(verbose_name=u'联系人姓名', max_length=20)
+    finddate = models.DateTimeField(verbose_name=u'发现时间')
+    findname = models.CharField(verbose_name=u'联系人姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系电话', max_length=50)
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -177,10 +175,10 @@ class DogOwner(models.Model):
         ordering = ['-create_time']
 
     def __str__(self):
-        return self.typeid.typename + '|' + self.colors
+        return self.typeid
 
     def _getTitle(self):
-        return '【寻主人】品种:%s(%s)\n发现地点:%s' % (self.typeid.typename,self.colors,self.findplace)
+        return '【寻主人】品种:%s\n发现地点:%s' % (self.typeid,self.findplace)
     title = property(_getTitle)
 
     def get_absolute_url(self):
@@ -217,12 +215,12 @@ class DogBreed(models.Model):
     name = models.CharField(verbose_name=u'名称', max_length=50)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,null=True,blank=True)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True)
-    colors = models.CharField(verbose_name=u'颜色', max_length=10 )
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
+    birth =  models.DateField(verbose_name=u'出生日期',blank=True,null=True)
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True)
     picture =models.ImageField(verbose_name=u'图片',  upload_to='breed', blank=True)
     price  = models.CharField(verbose_name=u'价格区间', max_length=100)
-    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100)
+    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100,blank=True,null=True)
     telephone = models.CharField(verbose_name=u'电话', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     showtime = models.DateTimeField(verbose_name=u'显示时间',blank=True,null=True)
@@ -265,13 +263,12 @@ class DogAdoption(models.Model):
 
 class DogDelivery(models.Model):
     name = models.CharField(verbose_name='昵称',max_length=50)
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
-    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     desc = models.CharField(verbose_name=u'特征', max_length=50,blank=True,null=True)
     picture =models.ImageField(verbose_name=u'照片',  upload_to='delivery/%Y%m%d/', blank=True,null=True)
-    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=20)
+    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -290,12 +287,11 @@ class DogDelivery(models.Model):
 
 #宠物求购
 class DogBuy(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
-    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
-    buyname = models.CharField(verbose_name=u'姓名', max_length=20)
+    buyname = models.CharField(verbose_name=u'姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -313,14 +309,13 @@ class DogBuy(models.Model):
 
 #宠物出售
 class DogSale(models.Model):
-    typeid = models.ForeignKey(Dogtype,verbose_name=u'品种',on_delete=models.CASCADE)
-    colors = models.CharField(verbose_name=u'颜色', max_length=10,blank=True,null=True )
+    typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
     picture =models.ImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
-    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20)
+    ownername = models.CharField(verbose_name=u'主人姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)

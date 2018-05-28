@@ -8,7 +8,7 @@
 <div class="weui-cells__title">寻找主人登记表</div>
 <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
-    <div class="weui-cell weui-cell_select weui-cell_select-after">
+    <div class="weui-cell">
         <div class="weui-cell__hd">
             <label for="" class="weui-label">{{ form.typeid.label }}:</label>
         </div>
@@ -16,12 +16,7 @@
               {{ form.typeid }}
         </div>
     </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.colors.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.colors }}
-        </div>
-    </div>
+
     <div class="weui-cell">
         <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
         <div class="weui-cell__bd">

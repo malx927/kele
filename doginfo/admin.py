@@ -32,7 +32,7 @@ admin.site.register(Company, CompanyAdmin)
 
 
 class DogBreedAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sex','colors','typeid', 'price','ownername','telephone', 'create_time','nickname')
+    list_display = ('name', 'sex','typeid', 'price','ownername','telephone', 'create_time','nickname')
     list_display_links = ('name',)
     list_per_page = 50
 
@@ -41,7 +41,7 @@ admin.site.register(DogBreed, DogBreedAdmin)
 
 #寻宠表
 class DogLossAdmin(admin.ModelAdmin):
-    list_display = ('dog_name', 'typeid','colors','desc','lostplace','lostdate','ownername','telephone', 'create_time','nickname')
+    list_display = ('dog_name', 'typeid','desc','lostplace','lostdate','ownername','telephone', 'create_time','nickname')
     list_display_links = ('dog_name',)
     list_per_page = 50
 
@@ -50,7 +50,7 @@ admin.site.register(DogLoss, DogLossAdmin)
 
 #寻宠表
 class DogOwnerAdmin(admin.ModelAdmin):
-    list_display = ('typeid','colors','desc','findplace','finddate','findname','telephone', 'create_time','nickname')
+    list_display = ('typeid','desc','findplace','finddate','findname','telephone', 'create_time','nickname')
     list_per_page = 50
 
 admin.site.register(DogOwner, DogOwnerAdmin)
@@ -65,7 +65,7 @@ admin.site.register(DogAdoption, DogAdoptionAdmin)
 
 #宠物送养
 class DogDeliveryAdmin(admin.ModelAdmin):
-    list_display = ('name','typeid','colors','ages','sex','ownername','telephone','create_time','is_show','nickname')
+    list_display = ('name','typeid','ages','sex','ownername','telephone','create_time','is_show','nickname')
     list_per_page = 50
 
 admin.site.register(DogDelivery, DogDeliveryAdmin)
@@ -73,14 +73,14 @@ admin.site.register(DogDelivery, DogDeliveryAdmin)
 
 #宠物出售
 class DogSaleAdmin(admin.ModelAdmin):
-    list_display = ('typeid','colors','ages','sex','desc','price','create_time','is_show','nickname')
+    list_display = ('typeid','ages','sex','desc','price','create_time','is_show','nickname')
     list_per_page = 50
 
 admin.site.register(DogSale, DogSaleAdmin)
 
 #宠物求购
 class DogBuyAdmin(admin.ModelAdmin):
-    list_display = ('typeid','colors','ages','sex','buyname','telephone','create_time','is_show','nickname')
+    list_display = ('typeid','ages','sex','buyname','telephone','create_time','is_show','nickname')
     list_per_page = 50
 
 admin.site.register(DogBuy, DogBuyAdmin)

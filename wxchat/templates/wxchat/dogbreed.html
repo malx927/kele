@@ -8,8 +8,7 @@
                     	<div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物列表<span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}" class="weui-btn weui-btn_mini weui-btn_primary r" >添加</a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >配种发布</a></div>
                         </div>
                 </div>
                 <div class="weui-panel__bd" id="dogbreed">
@@ -26,18 +25,6 @@
 
 {% endblock tabpanel %}
  {% block tabbar %}
-{#        <a href="#tab1" class="weui-tabbar__item">#}
-{#            <div class="weui-tabbar__icon">'#}
-{#                <img src="{% static 'wxchat/images/icon_nav_button.png' %}" alt="">#}
-{#            </div>#}
-{#            <p class="weui-tabbar__label">寻宠物</p>#}
-{#        </a>#}
-{#        <a href="#tab2" class="weui-tabbar__item">#}
-{#            <div class="weui-tabbar__icon">#}
-{#                <img src="{% static 'wxchat/images/icon_nav_msg.png' %}" alt="">#}
-{#            </div>#}
-{#            <p class="weui-tabbar__label">寻宠主</p>#}
-{#        </a>#}
 
 {% endblock tabbar %}
 {% block bottomjs %}
