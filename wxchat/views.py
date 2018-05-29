@@ -682,7 +682,7 @@ def updateUserinfo(request):
 #         redirect_url = getUrl(item)
 #         return  HttpResponseRedirect(redirect_url)
 
-def freshMan_bak(request):
+def shareAction(request):
     jsApi = WeChatJSAPI(client)
     ticket = jsApi.get_jsapi_ticket()
     noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
@@ -698,7 +698,7 @@ def freshMan_bak(request):
         "url":url,
         "signature":signature
     }
-    return render(request,template_name='wxchat/freshman.html',context={'sign':signPackage})
+    return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
 def createTestData(request):
     curDate = datetime.datetime.now()
