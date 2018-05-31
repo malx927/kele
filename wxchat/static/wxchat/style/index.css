@@ -95,3 +95,6 @@ a{
      max-height:100%;
  }
 
+.weui-tabbar__label {
+    font-size: 12px;
+}

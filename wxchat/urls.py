@@ -3,12 +3,15 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, DogdeliveryDetailView, FreshmanDetailView, \
-    doginstitution, DoginstitutionAdd
-from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
-    authlist, dogLoss, dogLossAdd, createTestData, DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
-    DogOwnerDetailView, dogOwnerAdd, dogAdopt, dogBuyAdd, DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman, dogTrade, updateUserinfo
+
+from wxchat.views import doginstitution, DoginstitutionAdd
+from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView
+from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
+    authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
+    DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction
+
+
 
 urlpatterns = [
 
@@ -61,6 +64,8 @@ urlpatterns = [
     url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(), name='dog-sale-detail'),
     # 宠物出售
 
+    #分享
+    url(r'^dogshare/$', shareAction,name='dog-share'),
 
     # 网页授权测试
     url(r'^auth2/$', auth2),
