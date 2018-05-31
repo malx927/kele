@@ -3,15 +3,12 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView
-from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
-    authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
-    DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo
-
-
-
-
+from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, DogdeliveryDetailView, FreshmanDetailView, \
+    doginstitution, DoginstitutionAdd
+from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
+    authlist, dogLoss, dogLossAdd, createTestData, DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
+    DogOwnerDetailView, dogOwnerAdd, dogAdopt, dogBuyAdd, DogBuyDetailView, DogSaleDetailView, dogSaleAdd
+from wxchat.views import freshman, dogTrade, updateUserinfo
 
 urlpatterns = [
 
@@ -39,28 +36,30 @@ urlpatterns = [
     url(r'^dogadoptadd/$', dogadoptAdd, name='dog-adopt-add'),
     url(r'^dogadoptdetail/(?P<pk>\d+)$', DogAdoptDetailView.as_view(), name='dog-adopt-detail'),
 
-
     url(r'^dogdeliveryadd/$', DogdeliveryAdd, name='dog-delivery-add'),
     url(r'^dogdeliverydetail/(?P<pk>\d+)$', DogdeliveryDetailView.as_view(), name='dog-delivery-detail'),
 
+    # 配种
+    url(r'^dogbreed/$', dogBreed, name='dog-breed'),
+    url(r'^dogbreedadd/$', dogBreedAdd, name='dog-breed-add'),
+    url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(), name='dog-breed-detail'),
 
-    #配种
-    url(r'^dogbreed/$', dogBreed,name='dog-breed'),
-    url(r'^dogbreedadd/$', dogBreedAdd,name='dog-breed-add'),
-    url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(),name='dog-breed-detail'),
+    # 新手学堂
+    url(r'^freshman/$', freshman, name='fresh-man'),
+    url(r'^freshmandetail/(?P<pk>\d+)$', FreshmanDetailView.as_view(), name='dog-freshman-detail'),
 
-    #新手学堂
-    url(r'^freshman/$', freshman,name='fresh-man'),
-    url(r'^freshmandetail/(?P<pk>\d+)$', FreshmanDetailView.as_view(),name='dog-freshman-detail'),
+    # 加盟宠物医疗机构
+    url(r'^doginstitution/$', doginstitution, name='dog-institution'),
+    url(r'^doginstitutionadd/$', DoginstitutionAdd, name='dog-institution-add'),
 
-    #宠物求购
-    url(r'^dogtrade/$', dogTrade,name='dog-trade'),
-    url(r'^dogbuyadd/$', dogBuyAdd,name='dog-buy-add'),
-    url(r'^dogbuydetail/(?P<pk>\d+)$', DogBuyDetailView.as_view(),name='dog-buy-detail'),
-    #宠物销售
-    url(r'^dogsaleadd/$', dogSaleAdd,name='dog-sale-add'),
-    url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(),name='dog-sale-detail'),
-    #宠物出售
+    # 宠物求购
+    url(r'^dogtrade/$', dogTrade, name='dog-trade'),
+    url(r'^dogbuyadd/$', dogBuyAdd, name='dog-buy-add'),
+    url(r'^dogbuydetail/(?P<pk>\d+)$', DogBuyDetailView.as_view(), name='dog-buy-detail'),
+    # 宠物销售
+    url(r'^dogsaleadd/$', dogSaleAdd, name='dog-sale-add'),
+    url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(), name='dog-sale-detail'),
+    # 宠物出售
 
 
     # 网页授权测试

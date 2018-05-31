@@ -16,7 +16,7 @@ from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, T
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from doginfo.models import DogDelivery,DogAdoption,Freshman
-from .forms import DogadoptForm,DogdeliveryForm
+from .forms import DogadoptForm,DogdeliveryForm,DogInstitutionForm
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
 from wechatpy.client.api import WeChatJSAPI
@@ -181,7 +181,7 @@ def createMenu(request):
                     {
                         "type": "view",
                         "name": "合作医院",
-                        "url": APP_URL + "/redirect/dogloss"
+                        "url": APP_URL + "/redirect/doginstitution"
                     },
                     {
                         "type": "view",
@@ -473,6 +473,36 @@ def DogdeliveryAdd(request):
         form = DogdeliveryForm()
         next = request.GET.get('next', '')
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
+
+
+#加盟宠物医疗机构发布
+def DoginstitutionAdd(request):
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
+        print('openid=', openid)
+        next = request.GET.get('next', None)
+        print(next)
+        form = DogInstitutionForm(request.POST, request.FILES)
+        if form.is_valid():
+            dogowner = form.save(commit=False)
+            dogowner.openid = openid
+            dogowner.nickname = nickname
+            dogowner.save()
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
+        else:
+            render(request, 'wxchat/message.html', {"success": "false", 'next': next})
+    else:
+        form = DogInstitutionForm()
+        next = request.GET.get('next', '')
+        return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
+
+
+#加盟宠物医疗机构
+def doginstitution(request):
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/doginstitution.html')
+
 
 #新手课堂
 def freshman(request):

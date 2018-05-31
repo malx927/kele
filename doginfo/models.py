@@ -379,3 +379,23 @@ class Freshman(models.Model):
         verbose_name = u'新手课堂'
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
+
+
+#加盟宠物医疗机构
+class Doginstitution(models.Model):
+    name = models.CharField(verbose_name=u'机构名称', max_length=50,null=True,blank=True)
+    tel = models.CharField(verbose_name=u'联系电话', max_length=50)
+    address = models.CharField(verbose_name=u'详细地址', max_length=500)
+    province = models.CharField(verbose_name=u'所属省市区', max_length=50)
+    # city = models.CharField(verbose_name=u'所属市', max_length=50)
+    # area = models.CharField(verbose_name=u'所属县区', max_length=50)
+    # click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
+    openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
+
+
+    class Meta:
+        verbose_name = u'加盟宠物医疗机构'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
