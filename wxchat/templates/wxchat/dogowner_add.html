@@ -70,4 +70,12 @@
 </form>
 
 {% endblock container %}
-
+{% block bottomjs %}
+    <script>
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#id_finddate' ,//指定元素
+            type: 'datetime'
+        });
+    </script>
+{% endblock bottomjs %}
