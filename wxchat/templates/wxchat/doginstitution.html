@@ -1,0 +1,102 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block title %}加盟宠物医疗机构{% endblock %}
+
+{% block tabpanel %}
+        <div class="weui-tab__content">
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    	<div class="weui-flex">
+                            <div class="weui-flex__item"><span class="title">加盟宠物医疗机构列表<span></div>
+                            <div class="weui-flex__item"></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-institution-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >医疗机构发布</a></div>
+                        </div>
+                </div>
+                <div class="weui-panel__bd" id="doginstitution">
+
+                </div>
+                <div class="weui-panel__ft" >
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doginstitutionmore">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+{% endblock tabpanel %}
+ {% block tabbar %}
+
+{% endblock tabbar %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+     nextUrl = '{% url 'dog-institution-list' %}';
+{#     var loading = weui.loading('加载中...');#}
+     ///缓存滚动条位置
+     $('.weui-tab__panel').scroll(function(){
+            if($(this).scrollTop() !=0 ){
+                sessionStorage.setItem('offsetTop',$(this).scrollTop());
+            }
+    });
+    $(function(){
+        weui.tab('#tab',{
+            defaultIndex: 0,
+            onChange: function(index){
+                sessionStorage.setItem('tab',index);
+            }
+        });
+
+        $('#doginstitutionmore').on('click',function(){
+            getDataList( nextUrl );
+        });
+        getDataList( nextUrl );
+    });
+    function getDataList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#doginstitution'),
+          success: function(data){
+              nextUrl = data.next;
+              appendItem(data.results);
+              if(nextUrl == null)
+                $('#doginstitutionmore').css('display','none');
+              else
+                 $('#doginstitutionmore').css('display','');
+              loading.hide();
+              setScollPos();
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    function appendItem(results){
+        $.each(results,function(index,item){
+{#            var img_url = item.picture;#}
+{#            if(img_url == null){#}
+{#                img_url = "{% static 'wxchat/images/default_dog.png' %}";#}
+{#            }#}
+          lossitem =  '<a href=" " class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
+                                '<ul class="weui-media-box__info">' +
+								  '<li class="weui-media-box__info__meta">' + item.province + '</li>' +
+								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">' + item.address +'</li>' +
+								'</ul>' +
+                               '<p class="weui-media-box__desc">'+ item.tel +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#doginstitution').append( lossitem );
+        }) ;
+    }
+    ////设置滚动条位置
+    function setScollPos(){
+        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+        $('.weui-tab__panel').scrollTop(_offset);
+    }
+    </script>
+{% endblock bottomjs %}

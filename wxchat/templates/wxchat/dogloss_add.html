@@ -1,78 +1,88 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-<script type="application/javascript">
- window.history.forward(1);
-</script>
-{% endblock extra%}
-{% block container %}
-<div class="weui-cells__title">寻宠登记表</div>
-<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
-<div class="weui-cells weui-cells_form" id="uploader">
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">{{ form.dog_name.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.dog_name }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd">
-            <label for="" class="weui-label">{{ form.typeid.label }}:</label>
-        </div>
-        <div class="weui-cell__bd">
-              {{ form.typeid }}
-        </div>
-    </div>
+    <script type="application/javascript">
+        window.history.forward(1);
+    </script>
 
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.desc }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label class="weui-label">{{ form.picture.label }}:</label></div>
-        <div class="weui-cell__bd">
-            <div class="weui-uploader">
-                 <div class="weui-uploader__bd">
-                     <ul class="weui-uploader__files" id="uploaderFiles"></ul>
-                     <div class="weui-uploader__input-box">
-                         {{ form.picture }}
-                     </div>
-                 </div>
+{% endblock extra %}
+{% block container %}
+    <div class="weui-cells__title">寻宠登记表</div>
+    <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form" id="uploader">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.dog_name.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.dog_name }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.typeid.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">
+                    {{ form.typeid }}
+                </div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.desc }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.picture.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    <div class="weui-uploader">
+                        <div class="weui-uploader__bd">
+                            <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                            <div class="weui-uploader__input-box">
+                                {{ form.picture }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cell__ft">
+                    <div class="weui-cells__tips"></div>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.lostplace.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.lostplace }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.lostdate.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.lostdate }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ownername.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.ownername }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.telephone }}
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary">提交</button>
             </div>
         </div>
-        <div class="weui-cell__ft">
-            <div class="weui-cells__tips"></div>
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.lostplace.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.lostplace }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.lostdate.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.lostdate }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ownername.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.ownername }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.telephone }}
-        </div>
-    </div>
-    <div class="weui-btn-area">
-        <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
-    </div>
-</div>
-</form>
+    </form>
 
 {% endblock container %}
+{% block bottomjs %}
+    <script>
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#id_lostdate' ,//指定元素
+            type: 'datetime'
+        });
+    </script>
+{% endblock bottomjs %}

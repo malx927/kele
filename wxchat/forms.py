@@ -3,7 +3,7 @@ __author__ = 'malxin'
 
 from django import forms
 from django.forms import ModelChoiceField
-from doginfo.models import DogDelivery,DogAdoption
+from doginfo.models import DogDelivery,DogAdoption,Doginstitution
 from doginfo.models import DogBreed, DogBuy, DogSale
 from doginfo.models import DogLoss,DogOwner
 
@@ -25,7 +25,10 @@ class DogLossForm(forms.ModelForm):
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
 
-        self.fields['lostdate'].input_formats = ['%Y-%m-%dT%H:%M']
+        # self.fields['lostdate'].input_formats = ['%Y-%m-%dT%H:%M']
+        self.fields['lostdate'].widget.attrs['class'] = 'weui-input'
+        self.fields['lostdate'].widget.attrs['placeholder'] = '请选择时间'
+
         self.fields['lostplace'].widget.attrs['class'] = 'weui-input'
         self.fields['lostplace'].widget.attrs['placeholder'] = '请输入地址'
 
@@ -39,7 +42,7 @@ class DogLossForm(forms.ModelForm):
         fields = ['dog_name', 'typeid', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
 
         widgets = {
-            'lostdate': forms.TextInput({'class': 'weui-input', 'type': 'datetime-local','placeholder': '请输入时间'}),
+            # 'lostdate': forms.DateTimeInput({'class': 'weui-input', 'type': 'datetime','placeholder': '请输入时间'}),
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',
                  'maxlength': '11'}),
@@ -58,7 +61,9 @@ class DogOwnerForm(forms.ModelForm):
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
 
-        self.fields['finddate'].input_formats = ['%Y-%m-%dT%H:%M']
+        self.fields['finddate'].widget.attrs['class'] = 'weui-input'
+        self.fields['finddate'].widget.attrs['placeholder'] = '请输入发现时间'
+
         self.fields['findplace'].widget.attrs['class'] = 'weui-input'
         self.fields['findplace'].widget.attrs['placeholder'] = '请输入地址'
 
@@ -69,7 +74,6 @@ class DogOwnerForm(forms.ModelForm):
         model = DogOwner
         fields = ['typeid',  'desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
         widgets = {
-            'finddate': forms.TextInput({'class': 'weui-input', 'type': 'datetime-local'}),
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',
                  'maxlength': '11'}),
@@ -231,3 +235,32 @@ class DogSaleForm(forms.ModelForm):
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
         }
 
+
+#加盟宠物医疗机构
+class DogInstitutionForm(forms.ModelForm):
+
+    def __init__(self, *args,**kwargs):
+        super(DogInstitutionForm,self).__init__(*args,**kwargs)
+
+        self.fields['name'].widget.attrs['class'] = 'weui-input'
+        self.fields['name'].widget.attrs['placeholder'] = '请输入机构名称'
+
+        self.fields['province'].widget.attrs['class'] = 'weui-input'
+        self.fields['province'].widget.attrs['placeholder'] = '所属省市县(区)'
+
+        # self.fields['city'].widget.attrs['class'] = 'weui-input'
+        # self.fields['city'].widget.attrs['placeholder'] = '所属城市'
+        #
+        # self.fields['area'].widget.attrs['class'] = 'weui-input'
+        # self.fields['area'].widget.attrs['placeholder'] = '所属县区'
+
+        # self.fields['address'].widget.attrs['class'] = 'weui-input'
+        # self.fields['address'].widget.attrs['placeholder'] = '详细地址'
+
+    class Meta:
+        model = Doginstitution
+        fields = ['name','tel','province','address',]
+        widgets  = {
+            'tel':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
+            'address': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入详细地址', 'rows': '3'})
+        }

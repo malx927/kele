@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import DogBreed,DogAdoption,DogDelivery,Freshman
+from doginfo.models import DogBreed,DogAdoption,DogDelivery,Freshman,Doginstitution
 from doginfo.models import DogBuy, DogSale
 
 from doginfo.models import Doginfo,DogLoss,DogOwner
@@ -25,7 +25,8 @@ from .serializers import (
     DogBuySerializer,
     DogSaleSerializer,
     DogfreshmanSerializer,
-    SwiperImageListSerializer
+    SwiperImageListSerializer,
+    DogInstitutionSerializer,
 
 )
 from wxchat.models import SwiperImage
@@ -125,6 +126,15 @@ class DogFreshmanListAPIView(ListAPIView):
     serializer_class = DogfreshmanSerializer
     def get_queryset(self):
         return  Freshman.objects.filter(is_show=1)
+
+
+#加盟宠物医疗机构
+class DogInstitutionListAPIView(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = Doginstitution.objects.all()
+    serializer_class = DogInstitutionSerializer
+    def get_queryset(self):
+        return  Doginstitution.objects.filter(is_show=1)
 
 
 class SwiperImageListAPIView(ListAPIView):
