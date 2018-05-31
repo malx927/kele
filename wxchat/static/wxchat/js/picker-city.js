@@ -1,11 +1,71 @@
 +function (a) {
     a.rawCitiesData = [{
+        name: "辽宁",
+        sub: [{name: "请选择", sub: []}, {
+            name: "沈阳",
+            sub: [{name: "请选择"}, {name: "沈河区"}, {name: "皇姑区"}, {name: "和平区"}, {name: "大东区"}, {name: "铁西区"}, {name: "苏家屯区"}, {name: "东陵区"}, {name: "于洪区"}, {name: "新民市"}, {name: "法库县"}, {name: "辽中县"}, {name: "康平县"}, {name: "新城子区"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "大连",
+            sub: [{name: "请选择"}, {name: "西岗区"}, {name: "中山区"}, {name: "沙河口区"}, {name: "甘井子区"}, {name: "旅顺口区"}, {name: "金州区"}, {name: "瓦房店市"}, {name: "普兰店市"}, {name: "庄河市"}, {name: "长海县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "鞍山",
+            sub: [{name: "请选择"}, {name: "铁东区"}, {name: "铁西区"}, {name: "立山区"}, {name: "千山区"}, {name: "海城市"}, {name: "台安县"}, {name: "岫岩满族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "抚顺",
+            sub: [{name: "请选择"}, {name: "顺城区"}, {name: "新抚区"}, {name: "东洲区"}, {name: "望花区"}, {name: "抚顺县"}, {name: "清原满族自治县"}, {name: "新宾满族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "本溪",
+            sub: [{name: "请选择"}, {name: "平山区"}, {name: "明山区"}, {name: "溪湖区"}, {name: "南芬区"}, {name: "本溪满族自治县"}, {name: "桓仁满族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "丹东",
+            sub: [{name: "请选择"}, {name: "振兴区"}, {name: "元宝区"}, {name: "振安区"}, {name: "东港市"}, {name: "凤城市"}, {name: "宽甸满族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "锦州",
+            sub: [{name: "请选择"}, {name: "太和区"}, {name: "古塔区"}, {name: "凌河区"}, {name: "凌海市"}, {name: "黑山县"}, {name: "义县"}, {name: "北宁市"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "营口",
+            sub: [{name: "请选择"}, {name: "站前区"}, {name: "西市区"}, {name: "鲅鱼圈区"}, {name: "老边区"}, {name: "大石桥市"}, {name: "盖州市"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "阜新",
+            sub: [{name: "请选择"}, {name: "海州区"}, {name: "新邱区"}, {name: "太平区"}, {name: "清河门区"}, {name: "细河区"}, {name: "彰武县"}, {name: "阜新蒙古族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "辽阳",
+            sub: [{name: "请选择"}, {name: "白塔区"}, {name: "文圣区"}, {name: "宏伟区"}, {name: "太子河区"}, {name: "弓长岭区"}, {name: "灯塔市"}, {name: "辽阳县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "盘锦",
+            sub: [{name: "请选择"}, {name: "双台子区"}, {name: "兴隆台区"}, {name: "盘山县"}, {name: "大洼县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "铁岭",
+            sub: [{name: "请选择"}, {name: "银州区"}, {name: "清河区"}, {name: "调兵山市"}, {name: "开原市"}, {name: "铁岭县"}, {name: "昌图县"}, {name: "西丰县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "朝阳",
+            sub: [{name: "请选择"}, {name: "双塔区"}, {name: "龙城区"}, {name: "凌源市"}, {name: "北票市"}, {name: "朝阳县"}, {name: "建平县"}, {name: "喀喇沁左翼蒙古族自治县"}, {name: "其他"}],
+            type: 0
+        }, {
+            name: "葫芦岛",
+            sub: [{name: "请选择"}, {name: "龙港区"}, {name: "南票区"}, {name: "连山区"}, {name: "兴城市"}, {name: "绥中县"}, {name: "建昌县"},{name: "杨杖子"}, {name: "其他"}],
+            type: 0
+        }, {name: "其他"}],
+        type: 0
+    },{
         name: "北京",
         sub: [{
             name: "北京",
             sub: [{name: "请选择"}, {name: "东城区"}, {name: "西城区"}, {name: "崇文区"}, {name: "宣武区"}, {name: "朝阳区"}, {name: "海淀区"}, {name: "丰台区"}, {name: "石景山区"}, {name: "房山区"}, {name: "通州区"}, {name: "顺义区"}, {name: "昌平区"}, {name: "大兴区"}, {name: "怀柔区"}, {name: "平谷区"}, {name: "门头沟区"}, {name: "密云县"}, {name: "延庆县"}, {name: "其他"}]
         }],
-        type: 0
+        type: 1
     }, {
         name: "广东",
         sub: [{name: "请选择", sub: []}, {
@@ -107,67 +167,7 @@
             sub: [{name: "请选择"}, {name: "渝中区"}, {name: "大渡口区"}, {name: "江北区"}, {name: "南岸区"}, {name: "北碚区"}, {name: "渝北区"}, {name: "巴南区"}, {name: "长寿区"}, {name: "双桥区"}, {name: "沙坪坝区"}, {name: "万盛区"}, {name: "万州区"}, {name: "涪陵区"}, {name: "黔江区"}, {name: "永川区"}, {name: "合川区"}, {name: "江津区"}, {name: "九龙坡区"}, {name: "南川区"}, {name: "綦江县"}, {name: "潼南县"}, {name: "荣昌县"}, {name: "璧山县"}, {name: "大足县"}, {name: "铜梁县"}, {name: "梁平县"}, {name: "开县"}, {name: "忠县"}, {name: "城口县"}, {name: "垫江县"}, {name: "武隆县"}, {name: "丰都县"}, {name: "奉节县"}, {name: "云阳县"}, {name: "巫溪县"}, {name: "巫山县"}, {name: "石柱土家族自治县"}, {name: "秀山土家族苗族自治县"}, {name: "酉阳土家族苗族自治县"}, {name: "彭水苗族土家族自治县"}, {name: "其他"}]
         }],
         type: 0
-    }, {
-        name: "辽宁",
-        sub: [{name: "请选择", sub: []}, {
-            name: "沈阳",
-            sub: [{name: "请选择"}, {name: "沈河区"}, {name: "皇姑区"}, {name: "和平区"}, {name: "大东区"}, {name: "铁西区"}, {name: "苏家屯区"}, {name: "东陵区"}, {name: "于洪区"}, {name: "新民市"}, {name: "法库县"}, {name: "辽中县"}, {name: "康平县"}, {name: "新城子区"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "大连",
-            sub: [{name: "请选择"}, {name: "西岗区"}, {name: "中山区"}, {name: "沙河口区"}, {name: "甘井子区"}, {name: "旅顺口区"}, {name: "金州区"}, {name: "瓦房店市"}, {name: "普兰店市"}, {name: "庄河市"}, {name: "长海县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "鞍山",
-            sub: [{name: "请选择"}, {name: "铁东区"}, {name: "铁西区"}, {name: "立山区"}, {name: "千山区"}, {name: "海城市"}, {name: "台安县"}, {name: "岫岩满族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "抚顺",
-            sub: [{name: "请选择"}, {name: "顺城区"}, {name: "新抚区"}, {name: "东洲区"}, {name: "望花区"}, {name: "抚顺县"}, {name: "清原满族自治县"}, {name: "新宾满族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "本溪",
-            sub: [{name: "请选择"}, {name: "平山区"}, {name: "明山区"}, {name: "溪湖区"}, {name: "南芬区"}, {name: "本溪满族自治县"}, {name: "桓仁满族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "丹东",
-            sub: [{name: "请选择"}, {name: "振兴区"}, {name: "元宝区"}, {name: "振安区"}, {name: "东港市"}, {name: "凤城市"}, {name: "宽甸满族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "锦州",
-            sub: [{name: "请选择"}, {name: "太和区"}, {name: "古塔区"}, {name: "凌河区"}, {name: "凌海市"}, {name: "黑山县"}, {name: "义县"}, {name: "北宁市"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "营口",
-            sub: [{name: "请选择"}, {name: "站前区"}, {name: "西市区"}, {name: "鲅鱼圈区"}, {name: "老边区"}, {name: "大石桥市"}, {name: "盖州市"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "阜新",
-            sub: [{name: "请选择"}, {name: "海州区"}, {name: "新邱区"}, {name: "太平区"}, {name: "清河门区"}, {name: "细河区"}, {name: "彰武县"}, {name: "阜新蒙古族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "辽阳",
-            sub: [{name: "请选择"}, {name: "白塔区"}, {name: "文圣区"}, {name: "宏伟区"}, {name: "太子河区"}, {name: "弓长岭区"}, {name: "灯塔市"}, {name: "辽阳县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "盘锦",
-            sub: [{name: "请选择"}, {name: "双台子区"}, {name: "兴隆台区"}, {name: "盘山县"}, {name: "大洼县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "铁岭",
-            sub: [{name: "请选择"}, {name: "银州区"}, {name: "清河区"}, {name: "调兵山市"}, {name: "开原市"}, {name: "铁岭县"}, {name: "昌图县"}, {name: "西丰县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "朝阳",
-            sub: [{name: "请选择"}, {name: "双塔区"}, {name: "龙城区"}, {name: "凌源市"}, {name: "北票市"}, {name: "朝阳县"}, {name: "建平县"}, {name: "喀喇沁左翼蒙古族自治县"}, {name: "其他"}],
-            type: 0
-        }, {
-            name: "葫芦岛",
-            sub: [{name: "请选择"}, {name: "龙港区"}, {name: "南票区"}, {name: "连山区"}, {name: "兴城市"}, {name: "绥中县"}, {name: "建昌县"}, {name: "其他"}],
-            type: 0
-        }, {name: "其他"}],
-        type: 1
-    }, {
+    },  {
         name: "江苏",
         sub: [{name: "请选择", sub: []}, {
             name: "南京",
