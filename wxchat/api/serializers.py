@@ -20,7 +20,7 @@ from doginfo.models import (
 from wxchat.models import SwiperImage
 
 
-from dogtype.models import Dogtype
+from dogtype.models import Dogtype,AreaCode
 
 __author__ = 'malixin'
 
@@ -260,3 +260,41 @@ class SwiperImageListSerializer(serializers.ModelSerializer):
             'url'
         ]
 
+class CodeDistrictSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AreaCode
+        fields = [
+            'code',
+            'name',
+        ]
+
+class CodeCitySerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+    class Meta:
+        model = AreaCode
+        fields = [
+            'code',
+            'name',
+            'children',
+        ]
+
+    def get_children(self,obj):
+        distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
+        serializer = CodeDistrictSerializer(distrSet, many=True)
+        return serializer.data
+
+
+class CodeProvinceSerializer(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
+    class Meta:
+        model = AreaCode
+        fields = [
+            'code',
+            'name',
+            'children',
+        ]
+
+    def get_children(self,obj):
+        citySet = AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[obj.code])
+        serializer = CodeCitySerializer(citySet, many=True)
+        return serializer.data

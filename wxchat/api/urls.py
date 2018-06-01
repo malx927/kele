@@ -19,7 +19,7 @@ from .views import (
     DogFreshmanListAPIView,
     SwiperImageListAPIView,
     DogInstitutionListAPIView,
-
+    AreaCodeListAPIView,
 )
 
 urlpatterns = [
@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^freshmanlist/$', DogFreshmanListAPIView.as_view(), name='dog-freshman-list'),
     url(r'^swiperimagelist/$', SwiperImageListAPIView.as_view(), name='swiper-image-list'),
     url(r'^doginstitution/$', DogInstitutionListAPIView.as_view(), name='dog-institution-list'),
+    url(r'^arealist/$', AreaCodeListAPIView.as_view(), name='area-code-list'),
 
 
 ]
