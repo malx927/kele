@@ -345,7 +345,7 @@ a:active {
     }
 }
 
-/*鎸夐�?*/
+/*鎸夐�?*/
 
 .button_sp_area {
     padding: 10px 0;
@@ -376,7 +376,7 @@ a:active {
 }
 
 .bg-blue {
-    /*钃濊�?*/
+    /*钃濊�?*/
     background-color: #18b4ed;
 }
 
@@ -409,7 +409,7 @@ input.bg-blue-b {
 }
 
 .bg-orange {
-    /*姗欒�?*/
+    /*姗欒�?*/
     background-color: #FF6600;
 }
 
@@ -445,7 +445,7 @@ input.bg-orange-b {
     background-color: #e7e7e7;
 }
 
-/*瀛椾綋澶у�? 鐢熸�?11-32 35 40 45 50鍍忕礌�?�椾�? */
+/*瀛椾綋澶у�? 鐢熸�?11-32 35 40 45 50鍍忕礌�?�椾�? */
 .f11 {
     font-size: 11px !important;
     line-height: 11px;
@@ -654,7 +654,7 @@ input.bg-orange-b {
     border-right: none;
 }
 
-/*鍒嗗壊绾�?*/
+/*鍒嗗壊绾�?*/
 .weui-loadmore {
     font-size: 14px;
     line-height: 1.6em;
@@ -698,7 +698,7 @@ input.bg-orange-b {
 }
 
 /**
- * 琛ㄦ�?
+ * 琛ㄦ�?
  */
 .weui-table {
     width: 100%;
@@ -832,7 +832,7 @@ input.bg-orange-b {
     text-overflow: ellipsis;
 }
 
-/*鎼滅�?*/
+/*鎼滅�?*/
 .search-input {
     box-sizing: content-box;
     width: 100%;
@@ -865,7 +865,7 @@ input.bg-orange-b {
     border-radius: 0 !important;
 }
 
-/*鏍囩�?*/
+/*鏍囩�?*/
 .weui-label {
     display: inline-block;
     position: relative;
@@ -1013,7 +1013,7 @@ input.bg-orange-b {
     right: -5px;
 }
 
-/*鍔ㄧ�?*/
+/*鍔ㄧ�?*/
 .animated {
     -webkit-animation-duration: 1s;
     animation-duration: 1s;
@@ -1452,7 +1452,7 @@ input.bg-orange-b {
     background-image: linear-gradient(top, #999, #FFF);
 }
 
-/*鍥剧墖鏁堟灉缁勪�?*/
+/*鍥剧墖鏁堟灉缁勪�?*/
 .img-border {
     padding: 3px;
     margin-left: -5px;
@@ -1534,7 +1534,7 @@ weui-box*/
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-/*鍒嗛�?*/
+/*鍒嗛�?*/
 .pager {
     font-size: 14px;
 }
@@ -1599,7 +1599,7 @@ weui-box*/
     float: right;
 }
 
-/*鍒嗕韩鍒版湅鍙嬪�?鎴栨湅鍙�?*/
+/*鍒嗕韩鍒版湅鍙嬪�?鎴栨湅鍙�?*/
 .weui-share {
     position: fixed;
     left: 0;
@@ -1840,7 +1840,7 @@ weui-box*/
     padding: 0 15px;
 }
 
-/*璇勮�?*/
+/*璇勮�?*/
 .weui-comment {
     font-size: 16px;
     margin-top: -5px;
@@ -1980,7 +1980,7 @@ weui-box*/
     background-position: 0 -18px;
 }
 
-/*鍔犲�?*/
+/*鍔犲�?*/
 .weui-number-input {
     float: left;
     height: 20px;
@@ -2066,7 +2066,7 @@ weui-box*/
     overflow: hidden;
 }
 
-/*寮瑰嚭妗�?*/
+/*寮瑰嚭妗�?*/
 .weui_msg_img {
     background: rgba(0, 0, 0, 0.7) none repeat scroll 0 0;
     height: 100%;
@@ -2138,7 +2138,7 @@ weui-box*/
     padding: 0 0 10px;
 }
 
-/*toast 瀵硅瘽妗�? 鎵╁�?*/
+/*toast 瀵硅瘽妗�? 鎵╁�?*/
 .weui_dialog,
 .weui_toast {
     -webkit-transition-duration: .2s;
@@ -2999,7 +2999,7 @@ weui-box*/
     margin-right: 0
 }
 
-/*鏃堕棿绾�?*/
+/*鏃堕棿绾�?*/
 .timeline {
     padding: 1rem;
 }
@@ -3221,7 +3221,7 @@ weui-box*/
     background-clip: padding-box
 }
 
-/*涓婁笅鎷�?*/
+/*涓婁笅鎷�?*/
 .dropload-up, .dropload-down {
     position: relative;
     height: 0;
@@ -3573,15 +3573,12 @@ weui-box*/
     width: 100%;
 }
 
-/*鏈嬪弸鍦�?*/
+/*鏈嬪弸鍦�?*/
 /*
-  鍩烘湰鏍峰紡璁剧�?
+  鍩烘湰鏍峰紡璁剧�?
   Basic Setup
   寮曠敤WeUI,FontAwesome
 */
-body {
-    background-color: #eee;
-}
 
 .iphone-container {
     width: 250px;
@@ -4195,7 +4192,7 @@ button.weui-form-preview-btn {
     min-width: 0;
 }
 
-/*瑙掓�?*/
+/*瑙掓�?*/
 .weui-mark {
     padding-left: 10px;
     padding-right: 0;
@@ -4458,7 +4455,7 @@ button.weui-form-preview-btn {
     background: #aaa
 }
 
-/*�?粯鍦烘�?*/
+/*�?粯鍦烘�?*/
 .weui-pay {
     position: relative;
     z-index: 1;
@@ -4826,7 +4823,7 @@ button.weui-form-preview-btn {
     color: #04be02;
 }
 
-/*鏂板崟閫夊閫夋枃鏈枃鏈�?*/
+/*鏂板崟閫夊閫夋枃鏈枃鏈�?*/
 .weui-start:after {
     content: '*';
     font-weight: 700;
