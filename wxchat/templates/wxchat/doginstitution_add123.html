@@ -1,0 +1,62 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block extra %}
+<script>
+        $(function () {
+            $("#id_province").cityPicker({
+                title: "选择省市县(区)"
+            });
+        });
+
+    </script>
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+
+{% endblock extra%}
+
+{% block container %}
+<div class="weui-cells__title">加盟宠物医疗机构登记表</div>
+<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+<div class="weui-cells weui-cells_form" id="uploader">
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.name }}
+        </div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd">
+            <label for="" class="weui-label">{{ form.province.label }}:</label>
+        </div>
+        <div class="weui-cell__bd">
+              {{ form.province }}
+        </div>
+    </div>
+{#    <div class="weui-cell">#}
+{#        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.city.label }}:</label></div>#}
+{#        <div class="weui-cell__bd">#}
+{#            {{ form.city }}#}
+{#        </div>#}
+{#    </div>#}
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.address.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.address }}
+        </div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.tel.label }}:</label></div>
+        <div class="weui-cell__bd">
+            {{ form.tel }}
+        </div>
+    </div>
+    <div class="weui-btn-area">
+        <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+    </div>
+</div>
+</form>
+
+{% endblock container %}
+
+
