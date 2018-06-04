@@ -3,11 +3,38 @@
 {% block extra %}
 <script>
         $(function () {
-            $("#id_province").cityPicker({
-                title: "选择省市县(区)"
+            $('#id_province').on('click', function (e) {
+                target = e.target;
+               $(target).attr("readOnly","true");
+                getDataList("/static/wxchat/js/areacode.json");
             });
-        });
 
+        });
+    function getDataList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+             weui.picker(data, {
+                    depth: 3,
+                    defaultValue: ['21', '2114', '211402'],
+                    onChange: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+
+                    },
+                    onConfirm: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+                    },
+                    id: 'cascadePicker'
+                });
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
     </script>
 <script type="application/javascript">
  window.history.forward(1);

@@ -262,22 +262,39 @@ class SwiperImageListSerializer(serializers.ModelSerializer):
         ]
 
 class CodeDistrictSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
         ]
 
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
+
 class CodeCitySerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
+
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
             'children',
         ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
 
     def get_children(self,obj):
         distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
@@ -286,14 +303,23 @@ class CodeCitySerializer(serializers.ModelSerializer):
 
 
 class CodeProvinceSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
+
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
             'children',
         ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
 
     def get_children(self,obj):
         citySet = AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[obj.code])
