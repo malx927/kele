@@ -20,7 +20,8 @@ from doginfo.models import (
 from wxchat.models import SwiperImage
 
 
-from dogtype.models import Dogtype
+from dogtype.models import Dogtype,AreaCode
+
 
 __author__ = 'malixin'
 
@@ -260,3 +261,67 @@ class SwiperImageListSerializer(serializers.ModelSerializer):
             'url'
         ]
 
+class CodeDistrictSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+    class Meta:
+        model = AreaCode
+        fields = [
+            'label',
+            'value',
+        ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
+
+class CodeCitySerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AreaCode
+        fields = [
+            'label',
+            'value',
+            'children',
+        ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
+
+    def get_children(self,obj):
+        distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
+        serializer = CodeDistrictSerializer(distrSet, many=True)
+        return serializer.data
+
+
+class CodeProvinceSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
+    children = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AreaCode
+        fields = [
+            'label',
+            'value',
+            'children',
+        ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
+
+    def get_children(self,obj):
+        citySet = AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[obj.code])
+        serializer = CodeCitySerializer(citySet, many=True)
+        return serializer.data

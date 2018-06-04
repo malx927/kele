@@ -74,7 +74,7 @@ a{
 
 .swiper-container {
     width: 100%;
-    height: 220px;
+    height: 200px;
 }
 
 .swiper-slide img{
@@ -97,6 +97,13 @@ a{
 
 .weui-tabbar__label {
     font-size: 12px;
+}
+
+.weui-grid{
+   color: #09BB07;
+}
+.green{
+     color: #09BB07;
 }
 
 /* picker,日期时间popup,select*/

@@ -1,12 +1,13 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
 {% block container %}
 <div class="weui-panel weui-panel_access">
-    <div class="weui-panel__hd">丢失宠物详细介绍</div>
+    <div class="weui-panel__hd">丢失宠物详细介绍<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-lg green" aria-hidden="true"></i></a><span></div>
     <div class="weui-panel__bd">
-    {% if object.picture %}
-        <img src="{{object.picture.avatar.url }}" width="100%" height="280px">
-{#        <img src="{{ object.picture.url }}" width="100%" height="280px">#}
+     <div class="detail_header">
+     {% if object.picture %}
+        <img src="{{ object.picture.url }}" >
     {% endif %}
+     </div>
     <div class="weui-form-preview">
        <div class="weui-form-preview__hd">
            <div class="weui-form-preview__item">

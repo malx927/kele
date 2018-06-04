@@ -26,6 +26,7 @@ class AreaCode(models.Model):
      class Meta:
          verbose_name=u'地区编码表'
          verbose_name_plural = verbose_name
+         ordering = ['code']
 
      def __str__(self):
          return  self.name

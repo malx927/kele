@@ -141,60 +141,40 @@ def createMenu(request):
     resp = client.menu.create({
         "button": [
             {
-                "name":"互助服务",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "寻犬",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "配种",
-                        "url": APP_URL + "/redirect/dogbreed"
-                    },
-                    {
-                        "type": "view",
-                        "name": "领养",
-                        "url": APP_URL + "/redirect/dogadopt"
-                    },
-                    {
-                        "type": "view",
-                        "name": "买卖",
-                        "url": APP_URL + "/redirect/dogtrade"
-                    },
-                    {
-                        "type": "view",
-                        "name": "宠物共享",
-                        "url": APP_URL + "/redirect/dogshare"
-                    }
-                ]
+                "type": "view",
+                "name": "宠物社区",
+                "url": APP_URL + "/redirect/dogindex"
             },
             {
-                "name":"宠物社区",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "乐园服务",
-                        "url": APP_URL + "/redirect/dogservice"
-                    },
-                    {
-                        "type": "view",
-                        "name": "合作医院",
-                        "url": APP_URL + "/redirect/doginstitution"
-                    },
-                    {
-                        "type": "view",
-                        "name": "宠物相关",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "新手课堂",
-                        "url": APP_URL + "/redirect/freshman"
-                    }
-                ]
+                "type": "view",
+                "name": "本周团购",
+                "url": APP_URL + "/redirect/dogindex"
             },
+            # {
+            #     "name":"宠物社区",
+            #     "sub_button":[
+            #         {
+            #             "type": "view",
+            #             "name": "乐园服务",
+            #             "url": APP_URL + "/redirect/dogservice"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "合作医院",
+            #             "url": APP_URL + "/redirect/doginstitution"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "宠物相关",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "新手课堂",
+            #             "url": APP_URL + "/redirect/freshman"
+            #         }
+            #     ]
+            # },
             {
                 "name":"我的联盟",
                 "sub_button":[
@@ -495,7 +475,7 @@ def DoginstitutionAdd(request):
     else:
         form = DogInstitutionForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/doginstitution_add123.html', {'form': form, 'next': next})
 
 
 #加盟宠物医疗机构
@@ -730,6 +710,10 @@ def shareAction(request):
     }
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
+
+def dogIndex(request):
+    return render(request,'wxchat/dogindex.html')
+
 def createTestData(request):
     curDate = datetime.datetime.now()
     strDate = curDate.strftime('%Y-%m-%d')
@@ -786,3 +770,5 @@ def createTestData(request):
     #     DogSale.objects.create(**data)
 
     return HttpResponse('success')
+
+
