@@ -730,6 +730,10 @@ def shareAction(request):
     }
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
+
+def dogIndex(request):
+    return render(request,'wxchat/dogindex.html')
+
 def createTestData(request):
     curDate = datetime.datetime.now()
     strDate = curDate.strftime('%Y-%m-%d')
