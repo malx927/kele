@@ -144,3 +144,10 @@ class SwiperImageListAPIView(ListAPIView):
     def get_queryset(self):
         return  SwiperImage.objects.filter(is_show=1)
 
+#寻找宠物主人
+class AreaCode(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = DogBuy.objects.all()
+    serializer_class = DogBuySerializer
+    def get_queryset(self):
+        return  DogBuy.objects.filter(is_show=1)

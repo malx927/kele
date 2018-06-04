@@ -20,7 +20,7 @@ from doginfo.models import (
 from wxchat.models import SwiperImage
 
 
-from dogtype.models import Dogtype
+from dogtype.models import Dogtype, AreaCode
 
 __author__ = 'malixin'
 

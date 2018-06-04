@@ -3,9 +3,86 @@
 {% block extra %}
 <script>
         $(function () {
-            $("#id_province").cityPicker({
-                title: "选择省市县(区)"
+            $('#id_province').on('click', function (e) {
+                target = e.target;
+               $(target).attr("readOnly","true");
+                weui.picker([
+                    {
+                        label: '广东',
+                        value: 0,
+                        children: [
+                            {
+                                label: '广州',
+                                value: 0,
+                                children: [
+                                    {
+                                        label: '海珠',
+                                        value: 0
+                                    }, {
+                                        label: '番禺',
+                                        value: 1
+                                    }
+                                ]
+                            }, {
+                                label: '佛山',
+                                value: 1,
+                                children: [
+                                    {
+                                        label: '禅城',
+                                        value: 0
+                                    }, {
+                                        label: '南海',
+                                        value: 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }, {
+                        label: '广西',
+                        value: 1,
+                        children: [
+                            {
+                                label: '南宁',
+                                value: 0,
+                                children: [
+                                    {
+                                        label: '青秀',
+                                        value: 0
+                                    }, {
+                                        label: '兴宁',
+                                        value: 1
+                                    }
+                                ]
+                            }, {
+                                label: '桂林',
+                                value: 1,
+                                children: [
+                                    {
+                                        label: '象山',
+                                        value: 0
+                                    }, {
+                                        label: '秀峰',
+                                        value: 1
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ], {
+                    depth: 3,
+                    defaultValue: [0, 1, 1],
+                    onChange: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+                        console.log(result);
+                    },
+                    onConfirm: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+                        console.log(result);
+                    },
+                    id: 'cascadePicker'
+                });
             });
+
         });
 
     </script>
@@ -16,7 +93,7 @@
 {% endblock extra%}
 
 {% block container %}
-<div class="weui-cells__title">加盟宠物医疗机构登记表</div>
+<div class="weui-cells__title">加盟宠物医疗机构登记表1</div>
 <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
     <div class="weui-cell">

@@ -495,7 +495,7 @@ def DoginstitutionAdd(request):
     else:
         form = DogInstitutionForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/doginstitution_add123.html', {'form': form, 'next': next})
 
 
 #加盟宠物医疗机构
@@ -786,3 +786,5 @@ def createTestData(request):
     #     DogSale.objects.create(**data)
 
     return HttpResponse('success')
+
+
