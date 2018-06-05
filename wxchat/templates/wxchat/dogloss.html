@@ -2,21 +2,23 @@
 {% block swiper %}
 
 {#  <video width="100%" height="240" src="http://video.hld.gov.cn/2018/2018.5.15公开日.mp4" autoplay="autoplay"  controls="" x5-playsinline="" playsinline="" webkit-playsinline="" poster="" preload="auto"></video>#}
- <div class="swiper-container">
-    <div class="swiper-wrapper">
-    </div>
-    <div class="swiper-pagination"></div>
- </div>
+{# <div class="swiper-container">#}
+{#    <div class="swiper-wrapper">#}
+{#    </div>#}
+{#    <div class="swiper-pagination"></div>#}
+{# </div>#}
 {% endblock swiper %}
 {% block tabpanel %}
+        <div class="weui-flex" >
+            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">寻宠发布</a></div>
+            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >寻主发布</a></div>
+        </div>
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
-                    	<div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">寻找宠物列表</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r">寻宠发布</a></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >寻主发布</a></div>
-                        </div>
+                    <div class="weui-flex">
+                            <div class="weui-flex__item"><span class="title ">寻找宠物列表</span></div>
+                    </div>
                 </div>
                 <div class="weui-panel__bd" id="dogloss"></div>
                 <div class="weui-panel__ft">
@@ -32,8 +34,6 @@
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找主人列表</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r">寻宠发布</a></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >寻主发布</a></div>
                     </div>
                 </div>
                 <div class="weui-panel__bd" id="dogowner"></div>
@@ -48,14 +48,14 @@
 {% endblock tabpanel %}
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">寻宠物
-                <img src="{% static 'wxchat/images/search.png' %}" alt="">
+            <div class="weui-tabbar__icon">
+                <i class="fa fa-paw" aria-hidden="true"></i>
             </div>
             <p class="weui-tabbar__label">寻宠物</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
-            <div class="weui-tabbar__icon">寻宠主
-                <img src="{% static 'wxchat/images/icon_nav_search_bar.png' %}" alt="">
+            <div class="weui-tabbar__icon">
+               <i class="fa fa-male" aria-hidden="true"></i>
             </div>
             <p class="weui-tabbar__label">寻宠主</p>
         </a>
@@ -76,7 +76,7 @@
     });
 
     $(function(){
-        setImageUrl();
+        //setImageUrl();
 
         defIndex = sessionStorage.getItem('tab');
         console.log('defindex='+ defIndex);

@@ -11,6 +11,7 @@ from doginfo.models import DogBreed,DogAdoption,DogDelivery,Freshman,Doginstitut
 from doginfo.models import DogBuy, DogSale
 
 from doginfo.models import Doginfo,DogLoss,DogOwner
+from dogtype.models import AreaCode
 from .serializers import (
     DoginfoListSerializer,
     DoginfoCreateSerializer,
@@ -27,7 +28,7 @@ from .serializers import (
     DogfreshmanSerializer,
     SwiperImageListSerializer,
     DogInstitutionSerializer,
-
+    CodeProvinceSerializer,
 )
 from wxchat.models import SwiperImage
 
@@ -141,6 +142,17 @@ class SwiperImageListAPIView(ListAPIView):
     permission_classes = [AllowAny]
     queryset = SwiperImage.objects.all()
     serializer_class = SwiperImageListSerializer
+
     def get_queryset(self):
-        return  SwiperImage.objects.filter(is_show=1)
+        return SwiperImage.objects.filter(is_show=1)
+
+
+class AreaCodeListAPIView(ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = AreaCode.objects.all()
+    serializer_class = CodeProvinceSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return AreaCode.objects.extra(where=['length(code)=2'])
 

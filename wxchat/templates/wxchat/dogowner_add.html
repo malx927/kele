@@ -5,7 +5,7 @@
 </script>
 {% endblock extra%}
 {% block container %}
-<div class="weui-cells__title">寻找主人登记表</div>
+<div class="weui-cells__title">寻找主人登记表<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-lg green" aria-hidden="true"></i></a><span></div>
 <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
     <div class="weui-cell">

@@ -1,6 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block container %}
-    <div class="weui-panel__hd">宠物送养详细介绍</div>
+    <div class="weui-panel__hd">宠物送养详细介绍<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-lg green" aria-hidden="true"></i></a><span></div>
     {% if object.picture %}
         <img src="{{ object.picture.url }}" width="100%" height="280px">
     {% endif %}

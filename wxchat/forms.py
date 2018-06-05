@@ -42,7 +42,7 @@ class DogLossForm(forms.ModelForm):
         fields = ['dog_name', 'typeid', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
 
         widgets = {
-            # 'lostdate': forms.DateTimeInput({'class': 'weui-input', 'type': 'datetime','placeholder': '请输入时间'}),
+            #'lostdate': forms.DateTimeInput({'class': 'weui-input', 'type': 'datetime','placeholder': '请输入时间'}),
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',
                  'maxlength': '11'}),
