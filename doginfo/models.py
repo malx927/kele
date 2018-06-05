@@ -219,7 +219,7 @@ class DogBreed(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True)
     picture =models.ImageField(verbose_name=u'图片',  upload_to='breed', blank=True)
-    price  = models.CharField(verbose_name=u'价格区间', max_length=100)
+    price  = models.CharField(verbose_name=u'价格区间', max_length=100,blank=True)
     ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100,blank=True,null=True)
     telephone = models.CharField(verbose_name=u'电话', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
