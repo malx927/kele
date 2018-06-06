@@ -1,0 +1,171 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+ {% block container %}
+    <div class="weui-flex" >
+        <div class="placeholder" style="text-align: left;width:20px;"><i class="fa fa-arrow-left" ></i></div>
+        <div class="weui-flex__item" style="text-align: center;"><h4 class="placeholder">大眼可乐宠物联盟</h4></div>
+        <div class="placeholder" style="text-align: center;width:20px;"></div>
+    </div>
+     <div class="weui-tab" id="navbar" style=>
+		<div class="weui-navbar">
+			<div class="weui-navbar__item weui-bar__item_on">
+				寻找宠物<i class="fa fa-paw"></i>
+			</div>
+			<div class="weui-navbar__item">
+				寻找主人<i class="fa fa-male"></i>
+			</div>
+		</div>
+		<div class="weui-tab__panel">
+			<div class="weui-tab__content">
+				<div class="weui-panel weui-panel_access">
+                    <div class="weui-panel__bd" id="dogloss"></div>
+                    <div class="weui-panel__ft">
+                        <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doglossmore" style="display: none">
+                            <div class="weui-cell__bd">查看更多</div><span class="weui-cell__ft"></span>
+                        </a>
+                    </div>
+                </div>
+			</div>
+			<div class="weui-tab__content">
+                <div class="weui-panel weui-panel_access">
+                    <div class="weui-panel__bd" id="dogowner"></div>
+                    <div class="weui-panel__ft" >
+                        <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogownermore" style="display: none">
+                            <div class="weui-cell__bd">查看更多</div><span class="weui-cell__ft"></span>
+                        </a>
+                    </div>
+               </div>
+            </div>
+		</div>
+	</div>
+
+
+ {% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+     nextUrl = '{% url 'dog-loss-list' %}';
+     dogOwnerUrl = '{% url 'dog-owner-list' %}';
+
+    var loading = weui.loading('加载中...');
+     ///缓存滚动条位置
+     $('.weui-tab__panel').scroll(function(){
+            if($(this).scrollTop() !=0 ){
+                sessionStorage.setItem('offsetTop',$(this).scrollTop());
+            }
+    });
+
+    $(function(){
+        //setImageUrl();
+
+        defIndex = sessionStorage.getItem('tab');
+        console.log('defindex='+ defIndex);
+        weui.tab('#navbar',{
+            defaultIndex: defIndex ==null?0:defIndex,
+            onChange: function(index){
+                sessionStorage.setItem('tab',index);
+            }
+        });
+
+
+        $('#doglossmore').on('click',function(){
+            getDataList( nextUrl );
+        });
+
+        $('#dogownermore').on('click',function(){
+            getDogOwnerList( dogOwnerUrl );
+        });
+        getDataList( nextUrl );
+        getDogOwnerList(dogOwnerUrl);
+
+    });
+    function getDataList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#dogloss'),
+          success: function(data){
+              nextUrl = data.next;
+              appendItem(data.results);
+              $('#doglossmore').css('display','');
+              loading.hide();
+              setScollPos();
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+              loading.hide();
+          }
+        });
+    }
+
+    function appendItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.thumb_url;
+            if(img_url == null){
+                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+            }
+          lossitem =  '<a href="/wechat/doglossdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ item.dog_name +'</h4>' +
+                               '<ul class="weui-media-box__info">' +
+								  '<li class="weui-media-box__info__meta">' + item.typeid + '</li>' +
+								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">' + item.lostdate +'</li>' +
+								'</ul>' +
+                               '<p class="weui-media-box__desc">地点:'+ item.lostplace +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#dogloss').append( lossitem );
+        }) ;
+    }
+
+    function getDogOwnerList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#dogowner'),
+          success: function(data){
+              dogOwnerUrl = data.next;
+              appendDogOwnerItem(data.results);
+              $('#dogownermore').css('display','');
+              setScollPos();
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    function appendDogOwnerItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.thumb_url;
+            if(img_url == null){
+                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+            }
+          lossitem =  '<a  href="/wechat/dogownerdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">品种:'+ item.typeid +'</h4>' +
+                               '<ul class="weui-media-box__info">' +
+								  '<li class="weui-media-box__info__meta">时间:' + item.finddate +'</li>' +
+								'</ul>' +
+                               '<p class="weui-media-box__desc">地点:'+ item.findplace +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#dogowner').append( lossitem );
+        }) ;
+    }
+    ////设置滚动条位置
+    function setScollPos(){
+        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+        $('.weui-tab__panel').scrollTop(_offset);
+    }
+
+
+
+    </script>
+{% endblock bottomjs %}

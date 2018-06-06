@@ -1,5 +1,4 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-{% block title %}加盟宠物医疗机构{% endblock %}
 
 {% block tabpanel %}
         <div class="weui-tab__content">
@@ -80,8 +79,10 @@
                                '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
                                 '<ul class="weui-media-box__info">' +
 								  '<li class="weui-media-box__info__meta">' + item.province + '</li>' +
-								  '<li class="weui-media-box__info__meta weui-media-box__info__meta_extra">' + item.address +'</li>' +
 								'</ul>' +
+                                '<ul>'+
+                                '<li class="weui-media-box__desc">' + item.address +'</li>' +
+                                '</ul>'+
                                '<p class="weui-media-box__desc">'+ item.tel +'</p>'  +
                              '</div>' +
                         '</a>';

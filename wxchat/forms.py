@@ -19,8 +19,9 @@ class DogLossForm(forms.ModelForm):
 
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
-        # self.fields['desc'].widget.attrs['class'] = 'weui-textarea'
-        # self.fields['desc'].widget.attrs['placeholder'] = '请输入特征'
+
+        self.fields['sex'].widget.attrs['class'] = 'weui-select'
+        self.fields['sex'].empty_label = '请选择性别'
 
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
@@ -39,7 +40,7 @@ class DogLossForm(forms.ModelForm):
 
     class Meta:
         model = DogLoss
-        fields = ['dog_name', 'typeid', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
+        fields = ['dog_name', 'typeid','sex', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
 
         widgets = {
             #'lostdate': forms.DateTimeInput({'class': 'weui-input', 'type': 'datetime','placeholder': '请输入时间'}),
@@ -95,8 +96,8 @@ class DogBreedForm(forms.ModelForm):
         self.fields['ages'].widget.attrs['class'] = 'weui-input'
         self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
 
-        self.fields['sex'].widget.attrs['class'] = 'weui-select'
-        # self.fields['desc'].widget.attrs['placeholder'] = '请输入特征'
+        self.fields['sex'].widget.attrs['class'] = 'weui-input'
+        # self.fields['sex'].widget.attrs['placeholder'] = '请输入特征'
 
         self.fields['price'].widget.attrs['class'] = 'weui-input'
         self.fields['price'].widget.attrs['placeholder'] = '价格区间'
@@ -112,6 +113,7 @@ class DogBreedForm(forms.ModelForm):
         fields = ['name', 'typeid','birth','sex','ages', 'desc', 'picture', 'price', 'ownername', 'telephone']
 
         widgets = {
+
             'birth': forms.DateTimeInput({'class': 'weui-input', 'type': 'date', 'placeholder': '请输入时间'}),
             'telephone': forms.NumberInput(
                 {'class': 'weui-input', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$', 'maxlength': '11'}),

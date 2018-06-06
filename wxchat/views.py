@@ -135,7 +135,7 @@ def unSubUserinfo(openid):
         pass
 
 
-@login_required
+# @login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -206,7 +206,7 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-@login_required
+# @login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
@@ -302,6 +302,7 @@ def dogBreed(request):
 
 
 def dogBreedAdd(request):
+    sex = request.GET.get('sex')
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
@@ -321,7 +322,10 @@ def dogBreedAdd(request):
     else:
         form = DogBreedForm()
         next = request.GET.get('next', '')
+        if sex == '1':
+            return render(request, 'wxchat/dogfemale_add.html', {'form': form,'next': next})
         return render(request, 'wxchat/dogbreed_add.html', {'form': form,'next': next})
+
 
 
 # 配种详细视图
@@ -330,6 +334,17 @@ class DogBreedDetailView(DetailView):
     template_name = 'wxchat/dogbreed_detail.html'
     def get(self, request, *args, **kwargs):
         response = super(DogBreedDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
+
+
+# 母犬配种详细视图
+class DogFemaleDetailView(DetailView):
+    model = DogBreed
+    template_name = 'wxchat/dogfemale_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogFemaleDetailView, self).get(request, *args, **kwargs)
         self.object.click +=1
         self.object.save()
         return response
@@ -359,10 +374,8 @@ def dogOwnerAdd(request):
             dogowner.openid = openid
             dogowner.nickname = nickname
             dogowner.save()
-            print('$$$$$$$$$$$$$$$$$$$$$$$')
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            print('----------------------')
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogOwnerForm()
@@ -475,7 +488,7 @@ def DoginstitutionAdd(request):
     else:
         form = DogInstitutionForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/doginstitution_add123.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
 
 
 #加盟宠物医疗机构

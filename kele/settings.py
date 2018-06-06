@@ -286,4 +286,4 @@ APP_URL = 'http://www.hld8000.com/wechat'
 
 WECHAT_APPID = 'wxad07fe6b357d1f3a'
 WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
-#
+
