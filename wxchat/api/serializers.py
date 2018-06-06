@@ -74,7 +74,7 @@ class DogLossSerializer(serializers.ModelSerializer):
     lostdate = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
     def get_lostdate(self,obj):

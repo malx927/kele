@@ -19,8 +19,9 @@ class DogLossForm(forms.ModelForm):
 
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
-        # self.fields['desc'].widget.attrs['class'] = 'weui-textarea'
-        # self.fields['desc'].widget.attrs['placeholder'] = '请输入特征'
+
+        self.fields['sex'].widget.attrs['class'] = 'weui-select'
+        self.fields['sex'].empty_label = '请选择性别'
 
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
@@ -39,7 +40,7 @@ class DogLossForm(forms.ModelForm):
 
     class Meta:
         model = DogLoss
-        fields = ['dog_name', 'typeid', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
+        fields = ['dog_name', 'typeid','sex', 'desc', 'picture', 'lostplace', 'lostdate', 'ownername', 'telephone']
 
         widgets = {
             #'lostdate': forms.DateTimeInput({'class': 'weui-input', 'type': 'datetime','placeholder': '请输入时间'}),

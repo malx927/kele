@@ -12,13 +12,11 @@ a{
 }
 
 .placeholder {
-    margin: 5px;
-    padding: 0 10px;
-    background-color: #ebebeb;
-    height: 2.3em;
-    line-height: 2.3em;
+    padding: 0 15px;
+    height: 2em;
+    line-height: 2em;
     text-align: center;
-    color: #cfcfcf;
+
 }
 
 .color-primary {
@@ -95,15 +93,62 @@ a{
      max-height:100%;
  }
 
+.weui-tabbar__icon > i {
+    font-size: 24px;
+    color: #000;
+}
+
 .weui-tabbar__label {
     font-size: 12px;
+    color: #000;
 }
 
 .weui-grid{
-   color: #09BB07;
+   color: #f46253;
 }
 .green{
-     color: #09BB07;
+     color:  #09BB07;
+}
+
+.pink{
+     color:  #f46253;
+}
+
+.weui-navbar__item{
+    padding: 10px 0;
+}
+.weui-navbar{
+    top:0px;
+}
+
+.weui-tabbar__item.weui-bar__item_on{
+  /*background-color: #ECECEC;*/
+  color:#000;
+}
+
+.weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon > i, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label {
+     color: #f46253;
+}
+
+.weui-panel__hd {
+    color: #000;
+    font-size: 13px;
+    position: relative;
+}
+
+.weui-form-preview__hd .weui-form-preview__bd{
+    text-align: left;
+}
+
+.male{
+    color:#076fbb;
+    font-weight:bold;
+    padding-left:1px;
+}
+.female{
+    color:#ba07bb;
+    font-weight:bold;
+    padding-left:1px;
 }
 
 /* picker,日期时间popup,select*/
