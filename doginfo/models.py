@@ -120,7 +120,7 @@ class Company(models.Model):
 
 # 寻宠登记表
 class DogLoss(models.Model):
-    dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=500)
+    dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=50)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
     picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True,max_length=200)

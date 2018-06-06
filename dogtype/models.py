@@ -15,6 +15,7 @@ class Dogtype(models.Model):
         verbose_name = u"品种"
         verbose_name_plural = u'品种分类'
 
+
     def __str__(self):
         return self.typename
 
@@ -26,6 +27,7 @@ class AreaCode(models.Model):
      class Meta:
          verbose_name=u'地区编码表'
          verbose_name_plural = verbose_name
+         ordering = ['code']
 
      def __str__(self):
          return  self.name
