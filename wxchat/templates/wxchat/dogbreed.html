@@ -1,98 +1,197 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block tabpanel %}
-        <div class="weui-tab__content">
-            <div class="weui-panel weui-panel_access">
-                <div class="weui-panel__hd">
-                    	<div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">宠物列表<span></div>
-                            <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >配种发布</a></div>
-                        </div>
-                </div>
-                <div class="weui-panel__bd" id="dogbreed">
-
-                </div>
-                <div class="weui-panel__ft" >
-                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogbreedmore">
-                        <div class="weui-cell__bd">查看更多</div>
-                        <span class="weui-cell__ft"></span>
-                    </a>
+    <div class="weui-tab__content" id="tab1">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div class="weui-flex__item"><span class="title">公犬列表<span></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}"
+                                                    class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
+                    </div>
+                    <div class="weui-flex__item"><a
+                            href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1"
+                            class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
                 </div>
             </div>
+            <div class="weui-panel__bd" id="dogbreed">
+
+            </div>
+            <div class="weui-panel__ft">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogbreedmore">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>
+            </div>
         </div>
+    </div>
+    <div class="weui-tab__content" id="tab2">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div class="weui-flex__item"><span class="title">母犬列表</span></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}"
+                                                    class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
+                    </div>
+                    <div class="weui-flex__item"><a
+                            href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1"
+                            class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
+                </div>
+            </div>
+            <div class="weui-panel__bd" id="dogowner"></div>
+            <div class="weui-panel__ft">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogownermore"
+                   style="display: none">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>
+            </div>
+        </div>
+    </div>
 
 {% endblock tabpanel %}
- {% block tabbar %}
-
+{% block tabbar %}
+    <a href="#tab1" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">公犬列表
+            <img src="{% static 'wxchat/images/search.png' %}" alt="">
+        </div>
+        <p class="weui-tabbar__label">公犬列表</p>
+    </a>
+    <a href="#tab2" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">母犬列表
+            <img src="{% static 'wxchat/images/icon_nav_search_bar.png' %}" alt="">
+        </div>
+        <p class="weui-tabbar__label">母犬列表</p>
+    </a>
 {% endblock tabbar %}
 {% block bottomjs %}
     {{ block.super }}
     <script type="application/javascript">
-     nextUrl = '{% url 'dog-breed-list' %}';
-{#     var loading = weui.loading('加载中...');#}
-     ///缓存滚动条位置
-     $('.weui-tab__panel').scroll(function(){
-            if($(this).scrollTop() !=0 ){
-                sessionStorage.setItem('offsetTop',$(this).scrollTop());
-            }
-    });
-    $(function(){
-        weui.tab('#tab',{
-            defaultIndex: 0,
-            onChange: function(index){
-                sessionStorage.setItem('tab',index);
+        nextUrl = '{% url 'dog-breed-list' %}';
+{#        ownerUrl = '{% url 'dog-female-list' %}';#}
+        var loading = weui.loading('加载中...');
+        ///缓存滚动条位置
+        $('.weui-tab__panel').scroll(function () {
+            if ($(this).scrollTop() != 0) {
+                sessionStorage.setItem('offsetTop', $(this).scrollTop());
             }
         });
+        $(function () {
+{#            weui.tab('#tab', {#}
+{#                defaultIndex: 0,#}
+{#                onChange: function (index) {#}
+{#                    sessionStorage.setItem('tab', index);#}
+{#                }#}
+{#            });#}
 
-        $('#dogbreedmore').on('click',function(){
-            getDataList( nextUrl );
-        });
-        getDataList( nextUrl );
-    });
-    function getDataList(url){
-        $.ajax({
-          type: 'GET',
-          url: url,
-          dataType: 'json',
-          timeout: 5000,
-          context: $('#dogbreed'),
-          success: function(data){
-              nextUrl = data.next;
-              appendItem(data.results);
-              if(nextUrl == null)
-                $('#dogbreedmore').css('display','none');
-              else
-                 $('#dogbreedmore').css('display','');
-              loading.hide();
-              setScollPos();
-          },
-          error: function(xhr, type,error){
-              console.log(type);
-          }
-        });
-    }
+            defIndex = sessionStorage.getItem('tab');
+            console.log('defindex='+ defIndex);
+            weui.tab('#tab',{
+                defaultIndex: defIndex ==null?0:defIndex,
+                onChange: function(index){
+                    sessionStorage.setItem('tab',index);
+                }
+            });
 
-    function appendItem(results){
-        $.each(results,function(index,item){
-            var img_url = item.picture;
-            if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
-            }
-          lossitem =  '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
-                            '<div class="weui-media-box__bd">' +
-                               '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
-                               '<p class="weui-media-box__desc">'+ item.desc +'</p>'  +
-                             '</div>' +
+            $('#dogbreedmore').on('click', function () {
+                getDataList(nextUrl);
+            });
+            $('#dogownermore').on('click', function () {
+                getDogOwnerList(nextUrl);
+            });
+            getDogOwnerList(nextUrl);
+            getDataList(nextUrl);
+        });
+        function getDataList(url) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                timeout: 5000,
+                context: $('#dogbreed'),
+                success: function (data) {
+                    nextUrl = data.next;
+                    appendItem(data.results);
+                    if (nextUrl == null)
+                        $('#dogbreedmore').css('display', 'none');
+                    else
+                        $('#dogbreedmore').css('display', '');
+                    loading.hide();
+                    setScollPos();
+                },
+                error: function (xhr, type, error) {
+                    console.log(type);
+                }
+            });
+        }
+
+        function appendItem(results) {
+            $.each(results, function (index, item) {
+                var img_url = item.picture;
+                var sex = item.sex;
+                if ( sex == '公'){
+                    if (img_url == null) {
+                    img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                }
+                lossitem = '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                        '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>' +
+                        '<div class="weui-media-box__bd">' +
+                        '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
+                        '<p class="weui-media-box__desc">' + item.desc + '</p>' +
+                        '</div>' +
                         '</a>';
-            $('#dogbreed').append( lossitem );
-        }) ;
-    }
-    ////设置滚动条位置
-    function setScollPos(){
-        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
-        $('.weui-tab__panel').scrollTop(_offset);
-    }
+                $('#dogbreed').append(lossitem);
+                         }
+            });
+
+        }
+        function getDogOwnerList(url) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                timeout: 5000,
+                context: $('#dogowner'),
+                success: function (data) {
+                    nextUrl = data.next;
+                    appendDogOwnerItem(data.results);
+                    if (nextUrl == null)
+                        $('#dogownermore').css('display', 'none');
+                    else
+                        $('#dogownermore').css('display', '');
+                    loading.hide();
+                    setScollPos();
+                },
+                error: function (xhr, type, error) {
+                    console.log(type);
+                }
+            });
+        }
+
+        function appendDogOwnerItem(results) {
+            $.each(results, function (index, item) {
+                var img_url = item.picture;
+                var sex = item.sex;
+                if ( sex == '母'){
+                    if (img_url == null) {
+                        img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                    }
+                    lossitem = '<a href="/wechat/dogfemaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>' +
+                            '<div class="weui-media-box__bd">' +
+                            '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
+                            '<p class="weui-media-box__desc">' + item.desc + '</p>' +
+                            '</div>' +
+                            '</a>';
+                    $('#dogowner').append(lossitem);
+                }
+            });
+        }
+
+        ////设置滚动条位置
+        function setScollPos() {
+            var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+            $('.weui-tab__panel').scrollTop(_offset);
+        }
     </script>
 {% endblock bottomjs %}

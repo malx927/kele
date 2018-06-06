@@ -165,7 +165,7 @@ class DoginfoListSerializer(serializers.ModelSerializer):
 
 # 狗配种
 class DogbreedListSerializer(serializers.ModelSerializer):
-    dogsex = SerializerMethodField()
+    # dogsex = SerializerMethodField()
 
     class Meta:
         model = DogBreed
@@ -174,7 +174,7 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'name',
             'ages',
             'birth',
-            'dogsex',
+            'sex',
             'typeid',
             'desc',
             'picture',
@@ -183,8 +183,8 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'telephone',
         ]
 
-    def get_dogsex(self, obj):
-        return TYPE_SEX_CHOICE[1][1]
+    # def get_dogsex(self, obj):
+    #     return TYPE_SEX_CHOICE[1][1]
 
 
 # 宠物领养
