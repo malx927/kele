@@ -12,14 +12,13 @@
 {# </div>#}
 {% endblock swiper %}
 {% block tabpanel %}
-
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找宠物列表<span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
 
                 </div>
@@ -58,11 +57,6 @@
             </div>
             <p class="weui-tabbar__label">寻宠物</p>
         </a>
-{#        <a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-tabbar__item">#}
-{#            <div class="weui-tabbar__icon">#}
-{#               <i class="fa fa-male" aria-hidden="true"></i>#}
-{#            </div>#}
-{#        </a>#}
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
                <i class="fa fa-male" aria-hidden="true"></i>
@@ -71,6 +65,11 @@
         </a>
 
 {% endblock tabbar %}
+{% block add %}
+      <div class="circle">
+          <a href="{% url 'dog-loss-add' %}"><i class="fa fa-plus-circle fa-3x" aria-hidden="true"></i></a>
+      </div>
+{% endblock add %}
 {% block bottomjs %}
 
     {{ block.super }}
