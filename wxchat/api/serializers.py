@@ -22,6 +22,7 @@ from wxchat.models import SwiperImage
 
 from dogtype.models import Dogtype,AreaCode
 
+
 __author__ = 'malixin'
 
 from rest_framework import serializers
@@ -73,7 +74,7 @@ class DogLossSerializer(serializers.ModelSerializer):
     lostdate = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
     def get_lostdate(self,obj):
@@ -164,7 +165,7 @@ class DoginfoListSerializer(serializers.ModelSerializer):
 
 # 狗配种
 class DogbreedListSerializer(serializers.ModelSerializer):
-    dogsex = SerializerMethodField()
+    # dogsex = SerializerMethodField()
 
     class Meta:
         model = DogBreed
@@ -173,7 +174,7 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'name',
             'ages',
             'birth',
-            'dogsex',
+            'sex',
             'typeid',
             'desc',
             'picture',
@@ -182,8 +183,8 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'telephone',
         ]
 
-    def get_dogsex(self, obj):
-        return TYPE_SEX_CHOICE[1][1]
+    # def get_dogsex(self, obj):
+    #     return TYPE_SEX_CHOICE[1][1]
 
 
 # 宠物领养
@@ -261,22 +262,39 @@ class SwiperImageListSerializer(serializers.ModelSerializer):
         ]
 
 class CodeDistrictSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
         ]
 
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
+
 class CodeCitySerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
+
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
             'children',
         ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
 
     def get_children(self,obj):
         distrSet = AreaCode.objects.extra(where=['left(code,4)=%s', 'length(code)=6'], params=[obj.code])
@@ -285,14 +303,23 @@ class CodeCitySerializer(serializers.ModelSerializer):
 
 
 class CodeProvinceSerializer(serializers.ModelSerializer):
+    label = serializers.SerializerMethodField()
+    value = serializers.SerializerMethodField()
     children = serializers.SerializerMethodField()
+
     class Meta:
         model = AreaCode
         fields = [
-            'code',
-            'name',
+            'label',
+            'value',
             'children',
         ]
+
+    def get_label(self,obj):
+        return obj.name
+
+    def get_value(self,obj):
+        return  obj.code
 
     def get_children(self,obj):
         citySet = AreaCode.objects.extra(where=['left(code,2)=%s', 'length(code)=4'], params=[obj.code])

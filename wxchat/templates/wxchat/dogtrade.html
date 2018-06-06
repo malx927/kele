@@ -1,13 +1,15 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block tabpanel %}
+      <div class="weui-flex">
+        <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >出售发布</a></div>
+        <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-buy-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">求购发布</a></div>
+      </div>
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">出售宠物信息</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >出售发布</a></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-buy-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r">求购发布</a></div>
                     </div>
                 </div>
                 <div class="weui-panel__bd" id="dogsale"></div>
@@ -24,8 +26,6 @@
                 <div class="weui-panel__hd">
                     	<div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">求购宠物信息</span></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r" >出售发布</a></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-buy-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary r">求购发布</a></div>
                         </div>
                 </div>
                 <div class="weui-panel__bd" id="dogbuy">

@@ -135,66 +135,46 @@ def unSubUserinfo(openid):
         pass
 
 
-@login_required
+# @login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
         "button": [
             {
-                "name":"互助服务",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "寻犬",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "配种",
-                        "url": APP_URL + "/redirect/dogbreed"
-                    },
-                    {
-                        "type": "view",
-                        "name": "领养",
-                        "url": APP_URL + "/redirect/dogadopt"
-                    },
-                    {
-                        "type": "view",
-                        "name": "买卖",
-                        "url": APP_URL + "/redirect/dogtrade"
-                    },
-                    {
-                        "type": "view",
-                        "name": "宠物共享",
-                        "url": APP_URL + "/redirect/dogshare"
-                    }
-                ]
+                "type": "view",
+                "name": "宠物社区",
+                "url": APP_URL + "/redirect/dogindex"
             },
             {
-                "name":"宠物社区",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "乐园服务",
-                        "url": APP_URL + "/redirect/dogservice"
-                    },
-                    {
-                        "type": "view",
-                        "name": "合作医院",
-                        "url": APP_URL + "/redirect/doginstitution"
-                    },
-                    {
-                        "type": "view",
-                        "name": "宠物相关",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "新手课堂",
-                        "url": APP_URL + "/redirect/freshman"
-                    }
-                ]
+                "type": "view",
+                "name": "本周团购",
+                "url": APP_URL + "/redirect/dogindex"
             },
+            # {
+            #     "name":"宠物社区",
+            #     "sub_button":[
+            #         {
+            #             "type": "view",
+            #             "name": "乐园服务",
+            #             "url": APP_URL + "/redirect/dogservice"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "合作医院",
+            #             "url": APP_URL + "/redirect/doginstitution"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "宠物相关",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "新手课堂",
+            #             "url": APP_URL + "/redirect/freshman"
+            #         }
+            #     ]
+            # },
             {
                 "name":"我的联盟",
                 "sub_button":[
@@ -226,7 +206,7 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-@login_required
+# @login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
@@ -322,6 +302,7 @@ def dogBreed(request):
 
 
 def dogBreedAdd(request):
+    sex = request.GET.get('sex')
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
@@ -341,7 +322,10 @@ def dogBreedAdd(request):
     else:
         form = DogBreedForm()
         next = request.GET.get('next', '')
+        if sex == '1':
+            return render(request, 'wxchat/dogfemale_add.html', {'form': form,'next': next})
         return render(request, 'wxchat/dogbreed_add.html', {'form': form,'next': next})
+
 
 
 # 配种详细视图
@@ -350,6 +334,17 @@ class DogBreedDetailView(DetailView):
     template_name = 'wxchat/dogbreed_detail.html'
     def get(self, request, *args, **kwargs):
         response = super(DogBreedDetailView, self).get(request, *args, **kwargs)
+        self.object.click +=1
+        self.object.save()
+        return response
+
+
+# 母犬配种详细视图
+class DogFemaleDetailView(DetailView):
+    model = DogBreed
+    template_name = 'wxchat/dogfemale_detail.html'
+    def get(self, request, *args, **kwargs):
+        response = super(DogFemaleDetailView, self).get(request, *args, **kwargs)
         self.object.click +=1
         self.object.save()
         return response
@@ -379,10 +374,8 @@ def dogOwnerAdd(request):
             dogowner.openid = openid
             dogowner.nickname = nickname
             dogowner.save()
-            print('$$$$$$$$$$$$$$$$$$$$$$$')
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            print('----------------------')
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogOwnerForm()
@@ -730,6 +723,10 @@ def shareAction(request):
     }
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
+
+def dogIndex(request):
+    return render(request,'wxchat/dogindex.html')
+
 def createTestData(request):
     curDate = datetime.datetime.now()
     strDate = curDate.strftime('%Y-%m-%d')
@@ -786,3 +783,5 @@ def createTestData(request):
     #     DogSale.objects.create(**data)
 
     return HttpResponse('success')
+
+

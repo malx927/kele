@@ -3,11 +3,38 @@
 {% block extra %}
 <script>
         $(function () {
-            $("#id_province").cityPicker({
-                title: "选择省市县(区)"
+            $('#id_province').on('click', function (e) {
+                target = e.target;
+               $(target).attr("readOnly","true");
+                getDataList("/static/wxchat/js/areacode.json");
             });
-        });
 
+        });
+    function getDataList(url){
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+             weui.picker(data, {
+                    depth: 3,
+                    defaultValue: ['21', '2114', '211402'],
+                    onChange: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+
+                    },
+                    onConfirm: function (result) {
+                        $(target).val(result[0].label + ' ' + result[1].label + ' ' + result[2].label );
+                    },
+                    id: 'cascadePicker'
+                });
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
     </script>
 <script type="application/javascript">
  window.history.forward(1);
@@ -16,7 +43,7 @@
 {% endblock extra%}
 
 {% block container %}
-<div class="weui-cells__title">加盟宠物医疗机构登记表</div>
+<div class="weui-cells__title">加盟宠物医疗机构登记表1<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-lg green" aria-hidden="true"></i></a><span></div>
 <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
     <div class="weui-cell">
