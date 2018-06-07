@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '*!cmr!&7(lm*0x-j50q*v_c!lgidvw2&&w-yq251p77^2q!twx'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -278,8 +278,9 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 
 WECHAT_TOKEN = 'dayankele123'
-#APP_URL = 'http://3zxguq.natappfree.cc/wechat'
 APP_URL = 'http://shhry4.natappfree.cc/wechat'
+
+#APP_URL = 'http://www.hld8000.com/wechat'
 
 
 #测试号WeChat
@@ -288,4 +289,4 @@ WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
 
 # WECHAT_APPID = 'wxad07fe6b357d1f3a'
 # WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
-#
+
