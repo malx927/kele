@@ -4,7 +4,7 @@
 //
 //});
 
-
+//首页图片轮播
 function setImageUrl(){
     $.ajax({
       type: 'GET',
@@ -44,19 +44,18 @@ function setImageUrl(){
     });
 }
 
+////性别图标
+function getSexImage(item){
+        var seximg = item.sex;
+        if( seximg != null && seximg == '公') {
+            seximg = '<i class="fa fa-mars male" aria-hidden="true"></i> ';
+        }
+        else{
+            seximg = '<i class="fa fa-venus female" aria-hidden="true"></i> ';
+        }
+        return seximg;
+}
 
-//weui.tab('#tab',{
-//        defaultIndex: 0,
-//        onChange: function(index){
-//            console.log(index);
-//        }
-//});
-//weui.tab('#navbar',{
-//		defaultIndex: 0,
-//		onChange: function(index){
-//			console.log(index);
-//		}
-//});
 
 ///* 图片手动上传 */
 //var uploadCount = 0;

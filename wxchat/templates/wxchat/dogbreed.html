@@ -31,11 +31,9 @@
                 <div class="weui-flex">
                     <div class="weui-flex__item"><span class="title">母犬列表</span></div>
                     <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}"
-                                                    class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
+                                class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
                     </div>
-                    <div class="weui-flex__item"><a
-                            href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1"
-                            class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1" class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
                 </div>
             </div>
             <div class="weui-panel__bd" id="dogowner"></div>

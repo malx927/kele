@@ -16,7 +16,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">寻找宠物列表<span></div>
+                            <div class="weui-flex__item"><span class="title">寻找宠物列表</span></div>
                             <div class="weui-flex__item"></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
@@ -36,7 +36,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                      <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">寻找主人列表<span></div>
+                            <div class="weui-flex__item"><span class="title">寻找主人列表</span></div>
                             <div class="weui-flex__item"></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
@@ -87,8 +87,6 @@
     });
 
     $(function(){
-        //setImageUrl();
-
         defIndex = sessionStorage.getItem('tab');
         console.log('defindex='+ defIndex);
         weui.tab('#tab',{
@@ -97,7 +95,6 @@
                 sessionStorage.setItem('tab',index);
             }
         });
-
 
         $('#doglossmore').on('click',function(){
             getDataList( nextUrl );
@@ -125,8 +122,6 @@
               if(nextUrl !=null) {
                   $('#doglossmore').css('display','');
               }
-
-
               setScollPos();
           },
           error: function(xhr, type,error){
@@ -142,14 +137,8 @@
             if(img_url == null){
                 img_url = "{% static 'wxchat/images/default_dog.png' %}";
             }
-            var seximg = item.sex;
 
-            if( seximg != null && seximg == '公') {
-                seximg = '<i class="fa fa-mars male" aria-hidden="true"></i> ';
-            }
-            else{
-                seximg = '<i class="fa fa-venus female" aria-hidden="true"></i> ';
-            }
+          var seximg = getSexImage(item);
 
           lossitem =  '<a href="/wechat/doglossdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
                             '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
@@ -211,7 +200,6 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
-
 
 
     </script>

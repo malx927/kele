@@ -278,12 +278,15 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 
 WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://www.hld8000.com/wechat'
+APP_URL = 'http://shhry4.natappfree.cc/wechat'
+
+#APP_URL = 'http://www.hld8000.com/wechat'
+
 
 #测试号WeChat
-# WECHAT_APPID = 'wxbc591183cb175d16'
-# WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
+WECHAT_APPID = 'wxbc591183cb175d16'
+WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
 
-WECHAT_APPID = 'wxad07fe6b357d1f3a'
-WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
+# WECHAT_APPID = 'wxad07fe6b357d1f3a'
+# WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
 
