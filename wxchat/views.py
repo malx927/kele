@@ -293,7 +293,22 @@ def dogLossAdd(request):
     else:
         form = DogLossForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next})
+        jsApi = WeChatJSAPI(client)
+        ticket = jsApi.get_jsapi_ticket()
+        noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+        timestamp = int(time.time())
+        url = request.build_absolute_uri()
+        print(url)
+        signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+
+        signPackage = {
+            "appId":settings.WECHAT_APPID,
+            "nonceStr":noncestr,
+            "timestamp":timestamp,
+            "url":url,
+            "signature":signature
+        }
+        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next,'sign':signPackage})
 
 
 def dogBreed(request):

@@ -9,7 +9,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                      <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">宠物领养列表<span></div>
+                            <div class="weui-flex__item"><span class="title">宠物领养列表</span></div>
                             <div class="weui-flex__item"></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
@@ -26,9 +26,11 @@
         <div class="weui-tab__content" id="tab2">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
-                    <div class="weui-flex">
+                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物送养列表</span></div>
-                    </div>
+                            <div class="weui-flex__item"></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                     </div>
                 </div>
                 <div class="weui-panel__bd" id="dogdelivery"></div>
                 <div class="weui-panel__ft" >
@@ -55,6 +57,11 @@
         </a>
 
 {% endblock tabbar %}
+{% block add %}
+      <div class="circle">
+          <a href="{% url 'dog-adopt-add' %}"><i class="fa fa-plus-circle fa-3x" aria-hidden="true"></i></a>
+      </div>
+{% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
     <script type="application/javascript">
@@ -121,13 +128,10 @@
             if(img_url == null){
                 img_url = "{% static 'wxchat/images/default_dog.png' %}";
             }
-          lossitem =  '<a href="/wechat/dogadoptdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-
-                            '<div class="weui-media-box__bd">' +
+            lossitem =  '<a href="/wechat/dogadoptdetail/' + item.id + '">' +
+                            '<div class="weui-media-box weui-media-box_text">' +
                                '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
-                               '<ul class="weui-media-box__info">' +
-								  '<li class="weui-media-box__info__meta">' + item.record + '</li>' +
-                                '</ul>' +
+                                '<p class="weui-media-box__desc">宠物要求: '+ item.requirement +'</p>' +
                              '</div>' +
                         '</a>';
             $('#dogadopt').append( lossitem );
@@ -163,13 +167,12 @@
             if(img_url == null){
                 img_url = "{% static 'wxchat/images/default_dog.png' %}";
             }
-          lossitem =  '<a  href="/wechat/dogdeliverydetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+            sexImage = getSexImage(item);
+            lossitem =  '<a  href="/wechat/dogdeliverydetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
                             '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
                             '<div class="weui-media-box__bd">' +
-                               '<h4 class="weui-media-box__title">品种:'+ item.typeid +'</h4>' +
-                               '<ul class="weui-media-box__info">' +
-								  '<li class="weui-media-box__info__meta">特征:' + item.desc + '</li>' +
-								'</ul>' +
+                               '<h4 class="weui-media-box__title">'+ sexImage + item.typeid +'</h4>' +
+                               '<p class="weui-media-box__desc">宠物要求: '+ item.desc +'</p>' +
                              '</div>' +
                         '</a>';
             $('#dogdelivery').append( lossitem );

@@ -264,11 +264,11 @@ class DogAdoption(models.Model):
 class DogDelivery(models.Model):
     name = models.CharField(verbose_name='昵称',max_length=50)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
-    desc = models.CharField(verbose_name=u'特征', max_length=50,blank=True,null=True)
-    picture =models.ImageField(verbose_name=u'照片',  upload_to='delivery/%Y%m%d/', blank=True,null=True)
-    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=20,null=True,blank=True)
+    desc = models.CharField(verbose_name=u'宠物特征', max_length=50,blank=True,null=True)
+    picture =models.ImageField(verbose_name=u'宠物照片',  upload_to='delivery/%Y%m%d/', blank=True,null=True)
+    ownername = models.CharField(verbose_name=u'宠物姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
@@ -288,7 +288,7 @@ class DogDelivery(models.Model):
 #宠物求购
 class DogBuy(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True)
+    ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
     buyname = models.CharField(verbose_name=u'姓名', max_length=20,null=True,blank=True)
@@ -305,12 +305,12 @@ class DogBuy(models.Model):
         ordering = ['-create_time']
 
     def __str__(self):
-        return self.typeid.typename + "[" +self.colors + "]"
+        return self.typeid
 
 #宠物出售
 class DogSale(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True,null=True,default='')
+    ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
     picture =models.ImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
@@ -329,7 +329,7 @@ class DogSale(models.Model):
         ordering = ['-create_time']
 
     def __str__(self):
-        return self.typeid.typename + "[" +self.colors + "]"
+        return self.typeid
 
 #训犬 行为纠正
 class DogBehavior(models.Model):
