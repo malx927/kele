@@ -122,7 +122,7 @@ class Company(models.Model):
 class DogLoss(models.Model):
     dog_name = models.CharField(verbose_name=u'宠物昵称', max_length=50)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
+    desc = models.CharField(verbose_name=u'宠物说明', max_length=100, blank=True)
     picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True,max_length=200)
     # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True,null=True)
     lostplace = models.CharField(verbose_name=u'丢失地点', max_length=100, )
@@ -156,7 +156,7 @@ class DogLoss(models.Model):
 # 寻宠主
 class DogOwner(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    desc = models.CharField(verbose_name=u'宠物特征', max_length=100, blank=True)
+    desc = models.CharField(verbose_name=u'宠物说明', max_length=100, blank=True)
     picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
     # picture = models.ImageField(verbose_name=u'宠物图片', upload_to='loss/%Y%m%d/', blank=True)
     findplace = models.CharField(verbose_name=u'发现地点', max_length=100, )
@@ -212,16 +212,16 @@ class Dogfood(models.Model):
 
 #宠物配种
 class DogBreed(models.Model):
-    name = models.CharField(verbose_name=u'名称', max_length=50)
-    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,null=True,blank=True)
+    name = models.CharField(verbose_name=u'宠物昵称', max_length=50)
+    sex = models.CharField(verbose_name=u'宠物性别', max_length=10,choices=TYPE_SEX_CHOICE,null=True,blank=True)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True)
     birth =  models.DateField(verbose_name=u'出生日期',blank=True,null=True)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True)
-    picture =models.ImageField(verbose_name=u'图片',  upload_to='breed', blank=True)
+    desc = models.CharField(verbose_name=u'宠物说明', max_length=50,blank=True)
+    picture =models.ImageField(verbose_name=u'宠物图片',  upload_to='breed', blank=True)
     price  = models.CharField(verbose_name=u'价格区间', max_length=100,blank=True)
-    ownername = models.CharField(verbose_name=u'狗主姓名', max_length=100,blank=True,null=True)
-    telephone = models.CharField(verbose_name=u'电话', max_length=50 )
+    ownername = models.CharField(verbose_name=u'主人姓名', max_length=100,blank=True,null=True)
+    telephone = models.CharField(verbose_name=u'主人电话', max_length=50 )
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     showtime = models.DateTimeField(verbose_name=u'显示时间',blank=True,null=True)
     create_time = models.DateTimeField(verbose_name=u'添加时间', auto_now_add=True)
@@ -241,7 +241,7 @@ class DogBreed(models.Model):
 #宠物领养Pet adoption
 class DogAdoption(models.Model):
     name = models.CharField(verbose_name=u'领养人',max_length=50)
-    telephone = models.CharField(verbose_name=u'电话',max_length=20)
+    telephone = models.CharField(verbose_name=u'联系电话',max_length=20)
     record = models.CharField(verbose_name='饲养记录',max_length=100,blank=True,null=True)
     requirement = models.CharField(verbose_name='对宠物要求',max_length=200)
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
@@ -262,11 +262,11 @@ class DogAdoption(models.Model):
 #宠物送养pet delivery
 
 class DogDelivery(models.Model):
-    name = models.CharField(verbose_name='昵称',max_length=50)
+    name = models.CharField(verbose_name='宠物昵称',max_length=50)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
-    ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True)
-    sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
-    desc = models.CharField(verbose_name=u'宠物特征', max_length=50,blank=True,null=True)
+    ages = models.CharField(verbose_name=u'宠物年龄', max_length=50 ,blank=True,null=True)
+    sex = models.CharField(verbose_name=u'宠物性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
+    desc = models.CharField(verbose_name=u'宠物说明', max_length=50,blank=True,null=True)
     picture =models.ImageField(verbose_name=u'宠物照片',  upload_to='delivery/%Y%m%d/', blank=True,null=True)
     ownername = models.CharField(verbose_name=u'宠物姓名', max_length=20,null=True,blank=True)
     telephone = models.CharField(verbose_name=u'联系方式', max_length=50 )
@@ -386,7 +386,9 @@ class Doginstitution(models.Model):
     name = models.CharField(verbose_name=u'机构名称', max_length=50,null=True,blank=True)
     tel = models.CharField(verbose_name=u'联系电话', max_length=50)
     address = models.CharField(verbose_name=u'详细地址', max_length=500)
-    province = models.CharField(verbose_name=u'所属省市区', max_length=50)
+    province = models.CharField(verbose_name=u'所属省市区', max_length=50,null=True,blank=True,default='')
+    picture = models.ImageField(verbose_name=u'机构图片',upload_to='hospital/%Y%m%d/',null=True,blank=True,default='')
+    brief = models.CharField(verbose_name='机构简介',max_length=500,null=True,blank=True,default='')
     # city = models.CharField(verbose_name=u'所属市', max_length=50)
     # area = models.CharField(verbose_name=u'所属县区', max_length=50)
     # click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
@@ -394,8 +396,10 @@ class Doginstitution(models.Model):
     is_show = models.BooleanField(verbose_name=u'是否显示',default=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120,null=True,blank=True)
 
-
     class Meta:
         verbose_name = u'加盟宠物医疗机构'
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
+
+    def get_absolute_url(self):
+        return  reverse('dog-inst-detail',kwargs={'pk':self.id})

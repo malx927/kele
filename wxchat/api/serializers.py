@@ -248,7 +248,7 @@ class DogfreshmanSerializer(serializers.ModelSerializer):
 class DogInstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doginstitution
-        fields = ['id', 'name', 'tel','address','province',]
+        fields = ['id', 'name', 'tel','address','province','picture','brief']
 
 #图片轮播
 class SwiperImageListSerializer(serializers.ModelSerializer):

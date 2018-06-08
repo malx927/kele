@@ -9,7 +9,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">出售宠物信息</span></div>
+                            <div class="weui-flex__item"><span class="title">宠物出售信息</span></div>
                             <div class="weui-flex__item"></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
@@ -27,7 +27,7 @@
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                      <div class="weui-flex">
-                            <div class="weui-flex__item"><span class="title">求购宠物信息</span></div>
+                            <div class="weui-flex__item"><span class="title">宠物求购信息</span></div>
                             <div class="weui-flex__item"></div>
                             <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                      </div>
@@ -62,7 +62,7 @@
 {% endblock tabbar %}
 {% block add %}
       <div class="circle">
-          <a href="{% url 'dog-sale-add' %}"><i class="fa fa-plus-circle fa-3x" aria-hidden="true"></i></a>
+          <a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-3x" aria-hidden="true"></i></a>
       </div>
 {% endblock add %}
 {% block bottomjs %}
@@ -172,9 +172,9 @@
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ setImage + item.typeid + age +'</h4>' +
                                '<ul class="weui-media-box__info">' +
-								  '<li class="weui-media-box__info__meta">价格: ' + item.price +'</li>' +
+								  '<li class="weui-media-box__info__meta">价格 : ' + item.price +'</li>' +
 								'</ul>' +
-                               '<p class="weui-media-box__desc">特点: '+ item.desc +'</p>'  +
+                               '<p class="weui-media-box__desc">说明 : '+ item.desc +'</p>'  +
                              '</div>' +
                         '</a>';
             $('#dogsale').append( saleitem );
