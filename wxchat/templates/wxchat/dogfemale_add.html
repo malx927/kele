@@ -5,7 +5,9 @@
 </script>
 {% endblock extra%}
 {% block container %}
-<div class="weui-cells__title">母犬配种登记表</div>
+<div class="weui-cells__title">
+    MM登记表<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-2x pink" aria-hidden="true"></i></a><span>
+</div>
 <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
 <div class="weui-cells weui-cells_form" id="uploader">
     <div class="weui-cell">
@@ -28,12 +30,9 @@
             {{ form.birth }}
         </div>
     </div>
-
-{#        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.birth.label }}:</label></div>#}
-        <div class="weui-cell__bd">
-            <input class="weui-input" id="id_sex" name="sex" value="公" type="hidden" />
-        </div>
-
+    <div class="weui-cell__bd">
+        <input class="weui-input" id="id_sex" name="sex" value="母" type="hidden" />
+    </div>
     <div class="weui-cell">
         <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
         <div class="weui-cell__bd">

@@ -1,0 +1,41 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+<div class="weui-panel weui-panel_access">
+   <div class="weui-panel__hd">
+        <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="fa fa-angle-left fa-2x gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物机构详细介绍</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+        </div>
+   </div>
+    <div class="weui-panel__bd">
+      {% if object.picture %}
+         <div class="detail_header">
+            <img src="{{ object.picture.url }}" >
+         </div>
+      {% endif %}
+       <div class="weui-form-preview">
+       <div class="weui-form-preview__bd">
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">机构名称: :</label>
+               <span class="weui-form-preview__value"> {{ object.name }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">联系电话: :</label>
+               <span class="weui-form-preview__value">{{ object.tel }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">机构简介 :</label>
+               <span class="weui-form-preview__value">{{ object.brief }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">详细地址: :</label>
+               <span class="weui-form-preview__value">{{ object.address }}</span>
+           </div>
+       </div>
+    </div>
+    </div>
+</div>
+
+{% endblock container %}
+

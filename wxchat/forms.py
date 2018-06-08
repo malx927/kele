@@ -47,7 +47,7 @@ class DogLossForm(forms.ModelForm):
             'telephone': forms.TextInput(
                 {'class': 'weui-input', 'type': 'tel', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$',
                  'maxlength': '11'}),
-            'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物特征', 'rows': '3'})
+            'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物说明', 'rows': '3'})
         }
 
 
@@ -82,7 +82,7 @@ class DogOwnerForm(forms.ModelForm):
         }
 
 
-# 宠物配种
+# 宠物相亲
 class DogBreedForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(DogBreedForm, self).__init__(*args, **kwargs)
@@ -92,9 +92,8 @@ class DogBreedForm(forms.ModelForm):
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
 
-
-        self.fields['ages'].widget.attrs['class'] = 'weui-input'
-        self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
+        # self.fields['ages'].widget.attrs['class'] = 'weui-input'
+        # self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
 
         self.fields['sex'].widget.attrs['class'] = 'weui-input'
         # self.fields['sex'].widget.attrs['placeholder'] = '请输入特征'
@@ -110,14 +109,13 @@ class DogBreedForm(forms.ModelForm):
 
     class Meta:
         model = DogBreed
-        fields = ['name', 'typeid','birth','sex','ages', 'desc', 'picture', 'price', 'ownername', 'telephone']
+        fields = ['name', 'typeid','birth','sex', 'desc', 'picture', 'price', 'ownername', 'telephone']
 
         widgets = {
-
             'birth': forms.DateTimeInput({'class': 'weui-input', 'type': 'date', 'placeholder': '请输入时间'}),
             'telephone': forms.NumberInput(
                 {'class': 'weui-input', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$', 'maxlength': '11'}),
-            'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物特征', 'rows': '3'})
+            'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物特点', 'rows': '3'})
         }
 
 
@@ -250,6 +248,9 @@ class DogInstitutionForm(forms.ModelForm):
         self.fields['province'].widget.attrs['class'] = 'weui-input'
         self.fields['province'].widget.attrs['placeholder'] = '所属省市县(区)'
 
+        self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
+        self.fields['picture'].widget.attrs['accept'] = 'image/*'
+
         # self.fields['city'].widget.attrs['class'] = 'weui-input'
         # self.fields['city'].widget.attrs['placeholder'] = '所属城市'
         #
@@ -261,8 +262,9 @@ class DogInstitutionForm(forms.ModelForm):
 
     class Meta:
         model = Doginstitution
-        fields = ['name','tel','province','address',]
+        fields = ['name','tel','province','address','picture','brief']
         widgets  = {
             'tel':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
-            'address': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入详细地址', 'rows': '3'})
+            'address': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入详细地址', 'rows': '3'}),
+            'brief': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入机构简介', 'rows': '3'})
         }

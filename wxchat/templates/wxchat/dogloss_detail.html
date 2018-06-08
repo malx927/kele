@@ -29,7 +29,7 @@
                <span class="weui-form-preview__value">{{ object.sex }}</span>
            </div>
            <div class="weui-form-preview__item">
-               <label class="weui-form-preview__label">宠物特征 :</label>
+               <label class="weui-form-preview__label">宠物说明 :</label>
                <span class="weui-form-preview__value">{{ object.desc }}</span>
            </div>
             <div class="weui-form-preview__item">
@@ -38,16 +38,13 @@
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">丢失时间 :</label>
-               <span class="weui-form-preview__value">{{ object.lostdate|date:'Y-m-d'}}</span>
+               <span class="weui-form-preview__value">{{ object.lostdate|date:'Y-m-d H:m'}}</span>
            </div>
             <div class="weui-form-preview__item">
                <label class="weui-form-preview__label">主人电话 :</label>
                <span class="weui-form-preview__value">{{ object.telephone }}</span>
            </div>
        </div>
-{#       <div class="weui-form-preview__ft">#}
-{#           <a class="weui-form-preview__btn weui-form-preview__btn_primary" href="javascript:window.history.back(-1)">返回</a>#}
-{#       </div>#}
     </div>
     </div>
 </div>

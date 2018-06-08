@@ -185,7 +185,22 @@ a{
     color: #f46253;
 }
 
+.weui-media-box__thumb{
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+.weui-media-box__info {
+    margin-top: 5px;
+}
 
+.header_bottom:after{
+    border-bottom: 0px solid #E5E5E5;
+}
+
+.cells_top {
+    margin-top: 0px;
+}
 
 .male{
     color:#076fbb;

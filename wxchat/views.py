@@ -23,7 +23,7 @@ from wechatpy.client.api import WeChatJSAPI
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
 
-from doginfo.models import DogLoss, DogOwner
+from doginfo.models import DogLoss, DogOwner,Doginstitution
 from dogtype.models import Dogtype
 from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
@@ -493,10 +493,10 @@ def DoginstitutionAdd(request):
         print(next)
         form = DogInstitutionForm(request.POST, request.FILES)
         if form.is_valid():
-            dogowner = form.save(commit=False)
-            dogowner.openid = openid
-            dogowner.nickname = nickname
-            dogowner.save()
+            obj = form.save(commit=False)
+            obj.openid = openid
+            obj.nickname = nickname
+            obj.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -511,6 +511,10 @@ def doginstitution(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/doginstitution.html')
 
+# 寻宠物详细视图
+class DogInstitutionDetailView(DetailView):
+    model = Doginstitution
+    template_name = 'wxchat/doginstitution_detail.html'
 
 #新手课堂
 def freshman(request):
