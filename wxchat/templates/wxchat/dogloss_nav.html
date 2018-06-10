@@ -1,9 +1,19 @@
-{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block container %}
-
-<div class="weui-panel weui-panel_access bgcolor" style="height:100%;text-align: center;">
-    <div class="weui-panel_hd" style="height:70%;width: 70%;background-color: #000077;border-radius: 20px;">
-
+<div class="weui-panel weui-panel_access bgcolor" >
+    <div class="middle">
+        <div style="height:20%;width:100%;">
+        </div>
+        <div style="height:20%;width:100%;">
+            <a href="{% url 'dog-loss-add' %}?next={{ next }}" ><img src="{% static 'wxchat/images/find_pet.png' %}"></a>
+        </div>
+        <div style="height:20%;width:100%">
+        </div>
+         <div style="height:20%;width:100%">
+            <a href="{% url 'dog-owner-add' %}?next={{ next }}" ><img src="{% static 'wxchat/images/find_owner.png' %}"></a>
+        </div>
+         <div style="height:20%;width:100%;">
+        </div>
     </div>
 </div>
 
