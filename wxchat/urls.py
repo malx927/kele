@@ -9,7 +9,7 @@ from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,Dogdeli
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav
 
 
 
@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^doglossdetail/(?P<pk>\d+)$', DogLossDetailView.as_view(), name='dog-loss-detail'),
     url(r'^dogowneradd/$', dogOwnerAdd, name='dog-owner-add'),
     url(r'^dogownerdetail/(?P<pk>\d+)$', DogOwnerDetailView.as_view(), name='dog-owner-detail'),
+    url(r'^doglossnav/$', dogLossNav, name='dog-loss-nav'),
 
     # 宠物领养和送养
     url(r'^dogadopt/$', dogAdopt, name='dog-adoption'),

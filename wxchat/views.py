@@ -310,6 +310,10 @@ def dogLossAdd(request):
         }
         return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next,'sign':signPackage})
 
+def dogLossNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogloss_nav.html', {'next': next})
+
 
 def dogBreed(request):
     openid = request.session.get('openid', None)
