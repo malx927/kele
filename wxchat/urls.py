@@ -4,7 +4,8 @@ __author__ = 'malxin'
 from django.conf.urls import url
 from django.views.generic import TemplateView
 
-from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView
+from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
+    dogAdoptNav, dogTradeNav
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
@@ -39,6 +40,7 @@ urlpatterns = [
     url(r'^dogadopt/$', dogAdopt, name='dog-adoption'),
     url(r'^dogadoptadd/$', dogadoptAdd, name='dog-adopt-add'),
     url(r'^dogadoptdetail/(?P<pk>\d+)$', DogAdoptDetailView.as_view(), name='dog-adopt-detail'),
+    url(r'^dogadoptnav/$', dogAdoptNav, name='dog-adopt-nav'),
 
     url(r'^dogdeliveryadd/$', DogdeliveryAdd, name='dog-delivery-add'),
     url(r'^dogdeliverydetail/(?P<pk>\d+)$', DogdeliveryDetailView.as_view(), name='dog-delivery-detail'),
@@ -48,7 +50,7 @@ urlpatterns = [
     url(r'^dogbreedadd/$', dogBreedAdd, name='dog-breed-add'),
     url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(), name='dog-breed-detail'),
     url(r'^dogfemaledetail/(?P<pk>\d+)$', DogFemaleDetailView.as_view(), name='dog-female-detail'),
-
+    url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
     # 新手学堂
     url(r'^freshman/$', freshman, name='fresh-man'),
     url(r'^freshmandetail/(?P<pk>\d+)$', FreshmanDetailView.as_view(), name='dog-freshman-detail'),
@@ -65,6 +67,7 @@ urlpatterns = [
     # 宠物销售
     url(r'^dogsaleadd/$', dogSaleAdd, name='dog-sale-add'),
     url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(), name='dog-sale-detail'),
+    url(r'^dogtradnav/$', dogTradeNav, name='dog-trade-nav'),
     # 宠物出售
 
     #分享

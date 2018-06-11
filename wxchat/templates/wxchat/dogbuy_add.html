@@ -5,53 +5,64 @@
 </script>
 {% endblock extra%}
 {% block container %}
-<div class="weui-cells__title">求购登记表<span class="r"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-lg green" aria-hidden="true"></i></a><span></div>
-<form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
-<div class="weui-cells weui-cells_form" id="uploader">
-    <div class="weui-cell">
-        <div class="weui-cell__hd">
-            <label for="" class="weui-label">{{ form.typeid.label }}:</label>
-        </div>
-        <div class="weui-cell__bd">
-              {{ form.typeid }}
+
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="fa fa-angle-left fa-2x gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物求购登记</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
         </div>
     </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ages.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.ages }}
+    <div class="weui-panel__bd">
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top" id="uploader">
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.typeid.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">
+                      {{ form.typeid }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ages.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.ages }}
+                </div>
+            </div>
+            <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.sex.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">
+                      {{ form.sex }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.price.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.price }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.buyname.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.buyname }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.telephone }}
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+            </div>
         </div>
-    </div>
-    <div class="weui-cell weui-cell_select weui-cell_select-after">
-        <div class="weui-cell__hd">
-            <label for="" class="weui-label">{{ form.sex.label }}:</label>
-        </div>
-        <div class="weui-cell__bd">
-              {{ form.sex }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.price.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.price }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.buyname.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.buyname }}
-        </div>
-    </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}:</label></div>
-        <div class="weui-cell__bd">
-            {{ form.telephone }}
-        </div>
-    </div>
-    <div class="weui-btn-area">
-        <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+        </form>
     </div>
 </div>
-</form>
 
 {% endblock container %}
