@@ -315,6 +315,19 @@ def dogLossNav(request):
     return render(request, 'wxchat/dogloss_nav.html', {'next': next})
 
 
+def dogBreedNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogbreed_nav.html', {'next': next})
+
+def dogAdoptNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogAdopt_nav.html', {'next': next})
+
+def dogTradeNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogtrade_nav.html', {'next': next})
+
+
 def dogBreed(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/dogbreed.html')

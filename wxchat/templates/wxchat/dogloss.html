@@ -67,8 +67,8 @@
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-3x" aria-hidden="true"></i></a>
+      <div class="circle" >
+          <a href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg"></i><p>发布</p></a>
       </div>
 {% endblock add %}
 {% block bottomjs %}
