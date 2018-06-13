@@ -4,7 +4,7 @@ __author__ = 'yy'
 from django.contrib import admin
 
 from doginfo.models import Company, DogOwner, Doginfo, DogBreed, DogLoss, DogAdoption, DogDelivery, DogBuy, DogSale, \
-    Freshman, Doginstitution
+    Freshman, Doginstitution,DogStatus,DogStatusType
 
 
 # Register your models here.
@@ -115,6 +115,19 @@ class DoginstitutionAdmin(admin.ModelAdmin):
     list_per_page = 50
 admin.site.register(Doginstitution, DoginstitutionAdmin)
 
+
+class DogStatusAdmin(admin.ModelAdmin):
+    list_display = ('name',  'create_time')
+    list_display_links = ('name',)
+    list_per_page = 50
+admin.site.register(DogStatus, DogStatusAdmin)
+
+
+class DogStatusTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'dogtype' ,'create_time')
+    list_display_links = ('name',)
+    list_per_page = 50
+admin.site.register(DogStatusType, DogStatusTypeAdmin)
 
 # 宠物养护
 # class CuringAdmin(admin.ModelAdmin):
