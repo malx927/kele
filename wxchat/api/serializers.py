@@ -74,7 +74,7 @@ class DogLossSerializer(serializers.ModelSerializer):
     lostdate = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
+        fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
                   'telephone', 'openid']
 
     def get_lostdate(self,obj):
@@ -248,7 +248,7 @@ class DogfreshmanSerializer(serializers.ModelSerializer):
 class DogInstitutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Doginstitution
-        fields = ['id', 'name', 'tel','address','province',]
+        fields = ['id', 'name', 'tel','address','province','picture','brief']
 
 #图片轮播
 class SwiperImageListSerializer(serializers.ModelSerializer):

@@ -15,6 +15,7 @@ class Dogtype(models.Model):
         verbose_name = u"品种"
         verbose_name_plural = u'品种分类'
 
+
     def __str__(self):
         return self.typename
 

@@ -1,18 +1,13 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-{% block title %}配种{% endblock %}
 
 {% block tabpanel %}
     <div class="weui-tab__content" id="tab1">
         <div class="weui-panel weui-panel_access">
             <div class="weui-panel__hd">
                 <div class="weui-flex">
-                    <div class="weui-flex__item"><span class="title">公犬列表<span></div>
-                    <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}"
-                                                    class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
-                    </div>
-                    <div class="weui-flex__item"><a
-                            href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1"
-                            class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
+                    <div class="weui-flex__item"><span class="title">GG列表</span></div>
+                    <div class="weui-flex__item"></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                 </div>
             </div>
             <div class="weui-panel__bd" id="dogbreed">
@@ -30,13 +25,9 @@
         <div class="weui-panel weui-panel_access">
             <div class="weui-panel__hd">
                 <div class="weui-flex">
-                    <div class="weui-flex__item"><span class="title">母犬列表</span></div>
-                    <div class="weui-flex__item"><a href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}"
-                                                    class="weui-btn weui-btn_mini weui-btn_plain-primary r">公犬发布</a>
-                    </div>
-                    <div class="weui-flex__item"><a
-                            href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}&sex=1"
-                            class="weui-btn weui-btn_mini weui-btn_plain-primary r">母犬发布</a></div>
+                    <div class="weui-flex__item"><span class="title">MM列表</span></div>
+                    <div class="weui-flex__item"></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
                 </div>
             </div>
             <div class="weui-panel__bd" id="dogowner"></div>
@@ -53,23 +44,27 @@
 {% endblock tabpanel %}
 {% block tabbar %}
     <a href="#tab1" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon">公犬列表
-            <img src="{% static 'wxchat/images/search.png' %}" alt="">
+        <div class="weui-tabbar__icon">
+             <i class="fa fa-mars" aria-hidden="true"></i>
         </div>
-        <p class="weui-tabbar__label">公犬列表</p>
+        <p class="weui-tabbar__label">GG</p>
     </a>
     <a href="#tab2" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon">母犬列表
-            <img src="{% static 'wxchat/images/icon_nav_search_bar.png' %}" alt="">
+        <div class="weui-tabbar__icon">fa-venus
+            <i class="fa fa-venus" aria-hidden="true"></i>
         </div>
-        <p class="weui-tabbar__label">母犬列表</p>
+        <p class="weui-tabbar__label">MM</p>
     </a>
 {% endblock tabbar %}
+{% block add %}
+      <div class="circle">
+          <a href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
+      </div>
+{% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
     <script type="application/javascript">
         nextUrl = '{% url 'dog-breed-list' %}';
-{#        ownerUrl = '{% url 'dog-female-list' %}';#}
         var loading = weui.loading('加载中...');
         ///缓存滚动条位置
         $('.weui-tab__panel').scroll(function () {
@@ -78,13 +73,6 @@
             }
         });
         $(function () {
-{#            weui.tab('#tab', {#}
-{#                defaultIndex: 0,#}
-{#                onChange: function (index) {#}
-{#                    sessionStorage.setItem('tab', index);#}
-{#                }#}
-{#            });#}
-
             defIndex = sessionStorage.getItem('tab');
             console.log('defindex='+ defIndex);
             weui.tab('#tab',{

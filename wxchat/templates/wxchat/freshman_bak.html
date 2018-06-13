@@ -3,7 +3,7 @@
 <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
 <script>
     wx.config({
-        debug: true,
+        debug: false,
         appId: '{{ sign.appId }}',
         timestamp:'{{ sign.timestamp }}',
         nonceStr: '{{ sign.nonceStr }}',
@@ -40,7 +40,8 @@
         $('#checkJsApi').on('click',function(){
             wx.checkJsApi({
               jsApiList: [
-                'onMenuShareAppMessage'
+                'onMenuShareAppMessage',
+                  'chooseImage'
               ],
               success: function (res) {
                 alert(JSON.stringify(res));
@@ -103,6 +104,20 @@
     alert('已注册获取“发送给朋友”状态事件');
   };
 
+  document.querySelector('#chooseImage').onclick = function () {
+      wx.chooseImage({
+        count: 1, // 默认9
+        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+        success: function (res) {
+            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
+            document.querySelector('#img').src = localIds[0];
+            alert(localIds);
+        }
+    });
+    //alert('已注册获取“发送给朋友”状态事件');
+  };
+
 });
 </script>
 
@@ -115,6 +130,7 @@
         <a class="weui-btn weui-btn_primary"  id="scanQRCode0">二维码0</a>
         <a class="weui-btn weui-btn_primary"  id="scanQRCode1">二维码1</a>
         <a class="weui-btn weui-btn_primary"  id="shareaction">分享</a>
-        <a class="weui-btn weui-btn_primary" href="javascript:" id="showTooltips">确定</a>
+        <a class="weui-btn weui-btn_primary" ipt:" id="chooseImage">上传图片</a>
     </div>
+    <img id="img" src="" width="100px" height="50px">
 {% endblock container %}

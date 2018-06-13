@@ -3,13 +3,15 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView,dogOrder
+from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
+    dogAdoptNav, dogTradeNav
+
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav
 
 
 
@@ -33,11 +35,13 @@ urlpatterns = [
     url(r'^doglossdetail/(?P<pk>\d+)$', DogLossDetailView.as_view(), name='dog-loss-detail'),
     url(r'^dogowneradd/$', dogOwnerAdd, name='dog-owner-add'),
     url(r'^dogownerdetail/(?P<pk>\d+)$', DogOwnerDetailView.as_view(), name='dog-owner-detail'),
+    url(r'^doglossnav/$', dogLossNav, name='dog-loss-nav'),
 
     # 宠物领养和送养
     url(r'^dogadopt/$', dogAdopt, name='dog-adoption'),
     url(r'^dogadoptadd/$', dogadoptAdd, name='dog-adopt-add'),
     url(r'^dogadoptdetail/(?P<pk>\d+)$', DogAdoptDetailView.as_view(), name='dog-adopt-detail'),
+    url(r'^dogadoptnav/$', dogAdoptNav, name='dog-adopt-nav'),
 
     url(r'^dogdeliveryadd/$', DogdeliveryAdd, name='dog-delivery-add'),
     url(r'^dogdeliverydetail/(?P<pk>\d+)$', DogdeliveryDetailView.as_view(), name='dog-delivery-detail'),
@@ -48,8 +52,10 @@ urlpatterns = [
     url(r'^dogbreeddetail/(?P<pk>\d+)$', DogBreedDetailView.as_view(), name='dog-breed-detail'),
     url(r'^dogfemaledetail/(?P<pk>\d+)$', DogFemaleDetailView.as_view(), name='dog-female-detail'),
 
+
     #狗粮订单
     url(r'^dogorder/$', dogOrder, name='dog-order'),
+    url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂
     url(r'^freshman/$', freshman, name='fresh-man'),
@@ -58,6 +64,7 @@ urlpatterns = [
     # 加盟宠物医疗机构
     url(r'^doginstitution/$', doginstitution, name='dog-institution'),
     url(r'^doginstitutionadd/$', DoginstitutionAdd, name='dog-institution-add'),
+    url(r'^doginstitutiondetail/(?P<pk>\d+)$', DogInstitutionDetailView.as_view(), name='dog-inst-detail'),
 
     # 宠物求购
     url(r'^dogtrade/$', dogTrade, name='dog-trade'),
@@ -66,6 +73,7 @@ urlpatterns = [
     # 宠物销售
     url(r'^dogsaleadd/$', dogSaleAdd, name='dog-sale-add'),
     url(r'^dogsaledetail/(?P<pk>\d+)$', DogSaleDetailView.as_view(), name='dog-sale-detail'),
+    url(r'^dogtradnav/$', dogTradeNav, name='dog-trade-nav'),
     # 宠物出售
 
     #分享

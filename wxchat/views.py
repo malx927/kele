@@ -23,7 +23,7 @@ from wechatpy.client.api import WeChatJSAPI
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
 
-from doginfo.models import DogLoss, DogOwner
+from doginfo.models import DogLoss, DogOwner,Doginstitution
 from dogtype.models import Dogtype
 from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
@@ -293,7 +293,39 @@ def dogLossAdd(request):
     else:
         form = DogLossForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next})
+        jsApi = WeChatJSAPI(client)
+        ticket = jsApi.get_jsapi_ticket()
+        noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+        timestamp = int(time.time())
+        url = request.build_absolute_uri()
+        print(url)
+        signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+
+        signPackage = {
+            "appId":settings.WECHAT_APPID,
+            "nonceStr":noncestr,
+            "timestamp":timestamp,
+            "url":url,
+            "signature":signature
+        }
+        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next,'sign':signPackage})
+
+def dogLossNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogloss_nav.html', {'next': next})
+
+
+def dogBreedNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogbreed_nav.html', {'next': next})
+
+def dogAdoptNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogAdopt_nav.html', {'next': next})
+
+def dogTradeNav(request):
+    next = request.GET.get('next', '')
+    return render(request, 'wxchat/dogtrade_nav.html', {'next': next})
 
 
 def dogBreed(request):
@@ -374,10 +406,8 @@ def dogOwnerAdd(request):
             dogowner.openid = openid
             dogowner.nickname = nickname
             dogowner.save()
-            print('$$$$$$$$$$$$$$$$$$$$$$$')
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            print('----------------------')
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogOwnerForm()
@@ -480,17 +510,17 @@ def DoginstitutionAdd(request):
         print(next)
         form = DogInstitutionForm(request.POST, request.FILES)
         if form.is_valid():
-            dogowner = form.save(commit=False)
-            dogowner.openid = openid
-            dogowner.nickname = nickname
-            dogowner.save()
+            obj = form.save(commit=False)
+            obj.openid = openid
+            obj.nickname = nickname
+            obj.save()
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogInstitutionForm()
         next = request.GET.get('next', '')
-        return render(request, 'wxchat/doginstitution_add123.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
 
 
 #加盟宠物医疗机构
@@ -498,6 +528,10 @@ def doginstitution(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/doginstitution.html')
 
+# 寻宠物详细视图
+class DogInstitutionDetailView(DetailView):
+    model = Doginstitution
+    template_name = 'wxchat/doginstitution_detail.html'
 
 #新手课堂
 def freshman(request):
