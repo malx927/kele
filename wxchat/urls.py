@@ -3,7 +3,7 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView,dogOrder
+#from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
     dogAdoptNav, dogTradeNav
 
@@ -54,7 +54,7 @@ urlpatterns = [
 
 
     #狗粮订单
-    url(r'^dogorder/$', dogOrder, name='dog-order'),
+   # url(r'^dogorder/$', dogOrder, name='dog-order'),
     url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂

@@ -48,10 +48,10 @@ function setImageUrl(){
 function getSexImage(item){
         var seximg = item.sex;
         if( seximg != null && seximg == '公') {
-            seximg = '<i class="fa fa-mars male" aria-hidden="true"></i> ';
+            seximg = '<i class="icon iconfont icon-man14 male"></i> ';
         }
         else{
-            seximg = '<i class="fa fa-venus female" aria-hidden="true"></i> ';
+            seximg = '<i class="icon iconfont icon-female3 female"></i> ';
         }
         return seximg;
 }
