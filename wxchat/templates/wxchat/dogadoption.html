@@ -11,7 +11,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物领养列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogadopt"></div>
@@ -29,7 +29,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物送养列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogdelivery"></div>
@@ -45,22 +45,23 @@
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">'
-                <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                <i class="icon iconfont icon-lingyang" aria-hidden="true"></i>
             </div>
             <p class="weui-tabbar__label">宠物领养</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <i class="fa fa-twitter" aria-hidden="true"></i>>
+                <i class="icon iconfont icon-pet5" aria-hidden="true"></i>>
             </div>
             <p class="weui-tabbar__label">宠物送养</p>
         </a>
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-adopt-nav' %}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+    <a class="circle" href="{% url 'dog-adopt-nav' %}?next={{ request.get_full_path }}">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+    </a>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}

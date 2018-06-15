@@ -11,7 +11,7 @@
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物出售信息</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogsale"></div>
@@ -29,7 +29,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物求购信息</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogbuy">
@@ -48,22 +48,23 @@
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">'
-                <i class="fa fa-database" aria-hidden="true"></i>
+                <i class="icon iconfont icon-rongquanmaichu1"></i>
             </div>
             <p class="weui-tabbar__label">宠物出售</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                <i class="icon iconfont icon-mairu1" ></i>
             </div>
             <p class="weui-tabbar__label">宠物求购</p>
         </a>
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-trade-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+    <a class="circle" href="{% url 'dog-trade-nav' %}?next={{ request.get_full_path }}">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+    </a>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
