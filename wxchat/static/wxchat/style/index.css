@@ -115,6 +115,11 @@ a{
 
 .weui-grid{
    color: #f46253;
+
+}
+.weui-grid__icon > i{
+    font-size: 2em;
+    line-height: 28px;
 }
 .green{
      color:  #09BB07;
@@ -140,6 +145,10 @@ a{
 
 .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__icon > i, .weui-tabbar__item.weui-bar__item_on .weui-tabbar__label {
      color: #f46253;
+}
+
+.weui-tabbar__icon {
+ line-height: 27px;
 }
 
 .weui-panel__hd {
@@ -228,33 +237,39 @@ a{
  .circle{
      position: absolute;
      bottom: 0px;
-     left: 50%;
      color:#f46253;
-     margin:0px 0px 0px -24px;
+     /*margin:0px 0px 0px -24px;*/
      z-index: 500;
      width:48px;
-     height:48px;
-     /*border: 1px solid #C0BFC4;*/
-     /*background-color:#f46253;*/
+     height:52px;
+     left: 50%;
+    transform: translate(-50%,0);
      background-color: #F7F7FA;
      /*line-height:48px;*/
-     /*border-radius:50%;*/
+     border-radius:50%;
      text-align: center;
-     padding-top:2px;
 
- }
- .circle i{
-     font-size:2.4em;
  }
 
  .circle p{
      font-size:12px;
+     line-height: 1.8;
  }
 
- .circle a{
-     color: #f46253;
+ .circle_icon{
+     /*background-color:green;*/
+     text-align: center;
+     margin:0 auto;
+     width: 38px;
+     height: 30px;
+     display: inline-block;
+     line-height: 30px;
+     border-radius:50%;
      /*text-shadow: 1px 1px 1px #a4a4a4;*/
 
+ }
+ .circle_icon>i{
+     font-size:2.0em;
  }
 
  .swiper-pagination-bullet-active {

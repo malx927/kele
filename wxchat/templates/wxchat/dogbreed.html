@@ -45,21 +45,22 @@
 {% block tabbar %}
     <a href="#tab1" class="weui-tabbar__item">
         <div class="weui-tabbar__icon">
-             <i class="fa fa-mars" aria-hidden="true"></i>
+             <i class="icon iconfont icon-man"></i>
         </div>
         <p class="weui-tabbar__label">GG</p>
     </a>
     <a href="#tab2" class="weui-tabbar__item">
         <div class="weui-tabbar__icon">fa-venus
-            <i class="fa fa-venus" aria-hidden="true"></i>
+            <i class="icon iconfont icon-female4"></i>
         </div>
         <p class="weui-tabbar__label">MM</p>
     </a>
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+      <a class="circle" href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+      </a>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
