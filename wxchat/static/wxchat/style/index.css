@@ -53,6 +53,14 @@ a{
   background-color: #4cd964;
 }
 
+.btn_holder{
+    margin: 5px;
+    padding: 0 5px;
+    height: 2.3em;
+    line-height:2.3em;
+    text-align: center;
+    color: #cfcfcf;
+}
 .r{
     float: right;
 }
@@ -87,6 +95,7 @@ a{
 }
 
 .detail_header{
+    position: relative;
     width:auto;
     height:240px;
     background-color:#fff;
@@ -101,6 +110,22 @@ a{
     width: 100%;
     height: inherit;
 
+ }
+ .img_status{
+    position:absolute;
+    display: block;
+    width:40%;
+    height:100px;
+    left: 50%;
+    top: 50%;
+    font-size:22px;
+    font-weight: bold;
+    background: rgba(17, 17, 17, 0.7);
+    transform: translate(-50%,-50%);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 100px;
+    color:#f46253 ;
  }
 
 .weui-tabbar__icon > i {
@@ -126,11 +151,16 @@ a{
 }
 
 .pink{
-     color:  #f46253;
+    color:  #f46253;
     font-size: 22px;
     height:27px;
     line-height: 27px;
 }
+
+.icon_pink{
+    color:  #f46253;
+}
+
 .gray{
     color: #999999;
 }
@@ -274,6 +304,7 @@ a{
  .circle_icon>i{
      font-size:2.0em;
  }
+
 
  .swiper-pagination-bullet-active {
      background: #f46253;

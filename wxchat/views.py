@@ -94,7 +94,8 @@ def getDogLossList(request, msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
+        if dog.picture:
+            article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -762,6 +763,9 @@ def shareAction(request):
 
 def dogIndex(request):
     return render(request,'wxchat/dogindex.html')
+
+def myInfo(request):
+    return render(request,'wxchat/myinfo.html')
 
 def createTestData(request):
     curDate = datetime.datetime.now()

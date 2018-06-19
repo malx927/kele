@@ -12,6 +12,9 @@
      {% if object.picture %}
          <div class="detail_header">
             <img src="{{ object.picture.url }}" >
+          {% if object.result == 1 %}
+              <span class="img_status">已经找到</span>
+          {% endif %}
          </div>
       {% endif %}
      <div class="weui-form-preview">
