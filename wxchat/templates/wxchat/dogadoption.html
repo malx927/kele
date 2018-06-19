@@ -58,7 +58,8 @@
 
 {% endblock tabbar %}
 {% block add %}
-    <a class="circle" href="{% url 'dog-adopt-nav' %}?next={{ request.get_full_path }}">
+{#    {% url 'dog-adopt-nav' %}?next={{ request.get_full_path }}#}
+    <a id="pet_adopt" class="circle" href="javascript:;">
           <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
           <p>发布</p>
     </a>
@@ -184,5 +185,24 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
+
+     $('#pet_adopt').on("click",function(){
+            weui.actionSheet([
+             {
+                 label: '宠物领养',
+                 className:'color-primary',
+                 onClick: function () {
+                     window.location.href="{% url 'dog-adopt-add' %}?next={{ request.get_full_path }}";
+                 }
+             }, {
+                 label: '宠物送养',
+                 className:'color-success',
+                 onClick: function () {
+                     window.location.href="{% url 'dog-delivery-add' %}?sex=1&next={{ request.get_full_path }}";
+                 }
+             },
+             ]);
+        });
+
     </script>
 {% endblock bottomjs %}
