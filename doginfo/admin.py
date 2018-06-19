@@ -44,8 +44,7 @@ admin.site.register(DogBreed, DogBreedAdmin)
 
 # 寻宠表
 class DogLossAdmin(admin.ModelAdmin):
-    list_display = (
-    'dog_name', 'typeid','sex', 'desc', 'lostplace', 'lostdate', 'ownername', 'telephone', 'create_time', 'nickname')
+    list_display = ('dog_name', 'typeid','sex','lostplace', 'lostdate', 'ownername', 'telephone','result', 'create_time', 'nickname')
     list_display_links = ('dog_name',)
     list_per_page = 50
 
@@ -55,7 +54,7 @@ admin.site.register(DogLoss, DogLossAdmin)
 
 # 寻宠表
 class DogOwnerAdmin(admin.ModelAdmin):
-    list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'create_time', 'nickname')
+    list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'result','create_time', 'nickname')
     list_per_page = 50
 
 

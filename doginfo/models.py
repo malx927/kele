@@ -41,6 +41,12 @@ TYPE_SEX_CHOICE = (
     (u'母', u'母'),
 )
 
+TYPE_RESULT_CHOICE = (
+    (0, u'没找到'),
+    (1, u'已找到'),
+)
+
+
 
 # 用户
 class User(models.Model):
@@ -130,6 +136,7 @@ class DogLoss(models.Model):
     click = models.IntegerField(verbose_name=u'阅读量',blank=True,null=True,default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
+    result = models.IntegerField(verbose_name='当前状态',default=0,choices=TYPE_RESULT_CHOICE,null=True,blank=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120, null=True, blank=True)
     nickname = models.CharField(verbose_name='昵称', max_length=64, null=True, blank=True)
 
@@ -142,7 +149,7 @@ class DogLoss(models.Model):
         return self.dog_name
 
     def _getTitle(self):
-        return '【寻宠】昵称:%s(%s)\n丢失地点:%s' % (self.dog_name, self.typeid.typename, self.lostplace)
+        return '【寻宠】昵称:%s(%s)\n丢失地点:%s' % (self.dog_name, self.typeid, self.lostplace)
 
     title = property(_getTitle)
 
@@ -163,6 +170,7 @@ class DogOwner(models.Model):
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
+    result = models.IntegerField(verbose_name='当前状态',default=0,choices=TYPE_RESULT_CHOICE,null=True,blank=True)
     openid = models.CharField(verbose_name='唯一标识', max_length=120, null=True, blank=True)
     nickname = models.CharField(verbose_name='昵称', max_length=64, null=True, blank=True)
 
@@ -268,7 +276,6 @@ class Dogfood(models.Model):
 
 # 宠物配种
 class DogBreed(models.Model):
-
     name = models.CharField(verbose_name=u'宠物昵称', max_length=50)
     sex = models.CharField(verbose_name=u'宠物性别', max_length=10,choices=TYPE_SEX_CHOICE,null=True,blank=True)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True)
@@ -368,7 +375,6 @@ class DogBuy(models.Model):
 
 # 宠物出售
 class DogSale(models.Model):
-
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
     ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)

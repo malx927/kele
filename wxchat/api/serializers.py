@@ -12,9 +12,10 @@ from doginfo.models import Doginfo, DogLoss, DogOwner, DogBreed,DogBuy,DogSale
 from doginfo.models import (
     PAGE_TYPE_CHOICE,
     Vaccine_TYPE_CHOICE,
-    Type_TYPE_CHOICE,
     bodytype_TYPE_CHOICE,
     TYPE_SEX_CHOICE,
+    TYPE_RESULT_CHOICE,
+
 )
 
 from wxchat.models import SwiperImage
@@ -72,10 +73,16 @@ class DogLossSerializer(serializers.ModelSerializer):
     #       )
     thumb_url = serializers.SerializerMethodField()
     lostdate = serializers.SerializerMethodField()
+    #result = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername',
-                  'telephone', 'openid']
+        fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername','telephone', 'openid','result']
+
+    # def get_result(self, obj):
+    #     if obj.result == 0:
+    #         return TYPE_RESULT_CHOICE[0][1]
+    #     else:
+    #         return TYPE_RESULT_CHOICE[1][1]
 
     def get_lostdate(self,obj):
         if obj.lostdate:
@@ -99,9 +106,10 @@ class DogLossSerializer(serializers.ModelSerializer):
 class DogOwnerSerializer(serializers.ModelSerializer):
     thumb_url = serializers.SerializerMethodField()
     finddate = serializers.SerializerMethodField()
+
     class Meta:
         model = DogOwner
-        fields = ['id','typeid','desc','picture','thumb_url','findplace','finddate','findname','telephone']
+        fields = ['id','typeid','desc','picture','thumb_url','findplace','finddate','findname','telephone','result']
 
     def get_finddate(self,obj):
         if obj.finddate:
