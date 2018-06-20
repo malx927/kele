@@ -278,7 +278,7 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 
 WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://t4hzwv.natappfree.cc/wechat'
+APP_URL = 'http://89wi79.natappfree.cc/wechat'
 
 #APP_URL = 'http://www.hld8000.com/wechat'
 
