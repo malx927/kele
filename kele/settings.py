@@ -283,7 +283,7 @@ APP_URL = 'http://89wi79.natappfree.cc/wechat'
 #APP_URL = 'http://www.hld8000.com/wechat'
 
 
-#测试号WeChat
+# 测试号WeChat
 WECHAT_APPID = 'wxbc591183cb175d16'
 WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
 
