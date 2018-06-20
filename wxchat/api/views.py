@@ -12,6 +12,7 @@ from doginfo.models import DogBuy, DogSale
 
 from doginfo.models import Doginfo,DogLoss,DogOwner
 from dogtype.models import AreaCode
+from .paginations import PagePagination
 from .serializers import (
     DoginfoListSerializer,
     DoginfoCreateSerializer,
@@ -50,6 +51,8 @@ class DogLossListAPIView(ListAPIView):
     queryset = DogLoss.objects.all()
     serializer_class = DogLossSerializer
     def get_queryset(self):
+        # openid = self.request.session.get('openid', None)
+        # print('openid..........:',openid)
         return  DogLoss.objects.filter(is_show=1)
 
 #狗配种
@@ -155,4 +158,33 @@ class AreaCodeListAPIView(ListAPIView):
 
     def get_queryset(self):
         return AreaCode.objects.extra(where=['length(code)=2'])
+
+
+
+class MyInfoListAPIView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        type = request.GET.get('type',None)
+        openid = request.session.get('openid',None)
+        openid ='oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
+        print(type,openid)
+        if type == 'loss' and  openid:
+            queryset_list = DogLoss.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogLossSerializer(queryset_list, many=True)
+            print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='owner' and openid:
+            queryset_list = DogOwner.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogOwnerSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+
+        return Response()
 

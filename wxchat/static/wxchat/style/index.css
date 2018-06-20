@@ -159,10 +159,18 @@ a{
 
 .icon_pink{
     color:  #f46253;
+    font-size: 22px;
 }
 
 .gray{
     color: #999999;
+}
+.margin_top2{
+    margin-top: 2px;
+}
+.image_size{
+    width:60px!important;
+    height:60px!important;
 }
 .weui-navbar__item{
     padding: 10px 0;

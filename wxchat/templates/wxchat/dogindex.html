@@ -73,37 +73,15 @@
                 <div class="weui-panel__ft" ></div>
             </div>
         </div>
-        <div class="weui-tab__content" id="tab3">
-            <div class="weui-grids">
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 寻找宠物</p>
-              </a>
-              <a href="" class="weui-grid">
-
-                <p class="weui-grid__label"><i class="icon iconfont icon-man8 icon_pink"></i> 寻找主人</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物相亲</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物领养</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物送养</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物销售</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物求购</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物机构</p>
-              </a>
-              <a href="" class="weui-grid">
-                <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 宠物共享</p>
-              </a>
-            </div>
+{#        <div class="weui-tab__content" id="tab3">#}
+{#            <div class="weui-panel weui-panel_access">#}
+{#                <div class="weui-panel__hd"></div>#}
+{#                <div class="weui-panel__bd" ></div>#}
+{#                <div class="weui-panel__ft" ></div>#}
+{#            </div>#}
+{#        </div>#}
+        <div class="weui-tab__content" id="tab4">
+            {% include 'wxchat/myinfo.html' %}
         </div>
 {% endblock tabpanel %}
  {% block tabbar %}
@@ -119,7 +97,13 @@
             </div>
             <p class="weui-tabbar__label">商城</p>
         </a>
-        <a href="#tab3" class="weui-tabbar__item">
+{#        <a href="https://shop65587717.taobao.com/?spm=a230r.7195193.1997079397.2.54Qxn6" class="weui-tabbar__noitem">#}
+{#            <div class="weui-tabbar__icon">#}
+{#              <i class="icon iconfont icon-jiaoyi"></i>#}
+{#            </div>#}
+{#            <p class="weui-tabbar__label">淘宝</p>#}
+{#        </a>#}
+        <a href="#tab4" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
               <i class="icon iconfont icon-wo2"></i>
             </div>
