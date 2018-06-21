@@ -20,8 +20,9 @@ from .views import (
     SwiperImageListAPIView,
     DogInstitutionListAPIView,
     AreaCodeListAPIView,
-    MyInfoListAPIView
-)
+    MyInfoListAPIView,
+    UpdateLossView,
+    UpdateOwnerView)
 
 urlpatterns = [
     url(r'^doginfolist/$', DoginfoListAPIView.as_view(), name='doginfolist'),
@@ -41,6 +42,9 @@ urlpatterns = [
     url(r'^doginstitutionlist/$', DogInstitutionListAPIView.as_view(), name='dog-institution-list'),
     url(r'^arealist/$', AreaCodeListAPIView.as_view(), name='area-code-list'),
     url(r'^myinfolist/$', MyInfoListAPIView.as_view(), name='my-info-list'),
+     #更新找到标志
+    url(r'^updateloss/(?P<pk>\d+)/$', UpdateLossView.as_view(),name='update-loss'),
+    url(r'^updateowner/(?P<pk>\d+)/$', UpdateOwnerView.as_view(),name='update-owner'),
 
 
 ]

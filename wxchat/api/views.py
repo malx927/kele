@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView,UpdateAPIView,RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -30,7 +30,7 @@ from .serializers import (
     SwiperImageListSerializer,
     DogInstitutionSerializer,
     CodeProvinceSerializer,
-)
+    DogOwnerDetailSerializer)
 from wxchat.models import SwiperImage
 
 __author__ = 'malixin'
@@ -235,3 +235,13 @@ class MyInfoListAPIView(APIView):
             return Response(resp)
         return Response()
 
+class UpdateLossView(RetrieveUpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = DogLossDetailSerializer
+    queryset = DogLoss.objects.all()
+
+
+class UpdateOwnerView(RetrieveUpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = DogOwnerDetailSerializer
+    queryset = DogOwner.objects.all()

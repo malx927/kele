@@ -1,4 +1,6 @@
 # -*-coding:utf-8-*-
+from wxchat.api.views import UpdateLossView
+
 __author__ = 'malxin'
 
 from django.conf.urls import url
@@ -80,6 +82,7 @@ urlpatterns = [
 
      #首页
     url(r'^dogindex/$', dogIndex,name='dog-index'),
+
 
     #我的
     url(r'^myinfo/$', myInfo,name='my-info'),

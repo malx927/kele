@@ -33,8 +33,7 @@ from rest_framework import serializers
 class DogLossDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogLoss
-        fields = ['id', 'dog_name', 'typeid',  'desc', 'picture', 'lostplace', 'lostdate', 'ownername',
-                  'telephone', 'openid']
+        fields = ['id', 'dog_name', 'typeid',  'desc', 'picture', 'lostplace', 'lostdate', 'ownername','telephone', 'openid','result']
 
 
 # 宠物配种
@@ -127,7 +126,7 @@ class DogOwnerSerializer(serializers.ModelSerializer):
 class DogOwnerDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DogOwner
-        fields = ['id', 'typeid','desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone']
+        fields = ['id', 'typeid','desc', 'picture', 'findplace', 'finddate', 'findname', 'telephone','result']
 
 
 
