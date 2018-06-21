@@ -50,7 +50,7 @@
         <p class="weui-tabbar__label">GG</p>
     </a>
     <a href="#tab2" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon">fa-venus
+        <div class="weui-tabbar__icon">
             <i class="icon iconfont icon-female4"></i>
         </div>
         <p class="weui-tabbar__label">MM</p>
@@ -75,12 +75,12 @@
             }
         });
         $(function () {
-            defIndex = sessionStorage.getItem('tab');
+            defIndex = sessionStorage.getItem('breed');
             console.log('defindex='+ defIndex);
             weui.tab('#tab',{
                 defaultIndex: defIndex ==null?0:defIndex,
                 onChange: function(index){
-                    sessionStorage.setItem('tab',index);
+                    sessionStorage.setItem('breed',index);
                 }
             });
 
@@ -188,13 +188,13 @@
         $('#pet_breed').on("click",function(){
             weui.actionSheet([
              {
-                 label: 'GG相亲',
+                 label: '<i class="icon iconfont icon-man icon_pink"></i> GG相亲',
                  className:'color-primary',
                  onClick: function () {
                      window.location.href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}";
                  }
              }, {
-                 label: 'MM相亲',
+                 label: '<i class="icon iconfont icon-female4 icon_pink"></i> MM相亲',
                  className:'color-success',
                  onClick: function () {
                      window.location.href="{% url 'dog-breed-add' %}?sex=1&next={{ request.get_full_path }}";

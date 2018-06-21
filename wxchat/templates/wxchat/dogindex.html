@@ -73,14 +73,8 @@
                 <div class="weui-panel__ft" ></div>
             </div>
         </div>
-{#        <div class="weui-tab__content" id="tab3">#}
-{#            <div class="weui-panel weui-panel_access">#}
-{#                <div class="weui-panel__hd"></div>#}
-{#                <div class="weui-panel__bd" ></div>#}
-{#                <div class="weui-panel__ft" ></div>#}
-{#            </div>#}
-{#        </div>#}
-        <div class="weui-tab__content" id="tab4">
+
+        <div class="weui-tab__content" id="tab3">
             {% include 'wxchat/myinfo.html' %}
         </div>
 {% endblock tabpanel %}
@@ -91,19 +85,14 @@
             </div>
             <p class="weui-tabbar__label">首页</p>
         </a>
-        <a href="https://weidian.com/?userid=408882159&share_id=408882159&wfr=wx&ifr=shopdetail&code=021xPwYe0TntQz1gCc0f0eZuYe0xPwYb&state=H5WXshare" class="weui-tabbar__noitem">
+        <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
               <i class="icon iconfont icon-buy5"></i>
             </div>
             <p class="weui-tabbar__label">商城</p>
         </a>
-{#        <a href="https://shop65587717.taobao.com/?spm=a230r.7195193.1997079397.2.54Qxn6" class="weui-tabbar__noitem">#}
-{#            <div class="weui-tabbar__icon">#}
-{#              <i class="icon iconfont icon-jiaoyi"></i>#}
-{#            </div>#}
-{#            <p class="weui-tabbar__label">淘宝</p>#}
-{#        </a>#}
-        <a href="#tab4" class="weui-tabbar__item">
+
+        <a href="#tab3" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
               <i class="icon iconfont icon-wo2"></i>
             </div>
@@ -115,10 +104,23 @@
     <script type="application/javascript">
     $(function(){
         setImageUrl();
+        type = sessionStorage.getItem('type');
+        getDataList(type);
+        defIndex = sessionStorage.getItem('index');
+        console.log('-----------'+defIndex);
+        if(defIndex == 1) defIndex=0;
         weui.tab('#tab',{
-            defaultIndex: 0,
+            defaultIndex: defIndex ==null?0:defIndex,
             onChange: function(index){
+                console.log(index);
+                sessionStorage.setItem('index',index);
+                if(index == 1)
+                {
+                    window.location.href='https://weidian.com/?userid=408882159&share_id=408882159&wfr=wx&ifr=shopdetail&code=021xPwYe0TntQz1gCc0f0eZuYe0xPwYb&state=H5WXshare';
+                }
+                else if(index == 2){
 
+                }
             }
         });
 

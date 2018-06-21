@@ -81,11 +81,11 @@
         });
 
         $(function(){
-            defIndex = sessionStorage.getItem('tab');
+            defIndex = sessionStorage.getItem('trade');
             weui.tab('#tab',{
                 defaultIndex: defIndex ==null?0:defIndex,
                 onChange: function(index){
-                    sessionStorage.setItem('tab',index);
+                    sessionStorage.setItem('trade',index);
                 }
             });
 
@@ -192,13 +192,13 @@
      $('#pet_trade').on("click",function(){
             weui.actionSheet([
              {
-                 label: '宠物出售',
+                 label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',
                  className:'color-primary',
                  onClick: function () {
                      window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";
                  }
              }, {
-                 label: '宠物求购',
+                 label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',
                  className:'color-success',
                  onClick: function () {
                      window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";

@@ -185,6 +185,53 @@ class MyInfoListAPIView(APIView):
                 'results':serializer.data
             }
             return Response(resp)
-
+        elif type=='breed' and openid:
+            queryset_list = DogBreed.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogbreedListSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='adopt' and openid:
+            queryset_list = DogAdoption.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogadoptListSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='delivery' and openid:
+            queryset_list = DogDelivery.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogdeliverySerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='sale' and openid:
+            queryset_list = DogSale.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogSaleSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='buy' and openid:
+            queryset_list = DogBuy.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogBuySerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='institution' and openid:
+            queryset_list = Doginstitution.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogInstitutionSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
         return Response()
 
