@@ -25,7 +25,7 @@
         <div class="weui-tabbar__icon"><i class="icon iconfont icon-shouye2" ></i></div>
         <p class="weui-tabbar__label">首页</p>
     </a>
-    <a href="#" class="weui-tabbar__item">
+    <a href="javascript:void(0);" class="weui-tabbar__item" onclick="gotome();">
         <div class="weui-tabbar__icon"><i class="icon iconfont icon-wo2" ></i></div>
         <p class="weui-tabbar__label">我的</p>
     </a>
@@ -38,7 +38,7 @@
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
-    <script type="application/javascript">
+  <script type="application/javascript">
      nextUrl = '{% url 'dog-institution-list' %}';
      var loading = weui.loading('加载中...');
      ///缓存滚动条位置
@@ -46,13 +46,15 @@
             if($(this).scrollTop() !=0 ){
                 sessionStorage.setItem('offsetTop',$(this).scrollTop());
             }
-    });
+     });
+
     $(function(){
         $('#doginstitutionmore').on('click',function(){
             getDataList( nextUrl );
         });
         getDataList( nextUrl );
     });
+
     function getDataList(url){
         $.ajax({
           type: 'GET',
@@ -104,5 +106,12 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
-    </script>
+
+    function gotome(){
+        sessionStorage.setItem('index',2);
+        window.location.href = "{% url 'dog-index' %}";
+
+    }
+
+  </script>
 {% endblock bottomjs %}
