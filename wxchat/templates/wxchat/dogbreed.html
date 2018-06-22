@@ -58,7 +58,7 @@
 {% endblock tabbar %}
 {% block add %}
 {#    {% url 'dog-breed-nav' %}?next={{ request.get_full_path }}#}
-      <a id="pet_breed" class="circle" href="javascript:;">
+      <a  class="circle" href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}">
           <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
           <p>发布</p>
       </a>

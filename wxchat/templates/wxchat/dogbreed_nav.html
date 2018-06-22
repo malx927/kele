@@ -1,20 +1,27 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block container %}
 <div class="weui-panel weui-panel_access bgcolor" >
-    <div class="middle">
-        <div class="height10" ></div>
-        <div class="height15" ><h2>发布选择</h2></div>
-        <div class="height20">
-            <a href="{% url 'dog-breed-add' %}?next={{ next }}" ><img  src="{% static 'wxchat/images/find_pet.png' %}"></a>
+     <div class="middle">
+        <div class="height5" ></div>
+        <div class="height15" ><h3>发布选择</h3></div>
+        <div class="height30">
+            <a href="{% url 'dog-breed-add' %}?next={{ next }}" >
+                <img  src="{% static 'wxchat/images/gg.png' %}">
+                <p><h4>GG相亲<h4></p>
+            </a>
+
         </div>
-        <div class="height15">
+        <div class="height5">
         </div>
-         <div class="height20">
-            <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=1" ><img src="{% static 'wxchat/images/find_owner.png' %}"></a>
+         <div class="height30">
+            <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=1" >
+                <img src="{% static 'wxchat/images/mm.png' %}">
+                <p><h4>MM相亲<h4></p>
+            </a>
         </div>
-         <div class="height20">
+         <div class="height15">
         </div>
-    </div>
+     </div>
 </div>
 
 {% endblock container %}
