@@ -76,7 +76,7 @@ def wechat(request):
             print('eventkey=',msg.event)
             if msg.event == 'subscribe':
                 saveUserinfo(msg.source)
-                reply = create_reply('感谢您关注【大眼可乐宠物联盟】\n发送【寻宠】或者【寻主】两个字可以查看到最新发布的寻找宠物和寻找主人的信息', msg)
+                reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
@@ -778,7 +778,7 @@ def createTestData(request):
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
+            'picture':'wxchat/images/default_dog.png',
             'lostplace':'龙前街19-2号楼--%d'%(i,),
             'lostdate':strDate,
             'ownername':'张三--%d' %(i,),
@@ -791,7 +791,7 @@ def createTestData(request):
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
+            'picture':'wxchat/images/default_dog.png',
             'findplace':'龙前街19-2号楼--%d'%(i,),
             'finddate':strDate,
             'findname':'张三--%d' %(i,),
@@ -816,7 +816,7 @@ def createTestData(request):
     #         'colors':u'金毛--%d'%(i,),
     #         'price':u'1000-5000元--%d'%(i,),
     #         'desc':u'能歌善舞--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
+    #         'picture':'wxchat/images/default_dog.png',
     #         'ownername':'张三--%d'%(i,),
     #         'telephone':'123456789',
     #     }

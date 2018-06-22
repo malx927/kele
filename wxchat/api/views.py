@@ -167,7 +167,6 @@ class MyInfoListAPIView(APIView):
     def get(self, request):
         type = request.GET.get('type',None)
         openid = request.session.get('openid',None)
-        openid ='oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
         print(type,openid)
         if type == 'loss' and  openid:
             queryset_list = DogLoss.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
@@ -233,7 +232,12 @@ class MyInfoListAPIView(APIView):
                 'results':serializer.data
             }
             return Response(resp)
-        return Response()
+        else:
+            resp = {
+                'results':[]
+            }
+            return Response(resp)
+
 
 class UpdateLossView(RetrieveUpdateAPIView):
     permission_classes = [AllowAny]
