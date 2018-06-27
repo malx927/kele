@@ -261,6 +261,10 @@ a{
   text-align: center;
 }
 
+.weui-skin_android .weui-actionsheet__menu {
+  border-radius: 12px;
+}
+
 .weui-tabbar__noitem {
     display: block;
     -webkit-box-flex: 1;

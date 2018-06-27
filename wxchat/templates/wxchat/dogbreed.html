@@ -58,10 +58,29 @@
 {% endblock tabbar %}
 {% block add %}
 {#    {% url 'dog-breed-nav' %}?next={{ request.get_full_path }}#}
-      <a  class="circle" href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}">
+      <a id="pet_breed" class="circle" href="javascript:;">
           <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
           <p>发布</p>
       </a>
+    <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                   <a href="{% url 'dog-breed-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/gg.png' %}">
+                        <p><h4>GG相亲<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                      <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=1" >
+                            <img src="{% static 'wxchat/images/mm.png' %}">
+                            <p><h4>MM相亲<h4></p>
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
@@ -185,23 +204,36 @@
             $('.weui-tab__panel').scrollTop(_offset);
         }
 
-        $('#pet_breed').on("click",function(){
-            weui.actionSheet([
-             {
-                 label: '<i class="icon iconfont icon-man icon_pink"></i> GG相亲',
-                 className:'color-primary',
-                 onClick: function () {
-                     window.location.href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}";
-                 }
-             }, {
-                 label: '<i class="icon iconfont icon-female4 icon_pink"></i> MM相亲',
-                 className:'color-success',
-                 onClick: function () {
-                     window.location.href="{% url 'dog-breed-add' %}?sex=1&next={{ request.get_full_path }}";
-                 }
-             },
-             ]);
+          // android
+        $(function(){
+            var $actionSheet = $('#actionsheet');
+            var $mask = $actionSheet.find('.weui-mask');
+
+            $("#pet_breed").on('click', function(){
+                $actionSheet.fadeIn(200);
+                $mask.on('click',function () {
+                    $actionSheet.fadeOut(200);
+                });
+            });
         });
+
+{#        $('#pet_breed').on("click",function(){#}
+{#            weui.actionSheet([#}
+{#             {#}
+{#                 label: '<i class="icon iconfont icon-man icon_pink"></i> GG相亲',#}
+{#                 className:'color-primary',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             }, {#}
+{#                 label: '<i class="icon iconfont icon-female4 icon_pink"></i> MM相亲',#}
+{#                 className:'color-success',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-breed-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             },#}
+{#             ]);#}
+{#        });#}
 
     </script>
 {% endblock bottomjs %}

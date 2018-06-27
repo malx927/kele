@@ -66,6 +66,25 @@
           <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
           <p>发布</p>
     </a>
+     <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                    <a href="{% url 'dog-sale-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/chus.png' %}">
+                        <p><h4>宠物出售<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                      <a href="{% url 'dog-buy-add' %}?next={{ next }}" >
+                        <img src="{% static 'wxchat/images/qiug.png' %}">
+                        <p><h4>宠物求购<h4></p>
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
@@ -189,23 +208,36 @@
         $('.weui-tab__panel').scrollTop(_offset);
     }
 
-     $('#pet_trade').on("click",function(){
-            weui.actionSheet([
-             {
-                 label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',
-                 className:'color-primary',
-                 onClick: function () {
-                     window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";
-                 }
-             }, {
-                 label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',
-                 className:'color-success',
-                 onClick: function () {
-                     window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";
-                 }
-             },
-             ]);
+      // android
+    $(function(){
+        var $actionSheet = $('#actionsheet');
+        var $mask = $actionSheet.find('.weui-mask');
+
+        $("#pet_trade").on('click', function(){
+            $actionSheet.fadeIn(200);
+            $mask.on('click',function () {
+                $actionSheet.fadeOut(200);
+            });
         });
+    });
+
+{#     $('#pet_trade').on("click",function(){#}
+{#            weui.actionSheet([#}
+{#             {#}
+{#                 label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',#}
+{#                 className:'color-primary',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             }, {#}
+{#                 label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',#}
+{#                 className:'color-success',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             },#}
+{#             ]);#}
+{#        });#}
 
     </script>
 {% endblock bottomjs %}

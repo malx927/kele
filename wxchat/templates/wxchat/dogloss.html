@@ -67,10 +67,31 @@
 
 {% endblock tabbar %}
 {% block add %}
-     <a  class="circle" href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}">
+{#    href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}"#}
+     <a id="pet_loss" class="circle" href="javascript:;">
           <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
           <p>发布</p>
      </a>
+    <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                    <a href="{% url 'dog-loss-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/xc.png' %}">
+                        <p><h4>寻找宠物<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                     <a href="{% url 'dog-owner-add' %}?next={{ next }}" >
+                        <img src="{% static 'wxchat/images/xz.png' %}">
+                        <p><h4>寻找主人<h4></p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock add %}
 {% block bottomjs %}
 
@@ -222,6 +243,36 @@
         $('.weui-tab__panel').scrollTop(_offset);
     }
 
+     // android
+    $(function(){
+        var $actionSheet = $('#actionsheet');
+        var $mask = $actionSheet.find('.weui-mask');
+
+        $("#pet_loss").on('click', function(){
+            $actionSheet.fadeIn(200);
+            $mask.on('click',function () {
+                $actionSheet.fadeOut(200);
+            });
+        });
+    });
+
+{#    $('#pet_loss').on("click",function(){#}
+{#        weui.actionSheet([#}
+{#         {#}
+{#             label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',#}
+{#             className:'color-primary',#}
+{#             onClick: function () {#}
+{#                 window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";#}
+{#             }#}
+{#         }, {#}
+{#             label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',#}
+{#             className:'color-success',#}
+{#             onClick: function () {#}
+{#                 window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#             }#}
+{#         },#}
+{#         ]);#}
+{#    });#}
 
     </script>
 {% endblock bottomjs %}
