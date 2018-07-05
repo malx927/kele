@@ -1,6 +1,7 @@
 # -*-coding:utf-8-*-
 
 import datetime
+import os
 from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
@@ -71,6 +72,7 @@ class DogLossSerializer(serializers.ModelSerializer):
     #          view_name='dog-loss-detail'
     #       )
     thumb_url = serializers.SerializerMethodField()
+    #picture = serializers.SerializerMethodField()
     lostdate = serializers.SerializerMethodField()
     #result = serializers.SerializerMethodField()
     class Meta:
@@ -89,8 +91,18 @@ class DogLossSerializer(serializers.ModelSerializer):
         else:
             return None
 
+    # def get_picture(self,obj):
+    #     if obj.picture:
+    #         options = {'size': (1600, 1200), 'crop': True}
+    #         thumburl = get_thumbnailer(obj.picture).get_thumbnail(options).url
+    #         return thumburl
+    #     else:
+    #         return  None
+
     def get_thumb_url(self,obj):
         if obj.picture:
+            path = obj.picture.name
+            print(path)
             return obj.picture['avatar'].url
         else:
             return None

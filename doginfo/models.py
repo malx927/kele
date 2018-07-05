@@ -11,6 +11,7 @@ import random
 from ckeditor.fields import RichTextField
 from dogbrand.models import Dogbrand
 from dogtype.models import Dogtype
+from easy_thumbnails.files import get_thumbnailer
 
 now = datetime.datetime.now()
 order_id = now.strftime("%Y%m%d%H%M%S") + 'B'
@@ -155,6 +156,17 @@ class DogLoss(models.Model):
 
     def get_absolute_url(self):
         return reverse('dog-loss-detail', kwargs={'pk': self.id})
+
+    def get_picture(self):
+        if self.picture:
+            print(self.picture.width,self.picture.height)
+            # exif = self.picture._getexif()
+            # print(exif)
+            options = {'size': (1600, 1200), 'crop': True}
+            thumburl = get_thumbnailer(self.picture).get_thumbnail(options).url
+            return thumburl
+        else:
+            return  self.picture.url
 
 
 # 寻宠主
