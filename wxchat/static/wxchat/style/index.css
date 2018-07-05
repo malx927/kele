@@ -139,6 +139,7 @@ a{
     text-align: center;
     line-height: 100px;
     color:#f46253 ;
+    text-shadow: 1px 1px 0px #212121;
  }
 
 .weui-tabbar__icon > i {

@@ -8,7 +8,7 @@ __author__ = 'yy'
 from django.db import models
 import datetime
 import random
-from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 from dogbrand.models import Dogbrand
 from dogtype.models import Dogtype
 from easy_thumbnails.files import get_thumbnailer
@@ -109,7 +109,7 @@ class Company(models.Model):
     dynamic = models.CharField(verbose_name=u'最新动态', max_length=200, blank=True)
     address = models.CharField(verbose_name=u'狗场地址', max_length=200, blank=True)
     profile = models.CharField(verbose_name=u'简介', max_length=1000, blank=True)
-    remarks = RichTextField(verbose_name=u'备注', max_length=10000, blank=True)
+    remarks = RichTextUploadingField(verbose_name=u'备注', max_length=10000, blank=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -272,8 +272,8 @@ class Dogfood(models.Model):
     food_models = models.CharField(verbose_name=u'规格', max_length=50, blank=True)
     period = models.CharField(verbose_name=u'保质期', max_length=50, blank=True)
     netweight = models.CharField(verbose_name=u'净含量', max_length=50, blank=True)
-    dog_desc = RichTextField(verbose_name=u'简介', max_length=2000)
-    prod_desc = RichTextField(verbose_name=u'产品介绍', max_length=2000)
+    dog_desc = RichTextUploadingField(verbose_name=u'简介', max_length=2000)
+    prod_desc = RichTextUploadingField(verbose_name=u'产品介绍', max_length=2000)
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
@@ -444,7 +444,7 @@ class Freshman(models.Model):
     picture_title = models.CharField(verbose_name=u'图片标题', max_length=50)
     picture = models.ImageField(verbose_name=u'图片', upload_to='new/%Y%m%d/', blank=True, null=True)
     desc = models.CharField(verbose_name=u'简介', max_length=200)
-    prod_desc = RichTextField(verbose_name=u'内容', max_length=2000)
+    prod_desc = RichTextUploadingField(verbose_name=u'内容', max_length=2000)
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
