@@ -137,7 +137,7 @@ def unSubUserinfo(openid):
         pass
 
 
-# @login_required
+@login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -147,49 +147,48 @@ def createMenu(request):
                 "name": "宠物社区",
                 "url": APP_URL + "/redirect/dogindex"
             },
-            {
-                "type": "view",
-                "name": "本周团购",
-                "url": APP_URL + "/redirect/dogindex"
-            },
-
-            {
-                "name":"我的联盟",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "每日签到",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "联盟卡",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "一键导航",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "小程序",
-                        "url": APP_URL + "/redirect/dogloss"
-                    }
-                ]
-
-            }
+            # {
+            #     "type": "view",
+            #     "name": "本周团购",
+            #     "url": APP_URL + "/redirect/dogindex"
+            # },
+            #
+            # {
+            #     "name":"我的联盟",
+            #     "sub_button":[
+            #         {
+            #             "type": "view",
+            #             "name": "每日签到",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "联盟卡",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "一键导航",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "小程序",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         }
+            #     ]
+            #
+            # }
         ]
     })
     return HttpResponse(json.dumps(resp))
 
 
-# @login_required
+@login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
-
 
 
 @login_required
