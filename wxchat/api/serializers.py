@@ -102,16 +102,9 @@ class DogLossSerializer(serializers.ModelSerializer):
     def get_thumb_url(self,obj):
         if obj.picture:
             path = obj.picture.name
-            print(path)
             return obj.picture['avatar'].url
         else:
             return None
-        # if obj.picture:
-        #     options = {'size': (1600, 1200), 'crop': True}
-        #     thumburl = get_thumbnailer(obj.picture).get_thumbnail(options).url
-        #     return thumburl
-        # else:
-        #     return  None
 
 # 寻找宠物主人
 class DogOwnerSerializer(serializers.ModelSerializer):
@@ -259,11 +252,17 @@ class DogSaleSerializer(serializers.ModelSerializer):
 
 #新手课堂
 class DogfreshmanSerializer(serializers.ModelSerializer):
+    thumb_url = serializers.SerializerMethodField()
     #username = serializers.CharField(source='user.first_name', read_only=True)
     class Meta:
         model = Freshman
-        fields = ['id', 'title','picture','desc']
+        fields = ['id', 'title','picture','thumb_url','desc']
 
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return None
 #加盟宠物医疗机构
 class DogInstitutionSerializer(serializers.ModelSerializer):
     class Meta:

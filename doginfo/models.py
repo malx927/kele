@@ -426,7 +426,7 @@ class DogSkill(models.Model):
 # 新手课堂
 class Freshman(models.Model):
     title = models.CharField(verbose_name=u'标题', max_length=50)
-    picture = models.ImageField(verbose_name=u'标题图片', upload_to='new/%Y%m%d/', blank=True, null=True)
+    picture = ThumbnailerImageField(verbose_name=u'标题图片', upload_to='new/%Y%m%d/', blank=True, null=True)
     desc = models.CharField(verbose_name=u'简介', max_length=200)
     prod_desc = RichTextUploadingField(verbose_name=u'内容', max_length=2000)
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
