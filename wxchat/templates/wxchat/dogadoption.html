@@ -1,10 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block tabpanel %}
-{#        <div class="weui-flex" >#}
-{#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-adopt-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">领养发布</a></div>#}
-{#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-delivery-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >送养发布</a></div>#}
-{#        </div>#}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
@@ -161,13 +157,17 @@
 
     function appenddeliveryItem(results){
         $.each(results,function(index,item){
-            var img_url = item.picture;
+           var img_url = item.thumb_url;
+
             if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+            }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
             }
             sexImage = getSexImage(item);
             lossitem =  '<a  href="/wechat/dogdeliverydetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ sexImage + item.typeid +'</h4>' +
                                '<p class="weui-media-box__desc">宠物要求: '+ item.desc +'</p>' +

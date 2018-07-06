@@ -54,12 +54,17 @@ class DogadoptDetailSerializer(serializers.ModelSerializer):
 
 # 宠物送养
 class DogdeliverySerializer(serializers.ModelSerializer):
-    typename = serializers.CharField(source='typeid.typename', read_only=True)
+    thumb_url = SerializerMethodField()
     class Meta:
         model = DogDelivery
-        fields = ['id', 'name', 'typeid', 'typename', 'ages', 'sex', 'desc', 'picture', 'ownername',
+        fields = ['id', 'name', 'typeid', 'ages', 'sex', 'desc','thumb_url', 'picture', 'ownername',
                   'telephone']
 
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return  obj.picture['avatar'].url
+        else:
+            return  None
 
 class DogdeliveryDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -72,18 +77,12 @@ class DogLossSerializer(serializers.ModelSerializer):
     #          view_name='dog-loss-detail'
     #       )
     thumb_url = serializers.SerializerMethodField()
-    #picture = serializers.SerializerMethodField()
     lostdate = serializers.SerializerMethodField()
     #result = serializers.SerializerMethodField()
     class Meta:
         model = DogLoss
         fields = ['id', 'dog_name', 'typeid','sex', 'desc', 'picture','thumb_url', 'lostplace', 'lostdate', 'ownername','telephone', 'openid','result']
 
-    # def get_result(self, obj):
-    #     if obj.result == 0:
-    #         return TYPE_RESULT_CHOICE[0][1]
-    #     else:
-    #         return TYPE_RESULT_CHOICE[1][1]
 
     def get_lostdate(self,obj):
         if obj.lostdate:
@@ -177,7 +176,7 @@ class DoginfoListSerializer(serializers.ModelSerializer):
 
 # 狗配种
 class DogbreedListSerializer(serializers.ModelSerializer):
-    # dogsex = SerializerMethodField()
+    thumb_url = SerializerMethodField()
 
     class Meta:
         model = DogBreed
@@ -190,13 +189,17 @@ class DogbreedListSerializer(serializers.ModelSerializer):
             'typeid',
             'desc',
             'picture',
+            'thumb_url',
             'price',
             'ownername',
             'telephone',
         ]
 
-    # def get_dogsex(self, obj):
-    #     return TYPE_SEX_CHOICE[1][1]
+    def get_thumb_url(self, obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return  None
 
 
 # 宠物领养
@@ -245,10 +248,17 @@ class DogBuySerializer(serializers.ModelSerializer):
 
 
 class DogSaleSerializer(serializers.ModelSerializer):
+    thumb_url = SerializerMethodField()
+
     class Meta:
         model = DogSale
-        fields = ['id', 'typeid', 'ages','desc','sex','price','picture','ownername','telephone']
+        fields = ['id', 'typeid', 'ages','desc','sex','price','thumb_url','picture','ownername','telephone']
 
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return None
 
 #新手课堂
 class DogfreshmanSerializer(serializers.ModelSerializer):
@@ -265,10 +275,16 @@ class DogfreshmanSerializer(serializers.ModelSerializer):
             return None
 #加盟宠物医疗机构
 class DogInstitutionSerializer(serializers.ModelSerializer):
+    thumb_url = serializers.SerializerMethodField()
     class Meta:
         model = Doginstitution
-        fields = ['id', 'name', 'tel','address','province','picture','brief']
+        fields = ['id', 'name', 'tel','address','province','thumb_url','picture','brief']
 
+    def get_thumb_url(self,obj):
+        if obj.picture:
+            return obj.picture['avatar'].url
+        else:
+            return None
 #图片轮播
 class SwiperImageListSerializer(serializers.ModelSerializer):
     class Meta:
