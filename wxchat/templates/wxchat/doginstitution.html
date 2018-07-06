@@ -12,7 +12,7 @@
             </div>
             <div class="weui-panel__bd" id="doginstitution"></div>
             <div class="weui-panel__ft" >
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doginstitutionmore">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doginstitutionmore" style="display: none">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>
@@ -80,7 +80,7 @@
 
     function appendItem(results){
         $.each(results,function(index,item){
-             var img_url = item.picture;
+            var img_url = item.picture;
             if(img_url == null){
                 img_url = '<i class="icon iconfont icon-yiliaojigou1  weui-media-box__thumb" ></i>';
             }

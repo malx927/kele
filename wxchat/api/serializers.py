@@ -259,9 +259,10 @@ class DogSaleSerializer(serializers.ModelSerializer):
 
 #新手课堂
 class DogfreshmanSerializer(serializers.ModelSerializer):
+    #username = serializers.CharField(source='user.first_name', read_only=True)
     class Meta:
         model = Freshman
-        fields = ['id', 'name', 'picture_title','picture','desc','prod_desc',]
+        fields = ['id', 'title','picture','desc']
 
 #加盟宠物医疗机构
 class DogInstitutionSerializer(serializers.ModelSerializer):

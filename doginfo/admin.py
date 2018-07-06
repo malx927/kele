@@ -99,9 +99,13 @@ admin.site.register(DogBuy, DogBuyAdmin)
 
 # 新手课堂
 class FreshamnAdmin(admin.ModelAdmin):
-    list_display = ('name', 'desc', 'create_time')
-    list_display_links = ('name',)
+    list_display = ('title', 'desc', 'create_time')
+    list_display_links = ('title',)
     list_per_page = 50
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
 
 
 admin.site.register(Freshman, FreshamnAdmin)
