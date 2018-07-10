@@ -15,7 +15,7 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from doginfo.models import DogDelivery,DogAdoption,Freshman
+from doginfo.models import DogDelivery,DogAdoption,Freshman,DogOrder,DogStatus,DogStatusType
 from .forms import DogadoptForm,DogdeliveryForm,DogInstitutionForm
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
@@ -498,6 +498,47 @@ def DogdeliveryAdd(request):
         form = DogdeliveryForm()
         next = request.GET.get('next', '')
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
+
+
+#狗粮订单
+def dogOrder(request):
+    import random
+    now = datetime.datetime.now()
+    random_int = random.randint(100,10000)
+    dog_code = now.strftime("%Y%m%d%H%M%S")+str(random_int)+'B'
+    if request.method == 'POST':
+        openid = request.session.get('openid')
+        nickname = request.session.get('nickname')
+        print('openid=', openid)
+        dogtype = request.POST['dogtype']
+        body_status = request.POST['body_status']
+        skin_status = request.POST['skin_status']
+        eye_status = request.POST['eye_status']
+        bones_status = request.POST['bones_status']
+        intestinal_status = request.POST['intestinal_status']
+        peice = request.POST['peice']
+        dogorder = DogOrder()
+        dogorder.dog_code = dog_code
+        dogorder.openid = openid
+        dogorder.nickname = nickname
+        dogorder.dogtype = dogtype
+        dogorder.body_status = body_status
+        dogorder.skin_status = skin_status
+        dogorder.eye_status = eye_status
+        dogorder.bones_status = bones_status
+        dogorder.intestinal_status = intestinal_status
+        dogorder.peice = peice
+        dogorder.save()
+        order = DogOrder.objects.filter(dog_code=dog_code).first()
+        order1 = DogStatusType.objects.filter().all()
+        return render(request, 'wxchat/order_success.html', {"order": order,})
+    else:
+        order = []
+        order1 = DogStatus.objects.filter().all()
+        for i in order1:
+            a= i.dogstatustype.all()
+            order.append(a)
+        return render(request, 'wxchat/dogorder.html',{'order':order,'order1':order1})
 
 
 #加盟宠物医疗机构发布

@@ -133,8 +133,7 @@ admin.site.register(DogStatusType, DogStatusTypeAdmin)
 # class CuringAdmin(admin.ModelAdmin):
 #     list_display = ('feed', 'nursing', 'reproduction', 'remarks', 'create_time')
 #     list_display_links = ('feed',)
-#     list_per_page = 50
-
+#     list_per_page =
 
 # admin.site.register(Curing, CuringAdmin)
 
