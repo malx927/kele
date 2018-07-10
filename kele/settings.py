@@ -128,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 JET_SIDE_MENU_COMPACT = True
 
 
-CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_UPLOAD_PATH = "ckeditor/"
 
 CKEDITOR_CONFIGS = {
     'default': {
@@ -189,7 +189,7 @@ CKEDITOR_CONFIGS = {
             ]),
     }
 }
-CKEDITOR_JQUERY_URL = '//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'
+
 
 #STATIC_ROOT = os.path.join(BASE_DIR, 'static1')
 # Internationalization
@@ -228,9 +228,10 @@ ADMIN_SITE_HEADER = u'大眼可乐公司后台'
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
+        #'rest_framework.permissions.AllowAny',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ),
@@ -270,7 +271,7 @@ JWT_AUTH = {
 
 THUMBNAIL_ALIASES = {
     '': {
-        'avatar': {'size': (720,1280), 'crop':True},
+        'avatar': {'size': (240,240), 'crop':True},
     },
 
 }
@@ -278,15 +279,15 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 
 WECHAT_TOKEN = 'dayankele123'
-APP_URL = 'http://t4hzwv.natappfree.cc/wechat'
+#APP_URL = 'http://7nb6dr.natappfree.cc/wechat'
 
-#APP_URL = 'http://www.hld8000.com/wechat'
+APP_URL = 'http://www.hld8000.com/wechat'
 
 
-#测试号WeChat
-WECHAT_APPID = 'wxbc591183cb175d16'
-WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
+# 测试号WeChat
+# WECHAT_APPID = 'wxbc591183cb175d16'
+# WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
 
-# WECHAT_APPID = 'wxad07fe6b357d1f3a'
-# WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
+WECHAT_APPID = 'wxad07fe6b357d1f3a'
+WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
 

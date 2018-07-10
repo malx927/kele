@@ -25,6 +25,7 @@ class DogLossForm(forms.ModelForm):
 
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
+        #gitself.fields['picture'].widget.attrs['capture'] = 'camera'
 
         # self.fields['lostdate'].input_formats = ['%Y-%m-%dT%H:%M']
         self.fields['lostdate'].widget.attrs['class'] = 'weui-input'

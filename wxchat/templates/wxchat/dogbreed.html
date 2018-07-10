@@ -7,14 +7,14 @@
                 <div class="weui-flex">
                     <div class="weui-flex__item"><span class="title">GG列表</span></div>
                     <div class="weui-flex__item"></div>
-                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                 </div>
             </div>
-            <div class="weui-panel__bd" id="dogbreed">
+            <div class="weui-panel__bd" id="dogGG">
 
             </div>
             <div class="weui-panel__ft">
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogbreedmore">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogGGmore" style="display: none">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>
@@ -27,12 +27,12 @@
                 <div class="weui-flex">
                     <div class="weui-flex__item"><span class="title">MM列表</span></div>
                     <div class="weui-flex__item"></div>
-                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                 </div>
             </div>
-            <div class="weui-panel__bd" id="dogowner"></div>
+            <div class="weui-panel__bd" id="dogMM"></div>
             <div class="weui-panel__ft">
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogownermore"
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogMMmore"
                    style="display: none">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
@@ -45,21 +45,41 @@
 {% block tabbar %}
     <a href="#tab1" class="weui-tabbar__item">
         <div class="weui-tabbar__icon">
-             <i class="fa fa-mars" aria-hidden="true"></i>
+             <i class="icon iconfont icon-man"></i>
         </div>
         <p class="weui-tabbar__label">GG</p>
     </a>
     <a href="#tab2" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon">fa-venus
-            <i class="fa fa-venus" aria-hidden="true"></i>
+        <div class="weui-tabbar__icon">
+            <i class="icon iconfont icon-female4"></i>
         </div>
         <p class="weui-tabbar__label">MM</p>
     </a>
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-breed-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+      <a id="pet_breed" class="circle" href="javascript:;">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+      </a>
+    <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                   <a href="{% url 'dog-breed-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/gg.png' %}">
+                        <p><h4>GG相亲<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                      <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=1" >
+                            <img src="{% static 'wxchat/images/mm.png' %}">
+                            <p><h4>MM相亲<h4></p>
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
@@ -73,22 +93,22 @@
             }
         });
         $(function () {
-            defIndex = sessionStorage.getItem('tab');
+            defIndex = sessionStorage.getItem('breed');
             console.log('defindex='+ defIndex);
             weui.tab('#tab',{
                 defaultIndex: defIndex ==null?0:defIndex,
                 onChange: function(index){
-                    sessionStorage.setItem('tab',index);
+                    sessionStorage.setItem('breed',index);
                 }
             });
 
-            $('#dogbreedmore').on('click', function () {
+            $('#dogGGmore').on('click', function () {
                 getDataList(nextUrl);
             });
-            $('#dogownermore').on('click', function () {
+            $('#dogMMmore').on('click', function () {
                 getDogOwnerList(nextUrl);
             });
-            getDogOwnerList(nextUrl);
+            getDogMMList(nextUrl);
             getDataList(nextUrl);
         });
         function getDataList(url) {
@@ -97,14 +117,14 @@
                 url: url,
                 dataType: 'json',
                 timeout: 5000,
-                context: $('#dogbreed'),
+                context: $('#dogGG'),
                 success: function (data) {
                     nextUrl = data.next;
                     appendItem(data.results);
                     if (nextUrl == null)
-                        $('#dogbreedmore').css('display', 'none');
+                        $('#dogGGmore').css('display', 'none');
                     else
-                        $('#dogbreedmore').css('display', '');
+                        $('#dogGGmore').css('display', '');
                     loading.hide();
                     setScollPos();
                 },
@@ -116,38 +136,41 @@
 
         function appendItem(results) {
             $.each(results, function (index, item) {
-                var img_url = item.picture;
                 var sex = item.sex;
                 if ( sex == '公'){
-                    if (img_url == null) {
-                    img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                    img_url = item.thumb_url;
+                    if(img_url == null){
+                        img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+                    }
+                    else{
+                        img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+                    }
+                    lossitem = '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd">' + img_url + '</div>' +
+                            '<div class="weui-media-box__bd">' +
+                            '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
+                            '<p class="weui-media-box__desc">' + item.desc + '</p>' +
+                            '</div>' +
+                            '</a>';
+                    $('#dogGG').append(lossitem);
                 }
-                lossitem = '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                        '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>' +
-                        '<div class="weui-media-box__bd">' +
-                        '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
-                        '<p class="weui-media-box__desc">' + item.desc + '</p>' +
-                        '</div>' +
-                        '</a>';
-                $('#dogbreed').append(lossitem);
-                         }
             });
 
         }
-        function getDogOwnerList(url) {
+        function getDogMMList(url) {
             $.ajax({
                 type: 'GET',
                 url: url,
                 dataType: 'json',
                 timeout: 5000,
-                context: $('#dogowner'),
+                context: $('#dogMM'),
                 success: function (data) {
                     nextUrl = data.next;
-                    appendDogOwnerItem(data.results);
+                    appendDogMMItem(data.results);
                     if (nextUrl == null)
-                        $('#dogownermore').css('display', 'none');
+                        $('#dogMMmore').css('display', 'none');
                     else
-                        $('#dogownermore').css('display', '');
+                        $('#dogMMmore').css('display', '');
                     loading.hide();
                     setScollPos();
                 },
@@ -157,22 +180,26 @@
             });
         }
 
-        function appendDogOwnerItem(results) {
+        function appendDogMMItem(results) {
             $.each(results, function (index, item) {
                 var img_url = item.picture;
                 var sex = item.sex;
                 if ( sex == '母'){
-                    if (img_url == null) {
-                        img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                    img_url = item.thumb_url;
+                    if(img_url == null){
+                        img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+                    }
+                    else{
+                        img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
                     }
                     lossitem = '<a href="/wechat/dogfemaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>' +
+                            '<div class="weui-media-box__hd">' + img_url + '</div>' +
                             '<div class="weui-media-box__bd">' +
                             '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
                             '<p class="weui-media-box__desc">' + item.desc + '</p>' +
                             '</div>' +
                             '</a>';
-                    $('#dogowner').append(lossitem);
+                    $('#dogMM').append(lossitem);
                 }
             });
         }
@@ -182,5 +209,37 @@
             var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
             $('.weui-tab__panel').scrollTop(_offset);
         }
+
+          // android
+        $(function(){
+            var $actionSheet = $('#actionsheet');
+            var $mask = $actionSheet.find('.weui-mask');
+
+            $("#pet_breed").on('click', function(){
+                $actionSheet.fadeIn(200);
+                $mask.on('click',function () {
+                    $actionSheet.fadeOut(200);
+                });
+            });
+        });
+
+{#        $('#pet_breed').on("click",function(){#}
+{#            weui.actionSheet([#}
+{#             {#}
+{#                 label: '<i class="icon iconfont icon-man icon_pink"></i> GG相亲',#}
+{#                 className:'color-primary',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             }, {#}
+{#                 label: '<i class="icon iconfont icon-female4 icon_pink"></i> MM相亲',#}
+{#                 className:'color-success',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-breed-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             },#}
+{#             ]);#}
+{#        });#}
+
     </script>
 {% endblock bottomjs %}

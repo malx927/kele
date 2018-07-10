@@ -11,7 +11,7 @@
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物出售信息</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogsale"></div>
@@ -29,7 +29,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物求购信息</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogbuy">
@@ -48,22 +48,43 @@
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">'
-                <i class="fa fa-database" aria-hidden="true"></i>
+                <i class="icon iconfont icon-rongquanmaichu1"></i>
             </div>
             <p class="weui-tabbar__label">宠物出售</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                <i class="icon iconfont icon-mairu1" ></i>
             </div>
             <p class="weui-tabbar__label">宠物求购</p>
         </a>
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-trade-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+{#    {% url 'dog-trade-nav' %}?next={{ request.get_full_path }}#}
+    <a id="pet_trade" class="circle" href="javascript:;">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+    </a>
+     <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                    <a href="{% url 'dog-sale-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/chus.png' %}">
+                        <p><h4>宠物出售<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                      <a href="{% url 'dog-buy-add' %}?next={{ next }}" >
+                        <img src="{% static 'wxchat/images/qiug.png' %}">
+                        <p><h4>宠物求购<h4></p>
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
@@ -79,11 +100,11 @@
         });
 
         $(function(){
-            defIndex = sessionStorage.getItem('tab');
+            defIndex = sessionStorage.getItem('trade');
             weui.tab('#tab',{
                 defaultIndex: defIndex ==null?0:defIndex,
                 onChange: function(index){
-                    sessionStorage.setItem('tab',index);
+                    sessionStorage.setItem('trade',index);
                 }
             });
 
@@ -158,17 +179,22 @@
 
     function appendSaleItem(results){
         $.each(results,function(index,item){
-            var img_url = item.picture;
+            var img_url = item.thumb_url;
+
             if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
             }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+            }
+
             var age = item.ages;
             if( age != null )
                 age = '【' + age + '】'
 
             var setImage = getSexImage(item);
             saleitem =  '<a  href="/wechat/dogsaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ setImage + item.typeid + age +'</h4>' +
                                '<ul class="weui-media-box__info">' +
@@ -186,6 +212,37 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
+
+      // android
+    $(function(){
+        var $actionSheet = $('#actionsheet');
+        var $mask = $actionSheet.find('.weui-mask');
+
+        $("#pet_trade").on('click', function(){
+            $actionSheet.fadeIn(200);
+            $mask.on('click',function () {
+                $actionSheet.fadeOut(200);
+            });
+        });
+    });
+
+{#     $('#pet_trade').on("click",function(){#}
+{#            weui.actionSheet([#}
+{#             {#}
+{#                 label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',#}
+{#                 className:'color-primary',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             }, {#}
+{#                 label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',#}
+{#                 className:'color-success',#}
+{#                 onClick: function () {#}
+{#                     window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#                 }#}
+{#             },#}
+{#             ]);#}
+{#        });#}
 
     </script>
 {% endblock bottomjs %}

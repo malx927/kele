@@ -1,9 +1,11 @@
 # -*-coding:utf-8-*-
+from wxchat.api.views import UpdateLossView
+
 __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView,dogOrder
+#from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
     dogAdoptNav, dogTradeNav
 
@@ -11,8 +13,7 @@ from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,Dogdeli
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav
-
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo
 
 
 urlpatterns = [
@@ -54,7 +55,7 @@ urlpatterns = [
 
 
     #狗粮订单
-    url(r'^dogorder/$', dogOrder, name='dog-order'),
+   # url(r'^dogorder/$', dogOrder, name='dog-order'),
     url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂
@@ -81,6 +82,10 @@ urlpatterns = [
 
      #首页
     url(r'^dogindex/$', dogIndex,name='dog-index'),
+
+
+    #我的
+    url(r'^myinfo/$', myInfo,name='my-info'),
 
     # 网页授权测试
     url(r'^auth2/$', auth2),

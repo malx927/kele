@@ -48,10 +48,10 @@ function setImageUrl(){
 function getSexImage(item){
         var seximg = item.sex;
         if( seximg != null && seximg == '公') {
-            seximg = '<i class="fa fa-mars male" aria-hidden="true"></i> ';
+            seximg = '<i class="icon iconfont icon-man14 male"></i> ';
         }
         else{
-            seximg = '<i class="fa fa-venus female" aria-hidden="true"></i> ';
+            seximg = '<i class="icon iconfont icon-female3 female"></i> ';
         }
         return seximg;
 }
@@ -169,40 +169,6 @@ $('.detail_header').on('click', function(e){
     $('.weui-gallery span').html('');
 });
 
-$('#show-actions').on("click",function(){
-	weui.actionSheet([
-     {
-         label: '拍照',
-		 className:'color-primary',
-         onClick: function () {
-             console.log('拍照');
-         }
-     }, {
-         label: '从相册选择',
-		 className:'color-success',
-         onClick: function () {
-             console.log('从相册选择');
-         }
-     }, {
-         label: '其他',
-         onClick: function () {
-             console.log('其他');
-         }
-     }
-	 ], [
-		 {
-			 label:'取消',
-			 onClick: function () {
-				 console.log('取消');
-			 }
-		 }
-	 ], {
-		 className: '',
-		 onClose:function(){
-			 console.log('关闭');
-		 }
-	 });
-});
 
 function showing(){
     var wins = weui.loading('处理中...');

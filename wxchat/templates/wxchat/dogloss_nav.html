@@ -2,17 +2,24 @@
 {% block container %}
 <div class="weui-panel weui-panel_access bgcolor" >
     <div class="middle">
-        <div class="height10" ></div>
-        <div class="height15" ><h2>发布选择</h2></div>
-        <div class="height20">
-            <a href="{% url 'dog-loss-add' %}?next={{ next }}" ><img  src="{% static 'wxchat/images/find_pet.png' %}"></a>
+        <div class="height5" ></div>
+        <div class="height15" ><h3>发布选择</h3></div>
+        <div class="height30">
+            <a href="{% url 'dog-loss-add' %}?next={{ next }}" >
+                <img  src="{% static 'wxchat/images/xc.png' %}">
+                <p><h4>寻找宠物<h4></p>
+            </a>
+
         </div>
-        <div class="height15">
+        <div class="height5">
         </div>
-         <div class="height20">
-            <a href="{% url 'dog-owner-add' %}?next={{ next }}" ><img src="{% static 'wxchat/images/find_owner.png' %}"></a>
+         <div class="height30">
+            <a href="{% url 'dog-owner-add' %}?next={{ next }}" >
+                <img src="{% static 'wxchat/images/xz.png' %}">
+                <p><h4>寻找主人<h4></p>
+            </a>
         </div>
-         <div class="height20">
+         <div class="height15">
         </div>
     </div>
 </div>

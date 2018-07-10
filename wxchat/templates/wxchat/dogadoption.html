@@ -1,17 +1,13 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block tabpanel %}
-{#        <div class="weui-flex" >#}
-{#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-adopt-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">领养发布</a></div>#}
-{#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-delivery-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >送养发布</a></div>#}
-{#        </div>#}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物领养列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogadopt"></div>
@@ -29,7 +25,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">宠物送养列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogdelivery"></div>
@@ -45,22 +41,24 @@
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">'
-                <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                <i class="icon iconfont icon-lingyang"></i>
             </div>
             <p class="weui-tabbar__label">宠物领养</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <i class="fa fa-twitter" aria-hidden="true"></i>>
+                <i class="icon iconfont icon-pet5"></i>
             </div>
             <p class="weui-tabbar__label">宠物送养</p>
         </a>
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-adopt-nav' %}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+{#    {% url 'dog-adopt-nav' %}?next={{ request.get_full_path }}#}
+    <a id="pet_adopt" class="circle" href="javascript:;">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+    </a>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
@@ -77,12 +75,12 @@
 
     $(function(){
 
-        defIndex = sessionStorage.getItem('tab');
+        defIndex = sessionStorage.getItem('adopt');
         console.log('defindex='+ defIndex);
         weui.tab('#tab',{
             defaultIndex: defIndex ==null?0:defIndex,
             onChange: function(index){
-                sessionStorage.setItem('tab',index);
+                sessionStorage.setItem('adopt',index);
             }
         });
 
@@ -124,10 +122,6 @@
 
     function appendItem(results){
         $.each(results,function(index,item){
-            var img_url = item.picture;
-            if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
-            }
             lossitem =  '<a href="/wechat/dogadoptdetail/' + item.id + '">' +
                             '<div class="weui-media-box weui-media-box_text">' +
                                '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
@@ -163,13 +157,17 @@
 
     function appenddeliveryItem(results){
         $.each(results,function(index,item){
-            var img_url = item.picture;
+           var img_url = item.thumb_url;
+
             if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+            }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
             }
             sexImage = getSexImage(item);
             lossitem =  '<a  href="/wechat/dogdeliverydetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ sexImage + item.typeid +'</h4>' +
                                '<p class="weui-media-box__desc">宠物要求: '+ item.desc +'</p>' +
@@ -183,5 +181,24 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
+
+     $('#pet_adopt').on("click",function(){
+            weui.actionSheet([
+             {
+                 label: '<i class="icon iconfont icon-lingyang icon_pink"></i> 宠物领养',
+                 className:'color-primary',
+                 onClick: function () {
+                     window.location.href="{% url 'dog-adopt-add' %}?next={{ request.get_full_path }}";
+                 }
+             }, {
+                 label: '<i class="icon iconfont icon-pet5 icon_pink"></i> 宠物送养',
+                 className:'color-success',
+                 onClick: function () {
+                     window.location.href="{% url 'dog-delivery-add' %}?sex=1&next={{ request.get_full_path }}";
+                 }
+             },
+             ]);
+        });
+
     </script>
 {% endblock bottomjs %}

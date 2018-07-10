@@ -7,12 +7,12 @@
                 <div class="weui-flex">
                     <div class="weui-flex__item"><span class="title">宠物医疗机构</span></div>
                     <div class="weui-flex__item"></div>
-                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                 </div>
             </div>
             <div class="weui-panel__bd" id="doginstitution"></div>
             <div class="weui-panel__ft" >
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doginstitutionmore">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="doginstitutionmore" style="display: none">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>
@@ -22,22 +22,23 @@
 {% endblock tabpanel %}
  {% block tabbar %}
     <a href="{% url 'dog-index' %}" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon"><i class="fa fa-home" aria-hidden="true"></i></div>
+        <div class="weui-tabbar__icon"><i class="icon iconfont icon-shouye2" ></i></div>
         <p class="weui-tabbar__label">首页</p>
     </a>
-    <a href="#" class="weui-tabbar__item">
-        <div class="weui-tabbar__icon"><i class="fa fa-user" aria-hidden="true"></i></div>
+    <a href="javascript:void(0);" class="weui-tabbar__item" onclick="gotome();">
+        <div class="weui-tabbar__icon"><i class="icon iconfont icon-wo2" ></i></div>
         <p class="weui-tabbar__label">我的</p>
     </a>
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle">
-          <a href="{% url 'dog-institution-add' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i><p>发布</p></a>
-      </div>
+    <a class="circle" href="{% url 'dog-institution-add' %}?next={{ request.get_full_path }}">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+     </a>
 {% endblock add %}
 {% block bottomjs %}
     {{ block.super }}
-    <script type="application/javascript">
+  <script type="application/javascript">
      nextUrl = '{% url 'dog-institution-list' %}';
      var loading = weui.loading('加载中...');
      ///缓存滚动条位置
@@ -45,13 +46,15 @@
             if($(this).scrollTop() !=0 ){
                 sessionStorage.setItem('offsetTop',$(this).scrollTop());
             }
-    });
+     });
+
     $(function(){
         $('#doginstitutionmore').on('click',function(){
             getDataList( nextUrl );
         });
         getDataList( nextUrl );
     });
+
     function getDataList(url){
         $.ajax({
           type: 'GET',
@@ -77,9 +80,9 @@
 
     function appendItem(results){
         $.each(results,function(index,item){
-             var img_url = item.picture;
+            var img_url = item.thumb_url;
             if(img_url == null){
-                img_url = '<i class="fa fa-smile-o fa-5x pink weui-media-box__thumb" aria-hidden="true"></i>';
+                img_url = '<i class="icon iconfont icon-yiliaojigou1  weui-media-box__thumb" ></i>';
             }
             else {
                 img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
@@ -103,5 +106,12 @@
         var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
         $('.weui-tab__panel').scrollTop(_offset);
     }
-    </script>
+
+    function gotome(){
+        sessionStorage.setItem('index',2);
+        window.location.href = "{% url 'dog-index' %}";
+
+    }
+
+  </script>
 {% endblock bottomjs %}

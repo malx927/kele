@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, ListCreateAPIView, RetrieveAPIView,UpdateAPIView,RetrieveUpdateAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
@@ -12,6 +12,7 @@ from doginfo.models import DogBuy, DogSale
 
 from doginfo.models import Doginfo,DogLoss,DogOwner
 from dogtype.models import AreaCode
+from .paginations import PagePagination
 from .serializers import (
     DoginfoListSerializer,
     DoginfoCreateSerializer,
@@ -29,7 +30,7 @@ from .serializers import (
     SwiperImageListSerializer,
     DogInstitutionSerializer,
     CodeProvinceSerializer,
-)
+    DogOwnerDetailSerializer)
 from wxchat.models import SwiperImage
 
 __author__ = 'malixin'
@@ -50,6 +51,8 @@ class DogLossListAPIView(ListAPIView):
     queryset = DogLoss.objects.all()
     serializer_class = DogLossSerializer
     def get_queryset(self):
+        # openid = self.request.session.get('openid', None)
+        # print('openid..........:',openid)
         return  DogLoss.objects.filter(is_show=1)
 
 #狗配种
@@ -156,3 +159,93 @@ class AreaCodeListAPIView(ListAPIView):
     def get_queryset(self):
         return AreaCode.objects.extra(where=['length(code)=2'])
 
+
+
+class MyInfoListAPIView(APIView):
+    permission_classes = (AllowAny,)
+
+    def get(self, request):
+        type = request.GET.get('type',None)
+        openid = request.session.get('openid',None)
+        print(type,openid)
+        if type == 'loss' and  openid:
+            queryset_list = DogLoss.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogLossSerializer(queryset_list, many=True)
+            print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='owner' and openid:
+            queryset_list = DogOwner.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogOwnerSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='breed' and openid:
+            queryset_list = DogBreed.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogbreedListSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='adopt' and openid:
+            queryset_list = DogAdoption.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogadoptListSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='delivery' and openid:
+            queryset_list = DogDelivery.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogdeliverySerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='sale' and openid:
+            queryset_list = DogSale.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogSaleSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='buy' and openid:
+            queryset_list = DogBuy.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogBuySerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        elif type=='institution' and openid:
+            queryset_list = Doginstitution.objects.filter(is_show=1).filter(openid=openid).order_by('-create_time')
+            serializer = DogInstitutionSerializer(queryset_list, many=True)
+            #print(serializer.data)
+            resp = {
+                'results':serializer.data
+            }
+            return Response(resp)
+        else:
+            resp = {
+                'results':[]
+            }
+            return Response(resp)
+
+
+class UpdateLossView(RetrieveUpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = DogLossDetailSerializer
+    queryset = DogLoss.objects.all()
+
+
+class UpdateOwnerView(RetrieveUpdateAPIView):
+    permission_classes = [AllowAny]
+    serializer_class = DogOwnerDetailSerializer
+    queryset = DogOwner.objects.all()

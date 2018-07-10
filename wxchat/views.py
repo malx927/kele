@@ -28,6 +28,7 @@ from dogtype.models import Dogtype
 from .models import WxUserinfo
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
+from PIL import Image
 
 # WECHAT_TOKEN = 'hello2018'
 # APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
@@ -76,7 +77,7 @@ def wechat(request):
             print('eventkey=',msg.event)
             if msg.event == 'subscribe':
                 saveUserinfo(msg.source)
-                reply = create_reply('感谢您关注【大眼可乐宠物联盟】\n发送【寻宠】或者【寻主】两个字可以查看到最新发布的寻找宠物和寻找主人的信息', msg)
+                reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
@@ -94,7 +95,8 @@ def getDogLossList(request, msg):
         article = ObjectDict()
         article.title = dog.title
         article.description = dog.desc
-        article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
+        if dog.picture:
+            article.image = 'http://' + request.get_host() + dog.picture['avatar'].url
         article.url = 'http://' + request.get_host() + dog.get_absolute_url()
         articles.add_article(article)
     return articles
@@ -135,7 +137,7 @@ def unSubUserinfo(openid):
         pass
 
 
-# @login_required
+@login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -145,73 +147,48 @@ def createMenu(request):
                 "name": "宠物社区",
                 "url": APP_URL + "/redirect/dogindex"
             },
-            {
-                "type": "view",
-                "name": "本周团购",
-                "url": APP_URL + "/redirect/dogindex"
-            },
             # {
-            #     "name":"宠物社区",
+            #     "type": "view",
+            #     "name": "本周团购",
+            #     "url": APP_URL + "/redirect/dogindex"
+            # },
+            #
+            # {
+            #     "name":"我的联盟",
             #     "sub_button":[
             #         {
             #             "type": "view",
-            #             "name": "乐园服务",
-            #             "url": APP_URL + "/redirect/dogservice"
-            #         },
-            #         {
-            #             "type": "view",
-            #             "name": "合作医院",
-            #             "url": APP_URL + "/redirect/doginstitution"
-            #         },
-            #         {
-            #             "type": "view",
-            #             "name": "宠物相关",
+            #             "name": "每日签到",
             #             "url": APP_URL + "/redirect/dogloss"
             #         },
             #         {
             #             "type": "view",
-            #             "name": "新手课堂",
-            #             "url": APP_URL + "/redirect/freshman"
+            #             "name": "联盟卡",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "一键导航",
+            #             "url": APP_URL + "/redirect/dogloss"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "小程序",
+            #             "url": APP_URL + "/redirect/dogloss"
             #         }
             #     ]
-            # },
-            {
-                "name":"我的联盟",
-                "sub_button":[
-                    {
-                        "type": "view",
-                        "name": "每日签到",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "联盟卡",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "一键导航",
-                        "url": APP_URL + "/redirect/dogloss"
-                    },
-                    {
-                        "type": "view",
-                        "name": "小程序",
-                        "url": APP_URL + "/redirect/dogloss"
-                    }
-                ]
-
-            }
+            #
+            # }
         ]
     })
     return HttpResponse(json.dumps(resp))
 
 
-# @login_required
+@login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
-
 
 
 @login_required
@@ -273,6 +250,37 @@ def dogLoss(request):
     return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
 
 
+def changeImage(im):
+    image = Image.open(im)
+    try:
+        image.load()
+    except IOError:
+        pass
+    image.load()
+
+    try:
+        exif = image._getexif()
+    except Exception:
+        exif = None
+
+    if exif:
+        orientation = exif.get(0x0112)
+        if orientation == 2:
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 3:
+            image = image.transpose(Image.ROTATE_180)
+        elif orientation == 4:
+            image = image.transpose(Image.FLIP_TOP_BOTTOM)
+        elif orientation == 5:
+            image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 6:
+            image = image.transpose(Image.ROTATE_270)
+        elif orientation == 7:
+            image = image.transpose(Image.ROTATE_90).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 8:
+            image = image.transpose(Image.ROTATE_90)
+    return  image
+
 # 寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
@@ -280,13 +288,18 @@ def dogLossAdd(request):
         nickname = request.session.get('nickname')
         print('openid=', openid,nickname)
         next = request.GET.get('next', None)
+
         form = DogLossForm(request.POST, request.FILES)
         if form.is_valid():
-            dogloss = form.save(commit=False)
-            dogloss.openid = openid
-            dogloss.nickname = nickname
-            dogloss.save()
-            print(dogloss.lostdate)
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             return render(request, 'wxchat/dogloss_add.html', {"success": "false", 'form': form})
@@ -340,14 +353,17 @@ def dogBreedAdd(request):
         nickname = request.session.get('nickname')
         print('openid=', openid)
         next = request.GET.get('next', None)
-        print(request.FILES.get('picture'))
         form = DogBreedForm(request.POST, request.FILES)
         if form.is_valid():
-            dogbreed = form.save(commit=False)
-            dogbreed.openid = openid
-            dogbreed.nickname = nickname
-            dogbreed.showtime = datetime.datetime.now()
-            dogbreed.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.showtime = datetime.datetime.now()
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -402,10 +418,14 @@ def dogOwnerAdd(request):
         next = request.GET.get('next', None)
         form = DogOwnerForm(request.POST, request.FILES)
         if form.is_valid():
-            dogowner = form.save(commit=False)
-            dogowner.openid = openid
-            dogowner.nickname = nickname
-            dogowner.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -452,10 +472,14 @@ def dogadoptAdd(request):
         print(next)
         form = DogadoptForm(request.POST, request.FILES)
         if form.is_valid():
-            dogowner = form.save(commit=False)
-            dogowner.openid = openid
-            dogowner.nickname = nickname
-            dogowner.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -487,10 +511,14 @@ def DogdeliveryAdd(request):
         print(next)
         form = DogdeliveryForm(request.POST, request.FILES)
         if form.is_valid():
-            dogowner = form.save(commit=False)
-            dogowner.openid = openid
-            dogowner.nickname = nickname
-            dogowner.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -551,10 +579,14 @@ def DoginstitutionAdd(request):
         print(next)
         form = DogInstitutionForm(request.POST, request.FILES)
         if form.is_valid():
-            obj = form.save(commit=False)
-            obj.openid = openid
-            obj.nickname = nickname
-            obj.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
             render(request, 'wxchat/message.html', {"success": "false", 'next': next})
@@ -611,10 +643,10 @@ def dogBuyAdd(request):
         next = request.GET.get('next',None)
         form = DogBuyForm(request.POST)
         if form.is_valid():
-            dogbuy = form.save(commit=False)
-            dogbuy.openid = openid
-            dogbuy.nickname = nickname
-            dogbuy.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
             return render(request,'wxchat/message.html', {"success":"true",'next':next})
         else:
             return render(request,'wxchat/message.html', {"success":"false",'next':next})
@@ -632,10 +664,14 @@ def dogSaleAdd(request):
         next = request.GET.get('next',None)
         form = DogSaleForm(request.POST,request.FILES)
         if form.is_valid():
-            dogsale = form.save(commit=False)
-            dogsale.openid = openid
-            dogsale.nickname = nickname
-            dogsale.save()
+            instance = form.save(commit=False)
+            instance.openid = openid
+            instance.nickname = nickname
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
             return render(request,'wxchat/message.html', {"success":"true",'next':next})
         else:
             return render(request,'wxchat/message.html', {"success":"false",'next':next})
@@ -804,6 +840,9 @@ def shareAction(request):
 def dogIndex(request):
     return render(request,'wxchat/dogindex.html')
 
+def myInfo(request):
+    return render(request,'wxchat/myinfo.html')
+
 def createTestData(request):
     curDate = datetime.datetime.now()
     strDate = curDate.strftime('%Y-%m-%d')
@@ -815,7 +854,7 @@ def createTestData(request):
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
+            'picture':'wxchat/images/default_dog.png',
             'lostplace':'龙前街19-2号楼--%d'%(i,),
             'lostdate':strDate,
             'ownername':'张三--%d' %(i,),
@@ -828,7 +867,7 @@ def createTestData(request):
             'typeid':type,
             'colors':u'金毛--%d'%(i,),
             'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/dog.jpg',
+            'picture':'wxchat/images/default_dog.png',
             'findplace':'龙前街19-2号楼--%d'%(i,),
             'finddate':strDate,
             'findname':'张三--%d' %(i,),
@@ -853,7 +892,7 @@ def createTestData(request):
     #         'colors':u'金毛--%d'%(i,),
     #         'price':u'1000-5000元--%d'%(i,),
     #         'desc':u'能歌善舞--%d'%(i,),
-    #         'picture':'wxchat/images/dog.jpg',
+    #         'picture':'wxchat/images/default_dog.png',
     #         'ownername':'张三--%d'%(i,),
     #         'telephone':'123456789',
     #     }

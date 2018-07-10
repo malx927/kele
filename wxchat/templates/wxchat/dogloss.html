@@ -1,5 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block swiper %}
+
 {#        <div class="weui-flex" >#}
 {#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-loss-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">寻宠发布</a></div>#}
 {#            <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-owner-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >寻主发布</a></div>#}
@@ -12,13 +13,14 @@
 {# </div>#}
 {% endblock swiper %}
 {% block tabpanel %}
+      {{ MEDIA_URL }}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
                     <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找宠物列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
 
                 </div>
@@ -38,7 +40,7 @@
                      <div class="weui-flex">
                             <div class="weui-flex__item"><span class="title">寻找主人列表</span></div>
                             <div class="weui-flex__item"></div>
-                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="fa fa-home fa-2x pink r" ></i></a></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd" id="dogowner"></div>
@@ -54,22 +56,44 @@
  {% block tabbar %}
         <a href="#tab1" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-                <i class="fa fa-paw" aria-hidden="true"></i>
+                <i class="icon iconfont icon-chongwu3" ></i>
             </div>
             <p class="weui-tabbar__label">寻宠物</p>
         </a>
         <a href="#tab2" class="weui-tabbar__item">
             <div class="weui-tabbar__icon">
-               <i class="fa fa-male" aria-hidden="true"></i>
+               <i class="icon iconfont icon-man8"></i>
             </div>
             <p class="weui-tabbar__label">寻宠主</p>
         </a>
 
 {% endblock tabbar %}
 {% block add %}
-      <div class="circle" >
-          <a href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}"><i class="fa fa-plus-circle fa-lg"></i><p>发布</p></a>
-      </div>
+{#    href="{% url 'dog-loss-nav' %}?next={{ request.get_full_path }}"#}
+     <a id="pet_loss" class="circle" href="javascript:;">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+     </a>
+    <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                    <a href="{% url 'dog-loss-add' %}?next={{ next }}" >
+                        <img  src="{% static 'wxchat/images/xc.png' %}">
+                        <p><h4>寻找宠物<h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                     <a href="{% url 'dog-owner-add' %}?next={{ next }}" >
+                        <img src="{% static 'wxchat/images/xz.png' %}">
+                        <p><h4>寻找主人<h4></p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 {% endblock add %}
 {% block bottomjs %}
 
@@ -87,12 +111,12 @@
     });
 
     $(function(){
-        defIndex = sessionStorage.getItem('tab');
+        defIndex = sessionStorage.getItem('loss');
         console.log('defindex='+ defIndex);
         weui.tab('#tab',{
             defaultIndex: defIndex ==null?0:defIndex,
             onChange: function(index){
-                sessionStorage.setItem('tab',index);
+                sessionStorage.setItem('loss',index);
             }
         });
 
@@ -134,16 +158,26 @@
     function appendItem(results){
         $.each(results,function(index,item){
             var img_url = item.thumb_url;
+
             if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+            }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+            }
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
             }
 
           var seximg = getSexImage(item);
 
           lossitem =  '<a href="/wechat/doglossdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
-                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid +'</h4>' +
+                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid + result +'</h4>' +
                                '<ul class="weui-media-box__info">' +
 								  '<li class="weui-media-box__info__meta">时间: ' + item.lostdate + '</li>' +
 								'</ul>' +
@@ -179,13 +213,23 @@
     function appendDogOwnerItem(results){
         $.each(results,function(index,item){
             var img_url = item.thumb_url;
+
             if(img_url == null){
-                img_url = "{% static 'wxchat/images/default_dog.png' %}";
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+            }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+            }
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
             }
           lossitem =  '<a  href="/wechat/dogownerdetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd"><img class="weui-media-box__thumb" src="' + img_url + '" ></div>'+
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
-                               '<h4 class="weui-media-box__title">品种:'+ item.typeid +'</h4>' +
+                               '<h4 class="weui-media-box__title">品种:'+ item.typeid + result +'</h4>' +
                                '<ul class="weui-media-box__info">' +
 								  '<li class="weui-media-box__info__meta">时间:' + item.finddate +'</li>' +
 								'</ul>' +
@@ -201,6 +245,36 @@
         $('.weui-tab__panel').scrollTop(_offset);
     }
 
+     // android
+    $(function(){
+        var $actionSheet = $('#actionsheet');
+        var $mask = $actionSheet.find('.weui-mask');
+
+        $("#pet_loss").on('click', function(){
+            $actionSheet.fadeIn(200);
+            $mask.on('click',function () {
+                $actionSheet.fadeOut(200);
+            });
+        });
+    });
+
+{#    $('#pet_loss').on("click",function(){#}
+{#        weui.actionSheet([#}
+{#         {#}
+{#             label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',#}
+{#             className:'color-primary',#}
+{#             onClick: function () {#}
+{#                 window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";#}
+{#             }#}
+{#         }, {#}
+{#             label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',#}
+{#             className:'color-success',#}
+{#             onClick: function () {#}
+{#                 window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";#}
+{#             }#}
+{#         },#}
+{#         ]);#}
+{#    });#}
 
     </script>
 {% endblock bottomjs %}

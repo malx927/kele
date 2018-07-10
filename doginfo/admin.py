@@ -44,8 +44,7 @@ admin.site.register(DogBreed, DogBreedAdmin)
 
 # 寻宠表
 class DogLossAdmin(admin.ModelAdmin):
-    list_display = (
-    'dog_name', 'typeid','sex', 'desc', 'lostplace', 'lostdate', 'ownername', 'telephone', 'create_time', 'nickname')
+    list_display = ('dog_name', 'typeid','sex','lostplace', 'lostdate', 'ownername', 'telephone','result', 'create_time', 'nickname')
     list_display_links = ('dog_name',)
     list_per_page = 50
 
@@ -55,7 +54,7 @@ admin.site.register(DogLoss, DogLossAdmin)
 
 # 寻宠表
 class DogOwnerAdmin(admin.ModelAdmin):
-    list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'create_time', 'nickname')
+    list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'result','create_time', 'nickname')
     list_per_page = 50
 
 
@@ -100,9 +99,13 @@ admin.site.register(DogBuy, DogBuyAdmin)
 
 # 新手课堂
 class FreshamnAdmin(admin.ModelAdmin):
-    list_display = ('name', 'desc', 'create_time')
-    list_display_links = ('name',)
+    list_display = ('title', 'desc', 'create_time')
+    list_display_links = ('title',)
     list_per_page = 50
+
+    def save_model(self, request, obj, form, change):
+        obj.user = request.user
+        obj.save()
 
 
 admin.site.register(Freshman, FreshamnAdmin)
