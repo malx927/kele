@@ -87,8 +87,8 @@ urlpatterns = [
     url(r'^myinfo/$', myInfo,name='my-info'),
 
     #微信支付
-    url(r'^pay/paylist$', payList,name='pay-list'),
-    url(r'^pay/wxnotify$', payNotify,name='pay-notify'),
+    url(r'^pay/paylist/$', payList,name='pay-list'),
+    url(r'^pay/wxnotify/$', payNotify,name='pay-notify'),
 
 
 

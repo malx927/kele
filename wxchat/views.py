@@ -18,10 +18,11 @@ from wechatpy.exceptions import InvalidSignatureException
 from doginfo.models import DogDelivery,DogAdoption,Freshman,DogOrder,DogStatus,DogStatusType
 from .forms import DogadoptForm,DogdeliveryForm,DogInstitutionForm
 from wechatpy import parse_message,create_reply, WeChatClient
-from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
+from wechatpy.oauth import WeChatOAuth
 from wechatpy.client.api import WeChatJSAPI
 from wechatpy.pay import WeChatPay
-from wechatpy.pay.api import WeChatOrder
+from wechatpy.pay.utils import  dict_to_xml
+from wechatpy.exceptions import WeChatPayException
 from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
@@ -33,9 +34,6 @@ from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 from PIL import Image
 
-# WECHAT_TOKEN = 'hello2018'
-# APP_URL = 'http://3rmpm2.natappfree.cc/wechat'
-
 
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
@@ -43,6 +41,7 @@ APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
 
 @csrf_exempt
 def wechat(request):
@@ -823,38 +822,45 @@ def updateUserinfo(request):
 
 def shareAction(request):
     signPackage = getJsApiSign(request)
+
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
 def payList(request):
     signPackage = getJsApiSign(request)
-    wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.WECHAT_SECRET,mch_id=settings.MCH_ID)
 
     trade_type ='JSAPI'
     body = '商品描述测试'
     total_fee = 1
     user_id = request.session.get('openid')
-    data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
-    print(data)
-    return_code = data.get('return_code')
-    prepay_id = None
-    if return_code == 'FAIL':
-        print(data.get('return_msg'))
-    else:
-        result_code = data.get('result_code')
-        if result_code == 'FAIL':
-            print(data.get('err_code'),data.get('err_code_des'))
-        else:
-            prepay_id = data.get('prepay_id','')
 
-    return_data = None
-    if prepay_id:
-        return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
+    try:
+        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
+        print(data)
+        prepay_id = data.get('prepay_id','')
+        if prepay_id:
+            return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
+            print('return_data======',return_data)
+            return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
 
-    print('return_data======',return_data)
-    return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
+    except WeChatPayException as wxe:
+        print('-----------:',wxe)
+        return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'error':'错误'})
 
+@csrf_exempt
 def payNotify(request):
-    pass
+    print(request.body)
+    try:
+        result_data = wxPay.parse_payment_result(request.body)
+        data = {
+            'return_code':result_data.get('return_code'),
+            'return_msg':result_data.get('return_msg')
+        }
+        xml = dict_to_xml( data,'' )
+        print('xml=',xml)
+        return  HttpResponse(xml)
+    except InvalidSignatureException as error:
+        print(error)
+
 
 def getJsApiSign(request):
     ticket = client.jsapi.get_jsapi_ticket()
