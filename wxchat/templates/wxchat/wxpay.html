@@ -1,0 +1,53 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'chooseWXPay',
+        ]
+    });
+    wx.ready(function () {
+        $('#checkJsApi').on('click',function(){
+            wx.checkJsApi({
+              jsApiList: [
+                'chooseWXPay'
+              ],
+              success: function (res) {
+                alert(JSON.stringify(res));
+              }
+            });
+      });
+
+    $('#wxpay').on('click',function(){
+       wx.chooseWXPay({
+          timestamp: '{{ return_data.timestamp }}',
+          nonceStr: '{{ return_data.nonceStr }}',
+          package: '{{ return_data.package }}',
+          signType: '{{ return_data.signType }}',
+          paySign: '{{ return_data.paySign }}'
+        });
+    });
+
+
+});
+</script>
+
+
+{% endblock extra%}
+{% block container %}
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
+        <a class="weui-btn weui-btn_primary"  id="wxpay">微信支付</a>
+    </div>
+    {{ return_data.timestamp }}<br>
+    {{ return_data.nonceStr }}<br>
+    {{ return_data.package }}<br>
+    {{ return_data.signType }}<br>
+    {{ return_data.paySign }}
+{% endblock container %}

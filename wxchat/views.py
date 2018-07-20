@@ -20,6 +20,9 @@ from .forms import DogadoptForm,DogdeliveryForm,DogInstitutionForm
 from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth,WeChatOAuthException
 from wechatpy.client.api import WeChatJSAPI
+from wechatpy.pay import WeChatPay
+from wechatpy.pay.api import WeChatOrder
+from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
 
@@ -778,22 +781,53 @@ def updateUserinfo(request):
 #         return  HttpResponseRedirect(redirect_url)
 
 def shareAction(request):
-    jsApi = WeChatJSAPI(client)
-    ticket = jsApi.get_jsapi_ticket()
-    noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
+    signPackage = getJsApiSign(request)
+    return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
+
+def payList(request):
+    signPackage = getJsApiSign(request)
+    wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.WECHAT_SECRET,mch_id=settings.MCH_ID)
+
+    trade_type ='JSAPI'
+    body = '商品描述测试'
+    total_fee = 1
+    user_id = request.session.get('openid')
+    data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
+    print(data)
+    return_code = data.get('return_code')
+    prepay_id = None
+    if return_code == 'FAIL':
+        print(data.get('return_msg'))
+    else:
+        result_code = data.get('result_code')
+        if result_code == 'FAIL':
+            print(data.get('err_code'),data.get('err_code_des'))
+        else:
+            prepay_id = data.get('prepay_id','')
+
+    return_data = None
+    if prepay_id:
+        return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
+
+    print('return_data======',return_data)
+    return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
+
+def payNotify(request):
+    pass
+
+def getJsApiSign(request):
+    ticket = client.jsapi.get_jsapi_ticket()
+    noncestr = random_string(15)
     timestamp = int(time.time())
     url = request.build_absolute_uri()
-    print(url)
-    signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
-
+    signature = client.jsapi.get_jsapi_signature(noncestr,ticket,timestamp,url)
     signPackage = {
         "appId":settings.WECHAT_APPID,
         "nonceStr":noncestr,
         "timestamp":timestamp,
-        "url":url,
         "signature":signature
     }
-    return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
+    return signPackage
 
 
 def dogIndex(request):

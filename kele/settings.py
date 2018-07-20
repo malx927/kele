@@ -279,15 +279,19 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 
 WECHAT_TOKEN = 'dayankele123'
-#APP_URL = 'http://7nb6dr.natappfree.cc/wechat'
+APP_URL = 'http://3yd739.natappfree.cc/wechat'
 
-APP_URL = 'http://www.hld8000.com/wechat'
+#APP_URL = 'http://www.hld8000.com/wechat'
 
 
 # 测试号WeChat
-# WECHAT_APPID = 'wxbc591183cb175d16'
-# WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
-
-WECHAT_APPID = 'wxad07fe6b357d1f3a'
-WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
+WECHAT_APPID = 'wxbc591183cb175d16'
+WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
+MCH_ID = '35194596'
+MCH_KEY = 'BE0EE67671564031714961EA24A6FF71'
+NOTIFY_URL = 'http://www.hld8000.com/wechat/pay/wxnotify/'
+# API_CLIENT_CERT_PATH = "/path/your/cert/apiclient_cert.pem"
+# API_CLIENT_KEY_PATH = "/path/your/cert/apiclient_key.pem"
+# WECHAT_APPID = 'wxad07fe6b357d1f3a'
+# WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
 
