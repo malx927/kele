@@ -20,7 +20,7 @@ urlpatterns = [
 
     url(r'^$', wechat),  # 微信入口
 
-    url(r'^menu/$', TemplateView.as_view(template_name='index.html')),  # 菜单操作
+    url(r'^menu/$', TemplateView.as_view(template_name='wxchat/index.html')),  # 菜单操作
     url(r'^createmenu/$', createMenu),
     url(r'^getmenu/$', getMenu),
     url(r'^delmenu/$', deleteMenu),
@@ -88,6 +88,7 @@ urlpatterns = [
 
     #微信支付
     url(r'^pay/paylist/$', payList,name='pay-list'),
+    url(r'^pay/payinfo/$', payList,name='pay-info'),
     url(r'^pay/wxnotify/$', payNotify,name='pay-notify'),
 
 

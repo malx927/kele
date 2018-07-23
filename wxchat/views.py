@@ -825,30 +825,59 @@ def shareAction(request):
 
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
-def payList(request):
-    signPackage = getJsApiSign(request)
-
+def getPayInfo(request):
     trade_type ='JSAPI'
     body = '商品描述测试'
     total_fee = 1
     user_id = request.session.get('openid')
-    detail ='<![CDATA[{ "goods_detail":[ { "goods_id":"iphone6s_16G", "wxpay_goods_id":"1001", "goods_name":"iPhone6s 16G", "quantity":1, "price":528800, "goods_category":"123456", "body":"苹果手机" }, { "goods_id":"iphone6s_32G", "wxpay_goods_id":"1002", "goods_name":"iPhone6s 32G", "quantity":1, "price":608800, "goods_category":"123789", "body":"苹果手机" } ] }]]'
     try:
-        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id,detail=detail)
-        print(data)
+        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
         prepay_id = data.get('prepay_id','')
-
+        save_data = dict(data)
         #保存统一订单数据
-        WxUnifiedOrdeResult.objects.create(data)
-
+        WxUnifiedOrdeResult.objects.create(**save_data)
         if prepay_id:
             return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
             print('return_data======',return_data)
-            return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
+            return HttpResponse(json.dumps(return_data))
 
     except WeChatPayException as wxe:
         print('-----------:',wxe)
-        return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'error':'错误'})
+        errors = {
+            'return_code': wxe.return_code,
+            'result_code': wxe.result_code,
+            'return_msg':  wxe.return_msg,
+            'errcode':  wxe.errcode,
+            'errmsg':   wxe.errmsg
+        }
+        return HttpResponse(json.dumps(errors))
+
+
+
+def payList(request):
+    signPackage = getJsApiSign(request)
+    return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage})
+    # trade_type ='JSAPI'
+    # body = '商品描述测试'
+    # total_fee = 1
+    # user_id = request.session.get('openid')
+    # try:
+    #     data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
+    #     print(data)
+    #     prepay_id = data.get('prepay_id','')
+    #
+    #     save_data = dict(data)
+    #     #保存统一订单数据
+    #     WxUnifiedOrdeResult.objects.create(**save_data)
+    #
+    #     if prepay_id:
+    #         return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
+    #         print('return_data======',return_data)
+    #         return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
+    #
+    # except WeChatPayException as wxe:
+    #     print('-----------:',wxe)
+    #     return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'error':'错误'})
 
 @csrf_exempt
 def payNotify(request):
@@ -856,7 +885,8 @@ def payNotify(request):
     try:
         result_data = wxPay.parse_payment_result(request.body)
         #保存支付成功返回数据
-        WxPayResult.objects.create(result_data)
+        res_data = dict(result_data)
+        WxPayResult.objects.create(**res_data)
 
         data = {
             'return_code':result_data.get('return_code'),
