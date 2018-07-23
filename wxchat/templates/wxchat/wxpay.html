@@ -30,7 +30,22 @@
           nonceStr: '{{ return_data.nonceStr }}',
           package: '{{ return_data.package }}',
           signType: '{{ return_data.signType }}',
-          paySign: '{{ return_data.paySign }}'
+          paySign: '{{ return_data.paySign }}',
+          success: function(res){
+                // 支付成功后的回调函数
+              console.log(res)
+                if (res.errMsg == "chooseWXPay:ok") {
+                    //支付成功
+                    alert('支付成功');
+                } else {
+                    alert(res.errMsg);
+                }
+          },
+           cancel: function(res) {
+               console.log(res);
+               alert('支付取消');
+           }
+
         });
     });
 

@@ -29,7 +29,7 @@ from .forms import DogBreedForm, DogSaleForm
 
 from doginfo.models import DogLoss, DogOwner,Doginstitution
 from dogtype.models import Dogtype
-from .models import WxUserinfo
+from .models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
 import datetime
 from PIL import Image
@@ -832,11 +832,15 @@ def payList(request):
     body = '商品描述测试'
     total_fee = 1
     user_id = request.session.get('openid')
-
+    detail ='<![CDATA[{ "goods_detail":[ { "goods_id":"iphone6s_16G", "wxpay_goods_id":"1001", "goods_name":"iPhone6s 16G", "quantity":1, "price":528800, "goods_category":"123456", "body":"苹果手机" }, { "goods_id":"iphone6s_32G", "wxpay_goods_id":"1002", "goods_name":"iPhone6s 32G", "quantity":1, "price":608800, "goods_category":"123789", "body":"苹果手机" } ] }]]'
     try:
-        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
+        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id,detail=detail)
         print(data)
         prepay_id = data.get('prepay_id','')
+
+        #保存统一订单数据
+        WxUnifiedOrdeResult.objects.create(data)
+
         if prepay_id:
             return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
             print('return_data======',return_data)
@@ -851,12 +855,14 @@ def payNotify(request):
     print(request.body)
     try:
         result_data = wxPay.parse_payment_result(request.body)
+        #保存支付成功返回数据
+        WxPayResult.objects.create(result_data)
+
         data = {
             'return_code':result_data.get('return_code'),
             'return_msg':result_data.get('return_msg')
         }
         xml = dict_to_xml( data,'' )
-        print('xml=',xml)
         return  HttpResponse(xml)
     except InvalidSignatureException as error:
         print(error)
