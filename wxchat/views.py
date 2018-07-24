@@ -822,7 +822,6 @@ def updateUserinfo(request):
 
 def shareAction(request):
     signPackage = getJsApiSign(request)
-
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
 
 def getPayInfo(request):
@@ -838,11 +837,9 @@ def getPayInfo(request):
         WxUnifiedOrdeResult.objects.create(**save_data)
         if prepay_id:
             return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
-            print('return_data======',return_data)
             return HttpResponse(json.dumps(return_data))
 
     except WeChatPayException as wxe:
-        print('-----------:',wxe)
         errors = {
             'return_code': wxe.return_code,
             'result_code': wxe.result_code,
@@ -857,31 +854,10 @@ def getPayInfo(request):
 def payList(request):
     signPackage = getJsApiSign(request)
     return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage})
-    # trade_type ='JSAPI'
-    # body = '商品描述测试'
-    # total_fee = 1
-    # user_id = request.session.get('openid')
-    # try:
-    #     data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
-    #     print(data)
-    #     prepay_id = data.get('prepay_id','')
-    #
-    #     save_data = dict(data)
-    #     #保存统一订单数据
-    #     WxUnifiedOrdeResult.objects.create(**save_data)
-    #
-    #     if prepay_id:
-    #         return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
-    #         print('return_data======',return_data)
-    #         return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'return_data':return_data})
-    #
-    # except WeChatPayException as wxe:
-    #     print('-----------:',wxe)
-    #     return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage,'error':'错误'})
+
 
 @csrf_exempt
 def payNotify(request):
-    print(request.body)
     try:
         result_data = wxPay.parse_payment_result(request.body)
         #保存支付成功返回数据

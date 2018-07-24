@@ -13,7 +13,7 @@ from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,Dogdeli
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,payNotify
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,payNotify,getPayInfo
 
 
 urlpatterns = [
@@ -87,8 +87,8 @@ urlpatterns = [
     url(r'^myinfo/$', myInfo,name='my-info'),
 
     #微信支付
-    url(r'^pay/paylist/$', payList,name='pay-list'),
-    url(r'^pay/payinfo/$', payList,name='pay-info'),
+    url(r'^pay/paylist$', payList,name='pay-list'),
+    url(r'^pay/payinfo/$', getPayInfo,name='pay-info'),
     url(r'^pay/wxnotify/$', payNotify,name='pay-notify'),
 
 

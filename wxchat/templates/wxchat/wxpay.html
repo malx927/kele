@@ -26,44 +26,51 @@
       });
 
     $('#wxpay').on('click',function(){
+
        $.ajax({
           type: 'GET',
           url: '{% url "pay-info" %}',
           dataType: 'json',
           timeout: 5000,
           success: function(data){
-              alert(data);
-              alert(data.package)
+              if(data.package !=undefined){
+                  wxpay(data)
+              }
           },
           error: function(error){
               console.log(error);
           }
         });
-{#       wx.chooseWXPay({#}
-{#          timestamp: '{{ return_data.timestamp }}',#}
-{#          nonceStr: '{{ return_data.nonceStr }}',#}
-{#          package: '{{ return_data.package }}',#}
-{#          signType: '{{ return_data.signType }}',#}
-{#          paySign: '{{ return_data.paySign }}',#}
-{#          success: function(res){#}
-{#                // 支付成功后的回调函数#}
-{#            if (res.errMsg == "chooseWXPay:ok") {#}
-{#                //支付成功#}
-{#                alert('支付成功');#}
-{#            } else {#}
-{#                alert(res.errMsg);#}
-{#            }#}
-{#          },#}
-{#           cancel: function(res) {#}
-{#               console.log(res);#}
-{#               alert('支付取消');#}
-{#           }#}
-{##}
-{#        });#}
     });
 
 
 });
+
+function wxpay(data){
+    wx.chooseWXPay({
+          timestamp:data.timestamp,
+          nonceStr: data.nonceStr,
+          package:  data.package ,
+          signType: data.signType,
+          paySign:  data.paySign,
+          success: function(res){
+                // 支付成功后的回调函数
+            if (res.errMsg == "chooseWXPay:ok") {
+                //支付成功
+                alert('支付成功');
+                //window.location.replace();
+            } else {
+                alert(res.errMsg);
+            }
+          },
+           cancel: function(res) {
+               console.log(res);
+               alert('支付取消');
+           }
+
+    });
+}
+
 </script>
 
 
@@ -73,9 +80,5 @@
         <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
         <a class="weui-btn weui-btn_primary"  id="wxpay">微信支付</a>
     </div>
-{#    {{ return_data.timestamp }}<br>#}
-{#    {{ return_data.nonceStr }}<br>#}
-{#    {{ return_data.package }}<br>#}
-{#    {{ return_data.signType }}<br>#}
-{#    {{ return_data.paySign }}#}
+
 {% endblock container %}
