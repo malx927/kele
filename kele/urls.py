@@ -28,12 +28,13 @@ from doginfo.views import register
 admin.site.site_title = u'大眼可乐后台'
 
 urlpatterns = [
+    url(r'^$', TemplateView.as_view(template_name='wxchat/index.html') ),
     url(r'^jet/', include('jet.urls', 'jet')),  # Django JET URLS
     url(r'^jet/dashboard/', include('jet.dashboard.urls', 'jet-dashboard')),  # Django JET dashboard URLSc
-    url(r'^admin/menu/', TemplateView.as_view(template_name='admin/wxchat/menu/change_list.html')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^htadmin/menu/', TemplateView.as_view(template_name='admin/wxchat/menu/change_list.html')),
+    url(r'^htadmin/', admin.site.urls),
     url(r'^ckeditor/', include('ckeditor_uploader.urls')),
-    url(r'^register/', register),
+   # url(r'^register/', register),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api/token/auth/', obtain_jwt_token),
     url(r'^api/token/refresh/', refresh_jwt_token),

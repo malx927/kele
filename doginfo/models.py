@@ -48,7 +48,29 @@ TYPE_RESULT_CHOICE = (
     (1, u'已找到'),
 )
 
+TYPE_DOG_CHOICE=(
+    (0,'大型犬'),
+    (1,'中型犬'),
+    (2,'小型犬'),
+    (3,'幼犬'),
+)
 
+TYPE_SEASON_CHOICE =(
+    (0,'春秋'),
+    (1,'夏季'),
+    (2,'冬季'),
+)
+
+TYPE_FUNC_CHOICE = (
+    (0,'增重'),
+    (1,'减肥'),
+)
+
+TYPE_LEVEL_CHOICE = (
+    (0,'低档'),
+    (1,'中档'),
+    (2,'高档'),
+)
 
 def defulfs():
     now = datetime.datetime.now()
@@ -425,7 +447,7 @@ class DogSkill(models.Model):
 
 # 新手课堂
 class Freshman(models.Model):
-    title = models.CharField(verbose_name=u'标题', max_length=50)
+    title = models.CharField(verbose_name=u'标题', max_length=50,blank=True, null=True)
     picture = ThumbnailerImageField(verbose_name=u'标题图片', upload_to='new/%Y%m%d/', blank=True, null=True)
     desc = models.CharField(verbose_name=u'简介', max_length=200)
     prod_desc = RichTextUploadingField(verbose_name=u'内容', max_length=2000)
@@ -464,3 +486,23 @@ class Doginstitution(models.Model):
     def get_absolute_url(self):
         return  reverse('dog-inst-detail',kwargs={'pk':self.id})
 
+
+class PetFood(models.Model):
+    name = models.CharField(verbose_name='产品名称',max_length=50)
+    images = models.ImageField(verbose_name='产品图片',upload_to='food/%Y%m%d/',null=True,blank=True)
+    brief = models.CharField(verbose_name='产品简介',max_length=500,null=True,blank=True)
+    type = models.IntegerField(verbose_name='适合犬型',choices=TYPE_DOG_CHOICE,null=True,blank=True)
+    season = models.IntegerField(verbose_name='使用季节',choices=TYPE_SEASON_CHOICE,null=True,blank=True)
+    function = models.IntegerField(verbose_name='食品功能',choices=TYPE_FUNC_CHOICE,null=True,blank=True)
+    level = models.IntegerField(verbose_name='档次',choices=TYPE_LEVEL_CHOICE,null=True,blank=True)
+    price = models.DecimalField(verbose_name='销售价格',max_digits=6,decimal_places=2,null=True,blank=True)
+    content = RichTextUploadingField(verbose_name=u'产品详情',null=True,blank=True)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
+
+    class Meta:
+        verbose_name = '宠物食品'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name

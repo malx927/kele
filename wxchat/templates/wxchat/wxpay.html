@@ -1,0 +1,84 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'chooseWXPay',
+        ]
+    });
+    wx.ready(function () {
+        $('#checkJsApi').on('click',function(){
+            wx.checkJsApi({
+              jsApiList: [
+                'chooseWXPay'
+              ],
+              success: function (res) {
+
+                alert(JSON.stringify(res));
+              }
+            });
+      });
+
+    $('#wxpay').on('click',function(){
+
+       $.ajax({
+          type: 'GET',
+          url: '{% url "pay-info" %}',
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              if(data.package !=undefined){
+                  wxpay(data)
+              }
+          },
+          error: function(error){
+              console.log(error);
+          }
+        });
+    });
+
+
+});
+
+function wxpay(data){
+    wx.chooseWXPay({
+          timestamp:data.timestamp,
+          nonceStr: data.nonceStr,
+          package:  data.package ,
+          signType: data.signType,
+          paySign:  data.paySign,
+          success: function(res){
+                // 支付成功后的回调函数
+            if (res.errMsg == "chooseWXPay:ok") {
+                //支付成功
+                alert('支付成功');
+                //window.location.replace();
+            } else {
+                alert(res.errMsg);
+            }
+          },
+           cancel: function(res) {
+               console.log(res);
+               alert('支付取消');
+           }
+
+    });
+}
+
+</script>
+
+
+{% endblock extra%}
+{% block container %}
+    <div class="weui-btn-area">
+        <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
+        <a class="weui-btn weui-btn_primary"  id="wxpay">微信支付</a>
+    </div>
+
+{% endblock container %}

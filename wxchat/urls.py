@@ -13,14 +13,14 @@ from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,Dogdeli
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,payNotify,getPayInfo
 
 
 urlpatterns = [
 
     url(r'^$', wechat),  # 微信入口
 
-    url(r'^menu/$', TemplateView.as_view(template_name='index.html')),  # 菜单操作
+    url(r'^menu/$', TemplateView.as_view(template_name='wxchat/index.html')),  # 菜单操作
     url(r'^createmenu/$', createMenu),
     url(r'^getmenu/$', getMenu),
     url(r'^delmenu/$', deleteMenu),
@@ -83,9 +83,15 @@ urlpatterns = [
      #首页
     url(r'^dogindex/$', dogIndex,name='dog-index'),
 
-
     #我的
     url(r'^myinfo/$', myInfo,name='my-info'),
+
+    #微信支付
+    url(r'^pay/paylist$', payList,name='pay-list'),
+    url(r'^pay/payinfo/$', getPayInfo,name='pay-info'),
+    url(r'^pay/wxnotify/$', payNotify,name='pay-notify'),
+
+
 
     # 网页授权测试
     url(r'^auth2/$', auth2),

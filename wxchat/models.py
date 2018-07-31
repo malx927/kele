@@ -59,3 +59,74 @@ class SwiperImage(models.Model):
 
     def __str__(self):
         return  self.name
+
+
+#微信统一下单结果
+class WxUnifiedOrdeResult(models.Model):
+    return_code = models.CharField(verbose_name='返回状态码',max_length=16,null=True,blank=True)
+    return_msg = models.CharField(verbose_name='返回信息',max_length=128,null=True,blank=True)
+
+    appid = models.CharField(verbose_name='公众账号ID',max_length=32,null=True,blank=True)
+    mch_id = models.CharField(verbose_name='商户号',max_length=32,null=True,blank=True)
+    device_info = models.CharField(verbose_name='设备号',max_length=32,null=True,blank=True)
+    nonce_str = models.CharField(verbose_name='随机字符串',max_length=32,null=True,blank=True)
+    sign = models.CharField(verbose_name='返回信息',max_length=32,null=True,blank=True)
+    result_code = models.CharField(verbose_name='业务结果',max_length=16,null=True,blank=True)
+    err_code = models.CharField(verbose_name='错误代码',max_length=32,null=True,blank=True)
+    err_code_des = models.CharField(verbose_name='错误代码描述',max_length=128,null=True,blank=True)
+
+    trade_type = models.CharField(verbose_name='交易类型',max_length=16,null=True,blank=True)
+    prepay_id = models.CharField(verbose_name='预支付会话标识',max_length=64,null=True,blank=True)
+    code_url = models.CharField(verbose_name='二维码链接',max_length=64,null=True,blank=True)
+
+    class Meta:
+        verbose_name='微信统一下单结果'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return  '预支付标识:{0}({1})'.format(self.prepay_id,self.mch_id)
+
+
+
+
+
+#微信支付结果
+class WxPayResult(models.Model):
+    return_code = models.CharField(verbose_name='返回状态码',max_length=16,null=True,blank=True)
+    return_msg = models.CharField(verbose_name='返回信息',max_length=128,null=True,blank=True)
+    appid = models.CharField(verbose_name='公众账号ID',max_length=32,null=True,blank=True)
+    mch_id = models.CharField(verbose_name='商户号',max_length=32,null=True,blank=True)
+    device_info = models.CharField(verbose_name='设备号',max_length=32,null=True,blank=True)
+    nonce_str = models.CharField(verbose_name='随机字符串',max_length=32,null=True,blank=True)
+    sign = models.CharField(verbose_name='返回信息',max_length=32,null=True,blank=True)
+    sign_type = models.CharField(verbose_name='返回信息',max_length=32,null=True,blank=True)
+    result_code = models.CharField(verbose_name='业务结果',max_length=16,null=True,blank=True)
+    err_code = models.CharField(verbose_name='错误代码',max_length=32,null=True,blank=True)
+    err_code_des = models.CharField(verbose_name='错误代码描述',max_length=128,null=True,blank=True)
+    openid = models.CharField(verbose_name='用户标识',max_length=128,null=True,blank=True)
+    is_subscribe = models.CharField(verbose_name='是否关注公众账号',max_length=1,null=True,blank=True)
+    trade_type = models.CharField(verbose_name='交易类型',max_length=16,null=True,blank=True)
+    bank_type = models.CharField(verbose_name='付款银行',max_length=16,null=True,blank=True)
+    total_fee = models.IntegerField(verbose_name='订单金额',null=True,blank=True)
+    settlement_total_fee = models.IntegerField(verbose_name='应结订单金额',null=True,blank=True)
+    fee_type = models.CharField(verbose_name='货币种类',max_length=8,null=True,blank=True)
+    cash_fee = models.IntegerField(verbose_name='现金支付金额',null=True,blank=True)
+    cash_fee_type = models.CharField(verbose_name='现金支付货币类型',max_length=16,null=True,blank=True)
+    coupon_fee = models.IntegerField(verbose_name='总代金券金额',null=True,blank=True)
+    coupon_count = models.IntegerField(verbose_name='代金券使用数量',null=True,blank=True)
+    coupon_type = models.CharField(verbose_name='代金券类型',max_length=16,null=True,blank=True)
+    coupon_id = models.CharField(verbose_name='代金券ID',max_length=20,null=True,blank=True)
+    coupon_fee_0 = models.IntegerField(verbose_name='单个代金券支付金额',null=True,blank=True)
+    transaction_id = models.CharField(verbose_name='微信支付订单号',max_length=32,null=True,blank=True)
+    out_trade_no = models.CharField(verbose_name='商户订单号',max_length=32,null=True,blank=True)
+    attach = models.CharField(verbose_name='商家数据包',max_length=128,null=True,blank=True)
+    time_end = models.CharField(verbose_name='支付完成时间',max_length=14,null=True,blank=True)
+
+    class Meta:
+        verbose_name='微信支付结果'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return  '订单号:{0}({1})'.format(self.transaction_id,self.out_trade_no)
+
+

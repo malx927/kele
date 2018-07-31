@@ -6,6 +6,8 @@ from django.contrib import admin
 from doginfo.models import Company, DogOwner, Doginfo, DogBreed, DogLoss, DogAdoption, DogDelivery, DogBuy, DogSale, \
     Freshman, Doginstitution,DogStatus,DogStatusType
 
+from doginfo.models import  PetFood
+
 
 # Register your models here.
 
@@ -131,6 +133,25 @@ class DogStatusTypeAdmin(admin.ModelAdmin):
     list_display_links = ('name',)
     list_per_page = 50
 admin.site.register(DogStatusType, DogStatusTypeAdmin)
+
+
+    # name = models.CharField(verbose_name='产品名称',max_length=50)
+    # images = models.ImageField(verbose_name='产品图片',upload_to='food/%Y%m%d/',null=True,blank=True)
+    # brief = models.CharField(verbose_name='产品简介',max_length=500,null=True,blank=True)
+    # type = models.IntegerField(verbose_name='适合犬型',choices=TYPE_DOG_CHOICE,null=True,blank=True)
+    # season = models.IntegerField(verbose_name='使用季节',choices=TYPE_SEASON_CHOICE,null=True,blank=True)
+    # function = models.IntegerField(verbose_name='食品功能',choices=TYPE_FUNC_CHOICE,null=True,blank=True)
+    # level = models.IntegerField(verbose_name='档次',choices=TYPE_LEVEL_CHOICE,null=True,blank=True)
+    # price = models.DecimalField(verbose_name='销售价格',max_digits=6,decimal_places=2,null=True,blank=True)
+    # content = RichTextUploadingField(verbose_name=u'内容',null=True,blank=True)
+    # create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    # is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
+
+@admin.register(PetFood)
+class PetFoodAdmin(admin.ModelAdmin):
+    list_display = ('name','type','season','function','level','price')
+    fields = ('name','images','brief',('type','season'),('function','level'),('price','is_show'),'content',)
+    list_per_page = 50
 
 # 宠物养护
 # class CuringAdmin(admin.ModelAdmin):
