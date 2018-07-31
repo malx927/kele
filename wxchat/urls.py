@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
     dogAdoptNav, dogTradeNav
 
-from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView
+from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
@@ -55,7 +55,7 @@ urlpatterns = [
 
 
     #狗粮订单
-   # url(r'^dogorder/$', dogOrder, name='dog-order'),
+    url(r'^dogorder/$', dogOrder, name='dog-order'),
     url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂

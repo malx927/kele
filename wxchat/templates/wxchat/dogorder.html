@@ -1,393 +1,94 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+    <div class="weui-panel weui-panel_access" id="switch" onclick="mySwitch()" style="display: block">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
+            </div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">澶х溂鍙箰</span></div>
+        </div>
 
-<html>
-
-<head>
-<meta http-equiv="Content-Language" content="zh-cn">
-<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
-<title>铁岭市公安局 - 机动车牌证申请表</title>
-
-</head>
-
-<body bgcolor="#757575" topmargin="0" leftmargin="0" rightmargin="0" bottommargin="0" marginwidth="0" marginheight="0">
-
-<div align="center">
-	<table border="0" width="990" id="table1" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF">
-		<tr>
-			<td colspan="2">
-			<img border="0" src="images/yysljyhgz.png" width="990" height="230"></td>
-		</tr>
-		<tr>
-			<td align="center" width="740">
-			
-
-						
-<form method="POST" action="jt2Save.asp">
-	<div align="center">
-		<table border="1" width="700" id="table1" cellspacing="0" cellpadding="0" style="font-size: 9pt" bordercolor="#000000" bordercolordark="#FFFFFF">
-			<tr>
-				<td colspan="2" height="40">
-				<p class="MsoNormal" align="center" style="text-align:center">
-				<b><span style="font-size: 22.0pt; font-family: 宋体">
-				机动车牌证申请表</span></b></td>
-			</tr>
-			<tr>
-				<td colspan="2" height="40">
-				<p class="MsoNormal" align="center" style="text-align:center">
-				<a href="jt2.htm"></b><span style="font-size: 14pt; font-family: 宋体"><font color="#FF0000"><b>*填表说明：预约申领检验合格标志条款及说明</b></font></span></a></td>
-			</tr>
-			<tr>
-				<td width="100" height="40" align="center">号牌种类</td>
-				<td height="40">
-				<table border="0" width="100%" id="table6" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="200" style="border-right:1px solid #000000" align="center">
-						<input type="text" name="T1" size="25" style="border:0px"></td>
-						<td width="80" style="border-right:1px solid #000000" align="center">号牌号码</td>
-						<td width="320" align="center">
-						<input type="text" name="T2" size="40" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" height="40" align="center">申请事项</td>
-				<td height="40" align="center">
-				<input type="text" name="T3" size="70" style="border:0px">申请原因及明细</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="2" height="40" align="center">号牌</td>
-				<td height="40">
-				<table border="0" width="100%" id="table22" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C4" value="1">补领</td>
-						<td width="518">　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C14" value="1">丢失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C15" value="1">灭失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C16" value="1">1面&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C17" value="1">2面</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table23" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C5" value="1">换领</td>
-						<td width="518">　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C18" value="1">损坏1面&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C19" value="1">损坏2面</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="2" height="40" align="center">行驶证</td>
-				<td height="40">
-				<table border="0" width="100%" id="table22" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C6" value="1">补领</td>
-						<td width="518">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 　<input type="checkbox" name="C20" value="1">丢失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C21" value="1">灭失</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table23" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C7" value="1">换领</td>
-						<td width="518">　<input type="text" name="T7" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="3" height="40" align="center">登记证书</td>
-				<td height="40">
-				<table border="0" width="100%" id="table22" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C8" value="1">申领</td>
-						<td width="518">　<input type="text" name="T8" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table23" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C9" value="1">补领</td>
-						<td width="518">　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C22" value="1">丢失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C23" value="1">灭失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C24" value="1">未获得&nbsp; </td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table31" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C10" value="1">换领</td>
-						<td width="518">　<input type="text" name="T10" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="3" height="40" align="center">检验合格标志</td>
-				<td height="40">
-				<table border="0" width="100%" id="table22" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C11" value="1">申领</td>
-						<td width="518">　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C25" value="1">在登记地车辆管理所申请&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="C26" value="1">在登记地以外车辆管理所申请 </td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table23" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C12" value="1">补领</td>
-						<td width="518">　&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C27" value="1">丢失&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<input type="checkbox" name="C28" value="1">灭失&nbsp;&nbsp; </td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table32" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						<input type="checkbox" name="C13" value="1">换领</td>
-						<td width="518">　<input type="text" name="T13" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="4" height="40" align="center">机动车所有人</td>
-				<td height="40">
-				<table border="0" width="100%" id="table22" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						姓名/名称</td>
-						<td width="518">　<input type="text" name="T14" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table23" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						邮寄地址</td>
-						<td width="518">　<input type="text" name="T15" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table33" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						邮政编码</td>
-						<td width="220" align="center" style="border-right:1px solid #000000">
-						<input type="text" name="T16" size="27" style="border:0px"></td>
-						<td width="80" align="center" style="border-right:1px solid #000000">
-						固定电话</td>
-						<td width="220" align="center">
-						<input type="text" name="T17" size="27" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table18" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						电子信箱</td>
-						<td width="220" align="center" style="border-right:1px solid #000000">
-						<input type="text" name="T18" size="27" style="border:0px"></td>
-						<td width="80" align="center" style="border-right:1px solid #000000">
-						移动电话</td>
-						<td width="220" align="center">
-						<input type="text" name="T19" size="27" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" rowspan="5" height="40" align="center">代理人</td>
-				<td height="40">
-				<table border="0" width="100%" id="table27" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						姓名/名称</td>
-						<td width="518">　<input type="text" name="T20" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table28" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						邮寄地址</td>
-						<td width="518">　<input type="text" name="T21" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table29" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						邮政编码</td>
-						<td width="220" align="center" style="border-right:1px solid #000000">
-						<input type="text" name="T22" size="27" style="border:0px"></td>
-						<td width="80" align="center" style="border-right:1px solid #000000">
-						联系电话</td>
-						<td width="220" align="center">
-						<input type="text" name="T23" size="27" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table30" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						电子信箱</td>
-						<td width="518">　<input type="text" name="T24" size="55" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td height="40">
-				<table border="0" width="100%" id="table17" cellspacing="0" cellpadding="0" height="100%" style="font-size: 9pt">
-					<tr>
-						<td width="75" align="center" style="border-right:1px solid #000000">
-						经办人姓名</td>
-						<td width="220" align="center" style="border-right:1px solid #000000">
-						<input type="text" name="T25" size="27" style="border:0px"></td>
-						<td width="80" align="center" style="border-right:1px solid #000000">
-						联系电话</td>
-						<td width="220" align="center">
-						<input type="text" name="T26" size="27" style="border:0px"></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<tr>
-				<td width="100" height="30" align="center">自设密码</td>
-				<td height="30" align="center">
-				<input type="text" name="T27" size="80"></td>
-			</tr>
-			<tr>
-				<td width="100" height="80" align="center">备&nbsp; 注</td>
-				<td height="40" align="center">
-				<textarea rows="5" name="S1" cols="80" style="border:0px"></textarea></td>
-			</tr>
-		</table>
-		<table border="0" width="100%" id="table16" cellspacing="0" cellpadding="0">
-			<tr>
-				<td height="50" align="center">
-				<p align="left">　&nbsp; 注：机动车所有人及代理人对申请材料的真实有效性负责。</td>
-			</tr>
-			<tr>
-				<td height="50" align="center">
-				<input type="submit" value="提交" name="B1">　<input type="reset" value="重写" name="B2"></td>
-			</tr>
-		</table>
-	</div>
-</form>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__bd">
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">澶х溂鍙箰1</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">澶х溂鍙箰2</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">澶х溂鍙箰3</span>
+                    </div>
 
 
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-panel__hd" style="display: none" id="2" onclick="mySwitch1()">
+        <div class="weui-flex">
+            {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
+        </div>
+        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">闂2</span></div>
 
-			
-			</td>
-			<td width="250" valign="top" align="center">
-			
-									<table border="0">
-										<tr>
-											<td height=20></td>
-										</tr>
-									</table>
-			
-			
-			<table border="0" width="200" id="table1" style="border: 1px solid #286EC3" cellspacing="0" cellpadding="0">
-				<tr>
-					<td height="100" align="center">
-					
-					<a target="_blank" href="110.asp">
-					<img border="0" src="images/a1.png" width="177" height="84"></a></td>
-				</tr>
-				<tr>
-					<td height="90" align="center">
-					
-					<a href="jzmail.asp" target="_blank">
-					<img border="0" src="images/a2.png" width="177" height="74"></a></td>
-				</tr>
-				<tr>
-					<td height="100" align="center">
-					<a target="_blank" href="tabledownload.asp">
-					<img border="0" src="images/a3.png" width="177" height="84"></td>
-				</tr>
-				<tr>
-					<td height="100" align="center">
-					<a target="_blank" href="ywzx.asp">
-					<img border="0" src="images/a4.png" width="177" height="84"></td>
-				</tr>
-				<tr>
-					<td height="100" align="center">
-					<a target="_blank" href="111.asp">
-					<img border="0" src="images/a5.png" width="177" height="84"></td>
-				</tr>
-			</table>
-			
-			</td>
-		</tr>
-		</table>
-									<table border="0">
-										<tr>
-											<td height=0></td>
-										</tr>
-									</table>
 
-<div align="center">
-	<table border="0" width="990" id="table4" cellspacing="0" cellpadding="0" background="images/foot_bg.gif" height="116" style="font-family: Arial; color: #FFFFFF; font-weight: bold; font-size: 10pt">
-		<tr>
-			<td align="center">Copyright &copy; 铁岭市公安局2009<p>技术支持：铁岭市公安局网络警察支队</td>
-		</tr>
-	</table>
-</div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__bd">
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀2</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀2</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀2</span>
+                    </div>
 
-</div>
 
-</body>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div style="display: none" id="3">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
+            </div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">闂3</span></div>
+        </div>
 
-</html>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__bd">
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀3</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀3</span>
+                    </div>
+                    <div class="weui-form-preview__item">
+                        <span class="weui-form-preview__value">绛旀3</span>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script language="javascript">
+        function mySwitch() {
+            document.getElementById('2').style.display = document.getElementById('2').style.display == 'none' ? 'block' : 'none';
+            document.getElementById('switch').style.display = document.getElementById('switch').style.display == 'block' ? 'none' : 'none';
+        }
+        function mySwitch1() {
+            document.getElementById('3').style.display = document.getElementById('3').style.display == 'none' ? 'block' : 'none';
+            document.getElementById('2').style.display = document.getElementById('2').style.display == 'block' ? 'none' : 'none';
+        }
+    </script>
+
+{% endblock container %}
+
