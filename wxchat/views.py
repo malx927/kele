@@ -139,7 +139,7 @@ def unSubUserinfo(openid):
         pass
 
 
-@login_required
+# @login_required
 def createMenu(request):
     print('createMenu',client.access_token)
     resp = client.menu.create({
@@ -186,14 +186,14 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-@login_required
+# @login_required
 def deleteMenu(request):
     print('deleteMenu',client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
 
 
-@login_required
+# @login_required
 def getMenu(request):
     #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
     print('getMenu',client.access_token)
@@ -530,9 +530,13 @@ def DogdeliveryAdd(request):
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
 
+
 #狗粮订单
 def dogOrder(request):
     import random
+    if request.is_ajax() and request.method == "GET":
+        print(request.GET['b'],22222222222222)
+
     now = datetime.datetime.now()
     random_int = random.randint(100,10000)
     dog_code = now.strftime("%Y%m%d%H%M%S")+str(random_int)+'B'
