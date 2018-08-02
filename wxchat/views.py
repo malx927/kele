@@ -31,6 +31,7 @@ from doginfo.models import DogLoss, DogOwner,Doginstitution
 from dogtype.models import Dogtype
 from .models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
+from .utils import changeImage
 import datetime
 from PIL import Image
 
@@ -251,37 +252,6 @@ def dogLoss(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
 
-
-def changeImage(im):
-    image = Image.open(im)
-    try:
-        image.load()
-    except IOError:
-        pass
-    image.load()
-
-    try:
-        exif = image._getexif()
-    except Exception:
-        exif = None
-
-    if exif:
-        orientation = exif.get(0x0112)
-        if orientation == 2:
-            image = image.transpose(Image.FLIP_LEFT_RIGHT)
-        elif orientation == 3:
-            image = image.transpose(Image.ROTATE_180)
-        elif orientation == 4:
-            image = image.transpose(Image.FLIP_TOP_BOTTOM)
-        elif orientation == 5:
-            image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_LEFT_RIGHT)
-        elif orientation == 6:
-            image = image.transpose(Image.ROTATE_270)
-        elif orientation == 7:
-            image = image.transpose(Image.ROTATE_90).transpose(Image.FLIP_LEFT_RIGHT)
-        elif orientation == 8:
-            image = image.transpose(Image.ROTATE_90)
-    return  image
 
 # 寻宠物发布
 def dogLossAdd(request):
@@ -829,6 +799,16 @@ def getPayInfo(request):
     body = '商品描述测试'
     total_fee = 1
     user_id = request.session.get('openid')
+
+    userName = request.GET.get('userName', None)
+    detailInfo = request.GET.get('detailInfo', None)
+    telNumber = request.GET.get('telNumber', None)
+    postalCode = request.GET.get('postalCode', None)
+    nationalCode = request.GET.get('nationalCode',None)
+    errMsg = request.GET.get('errMsg', None)
+
+    print(userName,detailInfo,telNumber,postalCode,nationalCode,errMsg)
+
     try:
         data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
         prepay_id = data.get('prepay_id','')
@@ -863,7 +843,10 @@ def payNotify(request):
         #保存支付成功返回数据
         res_data = dict(result_data)
         WxPayResult.objects.create(**res_data)
+        ##更新订单
 
+        #返回数据给微信
+        #查询一下订单号，确定真假
         data = {
             'return_code':result_data.get('return_code'),
             'return_msg':result_data.get('return_msg')

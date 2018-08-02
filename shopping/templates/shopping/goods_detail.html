@@ -1,0 +1,82 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">商品详细介绍</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+          {% if object.images %}
+             <div class="detail_header">
+                <img src="{{ object.images.url }}" >
+             </div>
+          {% endif %}
+           <div class="weui-form-preview">
+            <div class="weui-form-preview__hd line_height">
+                <div class="weui-form-preview__item ">
+                   <span class="price_title weui-form-preview__value ">¥{{ object.price }}</span>
+                   <em class="weui-form-preview__value">{{ object.name }}</em>
+               </div>
+            </div>
+               <div class="weui-form-preview__hd line_height">
+                <div class="weui-form-preview__item ">
+                   <em class="weui-form-preview__value">商品详情</em>
+               </div>
+            </div>
+           <div class="weui-form-preview__hd">
+               <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">适用及功能:</label>
+                   <label class="weui-form-preview__value">
+                       {{ object.get_type_display }}
+                       {{ object.get_season_display }}
+                       {{ object.get_func_type_display }}
+                       {{ object.get_level_display}}
+                   </label>
+               </div>
+           </div>
+               <div class="weui-form-preview__bd">
+               <div class="weui-form-preview__item">
+                   <label class="weui-form-preview__label">商品介绍:</label>
+                   <label class="weui-form-preview__value">
+                       {{ object.content|safe }}
+                   </label>
+               </div>
+           </div>
+        </div>
+        </div>
+    </div>
+    </div>
+    <div class="weui-tabbar">
+         <a href="#" class="weui-tabbar__item tabbar_item">
+            <p class="weui-tabbar__label " style="background-color: #3e3e3e"><i class="icon iconfont icon-buy2" ></i> 购物车</p>
+        </a>
+        <a href="#" class="weui-tabbar__item tabbar_item">
+             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-iconfontadd2" ></i> 加入购物车</p>
+        </a>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="buy_now">
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi2" ></i> 立即购买</p>
+        </a>
+    </div>
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+
+        $('#buy_now').on('click',function(){
+            window.location.href = "{% url 'goods-buy-list' %}?itemid={{ object.id }}&is_buy_now=1";
+        });
+
+    });
+
+    </script>
+{% endblock bottomjs %}

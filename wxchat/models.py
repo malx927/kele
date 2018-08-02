@@ -130,3 +130,20 @@ class WxPayResult(models.Model):
         return  '订单号:{0}({1})'.format(self.transaction_id,self.out_trade_no)
 
 
+#订单地址
+class OrderAddress(models.Model):
+    username = models.CharField(verbose_name='收货人姓名', max_length=64, null=True, blank=True)
+    postalcode = models.CharField(verbose_name='邮编', max_length=16, null=True, blank=True)
+    detailinfo = models.CharField(verbose_name='详细收货地址', max_length=200, null=True, blank=True)
+    nationalcode = models.CharField(verbose_name='地区编码', max_length=16, null=True, blank=True)
+    telnumber = models.CharField(verbose_name='详细收货地址', max_length=32, null=True, blank=True)
+    errmsg = models.CharField(verbose_name='成功状态', max_length=32, null=True, blank=True)
+
+    class Meta:
+        verbose_name='订单地址'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return self.username
+
+

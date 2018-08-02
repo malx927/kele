@@ -44,5 +44,7 @@ urlpatterns = [
     url(r'^wechat/api/', include('wxchat.api.urls')),
     url(r'^MP_verify_2uudrjFRwc095OZF\.txt$', TemplateView.as_view(template_name='MP_verify_2uudrjFRwc095OZF.txt', content_type='text/plain')),
     url(r'^favicon\.ico$',RedirectView.as_view(url=r'static/favicon.ico')),
+    url(r'^shopping/', include('shopping.urls')),
+    url(r'^shopping/api/', include('shopping.api.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

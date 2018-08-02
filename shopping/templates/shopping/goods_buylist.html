@@ -1,0 +1,221 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    <script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'chooseWXPay',
+            'openAddress',
+        ]
+    });
+    wx.ready(function () {
+        wx.checkJsApi({
+          jsApiList: [
+            'chooseWXPay',
+            'openAddress',
+          ],
+          success: function (res) { },
+          fail: function(errors){ console.log('加载jssdk失败' + errors); }
+        });
+
+     ///客户地址信息
+     $('#wxaddress').on('click',function(){
+        wx.openAddress({
+              success:function (res) {
+                  $('#username').text(res.userName);
+                  $('#telnumber').text(res.telNumber);
+                  $('#postalcode').text(res.postalCode);
+                  $('#address').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
+              },
+              cancel:function (res) {
+                console.log(JSON.stringify(res));
+              },
+              fail:function (res) {
+                  alert(JSON.stringify(res))
+                  console.log(JSON.stringify(res));
+              }
+        });
+    });
+
+    $('#wxpay').on('click',function(){
+        if($('#telnumber').text() == '')
+        {
+            weui.alert('请填写收件人姓名、详细地址等信息');
+            return;
+        }
+        var params ={
+          userName: $("#username").text(),
+          telNumber: $('#telnumber').text(),
+          postalCode: $('#postalcode').text(),
+          address: $('#address').text(),
+          message: $('#message').text()
+        }
+       $.ajax({
+          type: 'GET',
+          url: '{% url "pay-info" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              if(data.package !=undefined){
+                  wxpay(data)
+              }
+          },
+          error: function(error){
+              console.log(error);
+              alert('支付失败!');
+          }
+        });
+    });
+
+});
+
+
+
+function wxpay(data){
+    wx.chooseWXPay({
+          timestamp:data.timestamp,
+          nonceStr: data.nonceStr,
+          package:  data.package ,
+          signType: data.signType,
+          paySign:  data.paySign,
+          success: function(res){
+                // 支付成功后的回调函数
+            if (res.errMsg == "chooseWXPay:ok") {
+                //支付成功
+                alert('支付成功');
+                //window.location.replace();
+            } else {
+                alert(res.errMsg);
+            }
+          },
+           cancel: function(res) {
+               console.log(res);
+               alert('支付取消');
+           }
+
+    });
+}
+
+</script>
+{% endblock extra %}
+{% block tab %}
+    <form action="{% url 'goods-buy-list' %}" method="get" enctype="multipart/form-data" >{% csrf_token %}
+    <div class="weui-tab" id="tab">
+        <div class="weui-tab__content weui-tab__panel_active" >
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                        <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购买确认</span></div>
+                     </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <a class="weui-cell weui-cell_access" href="javascript:;" id="wxaddress">
+                        <div class="weui-cell__bd" style="height: 60px;">
+                            <p>
+                                <span id="username">收件人姓名及联系方式</span>
+                                <span style="padding-left: 10px;" id="telnumber"></span>
+                                <span id="postalcode" style="display:none"></span>
+                            </p>
+                            <p id="address">发货详细地址</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </a>
+                    <div class="weui-cell weui-cell_access">
+                        <div class="weui-cell__hd">
+                            <p><i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}</p>
+                        </div>
+                    </div>
+                    {% for goods in goods_list %}
+                    <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
+							<div class="weui-media-box__hd">
+								 <img class="weui-media-box__thumb" src="{{ goods.images.url }}" alt="">
+							</div>
+							<div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ goods.name }}</h4>
+                                <ul class="weui-media-box__info ">
+                                    <li class="weui-media-box__info__meta sub_title">¥ {{ goods.price }}</li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" id="goodsnums">
+                                        {% if is_buy_now %}x1{% endif %}
+                                    </li>
+                                </ul>
+                                {% if is_buy_now %}
+                                <p class="weui-media-box__desc sub_title" style="padding-top:5px;font-size:16px;">购买数量:
+                                    <span class="r">
+                                        <input type="button" id="minus" class="input_length" value="-" >
+                                        <input type="number" id="nums" value="1" min="1" max="{{ goods.stock_nums }}" class="input_length" />
+                                        <input type="button" id="add" class="input_length" value="+" >
+                                    </span>
+                                </p>
+                                {% endif %}
+							</div>
+                    </div>
+                    {% endfor %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">留言:</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" type="text" id="message"  placeholder="给卖家留言"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-tabbar">
+        <a href="#" class="weui-tabbar__item tabbar_item">
+             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-buy2" ></i> 我的购物车<span style="padding-left:10px;">¥0</span></p>
+        </a>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
+        </a>
+    </div>
+    </form>
+{% endblock tab %}
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+
+
+    $(function(){
+
+        var num = $('#nums').val();
+        if(num == 1){
+                $('#minus').attr('disabled', true);
+        }
+
+        $('#add').on('click',function(){
+            num = $('#nums').val();
+            num++;
+            if( num > 1 )
+                $('#minus').removeAttr('disabled');
+
+            $('#nums').val(num);
+            $('#goodsnums').text('x'+num);
+        });
+
+        $('#minus').on('click',function(){
+            num = $('#nums').val();
+            num--;
+            if(num == 1){
+                $('#minus').attr('disabled', true);
+            }
+             $('#nums').val(num);
+             $('#goodsnums').text('x'+num);
+        });
+
+        $('#nums').on('input',function(event){
+            num = event.target.value;
+            $('#goodsnums').text('x'+event.target.value);
+        })
+
+    });
+
+    </script>
+{% endblock bottomjs %}

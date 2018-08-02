@@ -13,7 +13,6 @@
 {# </div>#}
 {% endblock swiper %}
 {% block tabpanel %}
-      {{ MEDIA_URL }}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
@@ -146,6 +145,10 @@
               if(nextUrl !=null) {
                   $('#doglossmore').css('display','');
               }
+              else
+              {
+                  $('#goodsmore').css('display','none');
+              }
               setScollPos();
           },
           error: function(xhr, type,error){
@@ -201,6 +204,10 @@
               if( dogOwnerUrl != null )
               {
                   $('#dogownermore').css('display','');
+              }
+              else
+              {
+                  $('#goodsmore').css('display','none');
               }
               setScollPos();
           },
