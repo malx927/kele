@@ -37,8 +37,8 @@ TYPE_CARTITEM_STATUS = (
 )
 
 TYPE_SHOPPING_STATUS = (
-    ('1','已支付'),
-    ('0','待支付'),
+    (1,'已支付'),
+    (0,'待支付'),
 
 )
 
@@ -67,6 +67,8 @@ class Goods(models.Model):
 
     def __str__(self):
         return self.name
+
+
 
     def get_absolute_url(self):
         return reverse('goods-detail', kwargs={'pk': self.id})
@@ -122,7 +124,7 @@ class Order(models.Model):
     nationalcode = models.CharField(verbose_name='地区编码', max_length=16, null=True, blank=True)
     add_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True,auto_now=False)
     pay_time = models.DateTimeField(verbose_name='支付时间', auto_now_add=False,auto_now=True)
-    status = models.IntegerField(verbose_name='状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    status = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
     message = models.CharField(verbose_name='留言', max_length=400,null=True, blank=True)
 
@@ -137,10 +139,15 @@ class Order(models.Model):
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
 
+    def update_status_transaction_id(self,status,transaction_id):
+        self.status = status
+        self.transaction_id = transaction_id
+        self.save(update_fields=['status','transaction_id'])
+
 #订单明细
 class OrderItem(models.Model):
-    order = models.ForeignKey(Order,verbose_name='订单', related_name='items')
-    goods = models.ForeignKey(Goods,verbose_name='商品', related_name='order_items')
+    order = models.ForeignKey(Order,verbose_name='订单', related_name='items', on_delete=models.CASCADE)
+    goods = models.ForeignKey(Goods,verbose_name='商品', related_name='order_items', on_delete=models.CASCADE)
     price = models.DecimalField(verbose_name='价格',  max_digits=10, decimal_places=2)
     quantity = models.PositiveIntegerField(verbose_name='数量', default=1)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)

@@ -21,7 +21,7 @@ from wechatpy import parse_message,create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.client.api import WeChatJSAPI
 from wechatpy.pay import WeChatPay
-from wechatpy.pay.utils import  dict_to_xml
+
 from wechatpy.exceptions import WeChatPayException
 from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
@@ -790,6 +790,7 @@ def updateUserinfo(request):
 #         redirect_url = getUrl(item)
 #         return  HttpResponseRedirect(redirect_url)
 
+#测试jssdk页面
 def shareAction(request):
     signPackage = getJsApiSign(request)
     return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
@@ -830,31 +831,9 @@ def getPayInfo(request):
         return HttpResponse(json.dumps(errors))
 
 
-
 def payList(request):
     signPackage = getJsApiSign(request)
     return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage})
-
-
-@csrf_exempt
-def payNotify(request):
-    try:
-        result_data = wxPay.parse_payment_result(request.body)
-        #保存支付成功返回数据
-        res_data = dict(result_data)
-        WxPayResult.objects.create(**res_data)
-        ##更新订单
-
-        #返回数据给微信
-        #查询一下订单号，确定真假
-        data = {
-            'return_code':result_data.get('return_code'),
-            'return_msg':result_data.get('return_msg')
-        }
-        xml = dict_to_xml( data,'' )
-        return  HttpResponse(xml)
-    except InvalidSignatureException as error:
-        print(error)
 
 
 def getJsApiSign(request):

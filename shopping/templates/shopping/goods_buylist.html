@@ -1,27 +1,8 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+    {% include 'shopping/jssdk.html' %}
     <script>
-    wx.config({
-        debug: false,
-        appId: '{{ sign.appId }}',
-        timestamp:'{{ sign.timestamp }}',
-        nonceStr: '{{ sign.nonceStr }}',
-        signature: '{{ sign.signature }}',
-        jsApiList: [
-            'chooseWXPay',
-            'openAddress',
-        ]
-    });
     wx.ready(function () {
-        wx.checkJsApi({
-          jsApiList: [
-            'chooseWXPay',
-            'openAddress',
-          ],
-          success: function (res) { },
-          fail: function(errors){ console.log('加载jssdk失败' + errors); }
-        });
 
      ///客户地址信息
      $('#wxaddress').on('click',function(){
@@ -30,7 +11,7 @@
                   $('#username').text(res.userName);
                   $('#telnumber').text(res.telNumber);
                   $('#postalcode').text(res.postalCode);
-                  $('#address').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
+                  $('#detailInfo').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
               },
               cancel:function (res) {
                 console.log(JSON.stringify(res));
@@ -52,23 +33,26 @@
           userName: $("#username").text(),
           telNumber: $('#telnumber').text(),
           postalCode: $('#postalcode').text(),
-          address: $('#address').text(),
-          message: $('#message').text()
+          detailInfo: $('#detailInfo').text(),
+          message: $('#message').text(),
+          goods_id:$('#goods_id').val(),
+          quantity:$('#nums').val(),
+          csrfmiddlewaretoken:'{{ csrf_token }}'
         }
        $.ajax({
-          type: 'GET',
-          url: '{% url "pay-info" %}',
+          type: 'POST',
+          url: '{% url "create-order" %}',
           dataType: 'json',
           data: params,
           timeout: 5000,
           success: function(data){
-              if(data.package !=undefined){
-                  wxpay(data)
-              }
+              alert(JSON.stringify(data));
+              if(data.success == 'true')
+                    window.location.href = '{% url "create-order" %}?orderId=' + data.out_trade_no;
           },
           error: function(error){
               console.log(error);
-              alert('支付失败!');
+              weui.alert('商品支付失败!');
           }
         });
     });
@@ -76,36 +60,10 @@
 });
 
 
-
-function wxpay(data){
-    wx.chooseWXPay({
-          timestamp:data.timestamp,
-          nonceStr: data.nonceStr,
-          package:  data.package ,
-          signType: data.signType,
-          paySign:  data.paySign,
-          success: function(res){
-                // 支付成功后的回调函数
-            if (res.errMsg == "chooseWXPay:ok") {
-                //支付成功
-                alert('支付成功');
-                //window.location.replace();
-            } else {
-                alert(res.errMsg);
-            }
-          },
-           cancel: function(res) {
-               console.log(res);
-               alert('支付取消');
-           }
-
-    });
-}
-
 </script>
 {% endblock extra %}
 {% block tab %}
-    <form action="{% url 'goods-buy-list' %}" method="get" enctype="multipart/form-data" >{% csrf_token %}
+    <form action="#" method="get" enctype="multipart/form-data" >{% csrf_token %}
     <div class="weui-tab" id="tab">
         <div class="weui-tab__content weui-tab__panel_active" >
             <div class="weui-panel weui-panel_access">
@@ -123,7 +81,7 @@ function wxpay(data){
                                 <span style="padding-left: 10px;" id="telnumber"></span>
                                 <span id="postalcode" style="display:none"></span>
                             </p>
-                            <p id="address">发货详细地址</p>
+                            <p id="detailInfo">发货详细地址</p>
                         </div>
                         <div class="weui-cell__ft"></div>
                     </a>
@@ -134,9 +92,12 @@ function wxpay(data){
                     </div>
                     {% for goods in goods_list %}
                     <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
+                            <input type="hidden" id="goods_id" value="{{ goods.id }}">
+                            {% if goods.images %}
 							<div class="weui-media-box__hd">
 								 <img class="weui-media-box__thumb" src="{{ goods.images.url }}" alt="">
 							</div>
+                            {% endif %}
 							<div class="weui-media-box__bd">
                                 <h4 class="weui-media-box__title">{{ goods.name }}</h4>
                                 <ul class="weui-media-box__info ">
@@ -181,7 +142,6 @@ function wxpay(data){
 
     {{ block.super }}
     <script type="application/javascript">
-
 
     $(function(){
 

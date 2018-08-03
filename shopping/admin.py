@@ -9,12 +9,6 @@ class PetFoodAdmin(admin.ModelAdmin):
     fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
     list_per_page = 50
 
-    # def save_model(self, request, obj, form, change):
-    #     if not change and obj.sn:
-    #         sn = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-    #         obj.food_sn = sn
-    #         obj.save()
-
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
@@ -24,7 +18,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('out_trade_no', 'user_id', 'username', 'postalcode', 'detailinfo', 'telnumber', 'add_time','pay_time', 'status', 'transaction_id')
     list_per_page = 50
-    list_filter = ['out_trade_no', 'user_id', 'username','telnumber','transaction_id']
+    list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
     inlines = [OrderItemInline]
 
     fieldsets = [
