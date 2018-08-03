@@ -49,6 +49,21 @@ TYPE_RESULT_CHOICE = (
 )
 
 
+TYPE_FUNC_CHOICE = (
+    (0,'增重'),
+    (1,'减肥'),
+)
+
+ORDER_STATUS_CHOICE = (
+    (0,'交易成功'),
+    (1,'交易失败'),
+)
+
+TYPE_LEVEL_CHOICE = (
+    (0,'低档'),
+    (1,'中档'),
+    (2,'高档'),
+)
 
 def defulfs():
     now = datetime.datetime.now()
@@ -232,6 +247,7 @@ class DogOrder(models.Model):
     bones_status = models.CharField(verbose_name=u'骨骼状况', max_length=20, blank=True)
     intestinal_status = models.CharField(verbose_name=u'肠道状况', max_length=20, blank=True)
     mating_status = models.CharField(verbose_name=u'交配状况', max_length=20, blank=True)
+    status = models.IntegerField(verbose_name=u'订单状态', default=0,choices=ORDER_STATUS_CHOICE)
     peice = models.CharField(verbose_name=u'价格', max_length=20, )
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
     openid = models.CharField(verbose_name='唯一标识', max_length=120, null=True, blank=True)

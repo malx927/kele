@@ -96,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'kele',
         'USER': 'root',
-        'PASSWORD': '',
+        'PASSWORD': '123456',
         'HOST': '127.0.0.1',
         'PORT': '3306',
         'OPTIONS': {
@@ -281,10 +281,7 @@ THUMBNAIL_SUBDIR = 'thumbs'
 
 WECHAT_TOKEN = 'dayankele123'
 APP_URL = 'http://qmre8z.natappfree.cc/wechat'
-
 #APP_URL = 'http://www.hld8000.com/wechat'
-
-
 # 测试号WeChat
 WECHAT_APPID = 'wxbc591183cb175d16'
 WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
