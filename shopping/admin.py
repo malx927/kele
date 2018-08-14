@@ -1,12 +1,12 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType
 # Register your models here.
 
 @admin.register(Goods)
 class PetFoodAdmin(admin.ModelAdmin):
-    list_display = ('name','type','season','func_type','level','price')
-    fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
+    list_display = ('name', 'goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
+    #fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
     list_per_page = 50
 
 
@@ -28,4 +28,15 @@ class OrderAdmin(admin.ModelAdmin):
     ]
 
 
-    #readonly_fields = '__all__'
+@admin.register(ShopCart)
+class ShopCartAdmin(admin.ModelAdmin):
+    list_display = ('goods', 'user_id',  'quantity', 'status',)
+    list_per_page = 50
+    list_filter = ['goods', 'user_id']
+
+
+
+@admin.register(GoodsType)
+class GoodsTypeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sort')
+    list_per_page = 50

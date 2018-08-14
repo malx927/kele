@@ -10,47 +10,36 @@ from rest_framework_jwt.settings import api_settings
 from doginfo.models import DogAdoption, DogDelivery,Freshman,Doginstitution
 from easy_thumbnails.files import get_thumbnailer
 
-from shopping.models import(
-    TYPE_DOG_CHOICE,
-    TYPE_SEASON_CHOICE,
-    TYPE_FUNC_CHOICE,
-    TYPE_LEVEL_CHOICE,
-)
-from shopping.models import Goods,Order,OrderItem
+
+from shopping.models import Goods,Order,OrderItem, GoodsType
 
 from rest_framework import serializers
 
 
 #宠物商品
 class GoodsListSerializer(serializers.ModelSerializer):
-    type = serializers.SerializerMethodField()
-    season = serializers.SerializerMethodField()
-    func_type = serializers.SerializerMethodField()
-    level = serializers.SerializerMethodField()
+    benefits = SerializerMethodField()
 
     class Meta:
         model = Goods
-        fields = ('name','food_sn','images','brief','type','season','func_type','level','price','content','get_absolute_url')
+        fields = ('name','goodstype','images', 'price', 'benefits', 'scores', 'content', 'get_absolute_url')
 
-    def get_type(self,obj):
-        return dict(TYPE_DOG_CHOICE).get(obj.type)
+    def get_benefits(self,obj):
+        diff_price = obj.price - obj.benefits
+        if diff_price > 0:
+            return diff_price
+        else:
+            return 0
 
-    def get_season(self,obj):
-        return dict(TYPE_SEASON_CHOICE).get(obj.season)
+#宠物商品
+class GoodsTypeSerializer(serializers.ModelSerializer):
 
-    def get_func_type(self,obj):
-        return dict(TYPE_FUNC_CHOICE).get(obj.func_type)
+    class Meta:
+        model = GoodsType
+        fields = ('id','name','sort')
 
-    def get_level(self,obj):
-        return dict(TYPE_LEVEL_CHOICE).get(obj.level)
 
-# # 宠物丢失
-# class DogLossDetailSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = DogLoss
-#         fields = ['id', 'dog_name', 'typeid',  'desc', 'picture', 'lostplace', 'lostdate', 'ownername','telephone', 'openid','result']
-#
-#
+
 # # 宠物配种
 # class DogBreedDetailSerializer(serializers.ModelSerializer):
 #     class Meta:

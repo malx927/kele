@@ -15,9 +15,10 @@
               },
               cancel:function (res) {
                 console.log(JSON.stringify(res));
+
               },
               fail:function (res) {
-                  alert(JSON.stringify(res))
+{#                  alert(JSON.stringify(res))#}
                   console.log(JSON.stringify(res));
               }
         });
@@ -46,7 +47,6 @@
           data: params,
           timeout: 5000,
           success: function(data){
-              alert(JSON.stringify(data));
               if(data.success == 'true')
                     window.location.href = '{% url "create-order" %}?orderId=' + data.out_trade_no;
           },
@@ -100,10 +100,14 @@
                             {% endif %}
 							<div class="weui-media-box__bd">
                                 <h4 class="weui-media-box__title">{{ goods.name }}</h4>
-                                <ul class="weui-media-box__info ">
+                                <ul class="weui-media-box__info "><input type="hidden" id="goods_price" value="{{ goods.price }}">
                                     <li class="weui-media-box__info__meta sub_title">¥ {{ goods.price }}</li>
                                     <li class="weui-media-box__info__meta r" style="color: #977a7a;" id="goodsnums">
                                         {% if is_buy_now %}x1{% endif %}
+                                    </li>
+                                    <li class="weui-media-box__info__meta r" style="color: #c9302c;">
+                                        <input type="hidden" id="dif_price" value="{% if is_member == 1 %}{{ goods.diff_price }}{% else %}0{% endif %}">
+                                        <span  id="card">{{ goods.diff_price }}</span><i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
                                     </li>
                                 </ul>
                                 {% if is_buy_now %}
@@ -130,7 +134,10 @@
     </div>
     <div class="weui-tabbar">
         <a href="#" class="weui-tabbar__item tabbar_item">
-             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-buy2" ></i> 我的购物车<span style="padding-left:10px;">¥0</span></p>
+             <div class="weui-tabbar__label " style="color: black;">
+                 <div class="price-total"><span>应付总额: <b id="total_price"></b></span></div>
+                 <div class="benefits"><span>已优惠: <b id="benefits_price"></b></span></div>
+             </div>
         </a>
          <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
             <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
@@ -150,6 +157,10 @@
                 $('#minus').attr('disabled', true);
         }
 
+        var dif_price = parseInt($('#dif_price').val());
+
+        calc_total_prices();
+
         $('#add').on('click',function(){
             num = $('#nums').val();
             num++;
@@ -157,7 +168,9 @@
                 $('#minus').removeAttr('disabled');
 
             $('#nums').val(num);
+
             $('#goodsnums').text('x'+num);
+            calc_total_prices();
         });
 
         $('#minus').on('click',function(){
@@ -167,13 +180,32 @@
                 $('#minus').attr('disabled', true);
             }
              $('#nums').val(num);
+
              $('#goodsnums').text('x'+num);
+            calc_total_prices();
         });
 
         $('#nums').on('input',function(event){
             num = event.target.value;
+            if( num <= 0){
+                event.target.value = 1;
+                num = event.target.value;
+            }
             $('#goodsnums').text('x'+event.target.value);
+            calc_total_prices();
         })
+
+        function calc_total_prices()
+        {
+            goods_price = parseFloat( $("#goods_price").val() );
+            goods_nums = parseFloat( $("#nums").val()  );
+            diff_price = parseFloat( $("#dif_price").val()  );
+            total_price = (goods_price - diff_price) * goods_nums;
+            benefits_price = diff_price * goods_nums;
+
+            $("#total_price").text( '¥' + total_price.toFixed(2)  );
+            $("#benefits_price").text( '¥' + benefits_price.toFixed(2)  );
+        }
 
     });
 

@@ -30,9 +30,9 @@ TYPE_LEVEL_CHOICE = (
 )
 
 TYPE_CARTITEM_STATUS = (
-    ('1','正常'),
-    ('0','禁用'),
-    ('-1','删除'),
+    (1,'正常'),
+    (0,'禁用'),
+    (-1,'删除'),
 
 )
 
@@ -42,16 +42,27 @@ TYPE_SHOPPING_STATUS = (
 
 )
 
+class GoodsType(models.Model):
+    name = models.CharField(verbose_name='分类名称', max_length=64)
+    sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
+
+    class Meta:
+        verbose_name ='商品分类'
+        verbose_name_plural = verbose_name
+        ordering = ['sort']
+
+    def __str__(self):
+        return self.name
+
+
 class Goods(models.Model):
     name = models.CharField(verbose_name='商品名称', max_length=150)
     food_sn = models.CharField(verbose_name='商品货号', max_length=24, default=datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     images = models.ImageField(verbose_name='产品图片',upload_to='food/%Y%m%d/',null=True,blank=True)
-    brief = models.CharField(verbose_name='产品简介',max_length=500,null=True,blank=True)
-    type = models.IntegerField(verbose_name='适合犬型',choices=TYPE_DOG_CHOICE,null=True,blank=True)
-    season = models.IntegerField(verbose_name='食用季节',choices=TYPE_SEASON_CHOICE,null=True,blank=True)
-    func_type = models.IntegerField(verbose_name='食品功能',choices=TYPE_FUNC_CHOICE,null=True,blank=True)
-    level = models.IntegerField(verbose_name='食品档次',choices=TYPE_LEVEL_CHOICE,null=True,blank=True)
-    price = models.DecimalField(verbose_name='销售价格',max_digits=6,decimal_places=2,null=True,blank=True)
+    goodstype = models.ForeignKey(GoodsType,verbose_name='商品分类')
+    price = models.DecimalField(verbose_name='销售价格', max_digits=6, decimal_places=2, null=True, blank=True, default=0)
+    benefits = models.IntegerField(verbose_name='会员价', default=0, null=True, blank=True)
+    scores = models.IntegerField(verbose_name='金币', default=1, null=True, blank=True)
     content = RichTextUploadingField(verbose_name=u'产品详情',null=True,blank=True)
     stock_nums = models.IntegerField(verbose_name='库存量', default=99, null=True, blank=True)
     ship_free = models.BooleanField(default=True, verbose_name="是否承担运费")
@@ -68,7 +79,13 @@ class Goods(models.Model):
     def __str__(self):
         return self.name
 
-
+    def diff_price(self):
+        diff_price = self.price - self.benefits
+        print(diff_price)
+        if diff_price > 0 :
+            return  diff_price
+        else:
+            return 0
 
     def get_absolute_url(self):
         return reverse('goods-detail', kwargs={'pk': self.id})
@@ -83,8 +100,8 @@ class ShopCart(models.Model):
     user_id = models.CharField(verbose_name='用户ID',max_length=64)  #openid
     goods = models.ForeignKey(Goods,verbose_name='商品')
     quantity = models.PositiveIntegerField(verbose_name='数量',default=1)
-    status = models.IntegerField(verbose_name='状态',default=1, choices=TYPE_CARTITEM_STATUS)
-    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
+    status = models.IntegerField(verbose_name='状态', default=1, choices=TYPE_CARTITEM_STATUS)
+    add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True, auto_now=False)
 
     class Meta:
         verbose_name ='购物车'
@@ -139,6 +156,9 @@ class Order(models.Model):
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
 
+    def get_member_total_cost(self):
+        return sum(item.get_member_cost() for item in self.items.all())
+
     def update_status_transaction_id(self,status,transaction_id):
         self.status = status
         self.transaction_id = transaction_id
@@ -148,7 +168,8 @@ class Order(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(Order,verbose_name='订单', related_name='items', on_delete=models.CASCADE)
     goods = models.ForeignKey(Goods,verbose_name='商品', related_name='order_items', on_delete=models.CASCADE)
-    price = models.DecimalField(verbose_name='价格',  max_digits=10, decimal_places=2)
+    price = models.DecimalField(verbose_name='价格',  max_digits=10, decimal_places=2,blank=True,null=True)
+    benefits = models.DecimalField(verbose_name='会员价',  max_digits=10, decimal_places=2,blank=True,null=True)
     quantity = models.PositiveIntegerField(verbose_name='数量', default=1)
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True)
 
@@ -162,3 +183,6 @@ class OrderItem(models.Model):
 
     def get_cost(self):
         return self.price * self.quantity
+
+    def get_member_cost(self):
+        return self.benefits * self.quantity

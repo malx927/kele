@@ -8,6 +8,13 @@ SEX_CHOICE = (
     (0, u'未知'),
 )
 
+def getSceneMaxValue():
+     obj = WxUserinfo.objects.order_by('-qr_scene').first()
+     if obj:
+         return  obj.qr_scene + 1
+     else:
+        return 1
+
 class WxUserinfo(models.Model):
     subscribe = models.NullBooleanField(verbose_name='是否订阅', default=0)
     openid = models.CharField(verbose_name='唯一标识', max_length=120)
@@ -18,14 +25,18 @@ class WxUserinfo(models.Model):
     country = models.CharField(verbose_name='国家', max_length=64)
     language =models.CharField(verbose_name='国家', max_length=12)
     headimgurl = models.CharField(verbose_name='国家', max_length=240)
-    subscribe_time = models.DateTimeField(verbose_name='关注时间',null=True)
-    unionid = models.CharField(verbose_name='统一标识', max_length=64,null=True)
-    remark = models.CharField(verbose_name='备注', max_length=64,null=True)
-    groupid = models.CharField(verbose_name='分组ID', max_length=32,null=True)
-    tagid_list = models.CharField(verbose_name='标签列表', max_length=64,null=True)
-    subscribe_scene = models.CharField(verbose_name='渠道来源', max_length=64,null=True)
-    qr_scene = models.CharField(verbose_name='扫码场景', max_length=32,null=True)
-    qr_scene_str = models.CharField(verbose_name='扫码场景描述', max_length=64,null=True)
+    subscribe_time = models.DateTimeField(verbose_name='关注时间', null=True)
+    unionid = models.CharField(verbose_name='统一标识', max_length=64, null=True)
+    remark = models.CharField(verbose_name='备注', max_length=64, null=True)
+    groupid = models.CharField(verbose_name='分组ID', max_length=32, null=True)
+    tagid_list = models.CharField(verbose_name='标签列表', max_length=64, null=True)
+    subscribe_scene = models.CharField(verbose_name='渠道来源', max_length=64, null=True)
+    qr_scene = models.IntegerField(verbose_name='扫码场景',default=getSceneMaxValue,unique=True, blank=True, null=True)
+    qr_scene_str = models.CharField(verbose_name='扫码场景描述', max_length=64, null=True)
+    is_member = models.BooleanField(verbose_name='是否是会员',default=0, blank=True)
+    score = models.PositiveIntegerField(verbose_name='会员积分', default=0 , blank=True, null=True)
+    qr_image = models.ImageField(verbose_name='场景图片', upload_to='wxchat', blank=True, null=True)
+    qr_time = models.DateTimeField(verbose_name='图片创建时间', blank=True, null=True)
 
     def __str__(self):
         return self.nickname
@@ -33,6 +44,12 @@ class WxUserinfo(models.Model):
     class Meta:
         verbose_name  = u'微信用户信息'
         verbose_name_plural =verbose_name
+
+    # def save(self, *args, **kwargs):
+    #     WxUserinfo
+    #     pass
+
+
 
 
 #微信公众号菜单
@@ -51,11 +68,14 @@ class SwiperImage(models.Model):
     name = models.CharField(verbose_name='图片名称',max_length=40)
     image = models.ImageField(verbose_name='图片地址', upload_to='swiper')
     url = models.CharField(verbose_name='跳转地址',max_length=120)
+    sort = models.IntegerField(verbose_name='排序', blank=True, null=True)
     is_show = models.BooleanField(verbose_name='是否显示',default=True)
+    create_time = models.DateTimeField(verbose_name='添加时间',auto_now_add=True, auto_now=False)
 
     class Meta:
         verbose_name = '轮播图片'
         verbose_name_plural=verbose_name
+        ordering =['sort','-create_time']
 
     def __str__(self):
         return  self.name
@@ -78,6 +98,7 @@ class WxUnifiedOrdeResult(models.Model):
     trade_type = models.CharField(verbose_name='交易类型',max_length=16,null=True,blank=True)
     prepay_id = models.CharField(verbose_name='预支付会话标识',max_length=64,null=True,blank=True)
     code_url = models.CharField(verbose_name='二维码链接',max_length=64,null=True,blank=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True, auto_now=False)
 
     class Meta:
         verbose_name='微信统一下单结果'
@@ -147,3 +168,17 @@ class OrderAddress(models.Model):
         return self.username
 
 
+#公众号推荐表
+class WxIntroduce(models.Model):
+    openid = models.CharField(verbose_name='用户微信ID', max_length=120)
+    nickname = models.CharField(verbose_name='用户昵称', max_length=64, blank=True, null=True)
+    introduce_id = models.CharField(verbose_name='推荐人微信ID', max_length=120)
+    introduce_name = models.CharField(verbose_name='推荐人昵称', max_length=64, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True, auto_now=False)
+
+    class Meta:
+        verbose_name='公众号推荐关系表'
+        verbose_name_plural=verbose_name
+
+    def __str__(self):
+        return self.nickname + '<--' + self.introduce_name

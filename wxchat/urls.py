@@ -7,7 +7,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 #from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
-    dogAdoptNav, dogTradeNav
+    dogAdoptNav, dogTradeNav, myQRCode, showQRCode, myScore
 
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
@@ -90,6 +90,11 @@ urlpatterns = [
     url(r'^pay/paylist$', payList,name='pay-list'),
     url(r'^pay/payinfo/$', getPayInfo,name='pay-info'),
 
+
+    #显示我的二维码
+    #url(r'^qrcode/$', myQRCode, name='my-qrcode-image'),
+    url(r'^myqrcode/$', showQRCode, name='my-qrcode'),
+    url(r'^myscore/$', myScore, name='my-score'),
 
     # 网页授权测试
     url(r'^auth2/$', auth2),

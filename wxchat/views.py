@@ -1,5 +1,5 @@
 # coding=utf-8
-import random,string,time
+import random,string,time,os
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
@@ -29,12 +29,15 @@ from .forms import DogBreedForm, DogSaleForm
 
 from doginfo.models import DogLoss, DogOwner,Doginstitution
 from dogtype.models import Dogtype
-from .models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
+from .models import WxUserinfo,WxUnifiedOrdeResult, WxPayResult, WxIntroduce
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
-from .utils import changeImage
+from shopping.models import Order
+from .utils import changeImage, mergeImage
 import datetime
 from PIL import Image
-
+from io import StringIO, BytesIO
+from .models import getSceneMaxValue
+from django.db.models import Q
 
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
@@ -58,9 +61,10 @@ def wechat(request):
             echostr = 'error'
 
         return HttpResponse(echostr)
+
     elif request.method == 'POST':
         msg = parse_message(request.body)
-        print(msg.type)
+        print(msg)
         if msg.type == 'text':
             if msg.content == '寻宠':
                 reply = getDogLossList(request, msg)
@@ -84,6 +88,14 @@ def wechat(request):
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
+            elif msg.event == 'subscribe_scan':
+                reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
+                saveUserinfo(msg.source, msg.scene_id)
+                print('scene_id=',msg.scene_id)
+            elif msg.event == 'scan':
+                print('scan====', msg.scene_id)
+                setUserToMember(msg.source, msg.scene_id)
+                reply = create_reply('', msg)
             else:
                 reply = create_reply('view', msg)
 
@@ -117,25 +129,66 @@ def getDogOwnerList(request, msg):
         articles.add_article(article)
     return articles
 
+#已关注的用户成为会员
+def setUserToMember(openid, scene_id = None):
+    try:
+        intro_user = WxUserinfo.objects.get(qr_scene = scene_id, is_member=1)
+        user = WxUserinfo.objects.get(openid = openid)
+        intro = WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
+    except WxUserinfo.DoesNotExist:
+        print('用户不存在')
+    except WxIntroduce.DoesNotExist as ex:
+        print(ex)
+        user.is_member = 1
+        user.save()
+        defaults = {
+                    'nickname': user.nickname,
+                    'introduce_name': intro_user.nickname,
+                    'introduce_id': intro_user.openid,
+                }
+        WxIntroduce.objects.get_or_create(openid=user.openid, defaults=defaults)
+        client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
 
-def saveUserinfo(openid):
+
+def saveUserinfo(openid, scene_id=None):
     user = client.user.get(openid)
     if 'errcode' not in user:
         sub_time = user.pop('subscribe_time')
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
-        WxUserinfo.objects.update_or_create(defaults=user,openid=openid)
-        # WxUserinfo.objects.create(**user, subscribe_time=sub_time)
+        user['qr_scene'] = getSceneMaxValue()
+        if scene_id:
+            user['is_member'] = 1
+        obj, created = WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
+
+        try:
+            if scene_id and created:
+                ret = client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
+                print(ret)
+                intro_user = WxUserinfo.objects.get(qr_scene = scene_id)
+                #创建推荐表数据
+                defaults = {
+                    'nickname': obj.nickname,
+                    'introduce_name': intro_user.nickname,
+                    'introduce_id': intro_user.openid,
+                }
+                WxIntroduce.objects.get_or_create(openid=obj.openid, defaults=defaults)
+
+        except WxUserinfo.DoesNotExist:
+            print('会员推荐失败.....')
+
     else:
         print(user)
 
 
 def unSubUserinfo(openid):
     try:
-        user = WxUserinfo.objects.get(openid=openid, subscribe=1)
+        user = WxUserinfo.objects.get(openid=openid)
         if user:
-            user.subscribe = 0
-            user.save()
+            # user.subscribe = 0
+            # user.save()
+            user.delete()
+            WxIntroduce.objects.filter(Q(openid = openid) | Q(introduce_id = openid)).delete()
     except WxUserinfo.DoesNotExist:
         pass
 
@@ -152,36 +205,36 @@ def createMenu(request):
             },
             # {
             #     "type": "view",
-            #     "name": "本周团购",
+            #     "name": "会员中心",
             #     "url": APP_URL + "/redirect/dogindex"
             # },
             #
-            # {
-            #     "name":"我的联盟",
-            #     "sub_button":[
-            #         {
-            #             "type": "view",
-            #             "name": "每日签到",
-            #             "url": APP_URL + "/redirect/dogloss"
-            #         },
-            #         {
-            #             "type": "view",
-            #             "name": "联盟卡",
-            #             "url": APP_URL + "/redirect/dogloss"
-            #         },
-            #         {
-            #             "type": "view",
-            #             "name": "一键导航",
-            #             "url": APP_URL + "/redirect/dogloss"
-            #         },
-            #         {
-            #             "type": "view",
-            #             "name": "小程序",
-            #             "url": APP_URL + "/redirect/dogloss"
-            #         }
-            #     ]
-            #
-            # }
+            {
+                "name":"会员中心",
+                "sub_button":[
+                    {
+                        "type": "view",
+                        "name": "我的推广码",
+                        "url": APP_URL + "/redirect/myqrcode"
+                    },
+                    {
+                        "type": "view",
+                        "name": "我的积分",
+                        "url": APP_URL + "/redirect/myscore"
+                    },
+                    # {
+                    #     "type": "view",
+                    #     "name": "一键导航",
+                    #     "url": APP_URL + "/redirect/dogloss"
+                    # },
+                    # {
+                    #     "type": "view",
+                    #     "name": "小程序",
+                    #     "url": APP_URL + "/redirect/dogloss"
+                    # }
+                ]
+
+            }
         ]
     })
     return HttpResponse(json.dumps(resp))
@@ -217,13 +270,13 @@ def redirectUrl(request, item):
     print('code=', code)
     print('openid=', openid)
     if openid is None:
-        if code is None:
+        if code is None:   #获取授权码code
             redirect_url = '%s/redirect/%s' % (APP_URL, item)
             webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
             authorize_url = webchatOAuth.authorize_url
             print(authorize_url)
             return HttpResponseRedirect(authorize_url)
-        else:
+        else:             #同意授权，通过授权码获取ticket,根据ticket拉取用户信息
             webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
             res = webchatOAuth.fetch_access_token(code)
             if 'errcode' in res:
@@ -240,10 +293,13 @@ def redirectUrl(request, item):
                 request.session['openid'] = open_id
                 userinf = get_object_or_404(WxUserinfo,openid=open_id)
                 request.session['nickname'] = userinf.nickname
+                request.session['is_member'] = userinf.is_member
                 redirect_url = getUrl(item)
                 return HttpResponseRedirect(redirect_url)
     else:
-        print('---------direct access')
+        userinf = get_object_or_404(WxUserinfo,openid=openid)
+        request.session['is_member'] = userinf.is_member
+
         redirect_url = getUrl(item)
         return HttpResponseRedirect(redirect_url)
 
@@ -860,6 +916,75 @@ def dogIndex(request):
 
 def myInfo(request):
     return render(request,'wxchat/myinfo.html')
+
+#生成我的二维码
+def myQRCode(user):
+
+    myinfo = user
+
+    qrcode_data = {
+        'expire_seconds': 2592000,
+        'action_name': 'QR_SCENE',
+        'action_info': {
+            'scene': {'scene_id': myinfo.qr_scene},
+        }
+    }
+    openid = user.openid
+    res = client.qrcode.create( qrcode_data)
+    ret = client.qrcode.show(res)
+    f = BytesIO(ret.content)
+    image = Image.open(f)
+    logo = Image.open(os.path.join(settings.STATIC_ROOT,'wxchat\images\wx_logo.png'))
+
+    image = mergeImage(image, logo)
+
+    image_url = 'wxchat/{0}.png'.format(openid)
+
+    image.save(os.path.join(settings.MEDIA_ROOT, image_url), quality=100)
+
+    myinfo.qr_image = image_url
+    myinfo.qr_time = datetime.datetime.now()
+    myinfo.save()
+
+    return  myinfo
+
+
+#二维码显示
+def showQRCode(request):
+
+    openid = request.session.get('openid', None)
+    context = {}
+    try:
+        user = WxUserinfo.objects.get(openid=openid, is_member=1)
+        create_date = user.qr_time
+        if not create_date:
+            delta_time = 0
+        else:
+            cur_date = datetime.datetime.now()
+            print(cur_date)
+            delta_time =  (cur_date - create_date).days
+
+        print('delta_time:', delta_time)
+        if user and user.qr_image and delta_time < 28:
+            context['user'] = user
+            context['is_member'] = user.is_member
+        else:
+            userinfo = myQRCode(user)
+            context['user'] = userinfo
+            context['is_member'] = userinfo.is_member
+
+    except WxUserinfo.DoesNotExist:
+        print('WxUserinfo.DoesNotExist')
+        context['is_member'] = 0
+
+    return  render(request, template_name='wxchat/myqrcode.html', context = context)
+
+
+def myScore(request):
+
+    orders = Order.objects.all()
+
+    return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
 def createTestData(request):
     curDate = datetime.datetime.now()

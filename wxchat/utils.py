@@ -33,3 +33,27 @@ def changeImage(im):
         elif orientation == 8:
             image = image.transpose(Image.ROTATE_90)
     return  image
+
+def mergeImage(imgdst, imgsrc):
+
+    imgdst = imgdst.convert('RGBA')
+    imgsrc = imgsrc.convert("RGBA")
+
+    w , h = imgdst.size
+    logo_w , logo_h = imgsrc.size
+    factor = 4
+
+    s_w = int(w / factor)
+    s_h = int(h / factor)
+
+    if logo_w > s_w or logo_h > s_h:
+        logo_w = s_w
+        logo_h = s_h
+
+    imgsrc = imgsrc.resize((logo_w, logo_h), Image.ANTIALIAS)
+    l_w = int((w - logo_w) / 2)
+    l_h = int((h - logo_h) / 2)
+
+    imgdst.paste(imgsrc, (l_w, l_h), imgsrc)
+
+    return imgdst

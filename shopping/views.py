@@ -6,13 +6,17 @@ import random
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.views.generic import DetailView,ListView, View
+from wechatpy import WeChatClient
+from wechatpy.client.api import WeChatCustomService
 from kele import settings
-from .models import Goods, Order, OrderItem
+from .models import Goods, Order, OrderItem, ShopCart
 from wxchat.views import getJsApiSign
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
+from wxchat.views import client
+
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
 
@@ -33,6 +37,25 @@ class GoodsDetailView(DetailView):
         self.object.increase_click_nums()
         return response
 
+#购物车商品列表
+class ShopCartListView(ListView):
+    model = ShopCart
+    template_name = 'shopping/shopcart_list.html'
+    context_object_name = 'carts_list'
+
+    def get_queryset(self):
+        user_id = self.request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+
+        return ShopCart.objects.filter(user_id = user_id)
+
+    def get_context_data(self, **kwargs):
+        context = super(ShopCartListView, self).get_context_data(**kwargs)
+        context['project_name'] = settings.PROJECT_NAME
+        return context
+
+
+
+#直接购买商品列表
 class GoodsBuyListView(ListView):
     model = Goods
     template_name = 'shopping/goods_buylist.html'
@@ -50,6 +73,7 @@ class GoodsBuyListView(ListView):
         context['project_name'] = settings.PROJECT_NAME
         signPackage = getJsApiSign(self.request)
         context['sign'] = signPackage
+        context['is_member'] = self.request.session.get('is_member', None)
 
         if self.is_buy_now:
             context['is_buy_now'] = self.is_buy_now
@@ -93,7 +117,7 @@ class CreateOrderView(View):
             else:
                 try:
                     goods = Goods.objects.get(pk = goods_id)
-                    orderItem = OrderItem(order=order, goods=goods, price=goods.price, quantity=quantity)
+                    orderItem = OrderItem(order=order, goods=goods, price=goods.price,benefits=goods.benefits, quantity=quantity)
                     orderItem.save()
                     order_data['success'] = 'true'
                     order_data['out_trade_no'] = order.out_trade_no
@@ -108,11 +132,21 @@ class CreateOrderView(View):
 
     def get(self, request, *args, **kwargs):
 
+        signPackage = getJsApiSign(self.request)
+
         out_trade_no = request.GET.get('orderId',None)
 
         try:
+            is_member = request.session.get('is_member', None)
             order = Order.objects.get(out_trade_no=out_trade_no)
-            total_cost = order.get_total_cost()
+            if is_member == 1:
+                total_cost = order.get_member_total_cost()  #会员
+            else:
+                total_cost = order.get_total_cost()         #非会员
+
+            if total_cost <=0:
+                raise Exception
+
             items = order.items.all()
         except:
             return render( request, template_name='shopping/goods_list.html' )
@@ -120,7 +154,8 @@ class CreateOrderView(View):
         context={
             'total_cost':total_cost,
             'items': items,
-            'out_trade_no': out_trade_no
+            'out_trade_no': out_trade_no,
+            'sign': signPackage
         }
         return render(request,template_name='shopping/goods_checkout.html',context=context )
 
@@ -132,12 +167,16 @@ class PayOrderView(View):
         body = '宠物商品消费'
 
         #获得订单信息
-        out_trade_no = request.GET.get('out_trade_no', None)
+        out_trade_no = request.POST.get('out_trade_no', None)
         user_id = request.session.get('openid')
+        is_member = request.session.get('is_member')
         order =getShoppingOrder(user_id, out_trade_no)
 
         if order:
-            total_fee = order.get_total_cost() * 100
+            if is_member ==1:
+                total_fee = order.get_member_total_cost() * 100
+            else:
+                total_fee = order.get_total_cost() * 100
         else:
             return render( request, template_name='shopping/goods_list.html' )
 
@@ -172,6 +211,8 @@ def payNotify(request):
          #查询订单，判断是否正确
         transaction_id = res_data.get('transaction_id', None)
         out_trade_no = res_data.get('out_trade_no', None)
+        openid = res_data.get('openid', None)
+
         retBool = queryOrder( transaction_id, out_trade_no )    #查询订单
 
         data = {
@@ -189,12 +230,16 @@ def payNotify(request):
                     #更新订单
                     status = 1  #已支付标志
                     order.update_status_transaction_id(status, transaction_id)
+                    #发送消息
+                    if openid:
+                        ret = client.message.send_text(openid, 'hello')
+                        print(ret)
 
         return  HttpResponse(xml)
     except InvalidSignatureException as error:
         print(error)
 
-
+#查询微信订单是否存在
 def queryOrder( transaction_id, out_trade_no):
 
     order_data = wxPay.order.query( transaction_id=transaction_id, out_trade_no=out_trade_no)
@@ -204,6 +249,7 @@ def queryOrder( transaction_id, out_trade_no):
     else:
         return False
 
+#查询自定义订单
 def getShoppingOrder(user_id, out_trade_no):
 
     try:
