@@ -943,7 +943,7 @@ def myQRCode(user):
 
     image = mergeImage(image, logo)
 
-    image_url = 'wxchat/{0}.png'.format(openid)
+    image_url = '{0}.png'.format(openid)
 
     image.save(os.path.join(settings.MEDIA_ROOT, image_url), quality=100)
 
