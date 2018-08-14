@@ -156,7 +156,7 @@ def saveUserinfo(openid, scene_id=None):
         sub_time = user.pop('subscribe_time')
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
-        user['qr_scene'] = getSceneMaxValue()
+        user['qr_scene'] = WxUserinfo.getSceneMaxValue()
         if scene_id:
             user['is_member'] = 1
         obj, created = WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
@@ -497,7 +497,7 @@ def dogadoptAdd(request):
         nickname = request.session.get('nickname')
         print('openid=', openid)
         next = request.GET.get('next', None)
-        print(next)
+
         form = DogadoptForm(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save(commit=False)
@@ -796,6 +796,9 @@ def auth2(request):
 @login_required
 def updateUserinfo(request):
     userid_list = client.user.get_followers()
+
+    WxUserinfo.objects.all().update(qr_scene=0)
+
     if 'errcode' not in userid_list and userid_list['count'] > 0:
         openid_list = userid_list['data']['openid']
         userinfo_lists = client.user.get_batch( openid_list )
@@ -803,6 +806,8 @@ def updateUserinfo(request):
             sub_time = user.pop('subscribe_time')
             sub_time = datetime.datetime.fromtimestamp(sub_time).strftime('%Y-%m-%d %H:%M:%S')
             user['subscribe_time'] = sub_time
+
+            user['qr_scene'] = WxUserinfo.getSceneMaxValue()
             WxUserinfo.objects.update_or_create(defaults=user,openid=user['openid'])
         return HttpResponse(json.dumps(userinfo_lists,ensure_ascii=False))
     else:

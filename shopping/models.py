@@ -81,7 +81,6 @@ class Goods(models.Model):
 
     def diff_price(self):
         diff_price = self.price - self.benefits
-        print(diff_price)
         if diff_price > 0 :
             return  diff_price
         else:

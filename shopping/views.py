@@ -174,9 +174,9 @@ class PayOrderView(View):
 
         if order:
             if is_member ==1:
-                total_fee = order.get_member_total_cost() * 100
+                total_fee = int(order.get_member_total_cost() * 100)
             else:
-                total_fee = order.get_total_cost() * 100
+                total_fee = int(order.get_total_cost() * 100)
         else:
             return render( request, template_name='shopping/goods_list.html' )
 

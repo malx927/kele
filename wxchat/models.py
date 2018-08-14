@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 
 # Create your models here.
 
@@ -31,7 +32,7 @@ class WxUserinfo(models.Model):
     groupid = models.CharField(verbose_name='分组ID', max_length=32, null=True)
     tagid_list = models.CharField(verbose_name='标签列表', max_length=64, null=True)
     subscribe_scene = models.CharField(verbose_name='渠道来源', max_length=64, null=True)
-    qr_scene = models.IntegerField(verbose_name='扫码场景',default=getSceneMaxValue,unique=True, blank=True, null=True)
+    qr_scene = models.IntegerField(verbose_name='扫码场景',default=0, blank=True, null=True)
     qr_scene_str = models.CharField(verbose_name='扫码场景描述', max_length=64, null=True)
     is_member = models.BooleanField(verbose_name='是否是会员',default=0, blank=True)
     score = models.PositiveIntegerField(verbose_name='会员积分', default=0 , blank=True, null=True)
@@ -45,10 +46,13 @@ class WxUserinfo(models.Model):
         verbose_name  = u'微信用户信息'
         verbose_name_plural =verbose_name
 
-    # def save(self, *args, **kwargs):
-    #     WxUserinfo
-    #     pass
-
+    @classmethod
+    def getSceneMaxValue(cls):
+        obj = cls.objects.all().aggregate(maxid = Max('qr_scene'))
+        if obj['maxid']:
+            return  obj['maxid'] + 1
+        else:
+            return 1
 
 
 
