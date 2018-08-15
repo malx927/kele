@@ -251,14 +251,7 @@ class DogStatusType(models.Model):
 # 宠粮订单表
 class DogOrder(models.Model):
     dog_code = models.CharField(verbose_name=u'订单号', max_length=20, )
-    dogtype = models.CharField(verbose_name=u'犬型', max_length=20, )
-    dog_age = models.CharField(verbose_name=u'犬龄', max_length=20, )
-    body_status = models.CharField(verbose_name=u'身体状况', max_length=20)
-    skin_status = models.CharField(verbose_name=u'皮肤状况', max_length=20)
-    eye_status = models.CharField(verbose_name=u'眼睛状况', max_length=20, )
-    bones_status = models.CharField(verbose_name=u'骨骼状况', max_length=20, blank=True)
-    intestinal_status = models.CharField(verbose_name=u'肠道状况', max_length=20, blank=True)
-    mating_status = models.CharField(verbose_name=u'交配状况', max_length=20, blank=True)
+    product_detail = models.CharField(verbose_name=u'商品描述信息', max_length=2000, blank=True)
     status = models.IntegerField(verbose_name=u'订单状态', default=0,choices=ORDER_STATUS_CHOICE)
     peice = models.CharField(verbose_name=u'价格', max_length=20, )
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)

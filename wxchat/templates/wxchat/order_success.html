@@ -1,10 +1,151 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
+{% extends 'wxchat/wxbase.html' %}{% load static %}
 
-</body>
-</html>
+{% block extra %}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+{% endblock extra%}
+{% block container %}
+ <div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠粮详情</span></div>
+{#            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>#}
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top" id="uploader">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">犬龄:</label></div>
+                <div class="weui-cell__bd">
+                    {{ dog_age }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">犬型:</label></div>
+                <div class="weui-cell__bd">
+                    {{ dogtype }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">身体状况:</label></div>
+                <div class="weui-cell__bd">
+                    {{ body_status }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">皮肤状况:</label>
+                </div>
+                <div class="weui-cell__bd">
+                      {{ skin_status }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">眼睛状况:</label></div>
+                <div class="weui-cell__bd">
+                    {{ eye_status }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">骨骼状况:</label></div>
+                <div class="weui-cell__bd">
+                    {{ bones_status }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">价格:</label></div>
+                <div class="weui-cell__bd">
+                    {{ peice }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
+                <div class="weui-cell__bd">
+                    {{ dog_code }}
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary" id="wxpay">去支付</button>
+            </div>
+        </div>
+        </form>
+    </div>
+ </div>
+    <script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'chooseWXPay',
+        ]
+    });
+    wx.ready(function () {
+        $('#checkJsApi').on('click',function(){
+            wx.checkJsApi({
+              jsApiList: [
+                'chooseWXPay'
+              ],
+              success: function (res) {
+
+                alert(JSON.stringify(res));
+              }
+            });
+      });
+
+    $('#wxpay').on('click',function(){
+
+       $.ajax({
+          type: 'GET',
+          url: '{% url "pay-info" %}',
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              if(data.package !=undefined){
+                  wxpay(data)
+              }
+          },
+          error: function(error){
+              console.log(error);
+          }
+        });
+    });
+
+
+});
+
+function wxpay(data){
+    wx.chooseWXPay({
+          timestamp:data.timestamp,
+          nonceStr: data.nonceStr,
+          package:  data.package ,
+          signType: data.signType,
+          paySign:  data.paySign,
+          success: function(res){
+                // 支付成功后的回调函数
+            if (res.errMsg == "chooseWXPay:ok") {
+                //支付成功
+                alert('支付成功');
+                //window.location.replace();
+            } else {
+                alert(res.errMsg);
+            }
+          },
+           cancel: function(res) {
+               console.log(res);
+               alert('支付取消');
+           }
+
+    });
+}
+
+</script>
+
+{% endblock container %}
+
