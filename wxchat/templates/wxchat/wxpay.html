@@ -26,11 +26,19 @@
       });
 
     $('#wxpay').on('click',function(){
-
+        var params ={
+          userName: $("#username").text(),
+          postalCode: $('#postalcode').text(),
+          telNumber: $('#telnumber').text(),
+          nationalCode: $('#nationalcode').text(),
+          detailInfo: $('#detailinfo').text(),
+          errMsg: $('#errmsg').text()
+        }
        $.ajax({
           type: 'GET',
           url: '{% url "pay-info" %}',
           dataType: 'json',
+          data: params,
           timeout: 5000,
           success: function(data){
               if(data.package !=undefined){
@@ -39,11 +47,32 @@
           },
           error: function(error){
               console.log(error);
+              alert('支付失败!');
           }
         });
     });
 
 
+});
+
+$('#wxaddress').on('click',function(){
+    wx.openAddress({
+          success:function (res) {
+              alert(JSON.stringify(res));
+              $('#username').text(res.userName);
+              $('#postalcode').text(res.postalCode);
+              $('#telnumber').text(res.telNumber);
+              $('#nationalcode').text(res.nationalCode);
+              $('#detailinfo').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
+              $('#errmsg').text(res.errMsg);
+          },
+          cancel:function (res) {
+
+          },
+          fail:function (res) {
+            alert(JSON.stringify(res));
+          }
+    });
 });
 
 function wxpay(data){
@@ -77,8 +106,33 @@ function wxpay(data){
 {% endblock extra%}
 {% block container %}
     <div class="weui-btn-area">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">姓名:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="username"></label></div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="telnumber"></label></div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">详细地址:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="detailinfo"></label></div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">邮编:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="postalcode"></label></div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">地区编码:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="nationalcode"></label></div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">返回状态:</label></div>
+            <div class="weui-cell__bd"><label class="weui-label" id="errmsg"></label></div>
+        </div>
         <a class="weui-btn weui-btn_primary"  id="checkJsApi">确定</a>
         <a class="weui-btn weui-btn_primary"  id="wxpay">微信支付</a>
+        <a class="weui-btn weui-btn_primary"  id="wxaddress">发货地址</a>
     </div>
 
 {% endblock container %}

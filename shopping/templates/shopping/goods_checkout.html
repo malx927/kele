@@ -1,0 +1,116 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/jssdk.html' %}
+    <script>
+    wx.ready(function () {
+        $('#pay_now').on('click',function(){
+            var params ={
+              out_trade_no: $("#out_trade_no").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "pay-order" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  alert(JSON.stringify(data));
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+              },
+              error: function(error){
+                  console.log(error);
+                  weui.alert('商品支付失败!');
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        alert('支付成功');
+                        //window.location.replace();
+                    } else {
+                        alert(res.errMsg);
+                    }
+                  },
+                   cancel: function(res) {
+                       console.log(res);
+                       alert('支付取消');
+                   }
+
+            });
+        }
+
+});
+
+
+</script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">收银台</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd" style="text-align: right;">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">付款金额</label>
+                        <em class="weui-form-preview__value font16" >¥ {{ total_cost }}</em>
+                        <span id="out_trade_no" style="display: none" >{{ out_trade_no }}</span>
+                    </div>
+                </div>
+                <div class="weui-cells__title">商品列表</div>
+                <div class="weui-cells">
+                    {% for item in items %}
+                      <div class="weui-cell">
+                        <div class="weui-cell__hd"></div>
+                        <div class="weui-cell__bd">
+                          <p>{{ item.goods.name }}</p>
+                        </div>
+                        <div class="weui-cell__ft">x{{ item.quantity }}</div>
+                      </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="weui-tabbar">
+         <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span> ¥ {{ total_cost }}</span></p>
+        </a>
+
+    </div>
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+
+
+    });
+
+    </script>
+{% endblock bottomjs %}

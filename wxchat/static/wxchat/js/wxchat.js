@@ -16,7 +16,7 @@ function setImageUrl(){
         console.log(data);
         imgList ='';
           $.each(data.results,function(index,item){
-              imgList += '<div class="swiper-slide"><img src="'+ item.image +'"></div>';
+              imgList += '<div class="swiper-slide"><img src="'+ item.image +'" data-link="'+ item.url +'"></div>';
 
           });
           $('.swiper-wrapper').append(imgList);
@@ -35,6 +35,14 @@ function setImageUrl(){
                   },
                 observer:true,
                 observeParents:true,
+                on:{
+                    tap:function(event){
+                       url = event.target.attributes["data-link"].nodeValue;
+                       if (url.length > 7){
+                           window.location.href =  event.target.attributes["data-link"].nodeValue ;
+                       }
+                    },
+                },
         });
 
       },

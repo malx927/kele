@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+    {% for order in orders %}
+         {{ order.out_trade_no }}<br>
+        {% for item in order.items.all %}
+                {{ item }}<br>
+        {% endfor %}
+    {% endfor %}
+</body>
+</html>

@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     'dogbrand',
     'dogtype',
     'doginfo',
-
+    'shopping',
 
 
 ]
@@ -224,6 +224,7 @@ STATICFILES_DIRS = (
 )
 
 ADMIN_SITE_HEADER = u'大眼可乐公司后台'
+PROJECT_NAME = u'大眼可乐宠物联盟'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
@@ -278,34 +279,15 @@ THUMBNAIL_ALIASES = {
 THUMBNAIL_SUBDIR = 'thumbs'
 
 
-
-# WECHAT_TOKEN = 'dayankele123'
-# APP_URL = 'http://3yd739.natappfree.cc/wechat'
-
+WECHAT_TOKEN = 'dayankele123'
+APP_URL = 'http://qmre8z.natappfree.cc/wechat'
 #APP_URL = 'http://www.hld8000.com/wechat'
-
-
 # 测试号WeChat
-# WECHAT_APPID = 'wxbc591183cb175d16'
-# WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
-MCH_ID = '1111111'
-MCH_KEY = '1111111111111111111111111111'
-# NOTIFY_URL = 'http://3yd739.natappfree.cc/wechat/pay/wxnotify/'
+WECHAT_APPID = 'wxbc591183cb175d16'
+WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
+
 # API_CLIENT_CERT_PATH = "/path/your/cert/apiclient_cert.pem"
 # API_CLIENT_KEY_PATH = "/path/your/cert/apiclient_key.pem"
 # WECHAT_APPID = 'wxad07fe6b357d1f3a'
 # WECHAT_SECRET = '3b162faee0b6ee746a8a2eca9bb27818'
-
-WECHAT_TOKEN = 'hello2018'
-#APP_URL = 'http://7nb6dr.natappfree.cc/wechat'
-APP_URL = 'http://snva4g.natappfree.cc/wechat'
-
-
-# 测试号WeChat
-# WECHAT_APPID = 'wxbc591183cb175d16'
-# WECHAT_SECRET = 'bc4925cf759e581f41e8ea3699c36176'
-
-WECHAT_APPID = 'wxbc5a3d4ee654728b'
-WECHAT_SECRET = 'c4d084d34f4388be0bdfc99fcfd6e0c6'
-
 

@@ -1,0 +1,13 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block container %}
+    <div class="weui-panel weui-panel_access qrcode_bg" >
+    {% if is_member == 1 %}
+        <div class="qrcode_middle">
+            <img src="{{ user.qr_image.url }}"/>
+        </div>
+     {% else %}
+    {% endif %}
+    </div>
+
+{% endblock container %}

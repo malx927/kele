@@ -1,0 +1,114 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">商品详细介绍</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+          {% if object.images %}
+             <div class="detail_header">
+                <img src="{{ object.images.url }}" >
+             </div>
+          {% endif %}
+           <div class="weui-form-preview">
+            <div class="weui-form-preview__hd line_height">
+                <div class="weui-form-preview__item ">
+                   <p class="price_title weui-form-preview__value ">¥{{ object.price }}<span class="price-size r"><label style="color:#858282;">会员送: </label>¥{{ object.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i></span></p>
+                   <em class="weui-form-preview__value">{{ object.name }}</em>
+                   <p class="price_title weui-form-preview__value "><span class="price-size r"><label style="color:#858282;">会员返利: </label>{{ object.scores }}金币</span></p>
+                </div>
+            </div>
+               <div class="weui-form-preview__hd line_height">
+                <div class="weui-form-preview__item ">
+                   <em class="weui-form-preview__value">商品详情</em>
+               </div>
+            </div>
+            <div class="weui-form-preview__bd">
+               <div class="weui-form-preview__item">
+{#                   <label class="weui-form-preview__label">商品介绍:</label>#}
+                   <label class="weui-form-preview__value">
+                       {{ object.content|safe }}
+                   </label>
+               </div>
+           </div>
+        </div>
+        </div>
+    </div>
+    </div>
+    <div class="weui-tabbar">
+         <a href="{% url 'shop-cart-list' %}" class="weui-tabbar__item tabbar_item">
+            <p class="weui-tabbar__label " style="background-color: #3e3e3e"><i class="icon iconfont icon-buy2" ></i> 购物车<span id="cart_nums" class="weui-badge" style="margin-top: -15px;">0</span></p>
+        </a>
+        <a href="#" class="weui-tabbar__item tabbar_item" id="shopcart_add">
+             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-iconfontadd2" ></i> 加入购物车</p>
+        </a>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="buy_now">
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi2" ></i> 立即购买</p>
+        </a>
+    </div>
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+        getCount();
+        //立即购买
+        $('#buy_now').on('click',function(){
+            window.location.href = "{% url 'goods-buy-list' %}?itemid={{ object.id }}&is_buy_now=1";
+        });
+
+        ///添加到购物车
+        $('#shopcart_add').on('click', function(event){
+            event.preventDefault();
+            let params ={
+              itemid: {{ object.id }} ,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+           $.ajax({
+              type: 'POST',
+              url: '{% url "shop-cart-add" %}',
+              data:params,
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+
+                  if(data.success == true)
+                    $('#cart_nums').text(data.cart_nums);
+              },
+              error: function(xhr, type,error){
+                  console.log(type);
+              }
+            });
+        });
+
+    });
+
+    function getCount(){
+        $.ajax({
+          type: 'GET',
+          url: '{% url "order-cart-count" %}',
+          data:{ order:1,cart:1, _rand:Math.random() },
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+{#              $('#order_nums').text(data.order_nums);#}
+              $('#cart_nums').text(data.cart_nums);
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    </script>
+{% endblock bottomjs %}

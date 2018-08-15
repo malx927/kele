@@ -1,0 +1,213 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/jssdk.html' %}
+    <script>
+    wx.ready(function () {
+
+     ///客户地址信息
+     $('#wxaddress').on('click',function(){
+        wx.openAddress({
+              success:function (res) {
+                  $('#username').text(res.userName);
+                  $('#telnumber').text(res.telNumber);
+                  $('#postalcode').text(res.postalCode);
+                  $('#detailInfo').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
+              },
+              cancel:function (res) {
+                console.log(JSON.stringify(res));
+
+              },
+              fail:function (res) {
+{#                  alert(JSON.stringify(res))#}
+                  console.log(JSON.stringify(res));
+              }
+        });
+    });
+
+    $('#wxpay').on('click',function(){
+        if($('#telnumber').text() == '')
+        {
+            weui.alert('请填写收件人姓名、详细地址等信息');
+            return;
+        }
+        var params ={
+          userName: $("#username").text(),
+          telNumber: $('#telnumber').text(),
+          postalCode: $('#postalcode').text(),
+          detailInfo: $('#detailInfo').text(),
+          message: $('#message').text(),
+          goods_id:$('#goods_id').val(),
+          quantity:$('#nums').val(),
+          csrfmiddlewaretoken:'{{ csrf_token }}'
+        }
+       $.ajax({
+          type: 'POST',
+          url: '{% url "create-order" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              if(data.success == 'true')
+                    window.location.href = '{% url "create-order" %}?orderId=' + data.out_trade_no;
+          },
+          error: function(error){
+              console.log(error);
+              weui.alert('商品支付失败!');
+          }
+        });
+    });
+
+});
+
+
+</script>
+{% endblock extra %}
+{% block tab %}
+    <form action="#" method="get" enctype="multipart/form-data" >{% csrf_token %}
+    <div class="weui-tab" id="tab">
+        <div class="weui-tab__content weui-tab__panel_active" >
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                        <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购买确认</span></div>
+                     </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <a class="weui-cell weui-cell_access" href="javascript:;" id="wxaddress">
+                        <div class="weui-cell__bd" style="height: 60px;">
+                            <p>
+                                <span id="username">收件人姓名及联系方式</span>
+                                <span style="padding-left: 10px;" id="telnumber"></span>
+                                <span id="postalcode" style="display:none"></span>
+                            </p>
+                            <p id="detailInfo">发货详细地址</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </a>
+                    <div class="weui-cell weui-cell_access">
+                        <div class="weui-cell__hd">
+                            <p><i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}</p>
+                        </div>
+                    </div>
+                    {% for goods in goods_list %}
+                    <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
+                            <input type="hidden" id="goods_id" value="{{ goods.id }}">
+                            {% if goods.images %}
+							<div class="weui-media-box__hd">
+								 <img class="weui-media-box__thumb" src="{{ goods.images.url }}" alt="">
+							</div>
+                            {% endif %}
+							<div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ goods.name }}</h4>
+                                <ul class="weui-media-box__info "><input type="hidden" id="goods_price" value="{{ goods.price }}">
+                                    <li class="weui-media-box__info__meta sub_title">¥ {{ goods.price }}</li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" id="goodsnums">
+                                        {% if is_buy_now %}x1{% endif %}
+                                    </li>
+                                    <li class="weui-media-box__info__meta r" style="color: #c9302c;">
+                                        <input type="hidden" id="dif_price" value="{% if is_member == 1 %}{{ goods.diff_price }}{% else %}0{% endif %}">
+                                        <span  id="card">{{ goods.diff_price }}</span><i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
+                                    </li>
+                                </ul>
+                                {% if is_buy_now %}
+                                <p class="weui-media-box__desc sub_title" style="padding-top:5px;font-size:16px;">购买数量:
+                                    <span class="r">
+                                        <input type="button" id="minus" class="input_length" value="-" >
+                                        <input type="number" id="nums" value="1" min="1" max="{{ goods.stock_nums }}" class="input_length" />
+                                        <input type="button" id="add" class="input_length" value="+" >
+                                    </span>
+                                </p>
+                                {% endif %}
+							</div>
+                    </div>
+                    {% endfor %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">留言:</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" type="text" id="message"  placeholder="给卖家留言"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-tabbar">
+        <a href="#" class="weui-tabbar__item tabbar_item">
+             <div class="weui-tabbar__label " style="color: black;">
+                 <div class="price-total"><span>应付总额: <b id="total_price"></b></span></div>
+                 <div class="benefits"><span>已优惠: <b id="benefits_price"></b></span></div>
+             </div>
+        </a>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
+        </a>
+    </div>
+    </form>
+{% endblock tab %}
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+
+        var num = $('#nums').val();
+        if(num == 1){
+                $('#minus').attr('disabled', true);
+        }
+
+        var dif_price = parseInt($('#dif_price').val());
+
+        calc_total_prices();
+
+        $('#add').on('click',function(){
+            num = $('#nums').val();
+            num++;
+            if( num > 1 )
+                $('#minus').removeAttr('disabled');
+
+            $('#nums').val(num);
+
+            $('#goodsnums').text('x'+num);
+            calc_total_prices();
+        });
+
+        $('#minus').on('click',function(){
+            num = $('#nums').val();
+            num--;
+            if(num == 1){
+                $('#minus').attr('disabled', true);
+            }
+             $('#nums').val(num);
+
+             $('#goodsnums').text('x'+num);
+            calc_total_prices();
+        });
+
+        $('#nums').on('input',function(event){
+            num = event.target.value;
+            if( num <= 0){
+                event.target.value = 1;
+                num = event.target.value;
+            }
+            $('#goodsnums').text('x'+event.target.value);
+            calc_total_prices();
+        })
+
+        function calc_total_prices()
+        {
+            goods_price = parseFloat( $("#goods_price").val() );
+            goods_nums = parseFloat( $("#nums").val()  );
+            diff_price = parseFloat( $("#dif_price").val()  );
+            total_price = (goods_price - diff_price) * goods_nums;
+            benefits_price = diff_price * goods_nums;
+
+            $("#total_price").text( '¥' + total_price.toFixed(2)  );
+            $("#benefits_price").text( '¥' + benefits_price.toFixed(2)  );
+        }
+
+    });
+
+    </script>
+{% endblock bottomjs %}

@@ -7,13 +7,13 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 #from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
-    dogAdoptNav, dogTradeNav
+    dogAdoptNav, dogTradeNav, myQRCode, showQRCode, myScore
 
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder,ordersuccess
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,payNotify,getPayInfo
+from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,getPayInfo
 
 
 urlpatterns = [
@@ -90,9 +90,12 @@ urlpatterns = [
     #微信支付
     url(r'^pay/paylist$', payList,name='pay-list'),
     url(r'^pay/payinfo/$', getPayInfo,name='pay-info'),
-    url(r'^pay/wxnotify/$', payNotify,name='pay-notify'),
 
 
+    #显示我的二维码
+    #url(r'^qrcode/$', myQRCode, name='my-qrcode-image'),
+    url(r'^myqrcode/$', showQRCode, name='my-qrcode'),
+    url(r'^myscore/$', myScore, name='my-score'),
 
     # 网页授权测试
     url(r'^auth2/$', auth2),
