@@ -1,124 +1,121 @@
-{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
-{% block container %}
-    <div class="weui-panel weui-panel_access" style="display: block" id="1">
-        <div class="weui-panel__hd">
-            <div class="weui-flex">
-                {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
-            </div>
-            <div class="weui-flex__item" style="text-align: center;" ><span class="detail_title">大眼可乐</span></div>
-        </div>
+<!doctype html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <title>宠粮定制</title>
+    <link rel="stylesheet" href="{% static 'wxchat/style/style.css' %}">
 
-        <div class="weui-panel__bd">
-            <div class="weui-form-preview">
-                <div class="weui-form-preview__bd">
-                    <div class="weui-form-preview__item">
-                        <span class="weui-form-preview__value" id="dy" onclick="mySwitch()">大眼可乐1</span>
+</head>
+<body>
+<div class="container">
+    {% for i in order %}
+        {% if forloop.first == True %}
+            <ul class="question show" id="question_1">
+
+                <h3>{{ i.name }}</h3>
+                {% for s in i.dogstatustype.all %}
+                    <li data-answer="{{ s.name }}">{{ s.name }}</li>
+                {% endfor %}
+
+
+            </ul>
+        {% elif not forloop.last and not forloop.first %}
+
+            <ul class="question" id="question_{{ forloop.counter }}">
+
+                <h3>{{ i.name }}</h3>
+                {% for s in i.dogstatustype.all %}
+                    <li data-answer="{{ s.name }}">{{ s.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            {% if forloop.last %}
+                <ul class="question" id="question_{{ i.id }}">
+
+                    <h3>{{ i.name }}</h3>
+                    {% for s in i.dogstatustype.all %}
+                        <li data-answer="{{ s.name }}">{{ s.name }}</li>
+                    {% endfor %}
+                    <div class="btn_box">
+                        <a href="javascript:void(0);" class="submit" onclick="submitPage()">提交</a>
                     </div>
-                    <div class="weui-form-preview__item">
-                        <span class="weui-form-preview__value">大眼可乐2</span>
-                    </div>
-                    <div class="weui-form-preview__item">
-                        <span class="weui-form-preview__value">大眼可乐3</span>
-                    </div>
+                </ul>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    <div class="btn_box">
+        <a href="javascript:void(0);" class="previous_page hide">上一页</a>
 
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="weui-panel__hd" style="display: none" id="2">
-        <div class="weui-flex">
-            {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
-        </div>
-        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">问题2</span></div>
-
-
-        <div class="weui-panel__bd">
-            <div class="weui-form-preview">
-                <div class="weui-form-preview__bd">
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="dd1" onclick="mySwitch1()">答案2</div>
-                    </div>
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="dd2">答案3</div>
-                    </div>
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="dd3">答案2</div>
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
-    </div>
-    <div style="display: none" id="3">
-        <div class="weui-panel__hd">
-            <div class="weui-flex">
-                {#                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
-            </div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">问题3</span></div>
-        </div>
-
-        <div class="weui-panel__bd">
-            <div class="weui-form-preview">
-                <div class="weui-form-preview__bd">
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="da" name="da" value="答案1">sss</div>
-                    </div>
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="da2" name="da2" value="答案2">rrrr</div>
-                    </div>
-                    <div class="weui-form-preview__item">
-                        <div class="weui-form-preview__value" id="da3" name="da3" value="答案3">ttttt</div>
-                    </div>
-
-
-                </div>
-            </div>
-        </div>
     </div>
 
+</div>
+<script src="{% static 'wxchat/js/jquery.min.js' %}"></script>
+<script>
+    $(function () {
+        $(".question>li").on("click", function () {
+            var len = $(".container>ul").size();
+            var idx = $(this).parent().attr("id");
+            idx = idx.split('_')[1];
+            var idx2 = idx * 1 + 1;
+            $(this).addClass("answer").siblings("li").removeClass("answer");
+            setTimeout(function () {
+                if (idx == len) {
+                    return false;
+                } else {
+                    $("#question_" + idx + "").hide();
+                    $("#question_" + idx2 + "").show();
+                }
+            }, 500)
 
-    <script language="javascript">
-        function mySwitch() {
 
-            document.getElementById('2').style.display = document.getElementById('2').style.display == 'none' ? 'block' : 'none';
-            document.getElementById('1').style.display = document.getElementById('1').style.display == 'block' ? 'none' : 'none';
-        }
-        function mySwitch1() {
+        })
+        $(".previous_page").on("click", function () {
+            var idx = $(".question:visible").attr("id");
+            idx = idx.split('_')[1];
+            var idx2 = idx - 1;
+            $("#question_" + idx + "").hide();
+            $("#question_" + idx2 + "").show();
+            if ($("#question_1").is(":visible")) {
+                $(this).hide();
+            }
+        });
+        $("#question_1>li").on("click", function () {
+            setTimeout(function () {
+                $(".previous_page").show();
+            }, 500)
+        })
 
-            document.getElementById('3').style.display = document.getElementById('3').style.display == 'none' ? 'block' : 'none';
-            document.getElementById('2').style.display = document.getElementById('2').style.display == 'block' ? 'none' : 'none';
-        }
-    </script>
-    <script src="http://apps.bdimg.com/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script>
-        $(document).ready(function () {
-            $("#dy").click(function () {
-                var b = document.getElementById('dy').innerHTML;
-                alert(b)
-                $.ajax({
 
-                url:"{% url 'dog-order' %}",  //请求服务的地址
+    });
 
-                type:"GET",  //数据发送的方式
+    function submitPage() {
+        var a = [];
+        {#        a.push($(".question>li.answer").text())#}
+        $(".question>li.answer").each(function () {
+            var answers = $(this).data('answer');
+            a.push(answers)
+        });
+        {#        alert(a);#}
+        $.ajax({
 
-                contentType:"application/jason; encode=utf-8",  // 发送的数据及data对应数据的类型，前者是POST方式，后者是GET方式
+            url: "{% url 'dog-order' %}",  //请求服务的地址
 
-                data: {'b':b},
+            type: "GET",  //数据发送的方式
 
-                success: function(ret_data){
+            contentType: "application/jason; encode=utf-8",  // 发送的数据及data对应数据的类型，前者是POST方式，后者是GET方式
 
+            data: {'alldata': JSON.stringify(a)},
+
+            success: function (data) {
+                window.location.href = "{% url 'order-success'%}?peice=" + data['peice'] + '&skin_status=' + data['skin_status'] + '&eye_status=' + data['eye_status'] + '&dogtype=' + data['dogtype'] + '&dog_age=' + data['dog_age'] + '&body_status=' + data['body_status'] + '&bones_status=' + data['bones_status'] + '&dog_code=' + data['dog_code'];
                 //ret_data是ajax发送成功后，后端服务器HttpResponse（）返回的数据
 
-                }
+            }
 
-                });
-            });
         });
-    </script>
+    }
+</script>
 
-
-
-{% endblock container %}
-
+</body>
+</html>

@@ -1,5 +1,6 @@
 # coding=utf-8
 import random,string,time,os
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 
@@ -15,19 +16,18 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from doginfo.models import DogDelivery,DogAdoption,Freshman,DogOrder,DogStatus,DogStatusType
-from .forms import DogadoptForm,DogdeliveryForm,DogInstitutionForm
-from wechatpy import parse_message,create_reply, WeChatClient
+from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType
+from .forms import DogadoptForm, DogdeliveryForm, DogInstitutionForm
+from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.client.api import WeChatJSAPI
 from wechatpy.pay import WeChatPay
-
+from wechatpy.pay.utils import dict_to_xml
 from wechatpy.exceptions import WeChatPayException
 from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
-
-from doginfo.models import DogLoss, DogOwner,Doginstitution
+from doginfo.models import DogLoss, DogOwner, Doginstitution
 from dogtype.models import Dogtype
 from .models import WxUserinfo,WxUnifiedOrdeResult, WxPayResult, WxIntroduce
 from .forms import DogLossForm,DogOwnerForm,DogBuyForm
@@ -39,13 +39,15 @@ from io import StringIO, BytesIO
 from .models import getSceneMaxValue
 from django.db.models import Q
 
+
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
-wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
+wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY, mch_id=settings.MCH_ID)
+
 
 @csrf_exempt
 def wechat(request):
@@ -81,7 +83,7 @@ def wechat(request):
             reply.media_id = msg.media_id
             reply.content = '语音信息'
         elif msg.type == 'event':
-            print('eventkey=',msg.event)
+            print('eventkey=', msg.event)
             if msg.event == 'subscribe':
                 saveUserinfo(msg.source)
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
@@ -156,6 +158,9 @@ def saveUserinfo(openid, scene_id=None):
         sub_time = user.pop('subscribe_time')
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
+
+        WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
+        # WxUserinfo.objects.create(**user, subscribe_time=sub_time)
         user['qr_scene'] = WxUserinfo.getSceneMaxValue()
         if scene_id:
             user['is_member'] = 1
@@ -176,7 +181,6 @@ def saveUserinfo(openid, scene_id=None):
 
         except WxUserinfo.DoesNotExist:
             print('会员推荐失败.....')
-
     else:
         print(user)
 
@@ -195,7 +199,7 @@ def unSubUserinfo(openid):
 
 # @login_required
 def createMenu(request):
-    print('createMenu',client.access_token)
+    print('createMenu', client.access_token)
     resp = client.menu.create({
         "button": [
             {
@@ -242,15 +246,15 @@ def createMenu(request):
 
 # @login_required
 def deleteMenu(request):
-    print('deleteMenu',client.access_token)
+    print('deleteMenu', client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
 
 
 # @login_required
 def getMenu(request):
-    #client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
-    print('getMenu',client.access_token)
+    # client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+    print('getMenu', client.access_token)
     resp = client.menu.get()
     # print(resp)
     return HttpResponse(json.dumps(resp, ensure_ascii=False))
@@ -291,7 +295,7 @@ def redirectUrl(request, item):
                     WxUserinfo.objects.create(**userinfo)
 
                 request.session['openid'] = open_id
-                userinf = get_object_or_404(WxUserinfo,openid=open_id)
+                userinf = get_object_or_404(WxUserinfo, openid=open_id)
                 request.session['nickname'] = userinf.nickname
                 request.session['is_member'] = userinf.is_member
                 redirect_url = getUrl(item)
@@ -309,12 +313,46 @@ def dogLoss(request):
     return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
 
 
+
+def changeImage(im):
+    image = Image.open(im)
+    try:
+        image.load()
+    except IOError:
+        pass
+    image.load()
+
+    try:
+        exif = image._getexif()
+    except Exception:
+        exif = None
+
+    if exif:
+        orientation = exif.get(0x0112)
+        if orientation == 2:
+            image = image.transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 3:
+            image = image.transpose(Image.ROTATE_180)
+        elif orientation == 4:
+            image = image.transpose(Image.FLIP_TOP_BOTTOM)
+        elif orientation == 5:
+            image = image.transpose(Image.ROTATE_270).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 6:
+            image = image.transpose(Image.ROTATE_270)
+        elif orientation == 7:
+            image = image.transpose(Image.ROTATE_90).transpose(Image.FLIP_LEFT_RIGHT)
+        elif orientation == 8:
+            image = image.transpose(Image.ROTATE_90)
+    return image
+
+
+
 # 寻宠物发布
 def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=', openid,nickname)
+        print('openid=', openid, nickname)
         next = request.GET.get('next', None)
 
         form = DogLossForm(request.POST, request.FILES)
@@ -340,16 +378,17 @@ def dogLossAdd(request):
         timestamp = int(time.time())
         url = request.build_absolute_uri()
         print(url)
-        signature = jsApi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+        signature = jsApi.get_jsapi_signature(noncestr, ticket, timestamp, url)
 
         signPackage = {
-            "appId":settings.WECHAT_APPID,
-            "nonceStr":noncestr,
-            "timestamp":timestamp,
-            "url":url,
-            "signature":signature
+            "appId": settings.WECHAT_APPID,
+            "nonceStr": noncestr,
+            "timestamp": timestamp,
+            "url": url,
+            "signature": signature
         }
-        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next,'sign':signPackage})
+        return render(request, 'wxchat/dogloss_add.html', {'form': form, 'next': next, 'sign': signPackage})
+
 
 def dogLossNav(request):
     next = request.GET.get('next', '')
@@ -360,9 +399,11 @@ def dogBreedNav(request):
     next = request.GET.get('next', '')
     return render(request, 'wxchat/dogbreed_nav.html', {'next': next})
 
+
 def dogAdoptNav(request):
     next = request.GET.get('next', '')
     return render(request, 'wxchat/dogAdopt_nav.html', {'next': next})
+
 
 def dogTradeNav(request):
     next = request.GET.get('next', '')
@@ -399,18 +440,18 @@ def dogBreedAdd(request):
         form = DogBreedForm()
         next = request.GET.get('next', '')
         if sex == '1':
-            return render(request, 'wxchat/dogfemale_add.html', {'form': form,'next': next})
-        return render(request, 'wxchat/dogbreed_add.html', {'form': form,'next': next})
-
+            return render(request, 'wxchat/dogfemale_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/dogbreed_add.html', {'form': form, 'next': next})
 
 
 # 配种详细视图
 class DogBreedDetailView(DetailView):
     model = DogBreed
     template_name = 'wxchat/dogbreed_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogBreedDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
@@ -419,9 +460,10 @@ class DogBreedDetailView(DetailView):
 class DogFemaleDetailView(DetailView):
     model = DogBreed
     template_name = 'wxchat/dogfemale_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogFemaleDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
@@ -430,9 +472,10 @@ class DogFemaleDetailView(DetailView):
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogLossDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
@@ -467,30 +510,33 @@ def dogOwnerAdd(request):
 class DogOwnerDetailView(DetailView):
     model = DogOwner
     template_name = 'wxchat/dogowner_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogOwnerDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
 
-#宠物领养
+# 宠物领养
 def dogAdopt(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/dogadoption.html')
 
 
-#领养宠物详情
+# 领养宠物详情
 class DogAdoptDetailView(DetailView):
     model = DogAdoption
     template_name = 'wxchat/dogadoption_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogAdoptDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
-#领养宠物发布
+
+# 领养宠物发布
 def dogadoptAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
@@ -517,19 +563,19 @@ def dogadoptAdd(request):
         return render(request, 'wxchat/dogadopt_add.html', {'form': form, 'next': next})
 
 
-
-
-#送养宠物详情
+# 送养宠物详情
 class DogdeliveryDetailView(DetailView):
     model = DogDelivery
     template_name = 'wxchat/dogdelivery_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogdeliveryDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
-#送养宠物发布
+
+# 送养宠物发布
 def DogdeliveryAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
@@ -556,52 +602,69 @@ def DogdeliveryAdd(request):
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
 
+# 订单成功
 
-#狗粮订单
+def ordersuccess(request):
+    a= 1
+    all_product = []
+    openid = request.session.get('openid')
+    nickname = request.session.get('nickname')
+    peice = request.GET.get('peice')
+    dogtype = request.GET.get('dogtype')
+    dog_age = request.GET.get('dog_age')
+    body_status = request.GET.get('body_status')
+    eye_status = request.GET.get('eye_status')
+    bones_status = request.GET.get('bones_status')
+    dog_code = request.GET.get('dog_code')
+    skin_status = request.GET.get('skin_status')
+    all_order= str(dogtype)+str(dog_age)+str(bones_status)+str(body_status)+str(eye_status)+str(skin_status)
+    all_product.append(all_order)
+    if a== 2:
+        data = DogOrder()
+        data.dogtype = dogtype
+        data.peice =peice
+        data.openid= openid
+        data.nickname= nickname
+        data.dog_code=dog_code
+        data.product_detail=all_product
+        data.status=1
+        data.save()
+    return render(request, 'wxchat/order_success.html',
+                  {'peice': peice, 'skin_status': skin_status, 'dogtype': dogtype, 'dog_age': dog_age,
+                   'body_status': body_status, 'eye_status': eye_status,'bones_status':bones_status,'dog_code':dog_code})
+
+
+# 狗粮订单
 def dogOrder(request):
-    import random
-    if request.is_ajax() and request.method == "GET":
-        print(request.GET['b'],22222222222222)
+    import random, json
+    name = DogStatus.objects.all().order_by('id')
+    if request.method == 'GET':
+        alldata = request.GET.get('alldata')
+        if alldata:
+            dataall = json.loads(alldata)
+            dogtype = dataall[0]
+            dog_age = dataall[1]
+            body_status = dataall[2]
+            eye_status = dataall[3]
+            skin_status = dataall[4]
+            bones_status = dataall[5]
+            peice = dataall[6]
+            # print(body_status, skin_status, eye_status, peice, 22222222222)
+            now = datetime.datetime.now()
+            random_int = random.randint(100, 10000)
+            dog_code = now.strftime("%Y%m%d%H%M%S") + str(random_int) + 'B'
+            # print(dog_code, 3344444)
+            datas = {'eye_status': eye_status, 'dogtype': dogtype, 'dog_age': dog_age, 'bones_status': bones_status,
+                     'body_status': body_status, 'dog_code': dog_code, 'skin_status': skin_status, 'peice': peice}
+            return HttpResponse(json.dumps(datas), content_type="application/json")
 
-    now = datetime.datetime.now()
-    random_int = random.randint(100,10000)
-    dog_code = now.strftime("%Y%m%d%H%M%S")+str(random_int)+'B'
-    if request.method == 'POST':
-        openid = request.session.get('openid')
-        nickname = request.session.get('nickname')
-        print('openid=', openid)
-        dogtype = request.POST['dogtype']
-        body_status = request.POST['body_status']
-        skin_status = request.POST['skin_status']
-        eye_status = request.POST['eye_status']
-        bones_status = request.POST['bones_status']
-        intestinal_status = request.POST['intestinal_status']
-        peice = request.POST['peice']
-        dogorder = DogOrder()
-        dogorder.dog_code = dog_code
-        dogorder.openid = openid
-        dogorder.nickname = nickname
-        dogorder.dogtype = dogtype
-        dogorder.body_status = body_status
-        dogorder.skin_status = skin_status
-        dogorder.eye_status = eye_status
-        dogorder.bones_status = bones_status
-        dogorder.intestinal_status = intestinal_status
-        dogorder.peice = peice
-        dogorder.save()
-        order = DogOrder.objects.filter(dog_code=dog_code).first()
-        order1 = DogStatusType.objects.filter().all()
-        return render(request, 'wxchat/order_success.html', {"order": order,})
-    else:
-        order = []
-        order1 = DogStatus.objects.filter().all()
-        for i in order1:
-            a= i.dogstatustype.all()
-            order.append(a)
-        return render(request, 'wxchat/dogorder.html',{'order':order,'order1':order1})
+        else:
+            return render(request, 'wxchat/dogorder.html', {'order': name})
+
+    return render(request, 'wxchat/dogorder.html', {'order': name, })
 
 
-#加盟宠物医疗机构发布
+# 加盟宠物医疗机构发布
 def DoginstitutionAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
@@ -628,26 +691,29 @@ def DoginstitutionAdd(request):
         return render(request, 'wxchat/doginstitution_add.html', {'form': form, 'next': next})
 
 
-#加盟宠物医疗机构
+# 加盟宠物医疗机构
 def doginstitution(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/doginstitution.html')
+
 
 # 寻宠物详细视图
 class DogInstitutionDetailView(DetailView):
     model = Doginstitution
     template_name = 'wxchat/doginstitution_detail.html'
 
-#新手课堂
+
+# 新手课堂
 def freshman(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/freshman.html')
 
 
-#新手课堂详情
+# 新手课堂详情
 class FreshmanDetailView(DetailView):
     model = Freshman
     template_name = 'wxchat/freashman_detail.html'
+
     def get(self, request, *args, **kwargs):
         # 覆写 get 方法的目的是因为每当文章被访问一次，就得将文章阅读量 +1
         # get 方法返回的是一个 HttpResponse 实例
@@ -656,45 +722,48 @@ class FreshmanDetailView(DetailView):
         response = super(FreshmanDetailView, self).get(request, *args, **kwargs)
         # 将文章阅读量 +1
         # 注意 self.object 的值就是被访问的文章 post
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         # 视图必须返回一个 HttpResponse 对象
         return response
 
-#宠物交易
-def dogTrade(request):
-    openid = request.session.get('openid',None)
-    return render(request,template_name='wxchat/dogtrade.html')
 
-#宠物求购
+# 宠物交易
+def dogTrade(request):
+    openid = request.session.get('openid', None)
+    return render(request, template_name='wxchat/dogtrade.html')
+
+
+# 宠物求购
 def dogBuyAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=',openid)
-        next = request.GET.get('next',None)
+        print('openid=', openid)
+        next = request.GET.get('next', None)
         form = DogBuyForm(request.POST)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.openid = openid
             instance.nickname = nickname
             instance.save()
-            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            return render(request,'wxchat/message.html', {"success":"false",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogBuyForm()
         next = request.GET.get('next', '')
-        return  render(request,'wxchat/dogbuy_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/dogbuy_add.html', {'form': form, 'next': next})
 
-#宠物求购
+
+# 宠物求购
 def dogSaleAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=',openid)
-        next = request.GET.get('next',None)
-        form = DogSaleForm(request.POST,request.FILES)
+        print('openid=', openid)
+        next = request.GET.get('next', None)
+        form = DogSaleForm(request.POST, request.FILES)
         if form.is_valid():
             instance = form.save(commit=False)
             instance.openid = openid
@@ -704,32 +773,35 @@ def dogSaleAdd(request):
                 path = instance.picture.path
                 image = changeImage(path)
                 image.save(path)
-            return render(request,'wxchat/message.html', {"success":"true",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "true", 'next': next})
         else:
-            return render(request,'wxchat/message.html', {"success":"false",'next':next})
+            return render(request, 'wxchat/message.html', {"success": "false", 'next': next})
     else:
         form = DogSaleForm()
         next = request.GET.get('next', '')
-        return  render(request,'wxchat/dogsale_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/dogsale_add.html', {'form': form, 'next': next})
 
-#求购详情
+
+# 求购详情
 class DogBuyDetailView(DetailView):
     model = DogBuy
     template_name = 'wxchat/dogbuy_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogBuyDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
 
-#出售详情
+# 出售详情
 class DogSaleDetailView(DetailView):
     model = DogSale
     template_name = 'wxchat/dogsale_detail.html'
+
     def get(self, request, *args, **kwargs):
         response = super(DogSaleDetailView, self).get(request, *args, **kwargs)
-        self.object.click +=1
+        self.object.click += 1
         self.object.save()
         return response
 
@@ -792,7 +864,8 @@ def auth2(request):
     weburl = weburl.format(appid, redirect_url)
     return HttpResponseRedirect(weburl)
 
-#获取用户openid列表
+
+# 获取用户openid列表
 @login_required
 def updateUserinfo(request):
     userid_list = client.user.get_followers()
@@ -801,17 +874,17 @@ def updateUserinfo(request):
 
     if 'errcode' not in userid_list and userid_list['count'] > 0:
         openid_list = userid_list['data']['openid']
-        userinfo_lists = client.user.get_batch( openid_list )
+        userinfo_lists = client.user.get_batch(openid_list)
         for user in userinfo_lists:
             sub_time = user.pop('subscribe_time')
             sub_time = datetime.datetime.fromtimestamp(sub_time).strftime('%Y-%m-%d %H:%M:%S')
             user['subscribe_time'] = sub_time
-
             user['qr_scene'] = WxUserinfo.getSceneMaxValue()
             WxUserinfo.objects.update_or_create(defaults=user,openid=user['openid'])
         return HttpResponse(json.dumps(userinfo_lists,ensure_ascii=False))
     else:
-        return  HttpResponse(json.dumps(userid_list,ensure_ascii=False))
+        return HttpResponse(json.dumps(userid_list, ensure_ascii=False))
+
 
 # @csrf_exempt
 # def redirectUrl(request,item):
@@ -858,10 +931,11 @@ def updateUserinfo(request):
 #测试jssdk页面
 def shareAction(request):
     signPackage = getJsApiSign(request)
-    return render(request,template_name='wxchat/freshman_bak.html',context={'sign':signPackage})
+    return render(request, template_name='wxchat/freshman_bak.html', context={'sign': signPackage})
+
 
 def getPayInfo(request):
-    trade_type ='JSAPI'
+    trade_type = 'JSAPI'
     body = '商品描述测试'
     total_fee = 1
     user_id = request.session.get('openid')
@@ -876,29 +950,50 @@ def getPayInfo(request):
     print(userName,detailInfo,telNumber,postalCode,nationalCode,errMsg)
 
     try:
-        data = wxPay.order.create(trade_type=trade_type,body=body,total_fee=total_fee,notify_url=settings.NOTIFY_URL,user_id=user_id)
-        prepay_id = data.get('prepay_id','')
+        data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, notify_url=settings.NOTIFY_URL,
+                                  user_id=user_id)
+        prepay_id = data.get('prepay_id', '')
         save_data = dict(data)
-        #保存统一订单数据
+        # 保存统一订单数据
         WxUnifiedOrdeResult.objects.create(**save_data)
         if prepay_id:
-            return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id,jssdk=True)
+            return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
             return HttpResponse(json.dumps(return_data))
 
     except WeChatPayException as wxe:
         errors = {
             'return_code': wxe.return_code,
             'result_code': wxe.result_code,
-            'return_msg':  wxe.return_msg,
-            'errcode':  wxe.errcode,
-            'errmsg':   wxe.errmsg
+            'return_msg': wxe.return_msg,
+            'errcode': wxe.errcode,
+            'errmsg': wxe.errmsg
         }
         return HttpResponse(json.dumps(errors))
 
 
 def payList(request):
     signPackage = getJsApiSign(request)
-    return render(request,template_name='wxchat/wxpay.html',context={'sign':signPackage})
+    return render(request, template_name='wxchat/wxpay.html', context={'sign': signPackage})
+
+
+
+@csrf_exempt
+def payNotify(request):
+    try:
+        result_data = wxPay.parse_payment_result(request.body)
+        # 保存支付成功返回数据
+        res_data = dict(result_data)
+        WxPayResult.objects.create(**res_data)
+
+        data = {
+            'return_code': result_data.get('return_code'),
+            'return_msg': result_data.get('return_msg')
+        }
+        xml = dict_to_xml(data, '')
+        return HttpResponse(xml)
+    except InvalidSignatureException as error:
+        print(error)
+
 
 
 def getJsApiSign(request):
@@ -906,21 +1001,23 @@ def getJsApiSign(request):
     noncestr = random_string(15)
     timestamp = int(time.time())
     url = request.build_absolute_uri()
-    signature = client.jsapi.get_jsapi_signature(noncestr,ticket,timestamp,url)
+    signature = client.jsapi.get_jsapi_signature(noncestr, ticket, timestamp, url)
     signPackage = {
-        "appId":settings.WECHAT_APPID,
-        "nonceStr":noncestr,
-        "timestamp":timestamp,
-        "signature":signature
+        "appId": settings.WECHAT_APPID,
+        "nonceStr": noncestr,
+        "timestamp": timestamp,
+        "signature": signature
     }
     return signPackage
 
 
 def dogIndex(request):
-    return render(request,'wxchat/dogindex.html')
+    return render(request, 'wxchat/dogindex.html')
+
 
 def myInfo(request):
-    return render(request,'wxchat/myinfo.html')
+    return render(request, 'wxchat/myinfo.html')
+
 
 #生成我的二维码
 def myQRCode(user):
@@ -996,41 +1093,40 @@ def createTestData(request):
     strDate = curDate.strftime('%Y-%m-%d')
     print(strDate)
     type = Dogtype.objects.get(pk=1)
-    for i in range(1,50):
+    for i in range(1, 50):
         data = {
-            'dog_name':u'大眼可乐--%d'%(i,),
-            'typeid':type,
-            'colors':u'金毛--%d'%(i,),
-            'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/default_dog.png',
-            'lostplace':'龙前街19-2号楼--%d'%(i,),
-            'lostdate':strDate,
-            'ownername':'张三--%d' %(i,),
-            'telephone':'123456789',
+            'dog_name': u'大眼可乐--%d' % (i,),
+            'typeid': type,
+            'colors': u'金毛--%d' % (i,),
+            'desc': u'大眼可乐描述--%d' % (i,),
+            'picture': 'wxchat/images/default_dog.png',
+            'lostplace': '龙前街19-2号楼--%d' % (i,),
+            'lostdate': strDate,
+            'ownername': '张三--%d' % (i,),
+            'telephone': '123456789',
         }
         DogLoss.objects.create(**data)
-        #print(data)
-    for i in range(1,50):
+        # print(data)
+    for i in range(1, 50):
         data = {
-            'typeid':type,
-            'colors':u'金毛--%d'%(i,),
-            'desc':u'大眼可乐描述--%d'%(i,),
-            'picture':'wxchat/images/default_dog.png',
-            'findplace':'龙前街19-2号楼--%d'%(i,),
-            'finddate':strDate,
-            'findname':'张三--%d' %(i,),
-            'telephone':'123456789',
+            'typeid': type,
+            'colors': u'金毛--%d' % (i,),
+            'desc': u'大眼可乐描述--%d' % (i,),
+            'picture': 'wxchat/images/default_dog.png',
+            'findplace': '龙前街19-2号楼--%d' % (i,),
+            'finddate': strDate,
+            'findname': '张三--%d' % (i,),
+            'telephone': '123456789',
         }
         DogOwner.objects.create(**data)
 
-
-    for i in range(1,50):
+    for i in range(1, 50):
         data = {
-            'typeid':type,
-            'colors':u'金毛--%d'%(i,),
-            'price':u'1000-5000元--%d'%(i,),
-            'buyname':'张三--%d'%(i,),
-            'telephone':'123456789',
+            'typeid': type,
+            'colors': u'金毛--%d' % (i,),
+            'price': u'1000-5000元--%d' % (i,),
+            'buyname': '张三--%d' % (i,),
+            'telephone': '123456789',
         }
         DogBuy.objects.create(**data)
 
@@ -1047,5 +1143,3 @@ def createTestData(request):
     #     DogSale.objects.create(**data)
 
     return HttpResponse('success')
-
-
