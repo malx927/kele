@@ -77,8 +77,8 @@
                  <div class="benefits" ><span>已优惠: <b id="benefits_price">¥0.00</b></span></div>
              </div>
         </a>
-         <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
-            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="gotopay">
+            <p id="gotobuy" class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>
         </a>
     </div>
     </form>
@@ -219,6 +219,12 @@
           success: function(data){
               $('#total_price').text('¥' + data.price_totals.toFixed(2));
               $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
+              if( data.price_totals == 0 ){
+                  $("#gotobuy").css('background-color','#796e6e')
+              }
+              else{
+                  $("#gotobuy").css('background-color','#f46253')
+              }
           },
           error: function(error){
               console.log(error);
@@ -237,7 +243,6 @@
           data: params,
           timeout: 5000,
           success: function(data){
-              alert(JSON.stringify(data));
               if(data.action == "delall"){
                   //window.location.href = '{% url "shop-cart-list" %}'
                   $(".weui-media-box").remove();
@@ -255,6 +260,12 @@
               $('#total_price').text('¥' + data.price_totals.toFixed(2));
               $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
 
+              if( data.price_totals == 0 ){
+                  $("#gotobuy").css('background-color','#796e6e')
+              }
+              else{
+                  $("#gotobuy").css('background-color','#f46253')
+              }
 
           },
           error: function(error){
