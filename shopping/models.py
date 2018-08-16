@@ -30,9 +30,8 @@ TYPE_LEVEL_CHOICE = (
 )
 
 TYPE_CARTITEM_STATUS = (
-    (1,'正常'),
-    (0,'禁用'),
-    (-1,'删除'),
+    (1,'选中'),
+    (0,'未选'),
 
 )
 
@@ -110,9 +109,15 @@ class ShopCart(models.Model):
     def __str__(self):
         return self.goods.name
 
+    #媒体价格
     def total_price(self):
         return self.goods.price * self.quantity
     total_price = property(total_price)
+
+    #会员价格
+    def member_total_price(self):
+        return (self.goods.price - self.goods.benefits) * self.quantity
+    member_total_price = property(member_total_price)
 
     def name(self):
         return  self.goods.name

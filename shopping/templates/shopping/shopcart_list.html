@@ -18,24 +18,28 @@
                 <div class="weui-panel__bd">
                     <div class="weui-cell weui-cell_access">
                         <div class="weui-cell__hd">
-                            <p><i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}</p>
+                            <div class="weui-cells_checkbox" >
+                              <label class="weui-check__label" for="selectAll" >
+                                  <input type="checkbox" class="weui-check" name="checkall" id="selectAll" {% if checkAll %} checked {% endif %}>
+                                  <i class="weui-icon-checked"></i>
+                              </label>
+                              <i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}
+                            </div>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <span  class="r" id="clear_cart">清空</span>
                         </div>
                     </div>
                     {% for cart in carts_list %}
-                    <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
-{#                            <input type="hidden" id="goods_id" value="{{ cart.goods.id }}">#}
-{#                            <div class="weui-cells_checkbox">#}
-{#								 <input type="checkbox" name="checkbox1" class="weui-check" id="s12"><i class="weui-icon-checked"></i>#}
-{#							</div>#}
+                    <div class="weui-media-box weui-media-box_appmsg" id="item-{{ cart.goods.id }}" style="background-color: #fafafa">
                             <div class="weui-cells_checkbox" >
                               <label class="weui-check__label" for="id-{{ cart.goods.id }}" >
-                                  <input type="checkbox" class="weui-check" name="checkid" id="id-{{ cart.goods.id }}" >
+                                  <input type="checkbox" class="weui-check" name="checkid" id="id-{{ cart.goods.id }}" data-item="{{ cart.goods.id }}" {% if cart.status == 1 %} checked="true" {% endif %}>
                                   <i class="weui-icon-checked"></i>
                               </label>
                             </div>
                             {% if cart.goods.images %}
 							<div class="weui-media-box__hd">
-
 								 <img class="weui-media-box__thumb" src="{{ cart.goods.images.url }}" alt="">
 							</div>
                             {% else %}
@@ -47,17 +51,17 @@
                                 <h4 class="weui-media-box__title">{{ cart.goods.name }}</h4>
                                 <ul class="weui-media-box__info ">
                                     <li class="weui-media-box__info__meta sub_title">¥ {{ cart.price }}</li>
-                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" id="goodsnums">
-                                        x{{ cart.quantity }}
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" >
+                                        {{ cart.goods.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
                                     </li>
                                 </ul>
                                 <p class="weui-media-box__desc sub_title" style="padding-top:5px;font-size:16px;">
                                     <span >
-                                        <input type="button" id="minus" class="input_length" value="-" >
-                                        <input type="number" id="nums" value="{{ cart.quantity }}" min="1" max="{{ cart.goods.stock_nums }}" class="input_length" />
-                                        <input type="button" id="add" class="input_length" value="+" >
+                                        <input type="button"  class="decrease input_length" value="-" >
+                                        <input type="number" data-item="{{ cart.goods.id }}"  value="{{ cart.quantity }}" min="1" max="{{ cart.goods.stock_nums }}" class="number input_length" />
+                                        <input type="button"  class="increase input_length" value="+" >
                                     </span>
-                                    <span class="r"><i class="icon iconfont icon-delete2 color_red" style="font-weight: bold" ></i></span>
+                                    <span class="deleteitem r" data-item="{{ cart.goods.id }}"><i class="icon iconfont icon-delete2 color_red" style="font-weight: bold" ></i></span>
                                 </p>
 							</div>
                     </div>
@@ -68,10 +72,13 @@
     </div>
     <div class="weui-tabbar">
         <a href="#" class="weui-tabbar__item tabbar_item">
-             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-buy2" ></i> 我的购物车<span style="padding-left:10px;">¥0</span></p>
+             <div class="weui-tabbar__label" style="color: black;">
+                  <div class="price-total" ><span>总金额: <b id="total_price">¥0.00</b></span></div>
+                 <div class="benefits" ><span>已优惠: <b id="benefits_price">¥0.00</b></span></div>
+             </div>
         </a>
          <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
-            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>
         </a>
     </div>
     </form>
@@ -82,38 +89,179 @@
     <script type="application/javascript">
 
     $(function(){
+        //购物车统计
+        getShopCartCount();
 
-        var num = $('#nums').val();
-        if(num == 1){
-                $('#minus').attr('disabled', true);
-        }
-
-        $('#add').on('click',function(){
-            num = $('#nums').val();
-            num++;
-            if( num > 1 )
-                $('#minus').removeAttr('disabled');
-
-            $('#nums').val(num);
-            $('#goodsnums').text('x'+num);
-        });
-
-        $('#minus').on('click',function(){
-            num = $('#nums').val();
-            num--;
-            if(num == 1){
-                $('#minus').attr('disabled', true);
+        ///清空
+        $("#clear_cart").on('click', function(event){
+            var params ={
+                 action: 'delall',
             }
-             $('#nums').val(num);
-             $('#goodsnums').text('x'+num);
+            shopcartAction(params);
+        });
+        //全选
+        $('#selectAll').on('click',function(event){
+            obj = event.target;
+            if($(obj).prop('checked')){
+                $("input[name='checkid']").prop('checked', true);
+                var params ={
+                     action: 'checkall',
+                     flag: 1,
+                }
+                shopcartAction( params );
+            }
+            else{
+                $("input[name='checkid']").prop('checked', false);
+                var params ={
+                     action: 'checkall',
+                     flag: 0,
+                }
+                shopcartAction( params );
+            }
+
         });
 
-        $('#nums').on('input',function(event){
-            num = event.target.value;
-            $('#goodsnums').text('x'+event.target.value);
-        })
+        $("input[name='checkid']").on('click', function(event){
+
+            goods_id = $(this).attr('data-item');
+            if( $(this).prop('checked') ){
+                var params ={
+                     action: 'checkone',
+                     goods_id: goods_id,
+                     flag: 1 ,
+                }
+                shopcartAction( params ); ///选中
+            }
+            else{
+                var params ={
+                     action: 'checkone',
+                     goods_id: goods_id,
+                     flag: 0 ,
+                }
+                shopcartAction(params); ///未选中
+            }
+
+        });
+
+        $(".deleteitem").on('click', function(event){
+            goods_id = $(this).attr('data-item');
+            var params ={
+                 action: 'delone',
+                 goods_id: goods_id,
+            }
+            shopcartAction( params );
+            $('#item-'+goods_id).remove();
+        });
+
+        $('.decrease').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.number');
+            var goods_id = $input.attr("data-item");
+            var number = parseInt($input.val() || "0") - 1
+            if (number < 1) {
+                number = 1;
+                return;
+            }
+            $input.val(number);
+            var params ={
+                action: "itemupdate",
+                goods_id: goods_id,
+                number:number,
+            }
+            shopcartAction( params )
+        });
+
+        $('.increase').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.number');
+            var goods_id = $input.attr("data-item");
+            var number = parseInt($input.val() || "0") + 1
+            if (number > 99) {
+                number = 99;
+                return;
+            }
+            $input.val(number);
+            var params ={
+                action: "itemupdate",
+                goods_id: goods_id,
+                number:number,
+            }
+            shopcartAction( params )
+        });
+
+        $('.number').on('input',function(event){
+            $input = $(event.currentTarget);
+            var number = $input.val();
+            var goods_id = $input.attr("data-item");
+            if( number < 1){
+                number = 1;
+            }
+            $input.val(number);
+            var params ={
+                action: "itemupdate",
+                goods_id: goods_id,
+                number: number,
+            }
+            shopcartAction( params )
+        });
+
 
     });
+
+    function getShopCartCount(){
+         params ={
+             action:'count',
+         }
+         $.ajax({
+          type: 'GET',
+          url: '{% url "shop-cart" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              $('#total_price').text('¥' + data.price_totals.toFixed(2));
+              $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
+          },
+          error: function(error){
+              console.log(error);
+          }
+        });
+    }
+
+    function shopcartAction(params){
+
+         params['csrfmiddlewaretoken'] ='{{ csrf_token }}';
+
+         $.ajax({
+          type: 'POST',
+          url: '{% url "shop-cart" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              alert(JSON.stringify(data));
+              if(data.action == "delall"){
+                  //window.location.href = '{% url "shop-cart-list" %}'
+                  $(".weui-media-box").remove();
+                  $("#selectAll").prop('checked', false);
+              }
+              else if(data.action == "checkone" || data.action == "delone"){
+                  if(data.check_state){
+                      $("#selectAll").prop('checked', true);
+                  }
+                  else{
+                      $("#selectAll").prop('checked', false);
+                  }
+              }
+
+              $('#total_price').text('¥' + data.price_totals.toFixed(2));
+              $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
+
+
+          },
+          error: function(error){
+              console.log(error);
+          }
+        });
+    }
 
     </script>
 {% endblock bottomjs %}
