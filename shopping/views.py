@@ -51,8 +51,17 @@ class ShopCartListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(ShopCartListView, self).get_context_data(**kwargs)
         context['project_name'] = settings.PROJECT_NAME
+        context['checkAll'] = self.getCheckStatus()
         return context
 
+    def getCheckStatus(self):
+        user_id = self.request.session.get('openid', None)
+        counts = ShopCart.objects.filter(user_id=user_id).count()
+        if counts==0:
+            return False
+        else:
+            checked_status = ShopCart.objects.filter(user_id=user_id, status=1).count()
+            return  counts == checked_status
 
 
 #直接购买商品列表

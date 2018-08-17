@@ -1,16 +1,14 @@
 #-*-coding:utf-8-*-
 __author__ = 'malixin'
 
-from django.db.models import Sum
+from django.db.models import Sum,F, FloatField
 
 import json
 from rest_framework import status
-from rest_framework.generics import  ListAPIView, ListCreateAPIView, RetrieveAPIView,UpdateAPIView,RetrieveUpdateAPIView
-from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.generics import  ListAPIView
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
-from rest_framework_jwt.settings import api_settings
 
 from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType
 from .paginations import PagePagination
@@ -35,14 +33,17 @@ class CountAPIView(APIView):
             count['order_nums'] =  Order.objects.filter(user_id = user_id, status=0).count()
 
         if cart and int(cart) == 1:
-            good_nums = ShopCart.objects.filter(user_id = user_id).aggregate( goods_sum = Sum('quantity'))
-            count['cart_nums'] = good_nums.get('goods_sum', 0)
+            goods_nums = ShopCart.objects.filter(user_id = user_id).aggregate( goods_sum = Sum('quantity'))
+            if goods_nums.get('goods_sum'):
+                count['cart_nums'] = goods_nums.get('goods_sum')
+
 
         return Response(count)
 
 #增加购物车
 class CreateShopCartAPIView(APIView):
     permission_classes = [AllowAny]
+
     def post(self,request, *args, **kwargs):
         item_id = request.POST.get('itemid', None)
         user_id = request.session.get('openid', None)
@@ -61,9 +62,11 @@ class CreateShopCartAPIView(APIView):
             if not created:
                 obj.update_quantity(quantity)
 
-            goods_nums = ShopCart.objects.aggregate(goods_sum = Sum('quantity'))
+            goods_nums = ShopCart.objects.filter(user_id=user_id).aggregate(goods_sum = Sum('quantity'))
             print(goods_nums)
-            cart_nums = goods_nums.get('goods_sum',0)
+            cart_nums = goods_nums.get('goods_sum')
+            if not cart_nums:
+                cart_nums = 0
 
             resp['success'] = True
             resp['cart_nums'] = cart_nums
@@ -74,6 +77,7 @@ class CreateShopCartAPIView(APIView):
 
         return Response(resp)
 
+#商品列表
 class GoodsListAPIView(ListAPIView):
     permission_classes = [AllowAny]
     serializer_class = GoodsListSerializer
@@ -87,10 +91,146 @@ class GoodsListAPIView(ListAPIView):
             return Goods.objects.filter(is_show=1)
 
 
-
+#商品类型
 class GoodsTypeListAPIView(ListAPIView):
     permission_classes = [AllowAny]
     queryset = GoodsType.objects.all()
     serializer_class = GoodsTypeSerializer
     pagination_class = None
+
+
+#购物车价格和优惠统计
+class ShopCartView(APIView):
+    permission_classes = [AllowAny]
+
+    def getCartPriceCount(self):
+        count = {
+            'price_totals': 0 ,
+            'benefits_totals': 0
+        }
+
+        user_id = self.request.session.get('openid', None)
+        is_member = self.request.session.get('is_member', None)
+
+        if user_id:
+            totals = ShopCart.objects.filter(user_id = user_id, status=1)\
+                .aggregate(
+                    price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),
+                    benefits_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField())
+                    )
+            price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
+            benefits_totals = totals.get('benefits_totals') if totals.get('benefits_totals') is not None else 0.0
+
+            if is_member == 1:
+                count['price_totals'] = benefits_totals
+                count['benefits_totals'] = price_totals - benefits_totals
+            else:
+                count['price_totals'] = price_totals
+        return count
+
+    def setCheckAll(self):
+        flag = self.request.POST.get('flag', None)
+        user_id = self.request.session.get('openid', None)
+        rows = ShopCart.objects.filter(user_id=user_id).update(status = int(flag))
+        return rows
+
+    def setCheckOne(self):
+        flag = self.request.POST.get('flag', None)
+        goods_id = self.request.POST.get('goods_id', None)
+        user_id = self.request.session.get('openid', None)
+        rows = ShopCart.objects.filter(user_id=user_id,goods__id=goods_id).update(status = int(flag))
+        return rows
+
+
+    def deleteCartAll(self):
+        user_id = self.request.session.get('openid', None)
+        rows = ShopCart.objects.filter(user_id=user_id).delete()
+        print(type(rows))
+        return rows
+
+    def deleteItemOne(self):
+        user_id = self.request.session.get('openid', None)
+        goods_id = self.request.POST.get('goods_id', None)
+        rows = ShopCart.objects.filter(user_id=user_id,goods__id=goods_id).delete()
+        return rows
+
+    def setItemValue(self,val):
+        user_id = self.request.session.get('openid', None)
+        goods_id = self.request.POST.get('goods_id', None)
+        rows = ShopCart.objects.filter(user_id=user_id,goods__id=goods_id).update( quantity = val )
+        return rows
+
+    def getCheckStatus(self):
+        user_id = self.request.session.get('openid', None)
+        counts = ShopCart.objects.filter(user_id=user_id).count()
+        if counts ==0:
+            return False
+        else:
+            checked_status = ShopCart.objects.filter(user_id=user_id, status=1).count()
+            return  counts == checked_status
+
+    def get(self, request, *args, **kwargs):
+
+        action = request.GET.get('action', None)
+
+        #购物车价格和优惠统计
+        if action == 'count':
+            ret_count = self.getCartPriceCount()
+            return Response(ret_count)
+        else:
+            return Response(None)
+
+    def post(self,request, *args, **kwargs):
+        action = request.POST.get('action')
+        print(action)
+        if action =='checkall':
+            ret = self.setCheckAll()
+            ret_count = self.getCartPriceCount()
+            ret_count['rows'] = ret
+            ret_count['action'] = action
+            return Response(ret_count)
+        elif action == 'delall':
+            ret = self.deleteCartAll()
+            ret_count = self.getCartPriceCount()
+            ret_count['rows'] = ret[0]
+            ret_count['action'] = action
+            return Response(ret_count)
+        elif action == 'checkone':
+            ret = self.setCheckOne()
+            ret_count = self.getCartPriceCount()
+            check_state = self.getCheckStatus()
+            ret_count['rows'] = ret
+            ret_count['action'] = action
+            ret_count['check_state'] = check_state
+            return Response(ret_count)
+        elif action == "delone":
+            ret = self.deleteItemOne()
+            ret_count = self.getCartPriceCount()
+            check_state = self.getCheckStatus()
+            ret_count['check_state'] = check_state
+            ret_count['rows'] = ret[0]
+            ret_count['action'] = action
+            return Response(ret_count)
+        elif action =="itemupdate":
+            number = request.POST.get('number', None)
+            ret = 0
+            if number and int(number) <=99:
+                ret = self.setItemValue( int(number) )
+            ret_count = self.getCartPriceCount()
+            ret_count['rows'] = ret
+            ret_count['action'] = action
+            return Response(ret_count)
+
+        return Response({'success':'false'})
+
+
+
+
+
+
+
+
+
+
+
 
