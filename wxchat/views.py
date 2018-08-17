@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import DetailView
+from django.views.generic import DetailView,View
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -602,10 +602,105 @@ def DogdeliveryAdd(request):
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
 
-# 订单成功
+#订单支付
+class DogPayOrderView(View):
 
+    def post(self, request, *args, **kwargs):
+        trade_type ='JSAPI'
+        body = '宠粮定制消费'
+
+        #获得订单信息
+        dogorder = request.POST.get('dogorder', None)
+        user_id = request.session.get('openid')
+        # is_member = request.session.get('is_member')
+        # order =getShoppingOrder(user_id, dogorder)
+        peice = request.POST.get('price', None)
+
+        try:
+            data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=peice, out_trade_no=dogorder, notify_url=settings.NOTIFY_URL, user_id=user_id)
+            prepay_id = data.get('prepay_id','')
+            save_data = dict(data)
+            #保存统一订单数据
+            WxUnifiedOrdeResult.objects.create(**save_data)
+            if prepay_id:
+                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
+                return HttpResponse(json.dumps(return_data))
+
+        except WeChatPayException as wxe:
+            errors = {
+                'return_code': wxe.return_code,
+                'result_code': wxe.result_code,
+                'return_msg':  wxe.return_msg,
+                'errcode':  wxe.errcode,
+                'errmsg':   wxe.errmsg
+            }
+            return HttpResponse(json.dumps(errors))
+
+@csrf_exempt
+def DogpayNotify(request):
+    try:
+        result_data = wxPay.parse_payment_result(request.body)  #签名验证
+        #保存支付成功返回数据
+        res_data = dict(result_data)
+        WxPayResult.objects.create(**res_data)
+
+         #查询订单，判断是否正确
+        transaction_id = res_data.get('transaction_id', None)
+        dogorder = res_data.get('dogorder', None)
+        openid = res_data.get('openid', None)
+
+        retBool = queryOrder( transaction_id, dogorder )    #查询订单
+
+        data = {
+            'return_code': result_data.get('return_code'),
+            'return_msg': result_data.get('return_msg')
+        }
+        xml = dict_to_xml( data,'' )
+        if not retBool: #订单不存在
+            return  HttpResponse(xml)
+        else:
+            #验证金额是否一致
+            if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
+                order =getShoppingOrder(res_data['openid'], res_data['out_trade_no'])
+                if order.pay_status==0 and order.peice == res_data['total_fee']:
+                    #更新订单
+                    status = 1  #已支付标志
+                    order.update_status_transaction_id(status, transaction_id)
+                    #发送消息
+                    if openid:
+                        ret = client.message.send_text(openid, 'hello')
+                        print(ret)
+
+        return  HttpResponse(xml)
+    except InvalidSignatureException as error:
+        print(error)
+
+#查询微信订单是否存在
+def queryOrder( transaction_id, dogorder):
+
+    order_data = wxPay.order.query( transaction_id=transaction_id, out_trade_no=dogorder)
+    data = dict(order_data)
+    if 'return_code' in data and 'result_code' in data and data['return_code'] == 'SUCCESS' and data['result_code'] == 'SUCCESS':
+        return  True
+    else:
+        return False
+
+#查询自定义订单
+def getShoppingOrder(openid, dogorder):
+
+    try:
+        order = DogOrder.objects.get( openid=openid, dog_code=dogorder )
+    except Order.DoesNotExist:
+        order = None
+
+    return  order
+
+
+
+
+# 订单成功
 def ordersuccess(request):
-    a= 1
+
     all_product = []
     openid = request.session.get('openid')
     nickname = request.session.get('nickname')
@@ -619,16 +714,16 @@ def ordersuccess(request):
     skin_status = request.GET.get('skin_status')
     all_order= str(dogtype)+str(dog_age)+str(bones_status)+str(body_status)+str(eye_status)+str(skin_status)
     all_product.append(all_order)
-    if a== 2:
-        data = DogOrder()
-        data.dogtype = dogtype
-        data.peice =peice
-        data.openid= openid
-        data.nickname= nickname
-        data.dog_code=dog_code
-        data.product_detail=all_product
-        data.status=1
-        data.save()
+    # if :
+    data = DogOrder()
+    data.dogtype = dogtype
+    data.peice =peice
+    data.openid= openid
+    data.nickname= nickname
+    data.dog_code=dog_code
+    data.product_detail=all_product
+    data.order_status=1
+    data.save()
     return render(request, 'wxchat/order_success.html',
                   {'peice': peice, 'skin_status': skin_status, 'dogtype': dogtype, 'dog_age': dog_age,
                    'body_status': body_status, 'eye_status': eye_status,'bones_status':bones_status,'dog_code':dog_code})

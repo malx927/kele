@@ -55,8 +55,13 @@ TYPE_FUNC_CHOICE = (
 )
 
 ORDER_STATUS_CHOICE = (
-    (0,'交易成功'),
-    (1,'交易失败'),
+    (0,'正常'),
+    (1,'定制'),
+)
+
+PAY_STATUS_CHOICE = (
+    (0,'已支付'),
+    (1,'支付失败'),
 )
 
 TYPE_LEVEL_CHOICE = (
@@ -239,12 +244,15 @@ class DogStatusType(models.Model):
 # 宠粮订单表
 class DogOrder(models.Model):
     dog_code = models.CharField(verbose_name=u'订单号', max_length=20, )
+    name = models.CharField(verbose_name=u'商品名称', max_length=50, blank=True)
     product_detail = models.CharField(verbose_name=u'商品描述信息', max_length=2000, blank=True)
-    status = models.IntegerField(verbose_name=u'订单状态', default=0,choices=ORDER_STATUS_CHOICE)
+    order_status = models.IntegerField(verbose_name=u'订单类型', default=0,choices=ORDER_STATUS_CHOICE)
+    pay_status = models.IntegerField(verbose_name=u'支付状态', default=0,choices=PAY_STATUS_CHOICE)
     peice = models.CharField(verbose_name=u'价格', max_length=20, )
     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
     openid = models.CharField(verbose_name='唯一标识', max_length=120, null=True, blank=True)
     nickname = models.CharField(verbose_name='昵称', max_length=64, null=True, blank=True)
+    transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -255,6 +263,11 @@ class DogOrder(models.Model):
     def __str__(self):
         return self.productname
 
+
+    def update_status_transaction_id(self,pay_status,transaction_id):
+        self.pay_status = pay_status
+        self.transaction_id = transaction_id
+        self.save(update_fields=['status','transaction_id'])
 
 # 宠粮录入表
 

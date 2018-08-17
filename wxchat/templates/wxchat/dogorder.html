@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>宠粮定制</title>
-    <link rel="stylesheet" href="{% static 'wxchat/style/style.css' %}">
+    <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}">
 
 </head>
 <body>
@@ -69,7 +69,7 @@
             }, 500)
 
 
-        })
+        });
         $(".previous_page").on("click", function () {
             var idx = $(".question:visible").attr("id");
             idx = idx.split('_')[1];
