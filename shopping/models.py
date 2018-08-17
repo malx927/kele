@@ -144,10 +144,12 @@ class Order(models.Model):
     detailinfo = models.CharField(verbose_name='详细收货地址', max_length=200, null=True, blank=True)
     nationalcode = models.CharField(verbose_name='地区编码', max_length=16, null=True, blank=True)
     add_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True,auto_now=False)
-    pay_time = models.DateTimeField(verbose_name='支付时间', auto_now_add=False,auto_now=True)
+    pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     status = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
     message = models.CharField(verbose_name='留言', max_length=400,null=True, blank=True)
+    total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
 
     class Meta:
         verbose_name ='订单'

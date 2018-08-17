@@ -1,7 +1,7 @@
 #-*-coding:utf-8-*-
 __author__ = 'malixin'
 
-from django.db.models import Sum,F, FloatField
+from django.db.models import Sum,F, FloatField,Count
 
 import json
 from rest_framework import status
@@ -13,6 +13,8 @@ from rest_framework.views import APIView
 from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType
 from .paginations import PagePagination
 from .serializers import GoodsListSerializer, GoodsTypeSerializer
+from shopping.views import getShopCartTotals
+
 
 #订单数量和购物车商品数量
 class CountAPIView(APIView):
@@ -104,28 +106,9 @@ class ShopCartView(APIView):
     permission_classes = [AllowAny]
 
     def getCartPriceCount(self):
-        count = {
-            'price_totals': 0 ,
-            'benefits_totals': 0
-        }
-
         user_id = self.request.session.get('openid', None)
         is_member = self.request.session.get('is_member', None)
-
-        if user_id:
-            totals = ShopCart.objects.filter(user_id = user_id, status=1)\
-                .aggregate(
-                    price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),
-                    benefits_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField())
-                    )
-            price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
-            benefits_totals = totals.get('benefits_totals') if totals.get('benefits_totals') is not None else 0.0
-
-            if is_member == 1:
-                count['price_totals'] = benefits_totals
-                count['benefits_totals'] = price_totals - benefits_totals
-            else:
-                count['price_totals'] = price_totals
+        count = getShopCartTotals(user_id, is_member)
         return count
 
     def setCheckAll(self):
@@ -178,7 +161,7 @@ class ShopCartView(APIView):
             ret_count = self.getCartPriceCount()
             return Response(ret_count)
         else:
-            return Response(None)
+            return Response({'success':'false'})
 
     def post(self,request, *args, **kwargs):
         action = request.POST.get('action')

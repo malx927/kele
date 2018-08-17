@@ -12,18 +12,19 @@ class PetFoodAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    raw_id_fields = ['goods']
+    #raw_id_fields = ['goods']
+    readonly_fields = ['goods','price','benefits','quantity']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('out_trade_no', 'user_id', 'username', 'postalcode', 'detailinfo', 'telnumber', 'add_time','pay_time', 'status', 'transaction_id')
+    list_display = ('out_trade_no', 'user_id', 'username',  'detailinfo', 'telnumber','total_fee','cash_fee', 'add_time','pay_time', 'status', 'transaction_id')
     list_per_page = 50
     list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
     inlines = [OrderItemInline]
 
     fieldsets = [
         ('订单', {
-            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'nationalcode', 'status', 'transaction_id')
+            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','cash_fee','nationalcode', 'status', 'transaction_id')
         })
     ]
 

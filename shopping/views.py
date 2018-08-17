@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import json
 from datetime import datetime
@@ -16,9 +16,37 @@ from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 from wxchat.views import client
-
+from django.db.models import Sum,F, FloatField,Count
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
+
+#获得购物车统计数据
+def getShopCartTotals(user_id, is_member):
+    count = {
+        'price_totals': 0 ,
+        'benefits_totals': 0,
+        'goods_totals': 0,
+    }
+
+    if user_id:
+        totals = ShopCart.objects.filter(user_id = user_id, status=1)\
+            .aggregate(
+                price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),
+                benefits_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField()),
+                goods_totals = Count('goods')
+                )
+        price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
+        benefits_totals = totals.get('benefits_totals') if totals.get('benefits_totals') is not None else 0.0
+        goods_totals = totals.get('goods_totals') if totals.get('goods_totals') is not None else 0
+
+        count['goods_totals'] = goods_totals
+        if is_member == 1:
+            count['price_totals'] = benefits_totals
+            count['benefits_totals'] = price_totals - benefits_totals
+        else:
+            count['price_totals'] = price_totals
+    return count
+
 
 def index(request):
     return render(request,template_name='shopping/goods_list.html')
@@ -27,6 +55,50 @@ def index(request):
 def goodList(request):
     pass
 
+# {{first.DATA}}
+# 消费店铺：{{keyword1.DATA}}
+# 购买商品：{{keyword2.DATA}}
+# 消费金额：{{keyword3.DATA}}
+# 消费时间：{{keyword4.DATA}}
+# 交易流水：{{keyword5.DATA}}
+# {{remark.DATA}}
+def sendTemplateMessage(request):
+    template_id = 'ss5T1uPePrCZxbHf1cj-isdrvxbsqHWFU875ak8Bhck'
+    url ='http://www.qq.com'
+    data ={
+        'first':{
+            "value":"恭喜你购买成功！",
+            "color":"#173177"
+        },
+        "keyword1":{
+           "value":"大眼可乐宠物联盟",
+           "color":"#173177"
+        },
+        "keyword2":{
+           "value":"巧克力",
+           "color":"#173177"
+        },
+       "keyword3": {
+           "value":"39.8元",
+           "color":"#173177"
+       },
+        "keyword4": {
+           "value":"2014年9月22日",
+           "color":"#173177"
+        },
+       "keyword5": {
+           "value":"1234567890",
+           "color":"#173999"
+       },
+       "remark":{
+           "value":"欢迎再次购买！",
+           "color":"#173177"
+       }
+    }
+
+    ret = client.message.send_template(user_id='oX5Zn04Imn5RlCGlhEVg-aEUCHNs',template_id=template_id,url=url,data=data)
+    print(ret)
+    return JsonResponse(ret)
 
 # 宠物食品详情
 class GoodsDetailView(DetailView):
@@ -60,8 +132,28 @@ class ShopCartListView(ListView):
         if counts==0:
             return False
         else:
-            checked_status = ShopCart.objects.filter(user_id=user_id, status=1).count()
-            return  counts == checked_status
+            checked_counts = ShopCart.objects.filter(user_id=user_id, status=1).count()
+            return  counts == checked_counts
+
+#购物车购买商品列表
+class ShopCartBuyListView(ListView):
+    model = Goods
+    template_name = 'shopping/shopcart_buylist.html'
+    context_object_name = 'shop_cart_lists'
+
+    def get_queryset(self):
+        user_id = self.request.session.get('openid','oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        if user_id:
+            return ShopCart.objects.filter(user_id=user_id, status=1)
+
+    def get_context_data(self, **kwargs):
+        context = super(ShopCartBuyListView,self).get_context_data(**kwargs)
+        context['project_name'] = settings.PROJECT_NAME
+        signPackage = getJsApiSign(self.request)
+        context['sign'] = signPackage
+        context['is_member'] = self.request.session.get('is_member', None)
+        context['shopcart'] = 1
+        return context
 
 
 #直接购买商品列表
@@ -91,51 +183,106 @@ class GoodsBuyListView(ListView):
 
 class CreateOrderView(View):
 
-    def post(self, request, *args, **kwargs):
-        #产生订单号
+    def getUserInfo(self):
+        userName = self.request.POST.get('userName', None)
+        detailInfo = self.request.POST.get('detailInfo', None)
+        telNumber = self.request.POST.get('telNumber', None)
+        postalCode = self.request.POST.get('postalCode', None)
+        message = self.request.POST.get('message',None)
 
-        out_trade_no = request.POST.get('out_trade_no', None)
-        if out_trade_no is None:
-            out_trade_no = '{0}{1}{2}'.format(settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
-
-        userName = request.POST.get('userName', None)
-        detailInfo = request.POST.get('detailInfo', None)
-        telNumber = request.POST.get('telNumber', None)
-        postalCode = request.POST.get('postalCode', None)
-        goods_id = request.POST.get('goods_id',None)
-        quantity = request.POST.get('quantity',None)
-        user_id = request.session.get('openid')
-        message = request.POST.get('message',None)
-
-        defaults = {
-            'user_id': user_id,
+        return {
             'username': userName,
             'telnumber': telNumber,
             'postalcode': postalCode,
             'detailinfo': detailInfo,
             'message': message,
         }
+
+    def createCartOrder(self, out_trade_no):
+        defaults = self.getUserInfo()
+        user_id = self.request.session.get('openid', None)
+        is_member = self.request.session.get('is_member', None)
+
+        order_data = {
+            "success": "false",
+        }
+
+        shopCartTotals = getShopCartTotals(user_id, is_member)
+        print(shopCartTotals)
+        #数量小于等于零
+        if shopCartTotals.get('goods_totals', 0) <= 0:
+            order_data['quantity'] = 'invalid quantity'
+            return  order_data
+
+        defaults['total_fee'] = shopCartTotals.get('price_totals', 0)
         order, created = Order.objects.get_or_create(out_trade_no=out_trade_no, user_id=user_id, defaults=defaults)
 
-        order_data = {}
-
         if created:
-            #判断数量
-            if quantity is None or int(quantity) <= 0:
-                order_data['success'] = 'false'
-            else:
-                try:
-                    goods = Goods.objects.get(pk = goods_id)
-                    orderItem = OrderItem(order=order, goods=goods, price=goods.price,benefits=goods.benefits, quantity=quantity)
-                    orderItem.save()
-                    order_data['success'] = 'true'
-                    order_data['out_trade_no'] = order.out_trade_no
-                except Goods.DoesNotExist:
-                    print('good does not exist.')
-                    order_data['success'] = 'false'
+            orderitem_list =[]
+            for cart in ShopCart.objects.filter(user_id=user_id, status=1):
+                orderItem = OrderItem(order=order, goods=cart.goods, price=cart.goods.price, benefits=cart.goods.benefits, quantity=cart.quantity)
+                orderitem_list.append(orderItem)
+
+            OrderItem.objects.bulk_create(orderitem_list)
+            #保存成功后，清理购物车
+            ShopCart.objects.filter(user_id=user_id, status=1).delete()
+
+            order_data['success'] = 'true'
+            order_data['out_trade_no'] = order.out_trade_no
         else:
             order_data['success'] = 'true'
             order_data['out_trade_no'] = order.out_trade_no
+
+        return  order_data
+
+    def createOrder(self, out_trade_no):
+        defaults = self.getUserInfo()
+        goods_id = self.request.POST.get('goods_id', None)
+        quantity = self.request.POST.get('quantity', None)
+        user_id = self.request.session.get('openid', None)
+        is_member = self.request.session.get('is_member', None)
+
+        order_data = {
+            "success": "false",
+        }
+        if not quantity or int(quantity) <=0:
+            order_data['quantity'] = 'invalid quantity'
+            return order_data
+
+        try:
+            goods = Goods.objects.get(pk = goods_id)
+            #创建订单
+            total_fee = goods.benefits * int(quantity) if is_member == 1 else  goods.price * int(quantity)
+            defaults['total_fee'] = total_fee
+            order, created = Order.objects.get_or_create(out_trade_no=out_trade_no, user_id=user_id, defaults=defaults)
+            if created:
+                orderItem = OrderItem(order=order, goods=goods, price=goods.price, benefits=goods.benefits, quantity=quantity)
+                orderItem.save()
+                order_data['success'] = 'true'
+                order_data['out_trade_no'] = order.out_trade_no
+            else:
+                order_data['success'] = 'true'
+                order_data['out_trade_no'] = order.out_trade_no
+        except Goods.DoesNotExist:
+            print('good does not exist.')
+            order_data['goods'] = 'invalid goods'
+
+        return order_data
+
+    def post(self, request, *args, **kwargs):
+        #产生订单号
+        out_trade_no = request.POST.get('out_trade_no', None)
+        shopcart = request.POST.get('shopcart', None)
+        print("shopcart=",shopcart)
+        if out_trade_no is None:
+            out_trade_no = '{0}{1}{2}'.format(settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+
+        #购物车购买
+        if shopcart and int(shopcart) == 1:
+            order_data = self.createCartOrder( out_trade_no )
+        #直接购买单一商品
+        else:
+            order_data = self.createOrder( out_trade_no )
 
         return HttpResponse(json.dumps(order_data))
 
@@ -150,8 +297,10 @@ class CreateOrderView(View):
             order = Order.objects.get(out_trade_no=out_trade_no)
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
+                benefits_totals = order.get_total_cost() - total_cost
             else:
                 total_cost = order.get_total_cost()         #非会员
+                benefits_totals = 0
 
             if total_cost <=0:
                 raise Exception
@@ -163,6 +312,7 @@ class CreateOrderView(View):
         context={
             'total_cost':total_cost,
             'items': items,
+            'benefits_totals': benefits_totals,
             'out_trade_no': out_trade_no,
             'sign': signPackage
         }

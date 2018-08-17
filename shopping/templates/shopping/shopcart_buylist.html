@@ -1,0 +1,172 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/jssdk.html' %}
+    <script>
+    wx.ready(function () {
+
+     ///客户地址信息
+     $('#wxaddress').on('click',function(){
+        wx.openAddress({
+              success:function (res) {
+                  $('#username').text(res.userName);
+                  $('#telnumber').text(res.telNumber);
+                  $('#postalcode').text(res.postalCode);
+                  $('#detailInfo').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
+              },
+              cancel:function (res) {
+
+              },
+              fail:function (res) {
+
+              }
+        });
+    });
+
+    $('#wxpay').on('click',function(){
+        if($('#telnumber').text() == '' || $('#username').text() == '')
+        {
+            weui.alert('请填写收件人姓名、详细地址等信息');
+            return;
+        }
+        var params ={
+          userName: $("#username").text(),
+          telNumber: $('#telnumber').text(),
+          postalCode: $('#postalcode').text(),
+          detailInfo: $('#detailInfo').text(),
+          message: $('#message').text(),
+          shopcart:$('#shopcart').val(),
+          csrfmiddlewaretoken:'{{ csrf_token }}'
+        }
+       $.ajax({
+          type: 'POST',
+          url: '{% url "create-order" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              if(data.success == 'true')
+                    window.location.href = '{% url "create-order" %}?orderId=' + data.out_trade_no;
+          },
+          error: function(error){
+              console.log(error);
+              weui.alert('商品支付失败!');
+          }
+        });
+    });
+
+});
+
+
+</script>
+{% endblock extra %}
+{% block tab %}
+    <form action="#" method="get" enctype="multipart/form-data" >
+    <div class="weui-tab" id="tab">
+        <div class="weui-tab__content weui-tab__panel_active" >
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                        <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购买确认</span></div>
+                     </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <a class="weui-cell weui-cell_access" href="javascript:;" id="wxaddress">
+                        <div class="weui-cell__bd" style="height: 60px;">
+                            <p>
+                                <span id="username">收件人姓名及联系方式</span>
+                                <span style="padding-left: 10px;" id="telnumber"></span>
+                                <span id="postalcode" style="display:none"></span>
+                            </p>
+                            <p id="detailInfo">发货详细地址</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </a>
+                    <div class="weui-cell weui-cell_access">
+                        <div class="weui-cell__hd">
+                            <p><i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}</p>
+                        </div>
+                    </div>
+                    {% for cart in shop_cart_lists %}
+                    <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
+                            {% if cart.goods.images %}
+							<div class="weui-media-box__hd">
+								 <img class="weui-media-box__thumb" src="{{ cart.goods.images.url }}" alt="">
+							</div>
+                            {% endif %}
+							<div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ cart.goods.name }}</h4>
+                                <ul class="weui-media-box__info ">
+                                    <li class="weui-media-box__info__meta sub_title">¥ {{ cart.goods.price }}</li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" >
+                                        x{{ cart.quantity }}
+                                    </li>
+                                    <li class="weui-media-box__info__meta r" style="color: #c9302c;">
+                                        会员送:<span  id="card">{{ cart.goods.diff_price }}</span><i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
+                                    </li>
+                                </ul>
+							</div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+                <div class="weui-panel__ft">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">留言:</label></div>
+                        <div class="weui-cell__bd">
+                            <input class="weui-input" type="text" id="message"  placeholder="给卖家留言"/>
+                        </div>
+                    </div>
+                     <div class="weui-cell">
+                         <div class="weui-cell__bd"></div>
+                         <div class="weui-cell__ft" style="font-size:14px;"><span>共 <b id="goods_totals"></b> 件商品</span> 合计: <b id="goods_prices" style="color:red;"></b></div>
+                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-tabbar">
+        <a href="#" class="weui-tabbar__item tabbar_item">
+             <div class="weui-tabbar__label " style="color: black;"><input type="hidden" id="shopcart" value="{{ shopcart }}">
+                 <div class="price-total"><span>应付总额: <b id="total_price"></b></span></div>
+                 <div class="benefits"><span>已优惠: <b id="benefits_price"></b></span></div>
+             </div>
+        </a>
+         <a href="#" class="weui-tabbar__item tabbar_item" id="wxpay">
+            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
+        </a>
+    </div>
+    </form>
+{% endblock tab %}
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+        getShopCartCount();
+    });
+
+    function getShopCartCount(){
+         params ={
+             action:'count',
+         };
+         $.ajax({
+          type: 'GET',
+          url: '{% url "shop-cart" %}',
+          dataType: 'json',
+          data: params,
+          timeout: 5000,
+          success: function(data){
+              $('#total_price').text('¥' + data.price_totals.toFixed(2));
+              $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
+              $('#goods_totals').text(  data.goods_totals );
+              $('#goods_prices').text( '¥' + data.price_totals.toFixed(2) );
+          },
+          error: function(error){
+              console.log(error);
+          }
+        });
+    }
+    </script>
+{% endblock bottomjs %}

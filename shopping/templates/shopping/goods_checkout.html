@@ -73,8 +73,14 @@
                 <div class="weui-form-preview__hd" style="text-align: right;">
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label>
-                        <em class="weui-form-preview__value font16" >¥ {{ total_cost }}</em>
+                        <em class="weui-form-preview__value font16" >¥ {{ total_cost|floatformat:"2" }}</em>
                         <span id="out_trade_no" style="display: none" >{{ out_trade_no }}</span>
+                    </div>
+                </div>
+                <div class="weui-form-preview__hd" style="text-align: right;">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">已优惠</label>
+                        <em class="weui-form-preview__value font16" style="text-decoration:line-through;color: #c0c0c0;" >¥ {{ benefits_totals|floatformat:"2" }}</em>
                     </div>
                 </div>
                 <div class="weui-cells__title">商品列表</div>
