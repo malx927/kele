@@ -16,7 +16,7 @@
         </div>
     </div>
     <div class="weui-panel__bd">
-        <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <form action="{% url 'dog-pay-order' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
         <div class="weui-cells weui-cells_form cells_top" id="uploader">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">犬龄:</label></div>
@@ -103,7 +103,7 @@
 
        $.ajax({
           type: 'GET',
-          url: '{% url "pay-info" %}',
+          url: '{% url "dog-pay-order" %}',
           dataType: 'json',
           timeout: 5000,
           success: function(data){
