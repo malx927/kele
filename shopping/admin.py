@@ -1,6 +1,6 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem, ShopCart, GoodsType
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail
 # Register your models here.
 
 @admin.register(Goods)
@@ -41,3 +41,23 @@ class ShopCartAdmin(admin.ModelAdmin):
 class GoodsTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'sort')
     list_per_page = 50
+
+
+
+class MemberScoreDetailInline(admin.TabularInline):
+    model = MemberScoreDetail
+    readonly_fields = ['member','scores','from_user','user_id','create_time']
+
+
+@admin.register(MemberScore)
+class MemberScoreAdmin(admin.ModelAdmin):
+    list_display = ('nickname', 'user_id', 'total_scores','update_time')
+    list_per_page = 50
+    list_filter = ['nickname']
+    inlines = [MemberScoreDetailInline]
+
+    fieldsets = [
+        ('会员积分', {
+            'fields': ('nickname', 'user_id', 'total_scores')
+        })
+    ]

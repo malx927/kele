@@ -159,16 +159,21 @@ class Order(models.Model):
     def __str__(self):
         return '订单号 {}'.format(self.out_trade_no)
 
+    def get_total_scores(self):
+        return sum(item.get_scores() for item in self.items.all())
+
+
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
 
     def get_member_total_cost(self):
         return sum(item.get_member_cost() for item in self.items.all())
 
-    def update_status_transaction_id(self,status,transaction_id):
+    def update_status_transaction_id(self,status,transaction_id, cash_fee):
         self.status = status
         self.transaction_id = transaction_id
-        self.save(update_fields=['status','transaction_id'])
+        self.cash_fee = cash_fee
+        self.save(update_fields=['status','transaction_id','cash_fee'])
 
 #订单明细
 class OrderItem(models.Model):
@@ -192,3 +197,39 @@ class OrderItem(models.Model):
 
     def get_member_cost(self):
         return self.benefits * self.quantity
+
+    def get_scores(self):
+        return  self.goods.scores * self.quantity
+
+
+#会员积分
+class MemberScore(models.Model):
+    nickname = models.CharField(verbose_name='用户昵称', max_length=64, blank=True, null=True)
+    user_id = models.CharField(verbose_name='用户ID', max_length=64)
+    total_scores = models.IntegerField(verbose_name='金币', blank=True, null=True)
+    update_time = models.DateTimeField(verbose_name='更新时间',auto_now=True)
+
+    class Meta:
+        verbose_name ='会员积分'
+        verbose_name_plural = verbose_name
+        ordering = ['-update_time']
+
+    def __str__(self):
+        return  self.nickname
+
+
+#会员积分明细
+class MemberScoreDetail(models.Model):
+    member = models.ForeignKey(MemberScore, verbose_name='会员名称')
+    scores = models.IntegerField(verbose_name='积分', blank=True, null=True)
+    from_user = models.CharField(verbose_name='来源', max_length=64, blank=True, null=True)
+    user_id = models.CharField(verbose_name='来源ID', max_length=64, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+
+    class Meta:
+        verbose_name ='会员积分明细'
+        verbose_name_plural = verbose_name
+        ordering = ['-create_time']
+
+    def __str__(self):
+        return  self.member.nickname

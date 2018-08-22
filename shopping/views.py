@@ -9,11 +9,11 @@ from django.views.generic import DetailView,ListView, View
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
 from kele import settings
-from .models import Goods, Order, OrderItem, ShopCart
+from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail
 from wxchat.views import getJsApiSign
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
-from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult
+from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 from wxchat.views import client
 from django.db.models import Sum,F, FloatField,Count
@@ -384,11 +384,14 @@ def payNotify(request):
         else:
             #验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
-                order =getShoppingOrder(res_data['openid'], res_data['out_trade_no'])
+                order =getShoppingOrder(openid, res_data['out_trade_no'])
                 if order.status==0 and order.get_total_cost() * 100 == res_data['total_fee']:
                     #更新订单
                     status = 1  #已支付标志
-                    order.update_status_transaction_id(status, transaction_id)
+                    cash_fee = res_data['cash_fee'] / 100
+                    order.update_status_transaction_id(status, transaction_id, cash_fee)
+                    #更新会员积分
+                    setMemberScores( order )
                     #发送消息
                     if openid:
                         ret = client.message.send_text(openid, 'hello')
@@ -417,3 +420,25 @@ def getShoppingOrder(user_id, out_trade_no):
         order = None
 
     return  order
+
+#设置会员积分
+def setMemberScores( order ):
+    user_id = order.user_id
+    userinf = WxUserinfo.objects.get(user_id=user_id)
+    total_scores = order.get_total_scores()
+    defaults ={
+        'nickname': userinf.nickname,
+        'total_scores': total_scores,
+    }
+    memberScore, created = MemberScore.objects.get_or_create(openid=user_id, defaults=defaults)
+    if not created:
+        memberScore.total_scores += total_scores
+        memberScore.save()
+    #本人增加积分
+    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores=total_scores)
+    #推荐人增加积分
+    try:
+        intro_user = WxIntroduce.objects.get(openid=user_id)
+        MemberScoreDetail.objects.create(member=memberScore, user_id=intro_user.introduce_id, from_user=intro_user.nickname, scores=total_scores)
+    except WxIntroduce.DoesNotExist as ex:
+        print(ex)
