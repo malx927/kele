@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType
+from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit
 from .paginations import PagePagination
 from .serializers import GoodsListSerializer, GoodsTypeSerializer
 from shopping.views import getShopCartTotals
@@ -205,6 +205,47 @@ class ShopCartView(APIView):
             return Response(ret_count)
 
         return Response({'success':'false'})
+
+
+class ScoresLimitAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self,request,*args, **kwargs):
+        flag = request.POST.get("flag", None)
+        ret ={
+            "success": "false",
+            'total_cost': 0,
+            'scores_used': 0,
+        }
+        try:
+            user_id = request.session.get("openid",None)
+            out_trade_no = request.POST.get("out_trade_no", None)
+            order = Order.objects.get(user_id=user_id, out_trade_no = out_trade_no)
+
+            #额度
+            if int(flag) == 1:
+                if order.scores_used is None or order.scores_used == 0:
+                    limit_value = ScoresLimit.getLimitValue()
+                    scares_used = int( order.get_member_total_cost() * limit_value / 100 )
+                    order.scores_used = scares_used
+            elif int(flag) == 0:
+                order.scores_used = 0
+
+            order.save()
+
+            ret['total_cost'] = order.get_member_total_cost()
+            ret['scores_used'] = order.scores_used
+            ret['success'] = "true"
+            ret['flag'] = flag
+
+        except:
+            ret['errors'] = 'Order Doesnot Exits'
+
+        return Response(ret)
+
+
+
+
 
 
 

@@ -9,7 +9,7 @@ from django.views.generic import DetailView,ListView, View
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
 from kele import settings
-from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail
+from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit
 from wxchat.views import getJsApiSign
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
@@ -208,7 +208,7 @@ class CreateOrderView(View):
         }
 
         shopCartTotals = getShopCartTotals(user_id, is_member)
-        print(shopCartTotals)
+
         #数量小于等于零
         if shopCartTotals.get('goods_totals', 0) <= 0:
             order_data['quantity'] = 'invalid quantity'
@@ -295,12 +295,21 @@ class CreateOrderView(View):
         try:
             is_member = request.session.get('is_member', None)
             order = Order.objects.get(out_trade_no=out_trade_no)
+            flag = 0   #是否选中金币支付
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
                 benefits_totals = order.get_total_cost() - total_cost
+
+                if order.scores_used > 0:
+                    scores_used = order.scores_used
+                    flag = 1    #是否选中金币支付
+                else:
+                    limit_value = ScoresLimit.getLimitValue()
+                    scores_used = int(total_cost * limit_value / 100)
             else:
                 total_cost = order.get_total_cost()         #非会员
                 benefits_totals = 0
+                scores_used = 0
 
             if total_cost <=0:
                 raise Exception
@@ -310,10 +319,12 @@ class CreateOrderView(View):
             return render( request, template_name='shopping/goods_list.html' )
 
         context={
-            'total_cost':total_cost,
+            'total_cost': total_cost,
             'items': items,
             'benefits_totals': benefits_totals,
+            'scores_used': scores_used,
             'out_trade_no': out_trade_no,
+            'flag': flag,
             'sign': signPackage
         }
         return render(request,template_name='shopping/goods_checkout.html',context=context )
@@ -329,6 +340,7 @@ class PayOrderView(View):
         out_trade_no = request.POST.get('out_trade_no', None)
         user_id = request.session.get('openid')
         is_member = request.session.get('is_member')
+
         order =getShoppingOrder(user_id, out_trade_no)
 
         if order:
@@ -442,3 +454,4 @@ def setMemberScores( order ):
         MemberScoreDetail.objects.create(member=memberScore, user_id=intro_user.introduce_id, from_user=intro_user.nickname, scores=total_scores)
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
+

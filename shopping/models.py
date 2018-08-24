@@ -150,6 +150,7 @@ class Order(models.Model):
     message = models.CharField(verbose_name='留言', max_length=400,null=True, blank=True)
     total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
     cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    scores_used = models.IntegerField(verbose_name='使用积分', default=0, blank=True, null=True)
 
     class Meta:
         verbose_name ='订单'
@@ -167,7 +168,9 @@ class Order(models.Model):
         return sum(item.get_cost() for item in self.items.all())
 
     def get_member_total_cost(self):
-        return sum(item.get_member_cost() for item in self.items.all())
+        if self.scores_used is None:
+            self.scores_used = 0
+        return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee):
         self.status = status
@@ -233,3 +236,21 @@ class MemberScoreDetail(models.Model):
 
     def __str__(self):
         return  self.member.nickname
+
+#金币使用额度设置
+class ScoresLimit(models.Model):
+    limitvalue = models.IntegerField(verbose_name='金币额度(%)', blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '金币额度设置'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return  "{0}%".format(self.limitvalue)
+
+    @classmethod
+    def getLimitValue(cls):
+        score_limit = ScoresLimit.objects.all().first()
+        limitValue = score_limit.limitvalue if score_limit else 20
+        return limitValue

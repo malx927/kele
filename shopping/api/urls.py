@@ -3,7 +3,7 @@ from django.conf.urls import url
 
 __author__ = 'malixin'
 
-from .views import GoodsListAPIView, CountAPIView, CreateShopCartAPIView, GoodsTypeListAPIView, ShopCartView
+from .views import GoodsListAPIView, CountAPIView, CreateShopCartAPIView, GoodsTypeListAPIView, ShopCartView, ScoresLimitAPIView
 
 urlpatterns = [
     url(r'^goodslist/$', GoodsListAPIView.as_view(), name='goods-list'),
@@ -11,6 +11,7 @@ urlpatterns = [
     url(r'^addshopcart/$', CreateShopCartAPIView.as_view(), name='shop-cart-add'),
     url(r'^goodstype/$', GoodsTypeListAPIView.as_view(), name='goods-type-list'),
     url(r'^shopcart/$', ShopCartView.as_view(), name='shop-cart'),
+    url(r'^scoreslimit/$', ScoresLimitAPIView.as_view(), name='scores-limit'),
 
 ]
 

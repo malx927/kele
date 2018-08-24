@@ -164,6 +164,7 @@
               $('#goods_prices').text( '¥' + data.price_totals.toFixed(2) );
           },
           error: function(error){
+              alert(JSON.stringify(error));
               console.log(error);
           }
         });

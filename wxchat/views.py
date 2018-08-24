@@ -159,12 +159,13 @@ def saveUserinfo(openid, scene_id=None):
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
 
-        WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
-        # WxUserinfo.objects.create(**user, subscribe_time=sub_time)
-        user['qr_scene'] = WxUserinfo.getSceneMaxValue()
-        if scene_id:
-            user['is_member'] = 1
         obj, created = WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
+        qr_scene = WxUserinfo.getSceneMaxValue()
+        obj.qr_scene = qr_scene
+        if scene_id:
+            obj.is_member = 1
+
+        obj.save()
 
         try:
             if scene_id and created:
