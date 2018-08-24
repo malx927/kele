@@ -60,7 +60,7 @@ class Goods(models.Model):
     images = models.ImageField(verbose_name='产品图片',upload_to='food/%Y%m%d/',null=True,blank=True)
     goodstype = models.ForeignKey(GoodsType,verbose_name='商品分类')
     price = models.DecimalField(verbose_name='销售价格', max_digits=6, decimal_places=2, null=True, blank=True, default=0)
-    benefits = models.IntegerField(verbose_name='会员价', default=0, null=True, blank=True)
+    benefits = models.DecimalField(verbose_name='会员价',  max_digits=6, decimal_places=2, null=True, blank=True, default=0)
     scores = models.IntegerField(verbose_name='金币', default=1, null=True, blank=True)
     content = RichTextUploadingField(verbose_name=u'产品详情',null=True,blank=True)
     stock_nums = models.IntegerField(verbose_name='库存量', default=99, null=True, blank=True)
