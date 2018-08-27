@@ -273,7 +273,7 @@ class CreateOrderView(View):
         #产生订单号
         out_trade_no = request.POST.get('out_trade_no', None)
         shopcart = request.POST.get('shopcart', None)
-        print("shopcart=",shopcart)
+
         if out_trade_no is None:
             out_trade_no = '{0}{1}{2}'.format(settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
 
@@ -438,20 +438,37 @@ def setMemberScores( order ):
     user_id = order.user_id
     userinf = WxUserinfo.objects.get(user_id=user_id)
     total_scores = order.get_total_scores()
+    scores_used = order.scores_used if order.scores_used is not None else 0
+
     defaults ={
         'nickname': userinf.nickname,
         'total_scores': total_scores,
     }
+    #使用积分，先减掉使用的积分，并保存记录
+
     memberScore, created = MemberScore.objects.get_or_create(openid=user_id, defaults=defaults)
     if not created:
+        memberScore.total_scores -= scores_used  #减掉使用的积分
         memberScore.total_scores += total_scores
         memberScore.save()
+    #本人减少积分
+    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = -1*scores_used)
     #本人增加积分
-    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores=total_scores)
+    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = total_scores)
     #推荐人增加积分
     try:
         intro_user = WxIntroduce.objects.get(openid=user_id)
-        MemberScoreDetail.objects.create(member=memberScore, user_id=intro_user.introduce_id, from_user=intro_user.nickname, scores=total_scores)
+        intro_defaults ={
+            'nickname': intro_user.introduce_name,
+            'total_scores': total_scores,
+        }
+
+        intro_memberScore, intro_created = MemberScore.objects.get_or_create(user_id=intro_user.introduce_id, defaults = intro_defaults)
+        if not intro_created:
+            intro_memberScore.total_scores += total_scores
+            intro_memberScore.save()
+
+        MemberScoreDetail.objects.create(member=intro_memberScore, user_id=intro_user.introduce_id, from_user=intro_user.nickname, scores=total_scores)
+
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
-

@@ -170,7 +170,6 @@ def saveUserinfo(openid, scene_id=None):
         try:
             if scene_id and created:
                 ret = client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
-                print(ret)
                 intro_user = WxUserinfo.objects.get(qr_scene = scene_id)
                 #创建推荐表数据
                 defaults = {

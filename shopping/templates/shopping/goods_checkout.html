@@ -88,7 +88,7 @@
                             <i class="weui-icon-checked"></i>
                         </div>
                         <div class="weui-cell__bd">
-                            <p>金币支付</p>
+                            <p>积分支付</p>
                         </div>
                          <div class="weui-cell__ft">
                             <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>
@@ -153,9 +153,14 @@
                   data: params,
                   timeout: 5000,
                   success: function(data){
+{#                    alert(JSON.stringify(data));#}
                      if(data.success == "true"){
                         $('#total_cost_top').text(' ¥ ' + data.total_cost.toFixed(2));
                         $('#total_cost_bottom').text(' ¥ ' + data.total_cost.toFixed(2));
+                     }
+                     else if( data.error_scores == "true" ){
+                         $("#sel_scores").prop("checked", false)
+                         weui.alert('您的积分不足,无法使用积分支付!');
                      }
                   },
                   error: function(error){

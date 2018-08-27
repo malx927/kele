@@ -10,7 +10,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit
+from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore
 from .paginations import PagePagination
 from .serializers import GoodsListSerializer, GoodsTypeSerializer
 from shopping.views import getShopCartTotals
@@ -210,23 +210,33 @@ class ShopCartView(APIView):
 class ScoresLimitAPIView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self,request,*args, **kwargs):
+    def post(self,request, *args, **kwargs):
         flag = request.POST.get("flag", None)
         ret ={
             "success": "false",
-            'total_cost': 0,
-            'scores_used': 0,
+            "total_cost": 0,
+            "scores_used": 0,
+            "error_scores": "false"
         }
         try:
             user_id = request.session.get("openid",None)
             out_trade_no = request.POST.get("out_trade_no", None)
             order = Order.objects.get(user_id=user_id, out_trade_no = out_trade_no)
 
+            #我的积分数量
+            member_Scores = MemberScore.objects.get(user_id=user_id)
+            myScores = member_Scores.total_scores
+
+            #积分使用数量
+            limit_value = ScoresLimit.getLimitValue()
+            scares_used = int( order.get_member_total_cost() * limit_value / 100 )
+            if myScores < scares_used:
+                ret["error_scores"] ="true"
+                return Response(ret)
+
             #额度
             if int(flag) == 1:
                 if order.scores_used is None or order.scores_used == 0:
-                    limit_value = ScoresLimit.getLimitValue()
-                    scares_used = int( order.get_member_total_cost() * limit_value / 100 )
                     order.scores_used = scares_used
             elif int(flag) == 0:
                 order.scores_used = 0
@@ -238,8 +248,12 @@ class ScoresLimitAPIView(APIView):
             ret['success'] = "true"
             ret['flag'] = flag
 
-        except:
+        except Order.DoesNotExist as ex:
+            print("ScoresLimitAPIView:", ex)
             ret['errors'] = 'Order Doesnot Exits'
+        except MemberScore.DoesNotExist as ex:
+            print("ScoresLimitAPIView:", ex)
+            ret['errors'] = 'MemberScore Doesnot Exits'
 
         return Response(ret)
 
