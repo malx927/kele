@@ -7,7 +7,7 @@
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
                 <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">商品详细介绍</span></div>
-                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
         <div class="weui-panel__bd">
@@ -21,7 +21,7 @@
                 <div class="weui-form-preview__item ">
                    <p class="price_title weui-form-preview__value ">¥{{ object.price }}<span class="price-size r"><label style="color:#858282;">会员送: </label>¥{{ object.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i></span></p>
                    <em class="weui-form-preview__value">{{ object.name }}</em>
-                   <p class="price_title weui-form-preview__value "><span class="price-size r"><label style="color:#858282;">会员返利: </label>{{ object.scores }}金币</span></p>
+                   <p class="price_title weui-form-preview__value "><span class="price-size r"><label style="color:#858282;">会员返利: </label>{{ object.scores }}积分</span></p>
                 </div>
             </div>
                <div class="weui-form-preview__hd line_height">

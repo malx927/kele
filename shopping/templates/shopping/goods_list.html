@@ -7,7 +7,7 @@
     <nav id="menu" class="menu">
       <a href="javascript:;" >
         <header class="menu-header">
-          <span class="menu-header-title">食品分类</span>
+          <span class="menu-header-title">商品分类</span>
         </header>
       </a>
 
@@ -37,17 +37,21 @@
         </div>
 {% endblock tabpanel %}
  {% block tabbar %}
-        <a href="#" class="weui-tabbar__item tabbar_item" id="my_order">
+        <a href="{% url 'my-order-list' %}" class="weui-tabbar__item tabbar_item" id="my_order">
              <p class="weui-tabbar__label" style="background-color: #3e3e3e"><i class="icon iconfont icon-orderlisto" ></i> 订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></p>
         </a>
-        <a href="{% url 'shop-cart-list' %}" class="weui-tabbar__item tabbar_item" id="my_cart">
-             <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-buy2" ></i> 我的购物车<span id="cart_nums" class="weui-badge" style="margin-top: -15px;">0</span></p>
+        <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="my_cart">
+             <p class="weui-tabbar__label bg_black">
+                 <i class="icon iconfont icon-buy2" ></i>
+                 <span id="cart_nums" class="weui-badge" style="margin-top: -15px;">0</span>
+                 <span id="cart_money">¥0.00</span>
+             </p>
         </a>
-         <a href="#" class="weui-tabbar__item tabbar_item">
-            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 已选好</p>
+         <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="gotocart">
+            <p class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jiaoyi3" ></i><span id="btn_text"> 请选择</p>
         </a>
 {% endblock tabbar %}
-  </main>
+
 {% block bottomjs %}
 
     {{ block.super }}
@@ -81,7 +85,6 @@
         getGoodsTypeList();
         getGoodsList( nextUrl,0 );
         getCartAndOrderCount();
-
         var count = 0;
          var flag = setInterval(function(max){
              if( count < max ){
@@ -96,8 +99,13 @@
 
         } , 2000, 1 );
 
-    });
+        $("#gotocart").on('click', function(e){
+            cart_nums = $('#cart_nums').text();
+            if( cart_nums == 0 ) return false;
+            window.location.href = '{% url 'shop-cart-list' %}';
+        });
 
+    });
 
     function getGoodsList(url, typeid){
         var loading = weui.loading('加载中...');
@@ -120,16 +128,20 @@
               appendItem(data);
               loading.hide();
               setScollPos();
+              counter();
+              getShopCartList();
           },
-          error: function(xhr, type,error){
-              console.log(type);
-              loading.hide();
-          }
+          error: function(xhr, type,error){loading.hide();}
         });
     }
 
     function appendItem(results){
-        $('#goods a').remove();
+        var counter = '<div class="weui-count weui-count_ex" >' +
+                  '<span class="weui-count__btn weui-count__decrease"></span>' +
+                  '<input class="weui-count__number" type="number" value="0" readonly>' +
+                  '<span class="weui-count__btn weui-count__increase"></span>' +
+                  '</div>';
+        $('#goods div').remove();
         $.each(results,function(index,item){
             var img_url = item.images;
 
@@ -140,19 +152,21 @@
                 img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
             }
 
-            newItem =  '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
+            newItem =  '<div class="weui-media-box media-box" data-item="'+ item.id +'">' +
+                        '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
                             '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
                                '<h4 class="weui-media-box__title">'+ item.name   +'</h4>' +
-                               '<span class="weui-media-box__title color_red price-size"> ¥'+ item.price   +'</span>' +
-                               '<span class="weui-media-box__title color_red price-size r "> <i style="color:#cccccc">会员送:</i> ¥'+ item.benefits   +'<i class="icon iconfont icon-youhuiquan1 benefits_card"></i></span>' +
-                               '<ul class="weui-media-box__info sub_title">' +
-								  '<li class="weui-media-box__info__meta">返利: ' + item.scores + '金币</li>' +
-{#								  '<li class="weui-media-box__info__meta">季节: ' + item.season + '</li>' +#}
-{#								  '<li class="weui-media-box__info__meta">功能: ' + item.func_type + '</li>' +#}
-								'</ul>' +
-                             '</div>' +
-                        '</a>';
+                                '<div class="weui-media-box__title">'+
+                                     '<span class="color_red price-size"> ¥'+ item.price   +'</span>'  +
+                                     '<span class="color_red price-size r "> <i style="color:#cccccc">会员送:</i> ¥'+ item.benefits +'<i class="icon iconfont icon-youhuiquan1"></i></span>' +
+                                '</div>' +
+                                '<div class="weui-media-box__title">'+
+                                     '<span class="price-size"> 会员返利: '+ item.scores   +' 积分</span>'  +
+                                '</div>' +
+                             '</div>'  +
+                        '</a>'  + counter +
+                        '</div>'
             $('#goods').append( newItem );
         }) ;
     }
@@ -174,6 +188,17 @@
           success: function(data){
               $('#order_nums').text(data.order_nums);
               $('#cart_nums').text(data.cart_nums);
+              $('#cart_money').text('¥ ' + data.cart_money.toFixed(2));
+              if(data.cart_nums > 0){
+                  $('#btn_text').text("选好了");
+                  $("#gotocart p").hasClass("bg_gray") && $("#gotocart p").removeClass("bg_gray");
+                  $("#gotocart p").addClass("bg_red");
+              }
+              else{
+                  $('#btn_text').text("请选择");
+                  $("#gotocart p").hasClass("bg_red") && $("#gotocart p").removeClass("bg_red");
+                  $("#gotocart p").addClass("bg_gray");
+              }
           },
           error: function(xhr, type,error){
               console.log(type);
@@ -207,6 +232,74 @@
           }
         });
     }
+
+     function counter(){
+         var MAX = 99, MIN = 0;
+          $('.weui-count__decrease').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.weui-count__number');
+            var number = parseInt($input.val() || "0") - 1
+            if (number < MIN) number = MIN;
+            $input.val(number)
+            var itemid = $(e.currentTarget).parent().parent().attr('data-item');
+            addShopCartItem(itemid, number);
+          });
+
+          $('.weui-count__increase').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.weui-count__number');
+            var number = parseInt($input.val() || "0") + 1
+            if (number > MAX) number = MAX;
+            $input.val(number);
+            var itemid = $(e.currentTarget).parent().parent().attr('data-item');
+            addShopCartItem(itemid, number);
+          });
+
+    }
+ ///添加到购物车
+    function addShopCartItem( itemid, quantity ){
+        var params ={
+          itemid: itemid ,
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          quantity: quantity,
+        }
+       $.ajax({
+          type: 'POST',
+          url: '{% url "shop-cart-add" %}',
+          data:params,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              if(data.success == true){
+                  getCartAndOrderCount();
+              }
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+    ////同步购物车商品数量
+    function getShopCartList(){
+       params ={
+             action:'list',
+       }
+       $.ajax({
+          type: 'GET',
+          url: '{% url "shop-cart" %}',
+          data:params,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              $.each(data,function(index,item){
+                $input = $('div[data-item="' + item.goods + '"]').find('.weui-count__number');
+                $input.val(item.quantity);
+              });
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
 
 
     </script>

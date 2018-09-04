@@ -1,6 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-    {% include 'shopping/jssdk.html' %}
+    {% include 'shopping/include/jssdk.html' %}
     <script>
     wx.ready(function () {
         $('#pay_now').on('click',function(){
@@ -16,13 +16,11 @@
               data: params,
               timeout: 5000,
               success: function(data){
-                  alert(JSON.stringify(data));
                   if(data.package !=undefined){
                       wxpay(data)
                   }
               },
               error: function(error){
-                  console.log(error);
                   weui.alert('商品支付失败!');
               }
             });
@@ -37,22 +35,18 @@
                   paySign:  data.paySign,
                   success: function(res){
                     if (res.errMsg == "chooseWXPay:ok") {
-                        alert('支付成功');
-                        //window.location.replace();
+                        out_trade_no = $("#out_trade_no").text();
+                        window.location.replace('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
                     } else {
-                        alert(res.errMsg);
+                       weui.alert('商品支付失败!');
                     }
                   },
                    cancel: function(res) {
                        console.log(res);
-                       alert('支付取消');
                    }
-
             });
         }
-
 });
-
 
 </script>
 {% endblock extra %}
@@ -65,7 +59,7 @@
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
                 <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">收银台</span></div>
-                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
         <div class="weui-panel__bd">
@@ -73,19 +67,42 @@
                 <div class="weui-form-preview__hd" style="text-align: right;">
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label>
-                        <em class="weui-form-preview__value font16" >¥ {{ total_cost }}</em>
+                        <em class="weui-form-preview__value font16" id="total_cost_top" > ¥ {{ total_cost|floatformat:"2" }}</em>
                         <span id="out_trade_no" style="display: none" >{{ out_trade_no }}</span>
                     </div>
                 </div>
-                <div class="weui-cells__title">商品列表</div>
-                <div class="weui-cells">
+                <div class="weui-form-preview__bd" style="text-align: right;">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">已优惠</label>
+                        <em class="weui-form-preview__value " style="text-decoration:line-through;color: #c0c0c0;" >¥ {{ benefits_totals|floatformat:"2" }}</em>
+                    </div>
+                </div>
+{#                {% if scores_used %}#}
+{#                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;">#}
+{#                    <label class="weui-cell weui-check__label" for="sel_scores">#}
+{#                        <div class="weui-cell__hd">#}
+{#                            <input type="checkbox" class="weui-check" name="sel_scores" id="sel_scores"  {% if flag == 1 %} checked {% endif %}>#}
+{#                            <i class="weui-icon-checked"></i>#}
+{#                        </div>#}
+{#                        <div class="weui-cell__bd">#}
+{#                            <p>积分支付</p>#}
+{#                        </div>#}
+{#                         <div class="weui-cell__ft">#}
+{#                            <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>#}
+{#                        </div>#}
+{#                    </label>#}
+{#                </div>#}
+{#                {% endif %}#}
+
+                <div class="weui-cells" style="margin-top: 0;">
+                    <div class="weui-cells__title">商品列表</div>
                     {% for item in items %}
                       <div class="weui-cell">
                         <div class="weui-cell__hd"></div>
                         <div class="weui-cell__bd">
                           <p>{{ item.goods.name }}</p>
                         </div>
-                        <div class="weui-cell__ft">x{{ item.quantity }}</div>
+                        <div class="weui-cell__ft"> x {{ item.quantity }}</div>
                       </div>
                     {% endfor %}
                 </div>
@@ -95,7 +112,7 @@
     </div>
     <div class="weui-tabbar">
          <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
-            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span> ¥ {{ total_cost }}</span></p>
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ total_cost }}</span></p>
         </a>
 
     </div>
@@ -105,12 +122,5 @@
 
 {% block bottomjs %}
     {{ block.super }}
-    <script type="application/javascript">
 
-    $(function(){
-
-
-    });
-
-    </script>
 {% endblock bottomjs %}

@@ -49,6 +49,7 @@ class WxUserinfo(models.Model):
     @classmethod
     def getSceneMaxValue(cls):
         obj = cls.objects.all().aggregate(maxid = Max('qr_scene'))
+
         if obj['maxid']:
             return  obj['maxid'] + 1
         else:

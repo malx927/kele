@@ -1,6 +1,6 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem, ShopCart, GoodsType
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit
 # Register your models here.
 
 @admin.register(Goods)
@@ -12,18 +12,19 @@ class PetFoodAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    raw_id_fields = ['goods']
+    #raw_id_fields = ['goods']
+    readonly_fields = ['goods','price','benefits','quantity']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('out_trade_no', 'user_id', 'username', 'postalcode', 'detailinfo', 'telnumber', 'add_time','pay_time', 'status', 'transaction_id')
+    list_display = ( 'username',  'detailinfo', 'telnumber','total_fee','cash_fee','scores_used','out_trade_no',  'add_time','pay_time', 'status', 'transaction_id')
     list_per_page = 50
     list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
     inlines = [OrderItemInline]
 
     fieldsets = [
         ('订单', {
-            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'nationalcode', 'status', 'transaction_id')
+            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','scores_used','cash_fee','nationalcode', 'status', 'transaction_id')
         })
     ]
 
@@ -38,5 +39,32 @@ class ShopCartAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsType)
 class GoodsTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sort')
+    list_display = ('name', 'sort','is_show')
     list_per_page = 50
+
+
+
+class MemberScoreDetailInline(admin.TabularInline):
+    model = MemberScoreDetail
+    #readonly_fields = ['member','scores','from_user','user_id','create_time']
+
+
+@admin.register(MemberScore)
+class MemberScoreAdmin(admin.ModelAdmin):
+    list_display = ('nickname', 'user_id', 'total_scores','update_time')
+    list_per_page = 50
+    list_filter = ['nickname']
+    inlines = [MemberScoreDetailInline]
+
+    fieldsets = [
+        ('会员积分', {
+            'fields': ('nickname', 'user_id', 'total_scores')
+        })
+    ]
+
+
+@admin.register(ScoresLimit)
+class ScoresLimitAdmin(admin.ModelAdmin):
+    list_display = ('limitvalue', 'create_time')
+    list_per_page = 50
+

@@ -1,0 +1,65 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block container %}
+<div class="page">
+    {% include "shopping/include/myheader.html" %}
+    <div class="page_body">
+       <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray" ></i></a></div>
+                    <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">我的支付订单</span></div>
+                     <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+                 </div>
+            </div>
+            <div class="weui-panel__bd">
+                <div class="weui-cell">
+                    <div class="weui-cell__hd">
+                        <p><i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}</p>
+                    </div>
+                </div>
+                {% if order %}
+                    {% for orderItem in order.items.all %}
+                        <div class="weui-media-box weui-media-box_appmsg" style="background-color: #fafafa">
+                            {% if orderItem.goods.images %}
+                            <div class="weui-media-box__hd">
+                                 <img class="weui-media-box__thumb" src="{{orderItem.goods.images.url }}" alt="">
+                            </div>
+                            {% endif %}
+                            <div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ orderItem.goods.name }}</h4>
+                                <ul class="weui-media-box__info ">
+                                    <li class="weui-media-box__info__meta sub_title">¥ {{ orderItem.goods.price }}</li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" >
+                                        x{{ orderItem.quantity }}
+                                    </li>
+                                    <li class="weui-media-box__info__meta r" style="color: #c9302c;">
+                                        会员送:<span  id="card">{{ orderItem.goods.diff_price }}</span><i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    {% endfor %}
+                    <div class="weui-cell cell-end">
+                        <div class="weui-cell__bd color_red"  ><B>{% if order.status == 1 %} 已支付{% endif %}</B></div>
+                        <div class="weui-cell__ft " style="color:#000000" >
+                            {% if is_member == 1 %}
+                            <p>共 {{ order.get_total_count }} 件商品, 付款金额<B> ¥{{ order.get_member_total_cost }}</B></p>
+                            {% else %}
+                             <p>共 {{ order.get_total_count }} 件商品, 付款金额 ¥{{ order.get_total_cost }}</p>
+                            {% endif %}
+                            <p>订单编号:{{ order.out_trade_no }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock container %}
+{% block bottomjs %}
+
+    {{ block.super }}
+
+{% endblock bottomjs %}

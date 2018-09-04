@@ -159,19 +159,19 @@ def saveUserinfo(openid, scene_id=None):
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
 
-        WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
-        # WxUserinfo.objects.create(**user, subscribe_time=sub_time)
-        user['qr_scene'] = WxUserinfo.getSceneMaxValue()
-        if scene_id:
-            user['is_member'] = 1
         obj, created = WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
+        qr_scene = WxUserinfo.getSceneMaxValue()
+        obj.qr_scene = qr_scene
+        if scene_id:
+            obj.is_member = 1
+
+        obj.save()
 
         try:
             if scene_id and created:
                 ret = client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
-                print(ret)
-                intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
-                # 创建推荐表数据
+                intro_user = WxUserinfo.objects.get(qr_scene = scene_id)
+                #创建推荐表数据
                 defaults = {
                     'nickname': obj.nickname,
                     'introduce_name': intro_user.nickname,
@@ -296,11 +296,13 @@ def redirectUrl(request, item):
                 userinf = get_object_or_404(WxUserinfo, openid=open_id)
                 request.session['nickname'] = userinf.nickname
                 request.session['is_member'] = userinf.is_member
+                request.session['headimgurl'] = userinf.headimgurl
                 redirect_url = getUrl(item)
                 return HttpResponseRedirect(redirect_url)
     else:
         userinf = get_object_or_404(WxUserinfo, openid=openid)
         request.session['is_member'] = userinf.is_member
+        request.session['headimgurl'] = userinf.headimgurl
 
         redirect_url = getUrl(item)
         return HttpResponseRedirect(redirect_url)
@@ -1085,7 +1087,8 @@ def dogIndex(request):
 
 
 def myInfo(request):
-    return render(request, 'wxchat/myinfo.html')
+    # return render(request, 'wxchat/myinfo.html')
+    return render(request, 'shopping/user_shop_list.html')
 
 
 # 生成我的二维码
@@ -1155,6 +1158,7 @@ def myScore(request):
     return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
 
+
 def createTestData(request):
     curDate = datetime.datetime.now()
     strDate = curDate.strftime('%Y-%m-%d')
@@ -1210,3 +1214,4 @@ def createTestData(request):
     #     DogSale.objects.create(**data)
 
     return HttpResponse('success')
+
