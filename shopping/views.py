@@ -116,7 +116,7 @@ class ShopCartListView(ListView):
     context_object_name = 'carts_list'
 
     def get_queryset(self):
-        user_id = self.request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        user_id = self.request.session.get('openid', None)
 
         return ShopCart.objects.filter(user_id = user_id)
 
@@ -142,7 +142,7 @@ class ShopCartBuyListView(ListView):
     context_object_name = 'shop_cart_lists'
 
     def get_queryset(self):
-        user_id = self.request.session.get('openid','oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        user_id = self.request.session.get('openid',None)
         if user_id:
             return ShopCart.objects.filter(user_id=user_id, status=1)
 
@@ -401,7 +401,9 @@ def payNotify(request):
                     #更新订单
                     status = 1  #已支付标志
                     cash_fee = res_data['cash_fee'] / 100
-                    order.update_status_transaction_id(status, transaction_id, cash_fee)
+                    time_end = res_data['time_end']
+                    pay_time = datetime.datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                    order.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
                     #更新会员积分
                     setMemberScores( order )
                     #发送消息
@@ -446,7 +448,7 @@ def setMemberScores( order ):
     }
     #使用积分，先减掉使用的积分，并保存记录
 
-    memberScore, created = MemberScore.objects.get_or_create(openid=user_id, defaults=defaults)
+    memberScore, created = MemberScore.objects.get_or_create(user_id=user_id, defaults=defaults)
     if not created:
         memberScore.total_scores -= scores_used  #减掉使用的积分
         memberScore.total_scores += total_scores
@@ -472,3 +474,57 @@ def setMemberScores( order ):
 
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
+
+
+#订单列表
+class OrderView(View):
+
+    def get(self,request, *args, **kwargs):
+        user_id = request.session.get('openid',None)
+        out_trade_no = request.GET.get("out_trade_no", None)
+
+        context = { }
+        context['project_name'] = settings.PROJECT_NAME
+        context['is_member'] = self.request.session.get('is_member', None)
+
+        try:
+            if user_id:
+                userinfo = WxUserinfo.objects.get(openid=user_id)
+                context['headimgurl'] = userinfo.headimgurl
+        except WxUserinfo.DoesNotExist as ex:
+            pass
+
+        if out_trade_no:
+            try:
+                order = Order.objects.get(out_trade_no=out_trade_no,user_id=user_id, status=1)
+                context['order'] = order
+            except Order.DoesNotExist as ex:
+                print(ex)
+            return render(request, template_name='shopping/pay_result_list.html', context=context )
+        else:
+            orders = Order.objects.filter(user_id = user_id).order_by('status','-add_time')
+            context['orders'] = orders
+            return render(request, template_name='shopping/my_order_list.html', context=context )
+
+    def post(self, request, *args, **kwargs):
+        context = {
+            "success":"false"
+        }
+        user_id = request.session.get('openid', None)
+        action = request.POST.get("action", None)
+        if user_id is None:
+            context["errors"] = "invalid user"
+            return  HttpResponse(json.dumps(context))
+
+        try:
+            if action == "remove":
+                out_trade_no = request.POST.get("out_trade_no", None)
+                order = Order.objects.get(out_trade_no = out_trade_no, user_id=user_id)
+                OrderItem.objects.filter(order=order).delete()
+                order.delete()
+                context["success"] = "true"
+
+        except Order.DoesNotExist as ex:
+            context["errors"] = "order errors"
+
+        return HttpResponse(json.dumps(context))

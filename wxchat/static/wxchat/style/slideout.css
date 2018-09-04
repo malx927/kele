@@ -2,7 +2,7 @@
   position: fixed;
   top: 0;
   bottom: 0;
-  width: 156px;
+  width: 145px;
   min-height: 100vh;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -65,6 +65,7 @@ a {
 
 .menu-section {
   margin: 10px 0;
+  margin-bottom: 44px;
 }
 
 .menu-section-title {

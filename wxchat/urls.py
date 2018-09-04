@@ -11,7 +11,7 @@ from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, 
 
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder,ordersuccess,DogpayNotify,DogPayOrderView
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
-    authlist, dogLoss,dogLossAdd, createTestData,DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
+    authlist, dogLoss,dogLossAdd, DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
 from wxchat.views import freshman,dogTrade,updateUserinfo,shareAction, dogIndex,dogLossNav,myInfo,payList,getPayInfo
 
@@ -103,6 +103,6 @@ urlpatterns = [
     # 网页授权测试
     url(r'^auth2/$', auth2),
     url(r'^authlist/$', authlist),
-    url(r'^createdata/$', createTestData),
+
     url(r'^updateuserinfo/$', updateUserinfo),
 ]

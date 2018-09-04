@@ -1,18 +1,20 @@
 #-*-coding:utf-8-*-
+from django.http import Http404
+
 __author__ = 'malixin'
 
 from django.db.models import Sum,F, FloatField,Count
 
 import json
 from rest_framework import status
-from rest_framework.generics import  ListAPIView
+from rest_framework.generics import  ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore
 from .paginations import PagePagination
-from .serializers import GoodsListSerializer, GoodsTypeSerializer
+from .serializers import GoodsListSerializer, GoodsTypeSerializer, ShopCartSerializer, MemberScoreSerializer
 from shopping.views import getShopCartTotals
 
 
@@ -23,22 +25,27 @@ class CountAPIView(APIView):
     def get(self, request, *args, **kwargs):
         count = {
             'order_nums': 0,
-            'cart_nums': 0
+            'cart_nums': 0,
+            'cart_money':0,
         }
 
         user_id = request.session.get('openid', None)
         order = request.GET.get('order', None)
         cart = request.GET.get('cart', None)
-        print('**********:', user_id, order, cart)
+        is_member = request.session.get('is_member', None)
 
         if order  and int(order) == 1:
             count['order_nums'] =  Order.objects.filter(user_id = user_id, status=0).count()
 
         if cart and int(cart) == 1:
-            goods_nums = ShopCart.objects.filter(user_id = user_id).aggregate( goods_sum = Sum('quantity'))
+            goods_nums = ShopCart.objects.filter(user_id = user_id)\
+                        .aggregate( goods_sum = Sum('quantity'),
+                                    price_totals = Sum(F('goods__price') * F('quantity'), output_field=FloatField()),
+                                    benefits_totals = Sum(F('goods__benefits') * F('quantity'), output_field=FloatField())
+                                    )
             if goods_nums.get('goods_sum'):
                 count['cart_nums'] = goods_nums.get('goods_sum')
-
+                count['cart_money'] = goods_nums.get('benefits_totals') if is_member == 1 else goods_nums.get('price_totals')
 
         return Response(count)
 
@@ -49,23 +56,27 @@ class CreateShopCartAPIView(APIView):
     def post(self,request, *args, **kwargs):
         item_id = request.POST.get('itemid', None)
         user_id = request.session.get('openid', None)
-        quantity = request.POST.get('quantity', 1)
+        quantity = request.POST.get('quantity', None)
 
         resp ={}
+        print(item_id, quantity)
+
+        goods_quantity = int(quantity) if quantity else 1
 
         try:
             defaults = {
                 'user_id': user_id,
-                'quantity':quantity,
+                'quantity':goods_quantity,
             }
             goods = Goods.objects.get( pk = int(item_id) )
             obj, created = ShopCart.objects.get_or_create(goods=goods, user_id=user_id, defaults=defaults)
 
             if not created:
-                obj.update_quantity(quantity)
+                quantity and obj.update_quantity(goods_quantity)
+                quantity or obj.add_quantity(goods_quantity)
 
             goods_nums = ShopCart.objects.filter(user_id=user_id).aggregate(goods_sum = Sum('quantity'))
-            print(goods_nums)
+
             cart_nums = goods_nums.get('goods_sum')
             if not cart_nums:
                 cart_nums = 0
@@ -90,7 +101,7 @@ class GoodsListAPIView(ListAPIView):
         if typeid and int(typeid) != 0:
             return Goods.objects.filter(goodstype=typeid, is_show=1)
         else:
-            return Goods.objects.filter(is_show=1)
+            return Goods.objects.filter(is_show=1, goodstype__is_show=1)
 
 
 #商品类型
@@ -99,6 +110,9 @@ class GoodsTypeListAPIView(ListAPIView):
     queryset = GoodsType.objects.all()
     serializer_class = GoodsTypeSerializer
     pagination_class = None
+
+    def get_queryset(self,*args, **kwargs):
+        return GoodsType.objects.filter(is_show=1)
 
 
 #购物车价格和优惠统计
@@ -152,6 +166,12 @@ class ShopCartView(APIView):
             checked_status = ShopCart.objects.filter(user_id=user_id, status=1).count()
             return  counts == checked_status
 
+    def getMyCartList(self):
+        user_id = self.request.session.get('openid', None)
+        shopCartLists = ShopCart.objects.filter(user_id=user_id)
+        return  shopCartLists
+
+
     def get(self, request, *args, **kwargs):
 
         action = request.GET.get('action', None)
@@ -160,6 +180,10 @@ class ShopCartView(APIView):
         if action == 'count':
             ret_count = self.getCartPriceCount()
             return Response(ret_count)
+        elif action == 'list':
+            shopCartLists = self.getMyCartList()
+            seriaizers = ShopCartSerializer(shopCartLists,many=True)
+            return Response(seriaizers.data)
         else:
             return Response({'success':'false'})
 
@@ -256,6 +280,20 @@ class ScoresLimitAPIView(APIView):
             ret['errors'] = 'MemberScore Doesnot Exits'
 
         return Response(ret)
+
+class MemberScoreAPIView(APIView):
+    permission_classes = [AllowAny]
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = request.session.get("openid", 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+            scores = MemberScore.objects.get(user_id=user_id)
+        except MemberScore.DoesNotExist as ex:
+            print(ex)
+            raise Http404
+
+        serializer = MemberScoreSerializer(scores)
+
+        return Response(serializer.data)
 
 
 

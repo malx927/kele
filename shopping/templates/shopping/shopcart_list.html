@@ -1,9 +1,5 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
-{% block extra %}
-<script>
 
-</script>
-{% endblock extra %}
 {% block tab %}
     <form action="#" method="get" enctype="multipart/form-data" >{% csrf_token %}
     <div class="weui-tab" id="tab">
@@ -13,6 +9,7 @@
                     <div class="weui-flex">
                         <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
                         <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购物车</span></div>
+                        <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd">
@@ -78,7 +75,7 @@
              </div>
         </a>
          <a href="javascript:;" class="weui-tabbar__item tabbar_item" id="gotopay">
-            <p id="gotobuy" class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>
+            <p id="gotobuy" class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>
         </a>
     </div>
     </form>
@@ -229,10 +226,10 @@
               $('#total_price').attr('data-price',data.price_totals);
               $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
               if( data.price_totals == 0 ){
-                  $("#gotobuy").css('background-color','#796e6e')
+                  changeCss("bg_red","bg_gray");
               }
               else{
-                  $("#gotobuy").css('background-color','#f46253')
+                  changeCss("bg_gray","bg_red");
               }
           },
           error: function(error){
@@ -271,10 +268,10 @@
               $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
 
               if( data.price_totals == 0 ){
-                  $("#gotobuy").css('background-color','#796e6e')
+                  changeCss("bg_red","bg_gray");
               }
               else{
-                  $("#gotobuy").css('background-color','#f46253')
+                  changeCss("bg_gray","bg_red");
               }
 
           },
@@ -282,7 +279,12 @@
               console.log(error);
           }
         });
+
     }
 
+    function changeCss(src,dst){
+        $("#gotobuy").hasClass(src) && $("#gotobuy").removeClass(src);
+        $("#gotobuy").addClass(dst);
+    }
     </script>
 {% endblock bottomjs %}

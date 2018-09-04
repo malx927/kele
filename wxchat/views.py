@@ -296,11 +296,13 @@ def redirectUrl(request, item):
                 userinf = get_object_or_404(WxUserinfo, openid=open_id)
                 request.session['nickname'] = userinf.nickname
                 request.session['is_member'] = userinf.is_member
+                request.session['headimgurl'] = userinf.headimgurl
                 redirect_url = getUrl(item)
                 return HttpResponseRedirect(redirect_url)
     else:
         userinf = get_object_or_404(WxUserinfo,openid=openid)
         request.session['is_member'] = userinf.is_member
+        request.session['headimgurl'] = userinf.headimgurl
 
         redirect_url = getUrl(item)
         return HttpResponseRedirect(redirect_url)
@@ -309,8 +311,6 @@ def redirectUrl(request, item):
 def dogLoss(request):
     openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
-
-
 
 
 # 寻宠物发布
@@ -1077,7 +1077,8 @@ def dogIndex(request):
 
 
 def myInfo(request):
-    return render(request, 'wxchat/myinfo.html')
+    # return render(request, 'wxchat/myinfo.html')
+    return render(request, 'shopping/user_shop_list.html')
 
 
 #生成我的二维码
@@ -1149,58 +1150,3 @@ def myScore(request):
 
     return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
-def createTestData(request):
-    curDate = datetime.datetime.now()
-    strDate = curDate.strftime('%Y-%m-%d')
-    print(strDate)
-    type = Dogtype.objects.get(pk=1)
-    for i in range(1, 50):
-        data = {
-            'dog_name': u'大眼可乐--%d' % (i,),
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/default_dog.png',
-            'lostplace': '龙前街19-2号楼--%d' % (i,),
-            'lostdate': strDate,
-            'ownername': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogLoss.objects.create(**data)
-        # print(data)
-    for i in range(1, 50):
-        data = {
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/default_dog.png',
-            'findplace': '龙前街19-2号楼--%d' % (i,),
-            'finddate': strDate,
-            'findname': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogOwner.objects.create(**data)
-
-    for i in range(1, 50):
-        data = {
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'price': u'1000-5000元--%d' % (i,),
-            'buyname': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogBuy.objects.create(**data)
-
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'price':u'1000-5000元--%d'%(i,),
-    #         'desc':u'能歌善舞--%d'%(i,),
-    #         'picture':'wxchat/images/default_dog.png',
-    #         'ownername':'张三--%d'%(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogSale.objects.create(**data)
-
-    return HttpResponse('success')

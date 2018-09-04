@@ -1,6 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-    {% include 'shopping/jssdk.html' %}
+    {% include 'shopping/include/jssdk.html' %}
     <script>
     wx.ready(function () {
         $('#pay_now').on('click',function(){
@@ -35,21 +35,18 @@
                   paySign:  data.paySign,
                   success: function(res){
                     if (res.errMsg == "chooseWXPay:ok") {
-                        alert('支付成功');
-                        //window.location.replace();
+                        out_trade_no = $("#out_trade_no").text();
+                        window.location.replace('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
                     } else {
-                       //window.location.replace();
+                       weui.alert('商品支付失败!');
                     }
                   },
                    cancel: function(res) {
                        console.log(res);
-                       alert('支付取消');
                    }
             });
         }
-
 });
-
 
 </script>
 {% endblock extra %}
@@ -62,7 +59,7 @@
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
                 <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">收银台</span></div>
-                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
         <div class="weui-panel__bd">
@@ -80,22 +77,22 @@
                         <em class="weui-form-preview__value " style="text-decoration:line-through;color: #c0c0c0;" >¥ {{ benefits_totals|floatformat:"2" }}</em>
                     </div>
                 </div>
-                {% if scores_used %}
-                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;">
-                    <label class="weui-cell weui-check__label" for="sel_scores">
-                        <div class="weui-cell__hd">
-                            <input type="checkbox" class="weui-check" name="sel_scores" id="sel_scores"  {% if flag == 1 %} checked {% endif %}>
-                            <i class="weui-icon-checked"></i>
-                        </div>
-                        <div class="weui-cell__bd">
-                            <p>积分支付</p>
-                        </div>
-                         <div class="weui-cell__ft">
-                            <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>
-                        </div>
-                    </label>
-                </div>
-                {% endif %}
+{#                {% if scores_used %}#}
+{#                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;">#}
+{#                    <label class="weui-cell weui-check__label" for="sel_scores">#}
+{#                        <div class="weui-cell__hd">#}
+{#                            <input type="checkbox" class="weui-check" name="sel_scores" id="sel_scores"  {% if flag == 1 %} checked {% endif %}>#}
+{#                            <i class="weui-icon-checked"></i>#}
+{#                        </div>#}
+{#                        <div class="weui-cell__bd">#}
+{#                            <p>积分支付</p>#}
+{#                        </div>#}
+{#                         <div class="weui-cell__ft">#}
+{#                            <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>#}
+{#                        </div>#}
+{#                    </label>#}
+{#                </div>#}
+{#                {% endif %}#}
 
                 <div class="weui-cells" style="margin-top: 0;">
                     <div class="weui-cells__title">商品列表</div>
@@ -125,50 +122,5 @@
 
 {% block bottomjs %}
     {{ block.super }}
-    <script type="application/javascript">
 
-    $(function(){
-        $("#sel_scores").on('click', function(){
-
-            var params ={
-                  out_trade_no: $("#out_trade_no").text(),
-                  csrfmiddlewaretoken:'{{ csrf_token }}',
-            };
-            if( $(this).prop("checked") ){
-                params.flag = 1;
-            }
-            else{
-                params.flag = 0;
-            }
-            scoresLimit( params );
-
-        });
-
-        function scoresLimit( params )
-        {
-            $.ajax({
-                  type: 'POST',
-                  url: '{% url "scores-limit" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-{#                    alert(JSON.stringify(data));#}
-                     if(data.success == "true"){
-                        $('#total_cost_top').text(' ¥ ' + data.total_cost.toFixed(2));
-                        $('#total_cost_bottom').text(' ¥ ' + data.total_cost.toFixed(2));
-                     }
-                     else if( data.error_scores == "true" ){
-                         $("#sel_scores").prop("checked", false)
-                         weui.alert('您的积分不足,无法使用积分支付!');
-                     }
-                  },
-                  error: function(error){
-                      console.log(error);
-                  }
-            });
-        };
-    });
-
-    </script>
 {% endblock bottomjs %}

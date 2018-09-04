@@ -1,6 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-    {% include 'shopping/jssdk.html' %}
+    {% include 'shopping/include/jssdk.html' %}
     <script>
     wx.ready(function () {
 
@@ -59,7 +59,6 @@
 
 });
 
-
 </script>
 {% endblock extra %}
 {% block tab %}
@@ -71,6 +70,7 @@
                     <div class="weui-flex">
                         <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
                         <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购买确认</span></div>
+                        <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
                      </div>
                 </div>
                 <div class="weui-panel__bd">

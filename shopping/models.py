@@ -44,6 +44,7 @@ TYPE_SHOPPING_STATUS = (
 class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
+    is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
 
     class Meta:
         verbose_name ='商品分类'
@@ -130,10 +131,13 @@ class ShopCart(models.Model):
     def get_absolute_url(self):
         return self.goods.get_absolute_url()
 
-    def update_quantity(self, quantity):
+    def add_quantity(self, quantity):
         self.quantity += quantity
         self.save()
 
+    def update_quantity(self, quantity):
+        self.quantity = quantity
+        self.save()
 #订单
 class Order(models.Model):
     out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32)
@@ -155,7 +159,7 @@ class Order(models.Model):
     class Meta:
         verbose_name ='订单'
         verbose_name_plural = verbose_name
-        ordering = ['-add_time']
+        ordering = ['-status' , '-add_time',]
 
     def __str__(self):
         return '订单号 {}'.format(self.out_trade_no)
@@ -163,6 +167,8 @@ class Order(models.Model):
     def get_total_scores(self):
         return sum(item.get_scores() for item in self.items.all())
 
+    def get_total_count(self):
+        return sum(item.quantity for item in self.items.all())
 
     def get_total_cost(self):
         return sum(item.get_cost() for item in self.items.all())
@@ -172,11 +178,12 @@ class Order(models.Model):
             self.scores_used = 0
         return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used
 
-    def update_status_transaction_id(self,status,transaction_id, cash_fee):
+    def update_status_transaction_id(self,status,transaction_id, cash_fee,pay_time):
         self.status = status
         self.transaction_id = transaction_id
         self.cash_fee = cash_fee
-        self.save(update_fields=['status','transaction_id','cash_fee'])
+        self.pay_time = pay_time
+        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
 
 #订单明细
 class OrderItem(models.Model):
@@ -209,7 +216,7 @@ class OrderItem(models.Model):
 class MemberScore(models.Model):
     nickname = models.CharField(verbose_name='用户昵称', max_length=64, blank=True, null=True)
     user_id = models.CharField(verbose_name='用户ID', max_length=64)
-    total_scores = models.IntegerField(verbose_name='金币', blank=True, null=True)
+    total_scores = models.IntegerField(verbose_name='积分', blank=True, null=True)
     update_time = models.DateTimeField(verbose_name='更新时间',auto_now=True)
 
     class Meta:
@@ -237,13 +244,13 @@ class MemberScoreDetail(models.Model):
     def __str__(self):
         return  self.member.nickname
 
-#金币使用额度设置
+#积分使用额度设置
 class ScoresLimit(models.Model):
-    limitvalue = models.IntegerField(verbose_name='金币额度(%)', blank=True, null=True)
+    limitvalue = models.IntegerField(verbose_name='积分额度(%)', blank=True, null=True)
     create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     class Meta:
-        verbose_name = '金币额度设置'
+        verbose_name = '积分额度设置'
         verbose_name_plural = verbose_name
 
     def __str__(self):

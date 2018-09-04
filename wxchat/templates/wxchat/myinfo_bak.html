@@ -1,0 +1,459 @@
+{% load static %}
+<style>
+.page{
+    background-color: #f4eded;
+}
+.page_header {
+    margin:0px;
+    padding:0px;
+    width: 100%;
+    margin-top:-40px;
+    height: 240px;
+    background: #f46253;
+    -webkit-border-radius: 100px / 50px;
+    -moz-border-radius: 100px / 50px;
+    border-radius: 100% / 70px;
+    position:relative;
+}
+.page_center{
+    width:100px;
+    height:100px;
+    margin: auto;
+    position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background-color: red;
+    text-align: center;
+}
+
+.page_center img{
+    width: 100px;
+    height: 100px;
+    border-radius:50px;
+}
+.page_center p{
+    font-size:16px;
+    color:#fff;
+}
+.nav_header{
+    background: #fff;
+    height: 2.3em;
+    width:70%;
+    margin: 0 auto;
+    position:relative;
+    margin-top: -30px;
+    padding-bottom: 10px;
+}
+.placeholder{
+    margin: 5px 0;
+    height: 2.3em;
+    line-height: 2.3em;
+    text-align: center;
+    font-size:14px;
+}
+
+.placeholder:first-child {
+    border-right: 1px solid #d3d0d0;
+}
+
+</style>
+<div class="page">
+    <div class="page_header">
+        <div class="page_center">
+            <img src="http://ftpcty.natappfree.cc/uploads/swiper/c.jpg">
+            <p>用户名称</p>
+        </div>
+    </div>
+    <div class="nav_header">
+        <div class="weui-flex">
+          <div class="weui-flex__item placeholder"><i class="icon iconfont icon-orderlisto" ></i> 我的订单</div>
+          <div class="weui-flex__item placeholder"><i class="icon iconfont icon-jiaoyi1" ></i> 我的积分</div>
+        </div>
+    </div>
+    <div class="page_body" style="padding-top:5px;">
+
+    </div>
+</div>
+<div class="weui-grids">
+    <a id="pet_loss" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-wangyuanjing2 icon_pink"></i> 寻找宠物</p>
+    </a>
+    <a id="pet_owner" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-man3 icon_pink"></i> 寻找主人</p>
+    </a>
+    <a id="pet_breed" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-hunyin icon_pink"></i> 宠物相亲</p>
+    </a>
+    <a id="pet_adopt"  href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-lingyang1 icon_pink"></i> 宠物领养</p>
+    </a>
+    <a id="pet_delivery" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-pet5 icon_pink"></i> 宠物送养</p>
+    </a>
+    <a id="pet_sale" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物销售</p>
+    </a>
+    <a id="pet_buy" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-mairu1 icon_pink"></i> 宠物求购</p>
+    </a>
+    <a id="pet_institution" href="javascript:void(0);" class="weui-grid padd_left">
+        <p class="weui-grid__label"><i class="icon iconfont icon-yiliaojigou2 icon_pink"></i> 宠物机构</p>
+    </a>
+
+</div>
+<div class="weui-panel weui-panel_access margin_top2">
+    <div class="weui-panel__bd" id="doglist">
+
+    </div>
+</div>
+<script>
+    $('#pet_loss').on('click',function(){
+         getDataList( 'loss' );
+    });
+
+    $('#pet_owner').on('click',function(){
+          getDataList( 'owner' );
+    });
+
+    $('#pet_breed').on('click',function(){
+          getDataList( 'breed' );
+    });
+
+    $('#pet_adopt').on('click',function(){
+          getDataList( 'adopt' );
+    });
+
+    $('#pet_delivery').on('click',function(){
+          getDataList( 'delivery' );
+    });
+
+
+    $('#pet_sale').on('click',function(){
+          getDataList( 'sale' );
+    });
+
+
+    $('#pet_buy').on('click',function(){
+          getDataList( 'buy' );
+    });
+
+    $('#pet_institution').on('click',function(){
+          getDataList( 'institution' );
+    });
+
+    $('#pet_share').on('click',function(){
+          getDataList( 'share' );
+    });
+
+    function getDataList( type ){
+        console.log(type);
+        sessionStorage.setItem('type',type);
+         $.ajax({
+          type: 'GET',
+          url: '{% url "my-info-list" %}',
+          data: { type:type },
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#doglist'),
+          success: function(data){
+              console.log(data.results);
+              $("#doglist").empty();
+              if(type =='loss'){
+                  appendLossItem(data.results);
+              }
+              else if(type=='owner'){
+                 appendOwnerItem(data.results);
+              }
+              else if(type =='breed'){
+                appendBreedItem(data.results);
+              }
+              else if(type == 'adopt'){
+                  appendAdoptItem(data.results);
+              }
+              else if(type == 'delivery'){
+                  appendDeliveryItem(data.results);
+              }
+              else if(type == 'sale'){
+                  appendSaleItem(data.results);
+              }
+              else if(type == 'buy'){
+                 appendBuyItem(data.results);
+              }
+              else if(type == 'institution'){
+                 appendInstituItem(data.results);
+              }
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    function appendInstituItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+            img_url = getImageUrl(img_url);
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+
+            var brief = item.brief == null?'':item.brief;
+            var unit =  '<a href="/wechat/doginstitutiondetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">' + item.name +'</h4>' +
+                               '<p class="weui-media-box__desc">机构简介: '+ brief +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendBuyItem(results){
+         $.each(results,function(index,item){
+            var unit =  '<a href="/wechat/dogbuydetail/' + item.id + '">' +
+                            '<div class="weui-media-box weui-media-box_text">' +
+                               '<h4 class="weui-media-box__title">'+ item.typeid +'</h4>' +
+                                '<p class="weui-media-box__desc">价格区间: '+ item.price +'</p>' +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendSaleItem(results){
+         $.each(results,function(index,item){
+            var img_url = item.picture;
+            img_url = getImageUrl(img_url);
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+
+            var seximg = getSexImage(item);
+
+            var unit =  '<a href="/wechat/dogsaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid + result +'</h4>' +
+                               '<p class="weui-media-box__desc">宠物说明: '+ item.desc +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendDeliveryItem(results){
+
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+            img_url = getImageUrl(img_url);
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+
+            var seximg = getSexImage(item);
+
+            var unit =  '<a href="/wechat/dogdeliverydetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid + result +'</h4>' +
+                               '<p class="weui-media-box__desc">宠物说明: '+ item.desc +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendAdoptItem(results){
+        $.each(results,function(index,item){
+            var unit =  '<a href="/wechat/dogadoptdetail/' + item.id + '">' +
+                            '<div class="weui-media-box weui-media-box_text">' +
+                               '<h4 class="weui-media-box__title">'+ item.name +'</h4>' +
+                                '<p class="weui-media-box__desc">宠物要求: '+ item.requirement +'</p>' +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendBreedItem(results){
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+            img_url = getImageUrl(img_url);
+
+            var result ='';
+            if(item.result == 1)
+            {
+                result = '<span class="r"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+
+            var seximg = getSexImage(item);
+
+            var unit =  '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid + result +'</h4>' +
+                               '<p class="weui-media-box__desc">宠物说明: '+ item.desc +'</p>'  +
+                             '</div>' +
+                        '</a>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendOwnerItem(results){
+         $.each(results,function(index,item){
+            var img_url = item.picture;
+
+            img_url = getImageUrl(img_url);
+
+            var  button ='';
+            if(item.result == 1)
+            {
+                button = '<span class="r btn_pos"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+            else{
+                button ='<button class="weui-btn weui-btn_mini weui-btn_primary btn_pos" onclick="setOwnerResult('+ item.id +');">找到确认</button>';
+            }
+
+            var seximg = getSexImage(item);
+            var unit =  '<div class="weui-media-box weui-media-box_appmsg">' +
+                '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                '<div class="weui-media-box__bd">' + button  +
+                   '<a href="/wechat/dogownerdetail/' + item.id + '">' +
+                   '<h4 class="weui-media-box__title">'+ seximg + item.typeid  +'</h4>' +
+                   '<p class="weui-media-box__desc">丢失地点: '+ item.findplace +'</p>'  +
+                   '</a></div>' +
+            '</div>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function appendLossItem(results){
+
+        $.each(results,function(index,item){
+            var img_url = item.picture;
+
+            img_url = getImageUrl(img_url);
+
+            var  button ='';
+            if(item.result == 1)
+            {
+                button = '<span class="r btn_pos"><i class="weui-icon-success-no-circle"></i></span>';
+            }
+            else{
+                button ='<button class="weui-btn weui-btn_mini weui-btn_primary btn_pos" onclick="setLossResult('+ item.id +');">找到确认</button>';
+            }
+
+            var seximg = getSexImage(item);
+            var unit =  '<div class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd image_size">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' + button  +
+                               '<a href="/wechat/doglossdetail/' + item.id + '">' +
+                               '<h4 class="weui-media-box__title">'+ seximg + item.typeid  +'</h4>' +
+                               '<p class="weui-media-box__desc">丢失地点: '+ item.lostplace +'</p>'  +
+                               '</a></div>' +
+                        '</div>';
+            $('#doglist').append( unit );
+        }) ;
+    }
+
+    function getImageUrl(img_url){
+        var imageUrl = '';
+        if(img_url == null){
+            imageUrl = '<i class="icon iconfont icon-pet6  weui-media-box__thumb icon_size" ></i>';
+        }
+        else {
+            imageUrl = '<img class="weui-media-box__thumb" src="' + img_url + '">';
+        }
+        return imageUrl;
+    }
+
+    function setLossResult( itemid ){
+        $.ajax({
+          type: 'PATCH',
+          url: '/wechat/api/updateloss/'+ itemid + '/',
+          data: {result:1 },
+          dataType: 'json',
+          timeout: 2000,
+          beforeSend: function(xhr,settings){
+              xhr.setRequestHeader('X-CSRFtoken', $.fn.cookie('csrftoken'))
+          },
+          success: function(data){
+              console.log(data);
+              getDataList( 'loss' );
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+    function setOwnerResult( itemid ){
+        $.ajax({
+          type: 'PATCH',
+          url: '/wechat/api/updateowner/'+ itemid + '/',
+          data: {result:1 },
+          dataType: 'json',
+          timeout: 2000,
+          beforeSend: function(xhr,settings){
+              xhr.setRequestHeader('X-CSRFtoken', $.fn.cookie('csrftoken'))
+          },
+          success: function(data){
+              console.log(data);
+              getDataList( 'owner' );
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+</script>
+#积分操作
+$("#sel_scores").on('click', function(){
+
+            var params ={
+                  out_trade_no: $("#out_trade_no").text(),
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+            };
+            if( $(this).prop("checked") ){
+                params.flag = 1;
+            }
+            else{
+                params.flag = 0;
+            }
+            scoresLimit( params );
+
+        });
+
+        function scoresLimit( params )
+        {
+            $.ajax({
+                  type: 'POST',
+                  url: '{% url "scores-limit" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                     if(data.success == "true"){
+                        $('#total_cost_top').text(' ¥ ' + data.total_cost.toFixed(2));
+                        $('#total_cost_bottom').text(' ¥ ' + data.total_cost.toFixed(2));
+                     }
+                     else if( data.error_scores == "true" ){
+                         $("#sel_scores").prop("checked", false)
+                         weui.alert('您的积分不足,无法使用积分支付!');
+                     }
+                  },
+                  error: function(error){
+                      console.log(error);
+                  }
+            });
+        };

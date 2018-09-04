@@ -39,7 +39,7 @@ class ShopCartAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsType)
 class GoodsTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sort')
+    list_display = ('name', 'sort','is_show')
     list_per_page = 50
 
 

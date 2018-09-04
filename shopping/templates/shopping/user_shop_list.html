@@ -1,0 +1,88 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block tab %}
+    <div class="weui-tab" id="tab">
+        <div class="weui-tab__content weui-tab__panel_active" >
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                        <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                        <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">购物车</span></div>
+                     </div>
+                </div>
+                <div class="weui-panel__bd">
+                    <div class="weui-cell weui-cell_access">
+                        <div class="weui-cell__hd">
+                            <div class="weui-cells_checkbox" >
+                              <label class="weui-check__label" for="selectAll" >
+                                  <input type="checkbox" class="weui-check" name="checkall" id="selectAll" {% if checkAll %} checked {% endif %}>
+                                  <i class="weui-icon-checked"></i>
+                              </label>
+                              <i class="icon iconfont icon-shangcheng2" ></i> {{ project_name }}
+                            </div>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <span  class="r" id="clear_cart">清空</span>
+                        </div>
+                    </div>
+                    {% for cart in carts_list %}
+                    <div class="weui-media-box weui-media-box_appmsg" id="item-{{ cart.goods.id }}" style="background-color: #fafafa">
+                            <div class="weui-cells_checkbox" >
+                              <label class="weui-check__label" for="id-{{ cart.goods.id }}" >
+                                  <input type="checkbox" class="weui-check" name="checkid" id="id-{{ cart.goods.id }}" data-item="{{ cart.goods.id }}" {% if cart.status == 1 %} checked="true" {% endif %}>
+                                  <i class="weui-icon-checked"></i>
+                              </label>
+                            </div>
+                            {% if cart.goods.images %}
+							<div class="weui-media-box__hd">
+								 <img class="weui-media-box__thumb" src="{{ cart.goods.images.url }}" alt="">
+							</div>
+                            {% else %}
+                            <div class="weui-media-box__hd">
+                                 <i class="icon iconfont icon-pets  weui-media-box__thumb" ></i>
+							</div>
+                            {% endif %}
+							<div class="weui-media-box__bd">
+                                <h4 class="weui-media-box__title">{{ cart.goods.name }}</h4>
+                                <ul class="weui-media-box__info ">
+                                    <li class="weui-media-box__info__meta sub_title">¥ {{ cart.price }}</li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" >
+                                        {{ cart.goods.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
+                                    </li>
+                                </ul>
+                                <p class="weui-media-box__desc sub_title" style="padding-top:5px;font-size:16px;">
+                                    <span >
+                                        <input type="button"  class="decrease input_length" value="-" >
+                                        <input type="number" data-item="{{ cart.goods.id }}"  value="{{ cart.quantity }}" min="1" max="{{ cart.goods.stock_nums }}" class="number input_length" />
+                                        <input type="button"  class="increase input_length" value="+" >
+                                    </span>
+                                    <span class="deleteitem r" data-item="{{ cart.goods.id }}"><i class="icon iconfont icon-delete2 color_red" style="font-weight: bold" ></i></span>
+                                </p>
+							</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="weui-tabbar">
+{#        <a href="#" class="weui-tabbar__item tabbar_item">#}
+{#             <div class="weui-tabbar__label" style="color: black;">#}
+{#                  <div class="price-total" ><span>总金额: <b id="total_price" data-price="0">¥0.00</b></span></div>#}
+{#                 <div class="benefits" ><span>已优惠: <b id="benefits_price">¥0.00</b></span></div>#}
+{#             </div>#}
+{#        </a>#}
+{#         <a href="javascript:;" class="weui-tabbar__item tabbar_item" id="gotopay">#}
+{#            <p id="gotobuy" class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 去结算</p>#}
+{#        </a>#}
+    </div>
+{% endblock tab %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView
-from .views import sendTemplateMessage, ShopCartBuyListView
+from .views import sendTemplateMessage, ShopCartBuyListView, OrderView
 
 
 urlpatterns = [
@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^pay/wxnotify/$', payNotify, name='pay-notify'), #订单回调
     url(r'^shopcartlist/$', ShopCartListView.as_view(), name='shop-cart-list'), #购物车列表
     url(r'^cartbuylist/$', ShopCartBuyListView.as_view(), name='cart-buy-list'), #购物车购买列表
+    url(r'^myorderlist/$', OrderView.as_view(), name='my-order-list'), #我的订单列表
 
     url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息
 

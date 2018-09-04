@@ -1,0 +1,49 @@
+<div class="page_header">
+    <div class="page_center">
+        <img src="{{ request.session.headimgurl }}">
+        <p>{{ request.session.nickname }}</p>
+    </div>
+</div>
+<div class="nav_header">
+    <div class="weui-flex">
+      <a href="{% url 'my-order-list' %}" class="weui-flex__item placeholder"><i class="icon iconfont icon-orderlisto" ></i> 我的订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></a>
+      <a class="weui-flex__item placeholder"><i class="icon iconfont icon-jiaoyi1" ></i> 我的积分 <span id="myscore"></span></a>
+    </div>
+</div>
+<script>
+    $(function(){
+
+        getMyScore();
+        getMyOrderCount();
+    });
+
+    function getMyScore(){
+        $.ajax({
+              type: 'GET',
+              url: '{% url "member-score" %}',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                  if(data.total_scores){
+                     $("#myscore").text(data.total_scores);
+                  }
+              },
+              error: function(error){}
+            });
+    }
+
+    function getMyOrderCount(){
+        $.ajax({
+          type: 'GET',
+          url: '{% url "order-cart-count" %}',
+          data:{ order:1, _rand:Math.random() },
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              $('#order_nums').text(data.order_nums);
+
+          },
+          error: function(xhr, type,error){}
+        });
+    }
+ </script>
