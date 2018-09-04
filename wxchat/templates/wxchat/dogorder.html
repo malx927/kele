@@ -1,121 +1,162 @@
-<!doctype html>
-<html lang="en">
-{% load static %}
-<head>
-    <meta charset="UTF-8">
-    <title>宠粮定制</title>
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block extra %}
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}">
-
-</head>
-<body>
-<div class="container">
-    {% for i in order %}
-        {% if forloop.first == True %}
-            <ul class="question show" id="question_1">
-
-                <h3>{{ i.name }}</h3>
-                {% for s in i.dogstatustype.all %}
-                    <li data-answer="{{ s.name }}">{{ s.name }}</li>
-                {% endfor %}
-
-
-            </ul>
-        {% elif not forloop.last and not forloop.first %}
-
-            <ul class="question" id="question_{{ forloop.counter }}">
-
-                <h3>{{ i.name }}</h3>
-                {% for s in i.dogstatustype.all %}
-                    <li data-answer="{{ s.name }}">{{ s.name }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            {% if forloop.last %}
-                <ul class="question" id="question_{{ i.id }}">
-
-                    <h3>{{ i.name }}</h3>
+    <script type="application/javascript">
+        window.history.forward(1);
+    </script>
+{% endblock extra %}
+{% block container %}
+    <div class="weui-panel">
+    <div class="weui-panel__hds header_bottom">
+        <div class="weui-flex">
+            {#            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
+            {#            </div>#}
+            {#                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠粮定制</span></div>#}
+            {#            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>#}
+        </div>
+    </div>
+    <div class="weui-panel__bd" style="text-align: center">
+        {#        {% csrf_token %}#}
+        {% for i in order %}
+            {% if forloop.first == True %}
+                <ul class="weui_cells_title weui-start question show" id="question_1">
+                    <h1 class="f-green">{{ i.name }}</h1>
                     {% for s in i.dogstatustype.all %}
+
                         <li data-answer="{{ s.name }}">{{ s.name }}</li>
                     {% endfor %}
-                    <div class="btn_box">
-                        <a href="javascript:void(0);" class="submit" onclick="submitPage()">提交</a>
-                    </div>
                 </ul>
+            {% elif not forloop.last and not forloop.first %}
+{#                <div class="weui-form">#}
+                    <ul class="weui-form-li question" id="question_{{ forloop.counter }}">
+                        {% if i.name == '皮肤状况' %}
+                            <h1 class="f-green" style="margin-left: 10px;">{{ i.name }}</h1>
+                            {% for s in i.dogstatustype.all %}
+                                <input class="weui-form-checkbox" id="{{ s.id }}" type="checkbox" name="bones_status"
+                                       value="{{ s.name }}">
+                                <label for="{{ s.id }}">
+                                    <i class="weui-icon-checkbox"></i>
+
+                                    <div class="weui-form-text">
+                                        <p style="font-size: 20px;">{{ s.name }}</p></div>
+                                </label>
+                            {% endfor %}
+                            <a href="javascript:void(0);" class="previous_page weui_btns hide weui_btn_primary">上一页</a>
+                                <a href="javascript:void(0);" class="previous_pages  weui_btns questions weui_btn_primary"
+                                   id="questions_{{ forloop.counter }}">下一页</a>
+                        {% else %}
+                            <h1 class="f-green">{{ i.name }}</h1>
+                            {% for s in i.dogstatustype.all %}
+                                <li data-answer="{{ s.name }}">{{ s.name }}</li>
+                            {% endfor %}
+                            <a href="javascript:void(0);" class="previous_page hide weui_btns weui_btn_primary">上一页</a>
+                        {% endif %}
+                    </ul>
+{#                </div>#}
+            {% else %}
+                {% if forloop.last %}
+                    <ul class="question" id="question_{{ i.id }}">
+                        <h1 class="f-green">{{ i.name }}</h1>
+                        {% for s in i.dogstatustype.all %}
+                            <li data-answer="{{ s.name }}">{{ s.name }}</li>
+                        {% endfor %}
+                        {#                        <div class="btn_box">#}
+                        {#                            <a href="javascript:void(0);"  class="submit weui_btn weui_btn_primary"#}
+                        {#                               >提交</a>#}
+                        {#                        <a id="formSubmitBtn" href="javascript:" class="weui_btn weui_btn_primary">提交</a>#}
+                        {#                        </div>#}
+                        <a href="javascript:void(0);" class="previous_page hide weui_btns weui_btn_primary">上一页</a>
+                        <div class="weui-form">
+                            <div class="weui-form-li">
+                                <a href="javascript:" onclick="submitPage()"
+                                   class="weui_btn weui_btn_primary submit">提交</a>
+                            </div>
+                        </div>
+                    </ul>
+                {% endif %}
             {% endif %}
-        {% endif %}
-    {% endfor %}
-    <div class="btn_box">
-        <a href="javascript:void(0);" class="previous_page hide">上一页</a>
+        {% endfor %}
+
+
 
     </div>
+    <script src="{% static 'wxchat/js/jquery.min.js' %}"></script>
+    <script>
+        $(function () {
+            $(".question>li").on("click", function () {
+                var len = 7;
+                var idx = $(this).parent().attr("id");
+                idx = idx.split('_')[1];
+                var idx2 = idx * 1 + 1;
+                $(this).addClass("answer").siblings("li").removeClass("answer");
+                setTimeout(function () {
+                    if (idx == len) {
+                        return false;
+                    } else {
+                        $("#question_" + idx + "").hide();
+                        $("#question_" + idx2 + "").show();
+                    }
+                }, 500)
 
-</div>
-<script src="{% static 'wxchat/js/jquery.min.js' %}"></script>
-<script>
-    $(function () {
-        $(".question>li").on("click", function () {
-            var len = $(".container>ul").size();
-            var idx = $(this).parent().attr("id");
-            idx = idx.split('_')[1];
-            var idx2 = idx * 1 + 1;
-            $(this).addClass("answer").siblings("li").removeClass("answer");
-            setTimeout(function () {
-                if (idx == len) {
-                    return false;
-                } else {
-                    $("#question_" + idx + "").hide();
-                    $("#question_" + idx2 + "").show();
+            });
+            $(".previous_page").on("click", function () {
+                var idx = $(".question:visible").attr("id");
+                idx = idx.split('_')[1];
+                var idx2 = idx - 1;
+                $("#question_" + idx + "").hide();
+                $("#question_" + idx2 + "").show();
+                if ($("#question_1").is(":visible")) {
+                    $(this).hide();
                 }
-            }, 500)
+            });
 
+            $(".previous_pages").on("click", function () {
+                var idx = $(".questions:visible").attr("id");
+                idx = idx.split('_')[1];
+                var idx2 = parseInt(idx) + parseInt(1);
+                $("#question_" + idx + "").hide();
+                $("#question_" + idx2 + "").show();
 
+            });
+            $("#question_1>li").on("click", function () {
+                setTimeout(function () {
+                    $(".previous_page").show();
+                }, 500)
+            });
         });
-        $(".previous_page").on("click", function () {
-            var idx = $(".question:visible").attr("id");
-            idx = idx.split('_')[1];
-            var idx2 = idx - 1;
-            $("#question_" + idx + "").hide();
-            $("#question_" + idx2 + "").show();
-            if ($("#question_1").is(":visible")) {
-                $(this).hide();
-            }
-        });
-        $("#question_1>li").on("click", function () {
-            setTimeout(function () {
-                $(".previous_page").show();
-            }, 500)
-        })
+
+        function submitPage() {
+            var a = [];
+            {#        a.push($(".question>li.answer").text())#}
+            $(".question>li.answer").each(function () {
+                var answers = $(this).data('answer');
+                a.push(answers);
+            });
+            var chk_value = [];
+            $('input[name="bones_status"]:checked').each(function () {
+                chk_value.push($(this).val());
+            });
+            $.ajax({
+
+                url: "{% url 'dog-order' %}",  //请求服务的地址
+
+                type: "GET",  //数据发送的方式
+
+                contentType: "application/jason; encode=utf-8",  // 发送的数据及data对应数据的类型，前者是POST方式，后者是GET方式
+
+                data: {'alldata': JSON.stringify(a), 'aa': JSON.stringify(chk_value)},
+
+                success: function (data) {
+                    window.location.href = "{% url 'order-success'%}?peice=" + data['peice'] + '&skin_status=' + data['skin_status'] + '&eye_status=' + data['eye_status'] + '&dogtype=' + data['dogtype'] + '&dog_age=' + data['dog_age'] + '&body_status=' + data['body_status'] + '&bones_status=' + data['bones_status'] + '&dog_code=' + data['dog_code'];
+                    //ret_data是ajax发送成功后，后端服务器HttpResponse（）返回的数据
+
+                }
+
+            });
+        }
+    </script>
 
 
-    });
-
-    function submitPage() {
-        var a = [];
-        {#        a.push($(".question>li.answer").text())#}
-        $(".question>li.answer").each(function () {
-            var answers = $(this).data('answer');
-            a.push(answers)
-        });
-        {#        alert(a);#}
-        $.ajax({
-
-            url: "{% url 'dog-order' %}",  //请求服务的地址
-
-            type: "GET",  //数据发送的方式
-
-            contentType: "application/jason; encode=utf-8",  // 发送的数据及data对应数据的类型，前者是POST方式，后者是GET方式
-
-            data: {'alldata': JSON.stringify(a)},
-
-            success: function (data) {
-                window.location.href = "{% url 'order-success'%}?peice=" + data['peice'] + '&skin_status=' + data['skin_status'] + '&eye_status=' + data['eye_status'] + '&dogtype=' + data['dogtype'] + '&dog_age=' + data['dog_age'] + '&body_status=' + data['body_status'] + '&bones_status=' + data['bones_status'] + '&dog_code=' + data['dog_code'];
-                //ret_data是ajax发送成功后，后端服务器HttpResponse（）返回的数据
-
-            }
-
-        });
-    }
-</script>
-
-</body>
-</html>
+{% endblock container %}
