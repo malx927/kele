@@ -261,7 +261,7 @@ class DogOrder(models.Model):
         ordering = ['-create_time']
 
     def __str__(self):
-        return self.productname
+        return self.name
 
 
     def update_status_transaction_id(self,pay_status,transaction_id):
