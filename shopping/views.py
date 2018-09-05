@@ -294,7 +294,7 @@ class CreateOrderView(View):
 
         try:
             is_member = request.session.get('is_member', None)
-            order = Order.objects.get(out_trade_no=out_trade_no)
+            order = Order.objects.get(out_trade_no=out_trade_no, status=0)
             flag = 0   #是否选中金币支付
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
@@ -397,12 +397,12 @@ def payNotify(request):
             #验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
                 order =getShoppingOrder(openid, res_data['out_trade_no'])
-                if order.status==0 and order.get_total_cost() * 100 == res_data['total_fee']:
+                if order and order.status==0 :
                     #更新订单
                     status = 1  #已支付标志
                     cash_fee = res_data['cash_fee'] / 100
                     time_end = res_data['time_end']
-                    pay_time = datetime.datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                    pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
                     order.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
                     #更新会员积分
                     setMemberScores( order )
@@ -429,7 +429,7 @@ def queryOrder( transaction_id, out_trade_no):
 def getShoppingOrder(user_id, out_trade_no):
 
     try:
-        order = Order.objects.get( user_id=user_id, out_trade_no=out_trade_no )
+        order = Order.objects.get( user_id=user_id, out_trade_no=out_trade_no, status=0 )
     except Order.DoesNotExist:
         order = None
 

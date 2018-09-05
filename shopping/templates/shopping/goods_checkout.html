@@ -1,7 +1,7 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
     {% include 'shopping/include/jssdk.html' %}
-    <script>
+    <script type="text/javascript">
     wx.ready(function () {
         $('#pay_now').on('click',function(){
             var params ={
@@ -22,6 +22,7 @@
               },
               error: function(error){
                   weui.alert('商品支付失败!');
+                  window.location.href = "{% url 'shopping-list' %}";
               }
             });
         });
