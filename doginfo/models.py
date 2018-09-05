@@ -214,11 +214,12 @@ class DogOwner(models.Model):
 class DogStatus(models.Model):
     name = models.CharField(verbose_name=u'名称', max_length=20, db_index=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
 
     class Meta:
         verbose_name = u"宠物状况表"
         verbose_name_plural = u'宠物状况表'
-        ordering = ['-create_time']
+        ordering = ['sort']
 
     def __str__(self):
         return self.name

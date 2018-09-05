@@ -25,6 +25,8 @@ class GoodsListSerializer(serializers.ModelSerializer):
         fields = ('id','name','goodstype','images', 'price', 'benefits', 'scores', 'content', 'get_absolute_url')
 
     def get_benefits(self,obj):
+        if obj.benefits == 0:
+            return 0
         diff_price = obj.price - obj.benefits
         if diff_price > 0:
             return diff_price
