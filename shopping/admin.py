@@ -1,6 +1,6 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit, MailFee
 # Register your models here.
 
 @admin.register(Goods)
@@ -17,14 +17,14 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ( 'username',  'detailinfo', 'telnumber','total_fee','cash_fee','scores_used','out_trade_no',  'add_time','pay_time', 'status', 'transaction_id')
+    list_display = ( 'username',  'detailinfo', 'telnumber','total_fee','cash_fee','mailstyle','out_trade_no',  'add_time','pay_time', 'status', 'is_mail')
     list_per_page = 50
     list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
     inlines = [OrderItemInline]
 
     fieldsets = [
         ('订单', {
-            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','scores_used','cash_fee','nationalcode', 'status', 'transaction_id')
+            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','mail_cost', 'cash_fee','mailstyle','nationalcode', 'status', 'is_mail')
         })
     ]
 
@@ -66,5 +66,11 @@ class MemberScoreAdmin(admin.ModelAdmin):
 @admin.register(ScoresLimit)
 class ScoresLimitAdmin(admin.ModelAdmin):
     list_display = ('limitvalue', 'create_time')
+    list_per_page = 50
+
+
+@admin.register(MailFee)
+class MailFeeAdmin(admin.ModelAdmin):
+    list_display = ('mail_cost', 'create_at')
     list_per_page = 50
 

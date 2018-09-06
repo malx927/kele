@@ -9,11 +9,11 @@ from django.views.generic import DetailView,ListView, View
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
 from kele import settings
-from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit
+from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee
 from wxchat.views import getJsApiSign
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
-from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce
+from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 from wxchat.views import client
 from django.db.models import Sum,F, FloatField,Count
@@ -55,6 +55,7 @@ def index(request):
 def goodList(request):
     pass
 
+#消费通知
 # {{first.DATA}}
 # 消费店铺：{{keyword1.DATA}}
 # 购买商品：{{keyword2.DATA}}
@@ -62,9 +63,17 @@ def goodList(request):
 # 消费时间：{{keyword4.DATA}}
 # 交易流水：{{keyword5.DATA}}
 # {{remark.DATA}}
+#订单付款成功通知
+# {{first.DATA}}
+# 订单号：{{keyword1.DATA}}
+# 支付时间：{{keyword2.DATA}}
+# 支付金额：{{keyword3.DATA}}
+# 支付方式：{{keyword4.DATA}}
+# {{remark.DATA}}
 def sendTemplateMessage(request):
-    template_id = 'ss5T1uPePrCZxbHf1cj-isdrvxbsqHWFU875ak8Bhck'
-    url ='http://www.qq.com'
+    template_id = 'ss5T1uPePrCZxbHf1cj-isdrvxbsqHWFU875ak8Bhck' #消费通知
+
+    url ='http://www.hld8000.com/wechat/redirect/dogindex'
     data ={
         'first':{
             "value":"恭喜你购买成功！",
@@ -96,7 +105,37 @@ def sendTemplateMessage(request):
        }
     }
 
+    template_id1 = 'HALkJFfhQenGdkZIA1b0mvXQz1xV0CI0S2zNaudWlp4' #订单付款成功通知
+    data1 ={
+        'first':{
+            "value":"用户的订单已经支付",
+            "color":"#173177"
+        },
+        "keyword1":{
+           "value":"12345678",
+           "color":"#173177"
+        },
+        "keyword2":{
+           "value":"2018年9月6日",
+           "color":"#173177"
+        },
+        "keyword3":{
+           "value":"100.00",
+           "color":"#173177"
+        },
+       "keyword4": {
+           "value":"微信支付",
+           "color":"#173177"
+       },
+        "remark":{
+           "value":"请尽快核对订单，为客户发货！",
+           "color":"#173177"
+       }
+    }
+
     ret = client.message.send_template(user_id='oX5Zn04Imn5RlCGlhEVg-aEUCHNs',template_id=template_id,url=url,data=data)
+    print(ret)
+    ret = client.message.send_template(user_id='oX5Zn04Imn5RlCGlhEVg-aEUCHNs',template_id=template_id1,url=url,data=data1)
     print(ret)
     return JsonResponse(ret)
 
@@ -295,21 +334,15 @@ class CreateOrderView(View):
         try:
             is_member = request.session.get('is_member', None)
             order = Order.objects.get(out_trade_no=out_trade_no, status=0)
-            flag = 0   #是否选中金币支付
+
+            mail_cost = MailFee.getMailCost()
+
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
                 benefits_totals = order.get_total_cost() - total_cost
-
-                if order.scores_used > 0:
-                    scores_used = order.scores_used
-                    flag = 1    #是否选中金币支付
-                else:
-                    limit_value = ScoresLimit.getLimitValue()
-                    scores_used = int(total_cost * limit_value / 100)
             else:
                 total_cost = order.get_total_cost()         #非会员
                 benefits_totals = 0
-                scores_used = 0
 
             if total_cost <=0:
                 raise Exception
@@ -322,9 +355,9 @@ class CreateOrderView(View):
             'total_cost': total_cost,
             'items': items,
             'benefits_totals': benefits_totals,
-            'scores_used': scores_used,
+            'mail_cost': mail_cost,
+            'mail_style':order.mailstyle,
             'out_trade_no': out_trade_no,
-            'flag': flag,
             'sign': signPackage
         }
         return render(request,template_name='shopping/goods_checkout.html',context=context )
@@ -406,10 +439,9 @@ def payNotify(request):
                     order.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
                     #更新会员积分
                     setMemberScores( order )
-                    #发送消息
+                    #发送模板消息
                     if openid:
-                        ret = client.message.send_text(openid, 'hello')
-                        print(ret)
+                        sendTempMessageToUser( order )
 
         return  HttpResponse(xml)
     except InvalidSignatureException as error:
@@ -475,6 +507,85 @@ def setMemberScores( order ):
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
 
+#消费通知
+# {{first.DATA}}
+# 消费店铺：{{keyword1.DATA}}购买商品：{{keyword2.DATA}}消费金额：{{keyword3.DATA}}消费时间：{{keyword4.DATA}}交易流水：{{keyword5.DATA}}{{remark.DATA}}
+#订单付款成功通知
+# {{first.DATA}}订单号：{{keyword1.DATA}}支付时间：{{keyword2.DATA}}支付金额：{{keyword3.DATA}}支付方式：{{keyword4.DATA}}{{remark.DATA}}
+def sendTempMessageToUser( order ):
+
+    template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
+    template_kf = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
+
+    url ='http://www.hld8000.com/wechat/redirect/dogindex'
+    color = "#173177"
+    pay_time = order.pay_time.strftime('%Y年%m月%d日')
+    customer_data ={
+        'first':{
+            "value":"恭喜你购买成功！",
+            "color":color
+        },
+        "keyword1":{
+           "value":settings.PROJECT_NAME,
+           "color":color
+        },
+        "keyword2":{
+           "value":"",
+           "color":color
+        },
+       "keyword3": {
+           "value":"{0}{1}".format(order.total_fee + order.mail_cost,'元') ,
+           "color":color
+       },
+        "keyword4": {
+           "value":pay_time,
+           "color":color
+        },
+       "keyword5": {
+           "value":order.out_trade_no,
+           "color":color
+       },
+       "remark":{
+           "value":"欢迎再次购买！",
+           "color":color
+       }
+    }
+
+    kf_data ={
+        'first':{
+            "value":"客户 {0} 的订单已经支付成功",
+            "color":color
+        },
+        "keyword1":{
+           "value":order.out_trade_no,
+           "color":color
+        },
+        "keyword2":{
+           "value":pay_time,
+           "color":color
+        },
+        "keyword3":{
+           "value":"{0}{1}".format(order.total_fee + order.mail_cost,'元'),
+           "color":color
+        },
+       "keyword4": {
+           "value":"微信支付",
+           "color":color
+       },
+        "remark":{
+           "value":"请尽快核对订单，为客户发货！",
+           "color":color
+       }
+    }
+
+    ret = client.message.send_template(user_id = order.user_id,template_id = template_custmer, url=url, data=customer_data)
+    if ret['errcode'] == 0:
+        msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
+        for user in msgUsers:
+            ret = client.message.send_template(user_id=user.openid,template_id = template_kf, url=url, data=kf_data)
+            print("kf_client", ret)
+    else:
+        print("customer", ret)
 
 #订单列表
 class OrderView(View):

@@ -98,7 +98,7 @@
 
         } , 2000, 1 );
 
-        $("#gotocart").on('click', function(e){
+        $("#gotocart,#my_cart").on('click', function(e){
             cart_nums = $('#cart_nums').text();
             if( cart_nums == 0 ) return false;
             window.location.href = '{% url 'shop-cart-list' %}';

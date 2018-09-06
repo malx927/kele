@@ -41,6 +41,11 @@ TYPE_SHOPPING_STATUS = (
 
 )
 
+TYPE_MAIL_STYLE = (
+    (1,'邮寄'),
+    (0,'自提'),
+)
+
 class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
@@ -158,6 +163,9 @@ class Order(models.Model):
     total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
     cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
     scores_used = models.IntegerField(verbose_name='使用积分', default=0, blank=True, null=True)
+    mailstyle = models.IntegerField(verbose_name='发货方式', blank=True , null=True, choices=TYPE_MAIL_STYLE)
+    mail_cost = models.IntegerField(verbose_name='邮寄费用', blank=True, null=True, default=0)
+    is_mail = models.BooleanField(verbose_name="是否发货", blank=True,  default=0)
 
     class Meta:
         verbose_name ='订单'
@@ -174,12 +182,19 @@ class Order(models.Model):
         return sum(item.quantity for item in self.items.all())
 
     def get_total_cost(self):
-        return sum(item.get_cost() for item in self.items.all())
+        if self.mailstyle == 1:
+            return sum(item.get_cost() for item in self.items.all()) + self.mail_cost
+        else:
+            return sum(item.get_cost() for item in self.items.all())
 
     def get_member_total_cost(self):
         if self.scores_used is None:
             self.scores_used = 0
-        return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used
+
+        if self.mailstyle ==1:
+            return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used + self.mail_cost
+        else:
+            return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee,pay_time):
         self.status = status
@@ -264,3 +279,21 @@ class ScoresLimit(models.Model):
         score_limit = ScoresLimit.objects.all().first()
         limitValue = score_limit.limitvalue if score_limit else 20
         return limitValue
+
+
+class MailFee(models.Model):
+    mail_cost = models.IntegerField(verbose_name='快递费用(元)', blank=True, null=True)
+    create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name ="快递费用"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "{0}%".format(self.mail_cost)
+
+    @classmethod
+    def getMailCost(cls):
+        mailFee = MailFee.objects.all().first()
+        mail_cost = mailFee.mail_cost if mailFee else 3
+        return mail_cost

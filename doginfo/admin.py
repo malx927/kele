@@ -125,14 +125,14 @@ class MemberScoreDetailInline(admin.TabularInline):
 
 @admin.register(DogStatus)
 class DogStatusAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sort', 'create_time')
+    list_display = ('name', 'sort','is_checkbox', 'create_time')
     list_display_links = ('name',)
     list_per_page = 50
     inlines = [MemberScoreDetailInline]
 
     fieldsets = [
         ('状况分类', {
-            'fields': ('name','sort')
+            'fields': ('name','sort','is_checkbox')
         })
     ]
 

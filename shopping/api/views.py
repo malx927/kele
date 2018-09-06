@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore
+from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore, MailFee
 from .paginations import PagePagination
 from .serializers import GoodsListSerializer, GoodsTypeSerializer, ShopCartSerializer, MemberScoreSerializer
 from shopping.views import getShopCartTotals
@@ -282,6 +282,9 @@ class ScoresLimitAPIView(APIView):
         return Response(ret)
 
 class MemberScoreAPIView(APIView):
+    """
+        成员积分
+    """
     permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         try:
@@ -296,7 +299,50 @@ class MemberScoreAPIView(APIView):
         return Response(serializer.data)
 
 
+class MailFeeAPIView(APIView):
+    """
+        邮寄方式
+    """
+    permission_classes = [AllowAny]
 
+    def post(self,request, *args, **kwargs):
+        mail_style = request.POST.get("mailstyle", None)
+        ret ={
+            "success": "false",
+            "total_cost": 0,
+            "mail_style": mail_style,
+        }
+        try:
+            user_id = request.session.get("openid", None)
+            is_member = request.session.get("is_member", None)
+            out_trade_no = request.POST.get("out_trade_no", None)
+            order = Order.objects.get(user_id=user_id, out_trade_no = out_trade_no)
+
+            #邮寄
+            order.mailstyle= int(mail_style)
+            if mail_style == "1":
+                mail_cost = MailFee.getMailCost()
+                order.mail_cost = mail_cost
+            elif mail_style == "0":
+                order.mail_cost = 0
+
+            order.save()
+
+            if is_member == 1:
+                ret['total_cost'] = order.get_member_total_cost()
+            else:
+                ret['total_cost'] = order.get_total_cost()
+
+            ret['success'] = "true"
+
+        except Order.DoesNotExist as ex:
+            print("MailFeeAPIView:", ex)
+            ret['errors'] = 'Order Doesnot Exits'
+        except MailFee.DoesNotExist as ex:
+            print("MailFeeAPIView:", ex)
+            ret['errors'] = 'MailFee Doesnot Exits'
+
+        return Response(ret)
 
 
 

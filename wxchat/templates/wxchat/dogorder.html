@@ -3,70 +3,93 @@
 {% block extra %}
     <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
     <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}">
-    <script type="application/javascript">
-        window.history.forward(1);
-    </script>
+    <style>
+    .cardBg{
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+{#        overflow: hidden;#}
+        z-index: 0;
+        right: 0;
+        margin: auto;
+        max-width: 640px;
+        background: url({% static 'wxchat/images/card_bg.png' %}) no-repeat;
+{#        background-size: 100% auto;#}
+        background-size: 100% 100%;
+        -moz-background-size: 100% 100%;
+        -webkit-background-size: 100% 100%;
+    }
+
+    .check_label{
+        line-height: 48px;
+        padding: 0; padding-left:75px;
+        margin-bottom:20px;
+    }
+    .check_label:active{
+         background-color: transparent;
+    }
+    </style>
 {% endblock extra %}
 {% block container %}
-    <div class="weui-panel">
-    <div class="weui-panel__hds header_bottom">
+<div class="cardBg"></div>
+<div class="weui-panel" style="height: 100%;margin-top: 0px;background-color: transparent;">
+    <div class="weui-panel__hd">
         <div class="weui-flex">
-            {#            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray "></i></a>#}
-            {#            </div>#}
-            {#                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠粮定制</span></div>#}
-            {#            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>#}
+            <div></div>
+            <div class="weui-flex__item" style="text-align: center;"></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
-    <div class="weui-panel__bd" style="text-align: center">
-        {#        {% csrf_token %}#}
-        {% for i in order %}
+    <div class="weui-panel__bd" style="color: #3a1437;">
+     <div style="height:75px;"></div>
+        {% for order in orders %}
             {% if forloop.first == True %}
-                <ul class="weui_cells_title weui-start question show" id="question_1">
-                    <h1 class="f-green">{{ i.name }}</h1>
-                    {% for s in i.dogstatustype.all %}
-
-                        <li data-answer="{{ s.name }}">{{ s.name }}</li>
+            <div id="sort_{{ order.sort }}" style="overflow: hidden;">
+                <div class="weui-cells__title" style="margin-bottom: 2.8em;color: #3a1437;text-align: center;font-size: 30px;">{{ order.name }}</div>
+                <div class="weui-cells weui-cells_radio" style="background-color: transparent;">
+                    {% for s in order.dogstatustype.all %}
+                    <label class="weui-cell weui-check__label check_label" for="id_{{s.id}}" >
+                        <div class="weui-cell__bd" style="font-size: 18px;color: #3a1437;">
+                            {{ s.name }}
+                           <input type="radio" class="weui-check" name="radio_{{order.sort}}" id="id_{{s.id}}" value="{{ s.name }}">
+                            <span class="weui-icon-checked"></span>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </label>
                     {% endfor %}
-                </ul>
+                </div>
+            </div>
             {% elif not forloop.last and not forloop.first %}
-{#                <div class="weui-form">#}
                     <ul class="weui-form-li question" id="question_{{ forloop.counter }}">
-                        {% if i.name == '皮肤状况' %}
-                            <h1 class="f-green" style="margin-left: 10px;">{{ i.name }}</h1>
-                            {% for s in i.dogstatustype.all %}
-                                <input class="weui-form-checkbox" id="{{ s.id }}" type="checkbox" name="bones_status"
-                                       value="{{ s.name }}">
+                        {% if order.is_checkbox == 1 %}
+                            <h1 class="f-green" style="margin-left: 10px;">{{ order.name }}</h1>
+                            {% for s in order.dogstatustype.all %}
+                                <input class="weui-form-checkbox" id="{{ s.id }}" type="checkbox" name="bones_status" value="{{ s.name }}">
                                 <label for="{{ s.id }}">
                                     <i class="weui-icon-checkbox"></i>
-
-                                    <div class="weui-form-text">
-                                        <p style="font-size: 20px;">{{ s.name }}</p></div>
+                                    <div class="weui-form-text"><p style="font-size: 20px;">{{ s.name }}</p></div>
                                 </label>
                             {% endfor %}
                             <a href="javascript:void(0);" class="previous_page weui_btns hide weui_btn_primary">上一页</a>
-                                <a href="javascript:void(0);" class="previous_pages  weui_btns questions weui_btn_primary"
-                                   id="questions_{{ forloop.counter }}">下一页</a>
+                            <a href="javascript:void(0);" class="previous_pages  weui_btns questions weui_btn_primary" id="questions_{{ forloop.counter }}">下一页</a>
                         {% else %}
-                            <h1 class="f-green">{{ i.name }}</h1>
-                            {% for s in i.dogstatustype.all %}
+                            <h1 class="f-green">{{ order.name }}</h1>
+                            {% for s in order.dogstatustype.all %}
                                 <li data-answer="{{ s.name }}">{{ s.name }}</li>
                             {% endfor %}
                             <a href="javascript:void(0);" class="previous_page hide weui_btns weui_btn_primary">上一页</a>
                         {% endif %}
                     </ul>
-{#                </div>#}
+
             {% else %}
                 {% if forloop.last %}
                     <ul class="question" id="question_{{ i.id }}">
-                        <h1 class="f-green">{{ i.name }}</h1>
-                        {% for s in i.dogstatustype.all %}
+                        <h1 class="f-green">{{ order.name }}</h1>
+                        {% for s in order.dogstatustype.all %}
                             <li data-answer="{{ s.name }}">{{ s.name }}</li>
                         {% endfor %}
-                        {#                        <div class="btn_box">#}
-                        {#                            <a href="javascript:void(0);"  class="submit weui_btn weui_btn_primary"#}
-                        {#                               >提交</a>#}
-                        {#                        <a id="formSubmitBtn" href="javascript:" class="weui_btn weui_btn_primary">提交</a>#}
-                        {#                        </div>#}
                         <a href="javascript:void(0);" class="previous_page hide weui_btns weui_btn_primary">上一页</a>
                         <div class="weui-form">
                             <div class="weui-form-li">
@@ -82,7 +105,7 @@
 
 
     </div>
-    <script src="{% static 'wxchat/js/jquery.min.js' %}"></script>
+
     <script>
         $(function () {
             $(".question>li").on("click", function () {

@@ -187,3 +187,20 @@ class WxIntroduce(models.Model):
 
     def __str__(self):
         return self.nickname + '<--' + self.introduce_name
+
+
+class WxTemplateMsgUser(models.Model):
+    """
+        模板消息通知，用于用户支付后，通知客服
+    """
+    user = models.ForeignKey(WxUserinfo, verbose_name="姓名", blank=True, null=True)
+    remark = models.CharField(verbose_name="备注",max_length=100, blank=True, null=True)
+    create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+    is_check = models.BooleanField(verbose_name='是否启用', blank=True, default=1)
+
+    class Meta:
+        verbose_name = "购买通知设置"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.user.nickname

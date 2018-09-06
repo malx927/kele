@@ -78,23 +78,31 @@
                         <em class="weui-form-preview__value " style="text-decoration:line-through;color: #c0c0c0;" >¥ {{ benefits_totals|floatformat:"2" }}</em>
                     </div>
                 </div>
-{#                {% if scores_used %}#}
-{#                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;">#}
-{#                    <label class="weui-cell weui-check__label" for="sel_scores">#}
-{#                        <div class="weui-cell__hd">#}
-{#                            <input type="checkbox" class="weui-check" name="sel_scores" id="sel_scores"  {% if flag == 1 %} checked {% endif %}>#}
-{#                            <i class="weui-icon-checked"></i>#}
-{#                        </div>#}
-{#                        <div class="weui-cell__bd">#}
-{#                            <p>积分支付</p>#}
-{#                        </div>#}
-{#                         <div class="weui-cell__ft">#}
-{#                            <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>#}
-{#                        </div>#}
-{#                    </label>#}
-{#                </div>#}
-{#                {% endif %}#}
-
+                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;display: flex">
+                    <label class="weui-cell weui-check__label" for="self_style" style="width:45%">
+                        <div class="weui-cell__hd">
+                            <input type="radio" class="weui-check" name="mail_style" value="0" id="self_style" {% if mail_style == 0 %} checked {% endif %}>
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p>自提</p>
+                        </div>
+                         <div class="weui-cell__ft">
+                        </div>
+                    </label>
+                    <label class="weui-cell weui-check__label" for="post_style" style="width:45%">
+                        <div class="weui-cell__hd">
+                            <input type="radio" class="weui-check" name="mail_style" value="1" id="post_style" {% if mail_style == 1 %} checked {% endif %}>
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p>邮寄</p>
+                        </div>
+                         <div class="weui-cell__ft">
+                            <p>¥ {{ mail_cost|floatformat:"2" }}</p>
+                        </div>
+                    </label>
+                </div>
                 <div class="weui-cells" style="margin-top: 0;">
                     <div class="weui-cells__title">商品列表</div>
                     {% for item in items %}
@@ -123,5 +131,41 @@
 
 {% block bottomjs %}
     {{ block.super }}
+<script>
+    $("input[name='mail_style']").on('change', function(){
+        var params ={
+              out_trade_no: $("#out_trade_no").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+        };
+        if( $(this).prop("checked") ){
+            params.mailstyle = $(this).val();
+            mail_cost( params );
+        }
 
+    });
+
+    function mail_cost( params )
+    {
+        $.ajax({
+              type: 'POST',
+              url: '{% url "mail-cost" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                 if(data.success == "true"){
+                    $('#total_cost_top').text(' ¥ ' + data.total_cost.toFixed(2));
+                    $('#total_cost_bottom').text(' ¥ ' + data.total_cost.toFixed(2));
+                 }
+                 else{
+                    $("#self_style").prop("checked", false);
+                    $("#post_style").prop("checked", false);
+                 }
+              },
+              error: function(error){
+                  console.log(error);
+              }
+        });
+    };
+</script>
 {% endblock bottomjs %}

@@ -215,6 +215,7 @@ class DogStatus(models.Model):
     name = models.CharField(verbose_name=u'名称', max_length=20, db_index=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
+    is_checkbox = models.BooleanField(verbose_name='是否多选', default=False, blank=True)
 
     class Meta:
         verbose_name = u"宠物状况表"

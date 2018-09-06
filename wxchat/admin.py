@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from .models import WxUserinfo,Menu,SwiperImage,WxPayResult,WxUnifiedOrdeResult,OrderAddress, WxIntroduce
-
+from .models import WxTemplateMsgUser
 
 @admin.register(WxUserinfo)
 class WxUserinfoAdmin(admin.ModelAdmin):
@@ -46,4 +46,9 @@ class OrderAddressAdmin(admin.ModelAdmin):
 @admin.register(WxIntroduce)
 class WxIntroduceAdmin(admin.ModelAdmin):
     list_display = ('nickname','openid','introduce_id','introduce_name','create_time')
+    list_per_page = 50
+
+@admin.register(WxTemplateMsgUser)
+class WxTemplateMsgUserAdmin(admin.ModelAdmin):
+    list_display = ('user', 'remark', 'create_at', 'is_check')
     list_per_page = 50

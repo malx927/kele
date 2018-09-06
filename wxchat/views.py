@@ -708,7 +708,7 @@ def ordersuccess(request):
 # 狗粮订单
 def dogOrder(request):
     import random, json
-    name = DogStatus.objects.all().order_by('id')
+    orders = DogStatus.objects.all().order_by('sort')
     if request.method == 'GET':
         alldata = request.GET.get('alldata','')
         order_sn = request.GET.get('aa','')
@@ -722,19 +722,17 @@ def dogOrder(request):
             skin_status = dataall[4]
             bones_status = orders
             peice = dataall[5]
-            # print(body_status, skin_status, eye_status, peice, 22222222222)
             now = datetime.datetime.now()
             random_int = random.randint(100, 10000)
             dog_code = now.strftime("%Y%m%d%H%M%S") + str(random_int) + 'B'
-            # print(dog_code, 3344444)
             datas = {'eye_status': eye_status, 'dogtype': dogtype, 'dog_age': dog_age, 'bones_status': bones_status,
                      'body_status': body_status, 'dog_code': dog_code, 'skin_status': skin_status, 'peice': peice}
             return HttpResponse(json.dumps(datas), content_type="application/json")
 
         else:
-            return render(request, 'wxchat/dogorder.html', {'order': name})
+            return render(request, 'wxchat/dogorder.html', {'orders': orders})
 
-    return render(request, 'wxchat/dogorder.html', {'order': name, })
+    return render(request, 'wxchat/dogorder.html', {'orders': orders, })
 
 
 # 加盟宠物医疗机构发布
