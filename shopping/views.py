@@ -527,7 +527,7 @@ def sendTempMessageToUser( order ):
 
     out_trade_no = order.out_trade_no
     url_path = reverse("my-order-list")
-    url =os.path.join(settings.ROOT_URL,url_path,'?out_trade_no=',out_trade_no )
+    url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, url_path, out_trade_no )
     print(url)
 
     color = "#173177"
