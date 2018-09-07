@@ -224,7 +224,10 @@ class OrderItem(models.Model):
         return self.price * self.quantity
 
     def get_member_cost(self):
-        return self.benefits * self.quantity
+        if self.benefits > 0 :
+            return self.benefits * self.quantity
+        else:
+            return self.price * self.quantity
 
     def get_scores(self):
         return  self.goods.scores * self.quantity

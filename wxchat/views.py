@@ -89,6 +89,7 @@ def wechat(request):
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
+                request.session.clear()
             elif msg.event == 'subscribe_scan':
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
                 saveUserinfo(msg.source, msg.scene_id)
@@ -135,7 +136,7 @@ def getDogOwnerList(request, msg):
 def setUserToMember(openid, scene_id=None):
     try:
         intro_user = WxUserinfo.objects.get(qr_scene=scene_id, is_member=1)
-        user = WxUserinfo.objects.get(openid=openid)
+        user = WxUserinfo.objects.get(openid=openid, is_member=0)
         intro = WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
     except WxUserinfo.DoesNotExist:
         print('用户不存在')
@@ -158,20 +159,17 @@ def saveUserinfo(openid, scene_id=None):
         sub_time = user.pop('subscribe_time')
         sub_time = datetime.datetime.fromtimestamp(sub_time)
         user['subscribe_time'] = sub_time
-
         obj, created = WxUserinfo.objects.update_or_create(defaults=user, openid=openid)
-        qr_scene = WxUserinfo.getSceneMaxValue()
-        obj.qr_scene = qr_scene
-        if scene_id:
-            obj.is_member = 1
-
-        obj.save()
 
         try:
-            if scene_id and created:
+            if obj.is_member == 0 and scene_id is not None:
+                qr_scene = WxUserinfo.getSceneMaxValue()
+                obj.qr_scene = qr_scene
+                obj.is_member = 1
+                obj.save()
                 ret = client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
-                intro_user = WxUserinfo.objects.get(qr_scene = scene_id)
-                #创建推荐表数据
+                intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
+                # 创建推荐表数据
                 defaults = {
                     'nickname': obj.nickname,
                     'introduce_name': intro_user.nickname,
@@ -285,12 +283,11 @@ def redirectUrl(request, item):
                 return HttpResponse(json.dumps(res))
             else:
                 open_id = webchatOAuth.open_id
-                count = WxUserinfo.objects.filter(openid=open_id, subscribe=1).count()
-                if count == 0:
-                    userinfo = webchatOAuth.get_user_info()
-                    print(userinfo)
-                    userinfo.pop('privilege')
-                    WxUserinfo.objects.create(**userinfo)
+                userinfo = webchatOAuth.get_user_info()
+                print(userinfo)
+                userinfo.pop('privilege')
+
+                obj, created = WxUserinfo.objects.update_or_create(openid=open_id, defaults=userinfo)
 
                 request.session['openid'] = open_id
                 userinf = get_object_or_404(WxUserinfo, openid=open_id)
@@ -1091,6 +1088,15 @@ def myInfo(request):
 
 # 生成我的二维码
 def myQRCode(user):
+    """
+    2018-09-06
+    :param user:
+    :return:
+    """
+    if user.qr_scene == 0:
+        user.qr_scene = WxUserinfo.getSceneMaxValue()
+        user.save()
+
     myinfo = user
 
     qrcode_data = {

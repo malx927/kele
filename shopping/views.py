@@ -1,8 +1,10 @@
+#coding:utf-8
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 import json
 from datetime import datetime
-import random
+import random,os
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.views.generic import DetailView,ListView, View
@@ -22,6 +24,12 @@ wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=se
 
 #获得购物车统计数据
 def getShopCartTotals(user_id, is_member):
+    """
+    2018-09-06
+    :param user_id:
+    :param is_member:
+    :return:
+    """
     count = {
         'price_totals': 0 ,
         'benefits_totals': 0,
@@ -31,18 +39,18 @@ def getShopCartTotals(user_id, is_member):
     if user_id:
         totals = ShopCart.objects.filter(user_id = user_id, status=1)\
             .aggregate(
-                price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),
-                benefits_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField()),
+                price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),    #媒体价格
+                member_price_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField()), #会员价格
                 goods_totals = Count('goods')
                 )
         price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
-        benefits_totals = totals.get('benefits_totals') if totals.get('benefits_totals') is not None else 0.0
+        member_price_totals = totals.get('member_price_totals') if totals.get('member_price_totals') is not None else 0.0
         goods_totals = totals.get('goods_totals') if totals.get('goods_totals') is not None else 0
 
         count['goods_totals'] = goods_totals
         if is_member == 1:
-            count['price_totals'] = benefits_totals
-            count['benefits_totals'] = price_totals - benefits_totals
+            count['price_totals'] = member_price_totals if member_price_totals > 0 else price_totals
+            count['benefits_totals'] = price_totals - member_price_totals if member_price_totals > 0 else 0 #会员优惠
         else:
             count['price_totals'] = price_totals
     return count
@@ -291,7 +299,7 @@ class CreateOrderView(View):
         try:
             goods = Goods.objects.get(pk = goods_id)
             #创建订单
-            total_fee = goods.benefits * int(quantity) if is_member == 1 else  goods.price * int(quantity)
+            total_fee = goods.benefits * int(quantity) if is_member == 1 and goods.benefits > 0 else goods.price * int(quantity)
             defaults['total_fee'] = total_fee
             order, created = Order.objects.get_or_create(out_trade_no=out_trade_no, user_id=user_id, defaults=defaults)
             if created:
@@ -339,7 +347,7 @@ class CreateOrderView(View):
 
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
-                benefits_totals = order.get_total_cost() - total_cost
+                benefits_totals = order.get_total_cost() - total_cost if total_cost > 0 else 0
             else:
                 total_cost = order.get_total_cost()         #非会员
                 benefits_totals = 0
@@ -517,9 +525,13 @@ def sendTempMessageToUser( order ):
     template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
     template_kf = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
 
-    url ='http://www.hld8000.com/wechat/redirect/dogindex'
+    out_trade_no = order.out_trade_no
+    url_path = reverse("my-order-list")
+    url =os.path.join(settings.ROOT_URL,url_path,'?out_trade_no=',out_trade_no )
+    print(url)
+
     color = "#173177"
-    pay_time = order.pay_time.strftime('%Y年%m月%d日')
+    pay_time = order.pay_time.strftime('%Y-%m-%d')
     customer_data ={
         'first':{
             "value":"恭喜你购买成功！",
@@ -534,7 +546,7 @@ def sendTempMessageToUser( order ):
            "color":color
         },
        "keyword3": {
-           "value":"{0}{1}".format(order.total_fee + order.mail_cost,'元') ,
+           "value":"{0}{1}".format(order.cash_fee,'元') ,
            "color":color
        },
         "keyword4": {
@@ -553,7 +565,7 @@ def sendTempMessageToUser( order ):
 
     kf_data ={
         'first':{
-            "value":"客户 {0} 的订单已经支付成功",
+            "value":"客户 {0} 的订单已经支付成功".format(order.username),
             "color":color
         },
         "keyword1":{
@@ -565,7 +577,7 @@ def sendTempMessageToUser( order ):
            "color":color
         },
         "keyword3":{
-           "value":"{0}{1}".format(order.total_fee + order.mail_cost,'元'),
+           "value":"{0}{1}".format(order.total_fee, '元'),
            "color":color
         },
        "keyword4": {
@@ -582,7 +594,7 @@ def sendTempMessageToUser( order ):
     if ret['errcode'] == 0:
         msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
         for user in msgUsers:
-            ret = client.message.send_template(user_id=user.openid,template_id = template_kf, url=url, data=kf_data)
+            ret = client.message.send_template(user_id=user.user.openid,template_id = template_kf, url=url, data=kf_data)
             print("kf_client", ret)
     else:
         print("customer", ret)
