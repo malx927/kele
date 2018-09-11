@@ -87,6 +87,11 @@ class Goods(models.Model):
         verbose_name = '宠物食品'
         verbose_name_plural = verbose_name
 
+    def show_goodstype(self):
+        return [type.name for type in self.goodstype.all() ]
+    show_goodstype.short_description = "商品类别"
+
+
     def __str__(self):
         return self.name
 

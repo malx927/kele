@@ -5,9 +5,15 @@ from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, M
 
 @admin.register(Goods)
 class GoodsAdmin(admin.ModelAdmin):
-    list_display = ('name',  'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
+    list_display = ('name', 'show_goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
     #fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
+    list_filter =('goodstype',)
+    search_fields = ('name',)
+    # filter_horizontal=('goodstype',)
     list_per_page = 50
+
+    # def show_goodstype(self,obj):
+    #     return [type.name for type in obj.goodstype.all() ]
 
 
 class OrderItemInline(admin.TabularInline):
