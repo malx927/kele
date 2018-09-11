@@ -214,7 +214,7 @@ class DogOwner(models.Model):
 class DogStatus(models.Model):
     name = models.CharField(verbose_name=u'名称', max_length=64, db_index=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    sort = models.IntegerField(verbose_name='顺序')
+    sort = models.IntegerField(verbose_name='顺序', default=0, blank=True, null=True)
     suffix_name = models.CharField(verbose_name='后缀名',max_length=20, blank=True, default='')
     is_checkbox = models.BooleanField(verbose_name='是否多选', default=False, blank=True)
 
