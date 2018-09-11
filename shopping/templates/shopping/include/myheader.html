@@ -24,8 +24,9 @@
               dataType: 'json',
               timeout: 5000,
               success: function(data){
+                  $("#myscore").text(data.total_scores || 0);
                   if(data.total_scores){
-                     $("#myscore").text(data.total_scores);
+                     appendItem(data.details);
                   }
               },
               error: function(error){}
@@ -46,4 +47,19 @@
           error: function(xhr, type,error){}
         });
     }
+
+    function appendItem(data){
+        $.each(data,function(index,item){
+{#            alert(JSON.stringify(item));#}
+            newItem =  '<div class="weui-cell">';
+            newItem += '<div class="weui-cell__bd">';
+            newItem += '<span class="weui-badge" style="margin-left: 5px;margin-right: 5px;">'+ item.scores +'</span>';
+            newItem += '<span style="vertical-align: middle">积分</span>';
+            newItem += '</div>';
+            newItem += '<div class="weui-cell__ft">' + item.create_at +'</div>';
+            newItem += '</div>';
+            $("#scoreslist").append( newItem );
+        });
+    }
+
  </script>

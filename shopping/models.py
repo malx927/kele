@@ -263,7 +263,7 @@ class MemberScore(models.Model):
 
 #会员积分明细
 class MemberScoreDetail(models.Model):
-    member = models.ForeignKey(MemberScore, verbose_name='会员名称')
+    member = models.ForeignKey(MemberScore,related_name='details', verbose_name='会员名称', on_delete=models.CASCADE)
     scores = models.IntegerField(verbose_name='积分', blank=True, null=True)
     from_user = models.CharField(verbose_name='来源', max_length=64, blank=True, null=True)
     user_id = models.CharField(verbose_name='来源ID', max_length=64, blank=True, null=True)

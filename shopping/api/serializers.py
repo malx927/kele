@@ -11,7 +11,7 @@ from doginfo.models import DogAdoption, DogDelivery,Freshman,Doginstitution
 from easy_thumbnails.files import get_thumbnailer
 
 
-from shopping.models import Goods,Order,OrderItem, GoodsType, ShopCart, MemberScore
+from shopping.models import Goods,Order,OrderItem, GoodsType, ShopCart, MemberScore, MemberScoreDetail
 
 from rest_framework import serializers
 
@@ -58,7 +58,24 @@ class ShopCartSerializer(serializers.ModelSerializer):
         fields = ('goods','quantity')
 
 #会员积分
+class MemberScoreDetailSerializer(serializers.ModelSerializer):
+
+    create_at = serializers.SerializerMethodField()
+
+    def get_create_at(self,obj):
+        if obj.create_time:
+            return obj.create_time.strftime('%Y-%m-%d %H:%M')
+
+    class Meta:
+        model = MemberScoreDetail
+        fields = ('id','create_at','scores')
+
 class MemberScoreSerializer(serializers.HyperlinkedModelSerializer):
+
+    details = MemberScoreDetailSerializer(many=True,read_only=True)
+
     class Meta:
         model = MemberScore
-        fields = ('id','nickname','user_id','total_scores')
+        fields = ('id','nickname','user_id','total_scores','details')
+
+

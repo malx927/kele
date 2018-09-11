@@ -1,15 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title></title>
-</head>
-<body>
-    {% for order in orders %}
-         {{ order.out_trade_no }}<br>
-        {% for item in order.items.all %}
-                {{ item }}<br>
-        {% endfor %}
-    {% endfor %}
-</body>
-</html>
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block container %}
+<div class="page">
+    {% include "shopping/include/myheader.html" %}
+    <div class="page_body">
+        <div class="weui-panel weui-panel_access margin_top2">
+            <div class="weui-panel__bd" id="doglist">
+                <div class="weui-cells__title">积分明细</div>
+                <div class="weui-cells cells_top" id="scoreslist"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock container %}

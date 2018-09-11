@@ -31,7 +31,7 @@ from doginfo.models import DogLoss, DogOwner, Doginstitution
 from dogtype.models import Dogtype
 from .models import WxUserinfo, WxUnifiedOrdeResult, WxPayResult, WxIntroduce
 from .forms import DogLossForm, DogOwnerForm, DogBuyForm
-from shopping.models import Order
+from shopping.models import Order, MemberScore, MemberScoreDetail
 from .utils import changeImage, mergeImage
 import datetime
 from PIL import Image
@@ -189,6 +189,8 @@ def unSubUserinfo(openid):
         if user:
             user.delete()
             WxIntroduce.objects.filter(Q(openid=openid) | Q(introduce_id=openid)).delete()
+            MemberScore.objects.filter(user_id=openid).delete()
+            #MemberScoreDetail.objects.filter(user_id=openid).delete()
     except WxUserinfo.DoesNotExist:
         pass
 

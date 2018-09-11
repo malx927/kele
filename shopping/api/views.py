@@ -288,8 +288,10 @@ class MemberScoreAPIView(APIView):
     permission_classes = [AllowAny]
     def get(self, request, *args, **kwargs):
         try:
-            user_id = request.session.get("openid", 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
-            scores = MemberScore.objects.get(user_id=user_id)
+            user_id = request.session.get("openid", None)
+            is_member = request.session.get("is_member", None)
+            print('is_member=',is_member)
+            scores = MemberScore.objects.get(user_id=user_id) if is_member==1 else None
         except MemberScore.DoesNotExist as ex:
             print(ex)
             raise Http404
