@@ -41,10 +41,12 @@ class ShopCartAdmin(admin.ModelAdmin):
 class GoodsTypeAdmin(admin.ModelAdmin):
     list_display = ('name','parent', 'sort','is_show')
     list_per_page = 50
+    list_filter =('parent',)
+    search_fields = ('name',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         if db_field.name == "parent":
-             kwargs["queryset"] = GoodsType.objects.filter(parent__isnull=True)
+             kwargs["queryset"] = self.model.objects.filter(parent__isnull=True)
         return super(GoodsTypeAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
