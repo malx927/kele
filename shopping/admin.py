@@ -4,8 +4,8 @@ from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, M
 # Register your models here.
 
 @admin.register(Goods)
-class PetFoodAdmin(admin.ModelAdmin):
-    list_display = ('name', 'goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
+class GoodsAdmin(admin.ModelAdmin):
+    list_display = ('name',  'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
     #fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
     list_per_page = 50
 
@@ -17,7 +17,7 @@ class OrderItemInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ( 'username',  'detailinfo', 'telnumber','total_fee','mail_cost','cash_fee','mailstyle','out_trade_no',  'add_time','pay_time', 'status', 'is_mail')
+    list_display = ( 'username', 'detailinfo', 'telnumber','total_fee','mail_cost','cash_fee','mailstyle','out_trade_no',  'add_time','pay_time', 'status', 'is_mail')
     list_per_page = 50
     list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
     inlines = [OrderItemInline]
@@ -39,7 +39,7 @@ class ShopCartAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsType)
 class GoodsTypeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sort','is_show')
+    list_display = ('name','parent', 'sort','is_show')
     list_per_page = 50
 
 

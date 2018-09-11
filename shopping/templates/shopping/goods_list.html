@@ -10,9 +10,7 @@
           <span class="menu-header-title">商品分类</span>
         </header>
       </a>
-      <section class="menu-section">
-        <ul class="menu-section-list" id="typelist">
-        </ul>
+      <section class="menu-section" id="typelist">
       </section>
      </nav>
      <main id="panel" class="panel">
@@ -78,7 +76,7 @@
         });
 
         document.querySelector('.menu').addEventListener('click', function(eve) {
-          if (eve.target.nodeName === 'A') { slideout.close(); }
+          if(eve.target.classList.contains("menu-item")) { slideout.close();}
         });
 
         getGoodsTypeList();
@@ -92,7 +90,6 @@
              }
              else{
                  slideout.close();
-                 console.log(max);
                  clearInterval( flag );
              }
 
@@ -150,7 +147,6 @@
             else {
                 img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
             }
-
             newItem =  '<div class="weui-media-box media-box" data-item="'+ item.id +'">' +
                         '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
                             '<div class="weui-media-box__hd">' + img_url + '</div>'+
@@ -199,9 +195,7 @@
                   $("#gotocart p").addClass("bg_gray");
               }
           },
-          error: function(xhr, type,error){
-              console.log(type);
-          }
+          error: function(xhr, type,error){}
         });
     }
 
@@ -214,21 +208,32 @@
           context: $('#typelist'),
           success: function(data){
               $.each(data,function(inde,item){
-                 item = '<li class="menu-item" data-typeid="'+ item.id +'">' + item.name + '</li>';
-                 $('#typelist').append(item)
+                 if(item.counts > 0){
+                     var title = '<h3 class="menu-section-title">'+ item.name +'</h3>';
+                     var children = item.children;
+                     var listItem =  '<ul class="menu-section-list">';
+                      $.each(children, function(idx,child){
+                          listItem += '<li class="menu-item" data-typeid="'+ child.id +'">' + child.name + '</li>';
+                      });
+                      listItem +="</ul>"
+                      $("#typelist").append(title);
+                      $("#typelist").append(listItem);
+                 }
+                 else{
+                     var title = '<h3 class="menu-section-title menu-item section-title" data-typeid="'+ item.id +'">'+ item.name +'</h3>';
+                      $("#typelist").append(title);
+                 }
               });
 
               $('.menu-item').on('click', function(event){
                   typeid = $(this).attr('data-typeid');
                   getGoodsList('{% url 'goods-list' %}' ,typeid );
-                  $(this).siblings().removeClass('menu-active');
+                  $(".menu-item").removeClass('menu-active');
                   $(this).addClass('menu-active');
 
               });
           },
-          error: function(xhr, type,error){
-              console.log(type);
-          }
+          error: function(xhr, type,error){}
         });
     }
 

@@ -46,8 +46,14 @@ TYPE_MAIL_STYLE = (
     (0,'自提'),
 )
 
+# TYPE_CATEGORY_STYLE = (
+#     (1,'定制'),
+#     (0,'商品'),
+# )
+
 class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
+    parent = models.ForeignKey('self', verbose_name='父项', default=None, blank=True, null=True)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
     is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
 
@@ -64,7 +70,7 @@ class Goods(models.Model):
     name = models.CharField(verbose_name='商品名称', max_length=150)
     food_sn = models.CharField(verbose_name='商品货号', max_length=24, default=datetime.datetime.now().strftime('%Y%m%d%H%M%S'))
     images = models.ImageField(verbose_name='产品图片',upload_to='food/%Y%m%d/',null=True,blank=True)
-    goodstype = models.ForeignKey(GoodsType,verbose_name='商品分类')
+    goodstype = models.ManyToManyField(GoodsType,verbose_name='商品分类')
     price = models.DecimalField(verbose_name='销售价格', max_digits=6, decimal_places=2, null=True, blank=True, default=0)
     benefits = models.DecimalField(verbose_name='会员价',  max_digits=6, decimal_places=2, null=True, blank=True, default=0)
     scores = models.IntegerField(verbose_name='金币', default=1, null=True, blank=True)
@@ -146,6 +152,7 @@ class ShopCart(models.Model):
     def update_quantity(self, quantity):
         self.quantity = quantity
         self.save()
+
 #订单
 class Order(models.Model):
     out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32)

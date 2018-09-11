@@ -35,11 +35,20 @@ class GoodsListSerializer(serializers.ModelSerializer):
 
 #宠物商品
 class GoodsTypeSerializer(serializers.ModelSerializer):
-
+    children = SerializerMethodField()
+    counts = SerializerMethodField()
     class Meta:
         model = GoodsType
-        fields = ('id','name','sort')
+        fields = ('id','name','counts','children','sort')
 
+    def get_children(self,obj):
+        types = GoodsType.objects.filter(parent=obj.id)
+        serializer = GoodsTypeSerializer(types, many=True)
+        return serializer.data
+
+    def get_counts(self,obj):
+        counts = GoodsType.objects.filter(parent=obj.id).count()
+        return  counts
 
 #宠物商品
 class ShopCartSerializer(serializers.ModelSerializer):

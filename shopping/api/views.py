@@ -101,7 +101,7 @@ class GoodsListAPIView(ListAPIView):
         if typeid and int(typeid) != 0:
             return Goods.objects.filter(goodstype=typeid, is_show=1)
         else:
-            return Goods.objects.filter(is_show=1, goodstype__is_show=1)
+            return Goods.objects.filter(is_show=1)
 
 
 #商品类型
@@ -112,7 +112,7 @@ class GoodsTypeListAPIView(ListAPIView):
     pagination_class = None
 
     def get_queryset(self,*args, **kwargs):
-        return GoodsType.objects.filter(is_show=1)
+        return GoodsType.objects.filter(is_show=1, parent__isnull=True)
 
 
 #购物车价格和优惠统计

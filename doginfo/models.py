@@ -13,7 +13,7 @@ from ckeditor_uploader.fields import RichTextUploadingField
 from dogbrand.models import Dogbrand
 from dogtype.models import Dogtype
 from easy_thumbnails.files import get_thumbnailer
-
+from shopping.models import  TYPE_MAIL_STYLE, TYPE_SHOPPING_STATUS
 now = datetime.datetime.now()
 order_id = now.strftime("%Y%m%d%H%M%S") + 'B'
 
@@ -212,9 +212,10 @@ class DogOwner(models.Model):
 #
 # 宠物状况表
 class DogStatus(models.Model):
-    name = models.CharField(verbose_name=u'名称', max_length=20, db_index=True)
+    name = models.CharField(verbose_name=u'名称', max_length=64, db_index=True)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-    sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
+    sort = models.IntegerField(verbose_name='顺序')
+    suffix_name = models.CharField(verbose_name='后缀名',max_length=20, blank=True, default='')
     is_checkbox = models.BooleanField(verbose_name='是否多选', default=False, blank=True)
 
     class Meta:
@@ -225,13 +226,11 @@ class DogStatus(models.Model):
     def __str__(self):
         return self.name
 
-
 #
 # 宠物状况分类表
 class DogStatusType(models.Model):
-    name = models.CharField(verbose_name=u'名称', max_length=20, )
-    dogtype = models.ForeignKey(DogStatus, verbose_name=u'宠物基本情况', related_name='dogstatustype',
-                                on_delete=models.CASCADE,db_index=True)
+    name = models.CharField(verbose_name=u'名称', max_length=64, )
+    dogtype = models.ForeignKey(DogStatus, verbose_name=u'宠物基本情况', related_name='dogstatustype', on_delete=models.CASCADE)
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
@@ -245,34 +244,55 @@ class DogStatusType(models.Model):
 
 # 宠粮订单表
 class DogOrder(models.Model):
-    dog_code = models.CharField(verbose_name=u'订单号', max_length=20, )
-    name = models.CharField(verbose_name=u'商品名称', max_length=50, blank=True)
+    out_trade_no = models.CharField(verbose_name='订单号', max_length=32, default='')
+    user_id = models.CharField(verbose_name='用户ID', max_length=64, null=True, blank=True)
+    username = models.CharField(verbose_name='收货人姓名', max_length=64, null=True, blank=True)
+    telnumber = models.CharField(verbose_name='联系电话', max_length=32, null=True, blank=True)
+    postalcode = models.CharField(verbose_name='邮编', max_length=16, null=True, blank=True)
+    detailinfo = models.CharField(verbose_name='详细收货地址', max_length=200, null=True, blank=True)
+    total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    goods_nums = models.IntegerField(verbose_name='定制数量', blank=True , default=0)
     product_detail = models.CharField(verbose_name=u'商品描述信息', max_length=2000, blank=True)
-    order_status = models.IntegerField(verbose_name=u'订单类型', default=0,choices=ORDER_STATUS_CHOICE)
-    pay_status = models.IntegerField(verbose_name=u'支付状态', default=0,choices=PAY_STATUS_CHOICE)
-    peice = models.CharField(verbose_name=u'价格', max_length=20, )
-    click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
-    openid = models.CharField(verbose_name='唯一标识', max_length=120, null=True, blank=True)
-    nickname = models.CharField(verbose_name='昵称', max_length=64, null=True, blank=True)
+    mailstyle = models.IntegerField(verbose_name='发货方式', blank=True , null=True, choices=TYPE_MAIL_STYLE)
+    mail_cost = models.IntegerField(verbose_name='邮寄费用', blank=True, null=True, default=0)
+    is_mail = models.BooleanField(verbose_name="是否发货", blank=True,  default=0)
+    status = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now_add=True,auto_now=False)
+    pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
-    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    message = models.CharField(verbose_name='留言', max_length=400,null=True, blank=True)
 
     class Meta:
-        verbose_name = u"宠粮订单表"
-        verbose_name_plural = u'宠粮订单表'
+        verbose_name = u"宠粮定制单"
+        verbose_name_plural = verbose_name
         ordering = ['-create_time']
 
     def __str__(self):
-        return self.name
+         return '订单号 {}'.format(self.out_trade_no)
 
-
-    def update_status_transaction_id(self,pay_status,transaction_id):
-        self.pay_status = pay_status
+    def update_status_transaction_id(self,status,transaction_id, cash_fee,pay_time):
+        self.status = status
         self.transaction_id = transaction_id
-        self.save(update_fields=['status','transaction_id'])
+        self.cash_fee = cash_fee
+        self.pay_time = pay_time
+        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
+#狗粮订单选项
+class DogOrderItem(models.Model):
+    dogorder = models.ForeignKey(DogOrder, verbose_name='订单')
+    dog_status = models.ForeignKey(DogStatus, verbose_name='定制项目')
+    dog_status_type = models.CharField(verbose_name='选项内容', max_length=64, blank=True, null=True)
+
+    class Meta:
+        verbose_name = u"宠粮定制选项"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.dog_status_type
+
 
 # 宠粮录入表
-
 class Dogfood(models.Model):
     productname = models.CharField(verbose_name=u'产品名称', max_length=50, )
     dog_brandid = models.ForeignKey(Dogbrand, verbose_name=u'品牌', on_delete=models.CASCADE)

@@ -78,6 +78,11 @@ a {
   margin:0;
 }
 
+.section-title{
+  color: #fff;
+  padding:4px 20px;
+}
+
 .menu-section-list {
   padding:0;
   margin: 10px 0;
@@ -87,7 +92,8 @@ a {
 .menu-section-list li {
   display: block;
   padding: 4px 15px;
-  text-align: center;
+  text-align: left;
+  font-size:15px;
   border-bottom: 1px solid #6a6c6c;
   color: #fff;
 }

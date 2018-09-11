@@ -704,32 +704,25 @@ def ordersuccess(request):
 
 # 狗粮订单
 def dogOrder(request):
-    import random, json
-    orders = DogStatus.objects.all().order_by('sort')
+
     if request.method == 'GET':
-        alldata = request.GET.get('alldata','')
-        order_sn = request.GET.get('aa','')
-        if alldata:
-            dataall = json.loads(alldata)
-            orders= json.loads(order_sn)
-            dogtype = dataall[0]
-            dog_age = dataall[1]
-            body_status = dataall[2]
-            eye_status = dataall[3]
-            skin_status = dataall[4]
-            bones_status = orders
-            peice = dataall[5]
-            now = datetime.datetime.now()
-            random_int = random.randint(100, 10000)
-            dog_code = now.strftime("%Y%m%d%H%M%S") + str(random_int) + 'B'
-            datas = {'eye_status': eye_status, 'dogtype': dogtype, 'dog_age': dog_age, 'bones_status': bones_status,
-                     'body_status': body_status, 'dog_code': dog_code, 'skin_status': skin_status, 'peice': peice}
-            return HttpResponse(json.dumps(datas), content_type="application/json")
+        orders = DogStatus.objects.all().order_by('sort')
+        return render(request, 'wxchat/dogorder.html', {'orders': orders})
 
-        else:
-            return render(request, 'wxchat/dogorder.html', {'orders': orders})
+    elif request.method == "POST":
+        choice_list ={}
+        for k,v in request.POST.lists():
+            print(k,v)
+            if "radio" in k:
+                # key = k.split('_')[1]
+                choice_list[k] = ','.join(v)
+        print(choice_list)
+        return render(request, 'wxchat/order_success.html', context = { "choice_list": choice_list })
 
-    return render(request, 'wxchat/dogorder.html', {'orders': orders, })
+        #     now = datetime.datetime.now()
+        #     random_int = random.randint(100, 10000)
+        #     dog_code = now.strftime("%Y%m%d%H%M%S") + str(random_int) + 'B'
+
 
 
 # 加盟宠物医疗机构发布
