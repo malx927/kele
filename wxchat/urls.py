@@ -9,7 +9,7 @@ from django.views.generic import TemplateView
 from wxchat.views import doginstitution, DoginstitutionAdd,DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
     dogAdoptNav, dogTradeNav, myQRCode, showQRCode, myScore
 
-from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder,ordersuccess,DogpayNotify,DogPayOrderView,order_finish
+from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd,DogdeliveryDetailView,FreshmanDetailView,dogOrder,orderSuccess,DogpayNotify,DogPayOrderView,orderList
 from wxchat.views import wechat,createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss,dogLossAdd, DogLossDetailView,dogBreedAdd,dogBreed,DogBreedDetailView,\
     DogOwnerDetailView, dogOwnerAdd,dogAdopt,dogBuyAdd,DogBuyDetailView, DogSaleDetailView, dogSaleAdd
@@ -59,8 +59,8 @@ urlpatterns = [
     # url(r'^pay/dogcreateorder$', CreateOrder.as_view(), name='dog-create-order'), #创建订单
     url(r'^pay/dogpayorder$', DogPayOrderView.as_view(), name='dog-pay-order'), #支付订单
     url(r'^pay/dogwxnotify/$', DogpayNotify, name='dog-pay-notify'), #订单回调
-    url(r'^pay/ordersuccess$', ordersuccess, name='order-success'),
-    url(r'^orderfinish/$', order_finish, name='order-finish'),
+    url(r'^pay/ordersuccess/$', orderSuccess, name='order-success'),
+    url(r'^orderlist/$', orderList, name='order-list'),
     url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂

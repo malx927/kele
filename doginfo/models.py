@@ -216,11 +216,12 @@ class DogStatus(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     sort = models.IntegerField(verbose_name='顺序', default=0, blank=True, null=True)
     suffix_name = models.CharField(verbose_name='后缀名',max_length=20, blank=True, default='')
+    short_name = models.CharField(verbose_name='简称', max_length=20,blank=True, null=True)
     is_checkbox = models.BooleanField(verbose_name='是否多选', default=False, blank=True)
 
     class Meta:
-        verbose_name = u"宠物状况表"
-        verbose_name_plural = u'宠物状况表'
+        verbose_name = u"定制食品选项"
+        verbose_name_plural = verbose_name
         ordering = ['sort']
 
     def __str__(self):
@@ -234,13 +235,25 @@ class DogStatusType(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
     class Meta:
-        verbose_name = u"宠物状况分类表"
-        verbose_name_plural = u'宠物状况分类表'
+        verbose_name = u"定制食品分项"
+        verbose_name_plural = verbose_name
         ordering = ['-create_time']
 
     def __str__(self):
         return self.name
 
+#定制食品价格表
+class FoodPrice(models.Model):
+    name = models.CharField(verbose_name='价格名称', max_length=32, blank=True, null=True)
+    price = models.DecimalField(verbose_name="价格(元)", max_digits=6, decimal_places=2, null=True, blank=True, default=0)
+    create_time  = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '定制食品价格表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
 
 # 宠粮订单表
 class DogOrder(models.Model):
@@ -252,8 +265,9 @@ class DogOrder(models.Model):
     detailinfo = models.CharField(verbose_name='详细收货地址', max_length=200, null=True, blank=True)
     total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
     cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    price = models.DecimalField(verbose_name='价格',  max_digits=6, decimal_places=2,blank=True,null=True)
     goods_nums = models.IntegerField(verbose_name='定制数量', blank=True , default=0)
-    product_detail = models.CharField(verbose_name=u'商品描述信息', max_length=2000, blank=True)
+    product_detail = models.CharField(verbose_name=u'商品定制内容', max_length=2000, blank=True)
     mailstyle = models.IntegerField(verbose_name='发货方式', blank=True , null=True, choices=TYPE_MAIL_STYLE)
     mail_cost = models.IntegerField(verbose_name='邮寄费用', blank=True, null=True, default=0)
     is_mail = models.BooleanField(verbose_name="是否发货", blank=True,  default=0)
@@ -264,7 +278,7 @@ class DogOrder(models.Model):
     message = models.CharField(verbose_name='留言', max_length=400,null=True, blank=True)
 
     class Meta:
-        verbose_name = u"宠粮定制单"
+        verbose_name = u"定制食品订单"
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
 
@@ -280,7 +294,7 @@ class DogOrder(models.Model):
 
 #狗粮订单选项
 class DogOrderItem(models.Model):
-    dogorder = models.ForeignKey(DogOrder, verbose_name='订单')
+    dogorder = models.ForeignKey(DogOrder, verbose_name='订单', on_delete=models.CASCADE)
     dog_status = models.ForeignKey(DogStatus, verbose_name='定制项目')
     dog_status_type = models.CharField(verbose_name='选项内容', max_length=64, blank=True, null=True)
 

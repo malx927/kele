@@ -73,7 +73,7 @@ class Goods(models.Model):
     goodstype = models.ManyToManyField(GoodsType,verbose_name='商品分类')
     price = models.DecimalField(verbose_name='销售价格', max_digits=6, decimal_places=2, null=True, blank=True, default=0)
     benefits = models.DecimalField(verbose_name='会员价',  max_digits=6, decimal_places=2, null=True, blank=True, default=0)
-    scores = models.IntegerField(verbose_name='金币', default=1, null=True, blank=True)
+    scores = models.IntegerField(verbose_name='积分', default=1, null=True, blank=True)
     content = RichTextUploadingField(verbose_name=u'产品详情',null=True,blank=True)
     stock_nums = models.IntegerField(verbose_name='库存量', default=99, null=True, blank=True)
     ship_free = models.BooleanField(default=True, verbose_name="是否承担运费")

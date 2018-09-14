@@ -4,7 +4,7 @@ __author__ = 'yy'
 from django.contrib import admin
 
 from doginfo.models import Company, DogOwner, Doginfo, DogBreed, DogLoss, DogAdoption, DogDelivery, DogBuy, DogSale, \
-    Freshman, Doginstitution,DogStatus,DogStatusType
+    Freshman, Doginstitution,DogStatus,DogStatusType, FoodPrice, DogOrder
 
 
 # Register your models here.
@@ -125,19 +125,30 @@ class MemberScoreDetailInline(admin.TabularInline):
 
 @admin.register(DogStatus)
 class DogStatusAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sort','suffix_name','is_checkbox', 'create_time')
+    list_display = ('name', 'sort','suffix_name','short_name','is_checkbox', 'create_time')
     list_display_links = ('name',)
     list_per_page = 50
     inlines = [MemberScoreDetailInline]
 
     fieldsets = [
-        ('状况分类', {
-            'fields': ('name','sort','is_checkbox','suffix_name')
+        ('选项', {
+            'fields': ('name','sort','is_checkbox','short_name','suffix_name')
         })
     ]
 
 
+@admin.register(FoodPrice)
+class FoodPriceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'price','create_time')
+    list_display_links = ('name',)
+    list_per_page = 50
 
+
+@admin.register(DogOrder)
+class DogOrderAdmin(admin.ModelAdmin):
+    list_display = ('out_trade_no', 'username','telnumber','detailinfo','total_fee','cash_fee','price','goods_nums','product_detail','status','pay_time')
+    list_display_links = ('username',)
+    list_per_page = 50
 
 
 

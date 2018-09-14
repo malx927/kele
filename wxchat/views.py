@@ -3,6 +3,7 @@ import random, string, time, os
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.forms import model_to_dict
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -16,7 +17,7 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType
+from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType, FoodPrice, DogOrderItem
 from .forms import DogadoptForm, DogdeliveryForm, DogInstitutionForm
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth
@@ -574,16 +575,12 @@ class DogPayOrderView(View):
         body = '宠粮定制消费'
 
         # 获得订单信息
-        dogorder = request.POST.get('dogorder', None)
+        out_trade_no = request.POST.get('out_trade_no', None)
         user_id = request.session.get('openid')
-        out_trade_no = json.loads(dogorder)
-        # is_member = request.session.get('is_member')
-        # order =getShoppingOrder(user_id, dogorder)
-        peice = request.POST.get('price', None)
-
+        print('DogPayOrderView',out_trade_no)
         try:
-            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=peice, out_trade_no=out_trade_no,
-                                      notify_url=settings.NOTIFY_URLS, user_id=user_id)
+            order = DogOrder.objects.get( user_id=user_id, out_trade_no=out_trade_no, status=0 )
+            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=order.total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URLS, user_id=user_id)
             prepay_id = data.get('prepay_id', '')
             save_data = dict(data)
             # 保存统一订单数据
@@ -591,7 +588,8 @@ class DogPayOrderView(View):
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
-
+        except Order.DoesNotExist as ex:
+            pass
         except WeChatPayException as wxe:
             errors = {
                 'return_code': wxe.return_code,
@@ -664,44 +662,65 @@ def getShoppingOrder(openid, dogorder):
     return order
 
 #订单完成
-def order_finish(request):
-    order_code = request.GET.get('order_code',None)
-    order=json.loads(order_code)
+def orderList(request):
+    out_trade_no = request.GET.get('out_trade_no',None)
     try:
-        code = DogOrder.objects.get(dog_code=order).first()
+        order = DogOrder.objects.get( out_trade_no = out_trade_no )
     except DogOrder.DoesNotExist:
-        code =None
-    return render(request,'wxchat/order_finish.html',{'code':code})
+        order =None
+    return render(request,'wxchat/dogorder_checkout.html',{'order':order})
 
 # 订单成功
-def ordersuccess(request):
-    all_product = []
-    openid = request.session.get('openid')
-    nickname = request.session.get('nickname')
-    peice = request.GET.get('peice')
-    dogtype = request.GET.get('dogtype')
-    dog_age = request.GET.get('dog_age')
-    body_status = request.GET.get('body_status')
-    eye_status = request.GET.get('eye_status')
-    bones_status = request.GET.get('bones_status')
-    dog_code = request.GET.get('dog_code')
-    skin_status = request.GET.get('skin_status')
-    all_order = str(dogtype) + str(dog_age) + str(bones_status) + str(body_status) + str(eye_status) + str(skin_status)
-    all_product.append(all_order)
-    if openid and nickname:
-        data = DogOrder()
-        data.name = '宠粮定制消费'
-        data.peice = peice
-        data.openid = openid
-        data.nickname = nickname
-        data.dog_code = dog_code
-        data.product_detail = all_product
-        data.order_status = 1
-        data.save()
-    return render(request, 'wxchat/order_success.html',
-                  {'peice': peice, 'skin_status': skin_status, 'dogtype': dogtype, 'dog_age': dog_age,
-                   'body_status': body_status, 'eye_status': eye_status, 'bones_status': bones_status,
-                   'dog_code': dog_code})
+def orderSuccess(request):
+
+    if request.method == "POST":
+
+        order_data = {
+            "success": "false",
+        }
+
+        user_id = request.session.get('openid')
+        price = request.POST.get('price')
+        nums = request.POST.get('nums')
+        userName = request.POST.get('userName')
+        telNumber = request.POST.get('telNumber')
+        postalCode = request.POST.get('postalCode')
+        detailInfo = request.POST.get('detailInfo')
+        datalist = request.POST.getlist('datalist[]')
+
+        dict_datas = { data.split('|')[0]:data.split('|')[1] for data in datalist if len(data.split('|')) == 2 }
+
+        product_detail = ','.join(dict_datas.values())
+
+        out_trade_no = '{0}{1}{2}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000),'B')
+        total_fee = float(price) * int(nums)
+
+        defaults = {
+            'username': userName,
+            'telnumber': telNumber,
+            'postalcode': postalCode,
+            'detailinfo': detailInfo,
+            'price': price,
+            'goods_nums': nums,
+            'product_detail': product_detail,
+            'total_fee': total_fee,
+        }
+
+        #创建订单
+        order, created = DogOrder.objects.get_or_create(out_trade_no=out_trade_no, user_id=user_id, defaults=defaults)
+
+        if created:
+            item_list =[]
+            for key,value in dict_datas.items():
+                orderItem = DogOrderItem(dogorder=order,dog_status_id=int(key), dog_status_type = value )
+                item_list.append(orderItem)
+
+            DogOrderItem.objects.bulk_create(item_list)
+            order_data['success'] = 'true'
+            order_data['out_trade_no'] = order.out_trade_no
+
+
+        return HttpResponse(json.dumps(order_data))
 
 
 # 狗粮订单
@@ -712,14 +731,25 @@ def dogOrder(request):
         return render(request, 'wxchat/dogorder.html', {'orders': orders})
 
     elif request.method == "POST":
-        choice_list ={}
+        title_list ={}
+        values = DogStatus.objects.order_by("sort").values("sort","short_name")
+        prices = FoodPrice.objects.order_by('price')
+
+        for value in values:
+            print(value["sort"],value["short_name"])
+            title_list = {  str(value["sort"]) : value["short_name"] for value in values  }
+
+        choice_list = {}
+
         for k,v in request.POST.lists():
-            print(k,v)
             if "radio" in k:
-                # key = k.split('_')[1]
-                choice_list[k] = ','.join(v)
-        print(choice_list)
-        return render(request, 'wxchat/order_success.html', context = { "choice_list": choice_list })
+                radio,sort,item_id = k.split('_')
+                print(radio,sort,item_id)
+                title = title_list.get(sort,None)
+                choice_list[sort] = [ title, ','.join(v),item_id]
+
+        signPackage = getJsApiSign(request)
+        return render(request, 'wxchat/order_success.html', context = { "choice_list": choice_list,"sign": signPackage,"prices":prices })
 
         #     now = datetime.datetime.now()
         #     random_int = random.randint(100, 10000)
@@ -1156,61 +1186,4 @@ def myScore(request):
 
     return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
-
-
-def createTestData(request):
-    curDate = datetime.datetime.now()
-    strDate = curDate.strftime('%Y-%m-%d')
-    print(strDate)
-    type = Dogtype.objects.get(pk=1)
-    for i in range(1, 50):
-        data = {
-            'dog_name': u'大眼可乐--%d' % (i,),
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/default_dog.png',
-            'lostplace': '龙前街19-2号楼--%d' % (i,),
-            'lostdate': strDate,
-            'ownername': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogLoss.objects.create(**data)
-        # print(data)
-    for i in range(1, 50):
-        data = {
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'desc': u'大眼可乐描述--%d' % (i,),
-            'picture': 'wxchat/images/default_dog.png',
-            'findplace': '龙前街19-2号楼--%d' % (i,),
-            'finddate': strDate,
-            'findname': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogOwner.objects.create(**data)
-
-    for i in range(1, 50):
-        data = {
-            'typeid': type,
-            'colors': u'金毛--%d' % (i,),
-            'price': u'1000-5000元--%d' % (i,),
-            'buyname': '张三--%d' % (i,),
-            'telephone': '123456789',
-        }
-        DogBuy.objects.create(**data)
-
-    # for i in range(1,50):
-    #     data = {
-    #         'typeid':type,
-    #         'colors':u'金毛--%d'%(i,),
-    #         'price':u'1000-5000元--%d'%(i,),
-    #         'desc':u'能歌善舞--%d'%(i,),
-    #         'picture':'wxchat/images/default_dog.png',
-    #         'ownername':'张三--%d'%(i,),
-    #         'telephone':'123456789',
-    #     }
-    #     DogSale.objects.create(**data)
-
-    return HttpResponse('success')
 

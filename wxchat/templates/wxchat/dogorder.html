@@ -3,28 +3,35 @@
 {% block extra %}
     <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}">
     <style>
+    html, body{
+        background-color: #fccf5c;
+    }
     .cardBg{
-        position: fixed;
+        background-color: #fccf5c;
         left: 0;
         top: 0;
         width: 100%;
         height: 100%;
-{#        overflow: hidden;#}
+        max-width: 23.5em;
+        max-height: 38.4375em;
         z-index: 0;
         right: 0;
         margin: auto;
-        max-width: 640px;
         background: url({% static 'wxchat/images/card_bg.png' %}) no-repeat;
-{#        background-size: 100% auto;#}
-        background-size: 100% 100%;
-        -moz-background-size: 100% 100%;
-        -webkit-background-size: 100% 100%;
+        background-size: 100% auto;
+        -moz-background-size: 100% auto;
+        -webkit-background-size: 100% auto;
     }
 
     .check_label{
-        line-height: 48px;
-        padding: 0; padding-left:75px;
-        margin-bottom:20px;
+        height: 40px;
+        line-height: 40px;
+        padding: 0;
+        padding-left:55px;
+        margin-top:20px;
+    }
+    .check_label:first-child{
+        margin-top:34px;
     }
     .check_label:active{
          background-color: transparent;
@@ -32,8 +39,7 @@
     </style>
 {% endblock extra %}
 {% block container %}
-<div class="cardBg">
-<div class="weui-panel" style="height: 100%;margin-top: 0px;background-color: transparent;">
+<div class="weui-panel cardBg" >
     <div class="weui-panel__hd">
         <div class="weui-flex">
             <div></div>
@@ -41,20 +47,19 @@
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
-    <div class="weui-panel__bd" style="color: #3a1437;">
-     <div style="height:75px;"></div>
+    <div class="weui-panel__bd" style="color: #3a1437;overflow: hidden;">
         <form action="" method="post" enctype="multipart/form-data" id="form1" >{% csrf_token %}
         {% for order in orders %}
-            <div id="sort_{{ order.sort }}" style="overflow: hidden;" {% if not forloop.first %} class="hide" {% endif %}>
-                <div class="weui-cells__title" style="margin-bottom: 2.8em;color: #3a1437;text-align: center;font-size: 30px;">{{ order.sort }}.{{ order.name }}</div>
-                <div class="weui-cells weui-cells_checkbox" style="background-color: transparent;">
+            <div id="sort_{{ order.sort }}" style="overflow: hidden;position: absolute;width:18.563em;max-height:27.188em;left: 2.5em;top: 6.25em;" {% if not forloop.first %} class="hide" {% endif %}>
+                <div class="weui-cells__title" style="padding-left5px;padding-right:5px;height: 4.8em;line-height: 4.8em;color: #3a1437;text-align: center;font-size: 1.5625em;margin-top: 6px;margin-bottom:0px;" >{{ order.sort }}.{{ order.name }}</div>
+                <div class="weui-cells weui-cells_checkbox" style="background-color: transparent;height:307px;">
                     {% for s in order.dogstatustype.all %}
                         <label class="weui-cell weui-check__label check_label" for="id_{{s.id}}" >
                             <div class="weui-cell__hd">
                                 {% if order.is_checkbox == 1 %}
-                                    <input type="checkbox" class="weui-check" name="radio_{{order.sort}}" id="id_{{s.id}}" data-item="sort_{{ order.sort }}" value="{{ s.name }}">
+                                    <input type="checkbox" class="weui-check" name="radio_{{order.sort}}_{{ order.id }}" id="id_{{s.id}}" data-item="sort_{{ order.sort }}" value="{{ s.name }}">
                                 {% else %}
-                                    <input type="radio" class="weui-check" name="radio_{{order.sort}}" id="id_{{s.id}}" data-item="sort_{{ order.sort }}" value="{{ s.name }}">
+                                    <input type="radio" class="weui-check" name="radio_{{order.sort}}_{{ order.id }}" id="id_{{s.id}}" data-item="sort_{{ order.sort }}" value="{{ s.name }}">
                                 {% endif %}
                                 <i class="weui-icon-checked"></i>
                             </div>
@@ -63,20 +68,20 @@
                             </div>
                         </label>
                     {% endfor %}
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd">
-                            {% if not forloop.first %}
-                                <a href="javascript:void(0);" class="previous_page weui_btns  weui_btn_primary" id="prev_{{ order.sort }}">上一页</a>
+                        <div class="weui-flex" style="position: absolute; bottom:10px;width:100%">
+                             {% if not forloop.first %}
+                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" style="margin-top: 0px;" id="prev_{{ order.sort }}">上一页</a></div>
                              {% endif %}
-                        </div>
-                        <div class="weui-cell__bd">
+
                             {% if not forloop.last %}
-                                <a href="javascript:void(0);" class="previous_pages  weui_btns questions weui_btn_primary" id="next_{{ order.sort }}">下一页</a>
+                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="next_{{ order.sort }}">下一页</a></div>
                              {% endif %}
                              {% if forloop.last %}
-                                <a href="javascript:void(0);" class="previous_pages  weui_btns  weui_btn_primary" id="submit_form">提交</a>
+                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="submit_form">提交</a></div>
                              {% endif %}
+
                         </div>
+
                     </div>
                 </div>
             </div>
@@ -128,35 +133,6 @@
 
         });
 
-{#        function submitPage() {#}
-{#            var a = [];#}
-            {#        a.push($(".question>li.answer").text())#}
-{#            $(".question>li.answer").each(function () {#}
-{#                var answers = $(this).data('answer');#}
-{#                a.push(answers);#}
-{#            });#}
-{#            var chk_value = [];#}
-{#            $('input[name="bones_status"]:checked').each(function () {#}
-{#                chk_value.push($(this).val());#}
-{#            });#}
-{#            $.ajax({#}
-{##}
-{#                url: "{% url 'dog-order' %}",  //请求服务的地址#}
-{##}
-{#                type: "GET",  //数据发送的方式#}
-{##}
-{#                contentType: "application/jason; encode=utf-8",  // 发送的数据及data对应数据的类型，前者是POST方式，后者是GET方式#}
-{##}
-{#                data: {'alldata': JSON.stringify(a), 'aa': JSON.stringify(chk_value)},#}
-{##}
-{#                success: function (data) {#}
-{#                    window.location.href = "{% url 'order-success'%}?peice=" + data['peice'] + '&skin_status=' + data['skin_status'] + '&eye_status=' + data['eye_status'] + '&dogtype=' + data['dogtype'] + '&dog_age=' + data['dog_age'] + '&body_status=' + data['body_status'] + '&bones_status=' + data['bones_status'] + '&dog_code=' + data['dog_code'];#}
-{#                    //ret_data是ajax发送成功后，后端服务器HttpResponse（）返回的数据#}
-{##}
-{#                }#}
-{##}
-{#            });#}
-{#        }#}
     </script>
 
 

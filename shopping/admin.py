@@ -18,7 +18,6 @@ class GoodsAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    #raw_id_fields = ['goods']
     readonly_fields = ['goods','price','benefits','quantity']
 
 @admin.register(Order)
@@ -86,4 +85,5 @@ class ScoresLimitAdmin(admin.ModelAdmin):
 class MailFeeAdmin(admin.ModelAdmin):
     list_display = ('mail_cost', 'create_at')
     list_per_page = 50
+
 
