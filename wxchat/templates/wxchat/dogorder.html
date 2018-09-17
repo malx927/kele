@@ -51,7 +51,7 @@
         <form action="" method="post" enctype="multipart/form-data" id="form1" >{% csrf_token %}
         {% for order in orders %}
             <div id="sort_{{ order.sort }}" style="overflow: hidden;position: absolute;width:18.563em;max-height:27.188em;left: 2.5em;top: 6.25em;" {% if not forloop.first %} class="hide" {% endif %}>
-                <div class="weui-cells__title" style="padding-left5px;padding-right:5px;height: 4.8em;line-height: 4.8em;color: #3a1437;text-align: center;font-size: 1.5625em;margin-top: 6px;margin-bottom:0px;" >{{ order.sort }}.{{ order.name }}</div>
+                <div class="weui-cells__title" style="padding-left:5px;padding-right:5px;height: 4.8em;line-height: 4.8em;color: #3a1437;text-align: center;font-size: 1.5625em;margin-top: 6px;margin-bottom:0px;" >{{ order.sort }}.{{ order.name }}</div>
                 <div class="weui-cells weui-cells_checkbox" style="background-color: transparent;height:307px;">
                     {% for s in order.dogstatustype.all %}
                         <label class="weui-cell weui-check__label check_label" for="id_{{s.id}}" >
@@ -68,19 +68,17 @@
                             </div>
                         </label>
                     {% endfor %}
-                        <div class="weui-flex" style="position: absolute; bottom:10px;width:100%">
-                             {% if not forloop.first %}
-                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" style="margin-top: 0px;" id="prev_{{ order.sort }}">上一页</a></div>
-                             {% endif %}
+                    <div class="weui-flex" style="position: absolute; bottom:10px;width:100%">
+                         {% if not forloop.first %}
+                            <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" style="margin-top: 0px;" id="prev_{{ order.sort }}">上一页</a></div>
+                         {% endif %}
 
-                            {% if not forloop.last %}
-                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="next_{{ order.sort }}">下一页</a></div>
-                             {% endif %}
-                             {% if forloop.last %}
-                                <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="submit_form">提交</a></div>
-                             {% endif %}
-
-                        </div>
+                        {% if not forloop.last %}
+                            <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="next_{{ order.sort }}">下一页</a></div>
+                         {% endif %}
+                         {% if forloop.last %}
+                            <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" id="submit_form">提交</a></div>
+                         {% endif %}
 
                     </div>
                 </div>

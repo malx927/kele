@@ -567,7 +567,7 @@ def DogdeliveryAdd(request):
         next = request.GET.get('next', '')
         return render(request, 'wxchat/dogdelivery_add.html', {'form': form, 'next': next})
 
-
+############定制狗粮支付开始####################
 # 订单支付
 class DogPayOrderView(View):
     def post(self, request, *args, **kwargs):
@@ -580,7 +580,12 @@ class DogPayOrderView(View):
         print('DogPayOrderView',out_trade_no)
         try:
             order = DogOrder.objects.get( user_id=user_id, out_trade_no=out_trade_no, status=0 )
-            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=order.total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URLS, user_id=user_id)
+            total_fee = int(order.total_fee * 100)
+
+            if total_fee > 1 and user_id =='o0AHP0lpCKyadVWg88KeI5JrafYI':
+                total_fee =1
+
+            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URLS, user_id=user_id)
             prepay_id = data.get('prepay_id', '')
             save_data = dict(data)
             # 保存统一订单数据
@@ -611,9 +616,9 @@ def DogpayNotify(request):
 
         # 查询订单，判断是否正确
         transaction_id = res_data.get('transaction_id', None)
-        dogorder = res_data.get('dogorder', None)
+        out_trade_no = res_data.get('out_trade_no', None)
         openid = res_data.get('openid', None)
-        retBool = queryOrder(transaction_id, dogorder)  # 查询订单
+        retBool = queryOrder(transaction_id, out_trade_no)  # 查询订单
 
         data = {
             'return_code': result_data.get('return_code'),
@@ -626,15 +631,16 @@ def DogpayNotify(request):
             # 验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and \
                             res_data['result_code'] == 'SUCCESS':
-                order = getShoppingOrder(res_data['openid'], res_data['out_trade_no'])
-                if order.pay_status == 0 and order.peice == str(res_data['total_fee']):
+                order = getShoppingOrder(openid, res_data['out_trade_no'])
+                if order and order.status==0:
                     # 更新订单
                     pay_status = 1  # 已支付标志
-                    order.update_status_transaction_id(pay_status, transaction_id)
-                    # 发送消息
+                    cash_fee = res_data['cash_fee'] / 100
+                    time_end = res_data['time_end']
+                    pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                    order.update_status_transaction_id(pay_status, transaction_id, cash_fee, pay_time)
                     # if openid:
-                    #     ret = client.message.send_text(openid, 'hello')
-                    #     print(ret)
+                    #     sendTempMessageToUser( order )
 
         return HttpResponse(xml)
     except InvalidSignatureException as error:
@@ -661,14 +667,49 @@ def getShoppingOrder(openid, dogorder):
 
     return order
 
-#订单完成
+#订单去支付
 def orderList(request):
-    out_trade_no = request.GET.get('out_trade_no',None)
-    try:
-        order = DogOrder.objects.get( out_trade_no = out_trade_no )
-    except DogOrder.DoesNotExist:
-        order =None
-    return render(request,'wxchat/dogorder_checkout.html',{'order':order})
+
+    if request.method == "GET":
+        user_id = request.GET.get('openid', None)
+        out_trade_no = request.GET.get('out_trade_no',None)
+        _result = request.GET.get('_result',None)
+
+        if _result is None:
+            try:
+                order = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id )
+                signPackage = getJsApiSign(request)
+            except DogOrder.DoesNotExist:
+                order =None
+            return render(request,'wxchat/dogorder_checkout.html',{'order':order,'sign':signPackage})
+
+        elif _result == 'ok':  #支付成功
+            try:
+                dogorder = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id, status=1 )
+            except DogOrder.DoesNotExist:
+                dogorder = None
+            return render(request,'shopping/pay_result_list.html',{'dogorder':dogorder})
+
+    elif request.method == "POST":
+        context = {
+            "success":"false"
+        }
+        user_id = request.session.get('openid', None)
+        action = request.POST.get("action", None)
+        if user_id is None:
+            context["errors"] = "invalid user"
+            return  HttpResponse(json.dumps(context))
+
+        try:
+            if action == "remove":
+                out_trade_no = request.POST.get("out_trade_no", None)
+                DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id).delete()
+                context["success"] = "true"
+
+        except Order.DoesNotExist as ex:
+            context["errors"] = "order errors"
+
+        return HttpResponse(json.dumps(context))
 
 # 订单成功
 def orderSuccess(request):
@@ -751,11 +792,7 @@ def dogOrder(request):
         signPackage = getJsApiSign(request)
         return render(request, 'wxchat/order_success.html', context = { "choice_list": choice_list,"sign": signPackage,"prices":prices })
 
-        #     now = datetime.datetime.now()
-        #     random_int = random.randint(100, 10000)
-        #     dog_code = now.strftime("%Y%m%d%H%M%S") + str(random_int) + 'B'
-
-
+############定制狗粮支付结束####################
 
 # 加盟宠物医疗机构发布
 def DoginstitutionAdd(request):

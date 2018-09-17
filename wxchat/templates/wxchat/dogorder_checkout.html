@@ -37,13 +37,16 @@
                   success: function(res){
                     if (res.errMsg == "chooseWXPay:ok") {
                         out_trade_no = $("#out_trade_no").text();
-                        window.location.replace('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
+                        window.location.replace('{% url "order-list" %}?out_trade_no=' + out_trade_no + '&_result=ok');
                     } else {
-                       weui.alert('商品支付失败!');
+                       weui.alert('定制食品支付失败!');
                     }
                   },
                    cancel: function(res) {
                        console.log(res);
+                   },
+                   fail:function(res) {
+{#                          alert(JSON.stringify(res));#}
                    }
             });
         }
@@ -69,7 +72,7 @@
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label>
                         <em class="weui-form-preview__value font16" id="total_cost_top" > ¥ {{ order.total_fee|floatformat:"2" }}</em>
-                        <span id="out_trade_no"  >{{ order.out_trade_no }}</span>
+                        <span id="out_trade_no" style="display: none" >{{ order.out_trade_no }}</span>
                     </div>
                 </div>
                 <div class="weui-form-preview__bd" style="text-align: right;">

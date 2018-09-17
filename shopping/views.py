@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import DetailView,ListView, View
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
+from doginfo.models import DogOrder
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee
 from wxchat.views import getJsApiSign
@@ -520,7 +521,7 @@ def setMemberScores( order ):
 # 消费店铺：{{keyword1.DATA}}购买商品：{{keyword2.DATA}}消费金额：{{keyword3.DATA}}消费时间：{{keyword4.DATA}}交易流水：{{keyword5.DATA}}{{remark.DATA}}
 #订单付款成功通知
 # {{first.DATA}}订单号：{{keyword1.DATA}}支付时间：{{keyword2.DATA}}支付金额：{{keyword3.DATA}}支付方式：{{keyword4.DATA}}{{remark.DATA}}
-def sendTempMessageToUser( order ):
+def sendTempMessageToUser( order, type=0 ):
 
     template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
     template_kf = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
@@ -603,7 +604,7 @@ def sendTempMessageToUser( order ):
 class OrderView(View):
 
     def get(self,request, *args, **kwargs):
-        user_id = request.session.get('openid',None)
+        user_id = request.session.get('openid','oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
         out_trade_no = request.GET.get("out_trade_no", None)
 
         context = { }
@@ -626,7 +627,11 @@ class OrderView(View):
             return render(request, template_name='shopping/pay_result_list.html', context=context )
         else:
             orders = Order.objects.filter(user_id = user_id).order_by('status','-add_time')
+            dogorders = DogOrder.objects.filter(user_id = user_id).order_by('status','-create_time')
+
             context['orders'] = orders
+            context['dogorders'] = dogorders
+
             return render(request, template_name='shopping/my_order_list.html', context=context )
 
     def post(self, request, *args, **kwargs):

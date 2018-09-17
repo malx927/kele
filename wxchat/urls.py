@@ -60,7 +60,7 @@ urlpatterns = [
     url(r'^pay/dogpayorder$', DogPayOrderView.as_view(), name='dog-pay-order'), #支付订单
     url(r'^pay/dogwxnotify/$', DogpayNotify, name='dog-pay-notify'), #订单回调
     url(r'^pay/ordersuccess/$', orderSuccess, name='order-success'),
-    url(r'^orderlist/$', orderList, name='order-list'),
+    url(r'^pay/orderlist$', orderList, name='order-list'),
     url(r'^dogbreednav/$', dogBreedNav, name='dog-breed-nav'),
 
     # 新手学堂

@@ -1679,6 +1679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var $tabItems = $tab.find('.weui-navbar__item, .weui-tabbar__item');
 	        var $tabContents = $tab.find('.weui-tab__content');
 
+			$tabItems.removeClass('weui-bar__item_on');
 	        $tabItems.eq(options.defaultIndex).addClass('weui-bar__item_on');
 	        $tabContents.eq(options.defaultIndex).show();
 
