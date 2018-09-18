@@ -65,10 +65,10 @@
                         </div>
                     </div>
                     <div class="weui-cell cell-end">
-                        <div class="weui-cell__bd color_red"  ><B>{% if order.status == 1 %} 已支付{% endif %}</B></div>
+                        <div class="weui-cell__bd color_red"  ><B>{% if dogorder.status == 1 %} 已支付{% endif %}</B></div>
                         <div class="weui-cell__ft " style="color:#000000" >
                             <p>共 {{ dogorder.goods_nums }} 件商品, 付款金额<B> ¥{{ dogorder.total_fee }}</B></p>
-                            <p>订单编号:{{ order.out_trade_no }}</p>
+                            <p>订单编号:{{ dogorder.out_trade_no }}</p>
                         </div>
                     </div>
                 {% endif %}

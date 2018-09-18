@@ -13,12 +13,12 @@ from wechatpy.client.api import WeChatCustomService
 from doginfo.models import DogOrder
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee
-from wxchat.views import getJsApiSign
+from wxchat.views import getJsApiSign, sendTempMessageToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
-from wxchat.views import client
+
 from django.db.models import Sum,F, FloatField,Count
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
@@ -63,90 +63,6 @@ def index(request):
 
 def goodList(request):
     pass
-
-#消费通知
-# {{first.DATA}}
-# 消费店铺：{{keyword1.DATA}}
-# 购买商品：{{keyword2.DATA}}
-# 消费金额：{{keyword3.DATA}}
-# 消费时间：{{keyword4.DATA}}
-# 交易流水：{{keyword5.DATA}}
-# {{remark.DATA}}
-#订单付款成功通知
-# {{first.DATA}}
-# 订单号：{{keyword1.DATA}}
-# 支付时间：{{keyword2.DATA}}
-# 支付金额：{{keyword3.DATA}}
-# 支付方式：{{keyword4.DATA}}
-# {{remark.DATA}}
-def sendTemplateMessage(request):
-    template_id = 'ss5T1uPePrCZxbHf1cj-isdrvxbsqHWFU875ak8Bhck' #消费通知
-
-    url ='http://www.hld8000.com/wechat/redirect/dogindex'
-    data ={
-        'first':{
-            "value":"恭喜你购买成功！",
-            "color":"#173177"
-        },
-        "keyword1":{
-           "value":"大眼可乐宠物联盟",
-           "color":"#173177"
-        },
-        "keyword2":{
-           "value":"巧克力",
-           "color":"#173177"
-        },
-       "keyword3": {
-           "value":"39.8元",
-           "color":"#173177"
-       },
-        "keyword4": {
-           "value":"2014年9月22日",
-           "color":"#173177"
-        },
-       "keyword5": {
-           "value":"1234567890",
-           "color":"#173999"
-       },
-       "remark":{
-           "value":"欢迎再次购买！",
-           "color":"#173177"
-       }
-    }
-
-    template_id1 = 'HALkJFfhQenGdkZIA1b0mvXQz1xV0CI0S2zNaudWlp4' #订单付款成功通知
-    data1 ={
-        'first':{
-            "value":"用户的订单已经支付",
-            "color":"#173177"
-        },
-        "keyword1":{
-           "value":"12345678",
-           "color":"#173177"
-        },
-        "keyword2":{
-           "value":"2018年9月6日",
-           "color":"#173177"
-        },
-        "keyword3":{
-           "value":"100.00",
-           "color":"#173177"
-        },
-       "keyword4": {
-           "value":"微信支付",
-           "color":"#173177"
-       },
-        "remark":{
-           "value":"请尽快核对订单，为客户发货！",
-           "color":"#173177"
-       }
-    }
-
-    ret = client.message.send_template(user_id='oX5Zn04Imn5RlCGlhEVg-aEUCHNs',template_id=template_id,url=url,data=data)
-    print(ret)
-    ret = client.message.send_template(user_id='oX5Zn04Imn5RlCGlhEVg-aEUCHNs',template_id=template_id1,url=url,data=data1)
-    print(ret)
-    return JsonResponse(ret)
 
 # 宠物食品详情
 class GoodsDetailView(DetailView):
@@ -515,90 +431,6 @@ def setMemberScores( order ):
 
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
-
-#消费通知
-# {{first.DATA}}
-# 消费店铺：{{keyword1.DATA}}购买商品：{{keyword2.DATA}}消费金额：{{keyword3.DATA}}消费时间：{{keyword4.DATA}}交易流水：{{keyword5.DATA}}{{remark.DATA}}
-#订单付款成功通知
-# {{first.DATA}}订单号：{{keyword1.DATA}}支付时间：{{keyword2.DATA}}支付金额：{{keyword3.DATA}}支付方式：{{keyword4.DATA}}{{remark.DATA}}
-def sendTempMessageToUser( order, type=0 ):
-
-    template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
-    template_kf = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
-
-    out_trade_no = order.out_trade_no
-    url_path = reverse("my-order-list")
-    url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, url_path, out_trade_no )
-    print(url)
-
-    color = "#173177"
-    pay_time = order.pay_time.strftime('%Y-%m-%d')
-    customer_data ={
-        'first':{
-            "value":"恭喜你购买成功！",
-            "color":color
-        },
-        "keyword1":{
-           "value":settings.PROJECT_NAME,
-           "color":color
-        },
-        "keyword2":{
-           "value":"",
-           "color":color
-        },
-       "keyword3": {
-           "value":"{0}{1}".format(order.cash_fee,'元') ,
-           "color":color
-       },
-        "keyword4": {
-           "value":pay_time,
-           "color":color
-        },
-       "keyword5": {
-           "value":order.out_trade_no,
-           "color":color
-       },
-       "remark":{
-           "value":"欢迎再次购买！",
-           "color":color
-       }
-    }
-
-    kf_data ={
-        'first':{
-            "value":"客户 {0} 的订单已经支付成功".format(order.username),
-            "color":color
-        },
-        "keyword1":{
-           "value":order.out_trade_no,
-           "color":color
-        },
-        "keyword2":{
-           "value":pay_time,
-           "color":color
-        },
-        "keyword3":{
-           "value":"{0}{1}".format(order.total_fee, '元'),
-           "color":color
-        },
-       "keyword4": {
-           "value":"微信支付",
-           "color":color
-       },
-        "remark":{
-           "value":"请尽快核对订单，为客户发货！",
-           "color":color
-       }
-    }
-
-    ret = client.message.send_template(user_id = order.user_id,template_id = template_custmer, url=url, data=customer_data)
-    if ret['errcode'] == 0:
-        msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
-        for user in msgUsers:
-            ret = client.message.send_template(user_id=user.user.openid,template_id = template_kf, url=url, data=kf_data)
-            print("kf_client", ret)
-    else:
-        print("customer", ret)
 
 #订单列表
 class OrderView(View):

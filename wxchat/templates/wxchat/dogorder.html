@@ -47,10 +47,10 @@
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
-    <div class="weui-panel__bd" style="color: #3a1437;overflow: hidden;">
+    <div class="weui-panel__bd" style="color: #3a1437;">
         <form action="" method="post" enctype="multipart/form-data" id="form1" >{% csrf_token %}
         {% for order in orders %}
-            <div id="sort_{{ order.sort }}" style="overflow: hidden;position: absolute;width:18.563em;max-height:27.188em;left: 2.5em;top: 6.25em;" {% if not forloop.first %} class="hide" {% endif %}>
+            <div id="sort_{{ order.sort }}" style="position: absolute;width:18.563em;max-height:27.188em;left: 2.5em;top: 6.25em;" {% if not forloop.first %} class="hide" {% endif %}>
                 <div class="weui-cells__title" style="padding-left:5px;padding-right:5px;height: 4.8em;line-height: 4.8em;color: #3a1437;text-align: center;font-size: 1.5625em;margin-top: 6px;margin-bottom:0px;" >{{ order.sort }}.{{ order.name }}</div>
                 <div class="weui-cells weui-cells_checkbox" style="background-color: transparent;height:307px;">
                     {% for s in order.dogstatustype.all %}

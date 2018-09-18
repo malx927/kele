@@ -29,15 +29,13 @@ from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
 from doginfo.models import DogLoss, DogOwner, Doginstitution
-from dogtype.models import Dogtype
-from .models import WxUserinfo, WxUnifiedOrdeResult, WxPayResult, WxIntroduce
+from .models import WxUserinfo, WxUnifiedOrdeResult, WxPayResult, WxIntroduce, WxTemplateMsgUser
 from .forms import DogLossForm, DogOwnerForm, DogBuyForm
 from shopping.models import Order, MemberScore, MemberScoreDetail
 from .utils import changeImage, mergeImage
 import datetime
 from PIL import Image
 from io import StringIO, BytesIO
-from .models import getSceneMaxValue
 from django.db.models import Q
 
 WECHAT_TOKEN = settings.WECHAT_TOKEN
@@ -639,8 +637,8 @@ def DogpayNotify(request):
                     time_end = res_data['time_end']
                     pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
                     order.update_status_transaction_id(pay_status, transaction_id, cash_fee, pay_time)
-                    # if openid:
-                    #     sendTempMessageToUser( order )
+                    if openid:
+                        sendTempMessageToUser( order )
 
         return HttpResponse(xml)
     except InvalidSignatureException as error:
@@ -671,14 +669,14 @@ def getShoppingOrder(openid, dogorder):
 def orderList(request):
 
     if request.method == "GET":
-        user_id = request.GET.get('openid', None)
+        user_id = request.session.get('openid', None)
         out_trade_no = request.GET.get('out_trade_no',None)
         _result = request.GET.get('_result',None)
 
         if _result is None:
             try:
-                order = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id )
                 signPackage = getJsApiSign(request)
+                order = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id )
             except DogOrder.DoesNotExist:
                 order =None
             return render(request,'wxchat/dogorder_checkout.html',{'order':order,'sign':signPackage})
@@ -688,7 +686,12 @@ def orderList(request):
                 dogorder = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id, status=1 )
             except DogOrder.DoesNotExist:
                 dogorder = None
-            return render(request,'shopping/pay_result_list.html',{'dogorder':dogorder})
+
+            context = {
+                'dogorder':dogorder,
+                'project_name': settings.PROJECT_NAME
+            }
+            return render(request,'shopping/pay_result_list.html', context = context)
 
     elif request.method == "POST":
         context = {
@@ -1137,6 +1140,91 @@ def getJsApiSign(request):
         "signature": signature
     }
     return signPackage
+
+#消费通知
+# {{first.DATA}}
+# 消费店铺：{{keyword1.DATA}}购买商品：{{keyword2.DATA}}消费金额：{{keyword3.DATA}}消费时间：{{keyword4.DATA}}交易流水：{{keyword5.DATA}}{{remark.DATA}}
+#订单付款成功通知
+# {{first.DATA}}订单号：{{keyword1.DATA}}支付时间：{{keyword2.DATA}}支付金额：{{keyword3.DATA}}支付方式：{{keyword4.DATA}}{{remark.DATA}}
+def sendTempMessageToUser( order, type=0 ):
+
+    template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
+    template_kf = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
+
+    out_trade_no = order.out_trade_no
+    url_path = reverse("my-order-list") if type ==0 else reverse("order-list")
+    url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, url_path, out_trade_no )
+    print(url)
+
+    color = "#173177"
+    pay_time = order.pay_time.strftime('%Y-%m-%d')
+    customer_data ={
+        'first':{
+            "value":"恭喜你购买成功！",
+            "color":color
+        },
+        "keyword1":{
+           "value":settings.PROJECT_NAME,
+           "color":color
+        },
+        "keyword2":{
+           "value":"",
+           "color":color
+        },
+       "keyword3": {
+           "value":"{0}{1}".format(order.cash_fee,'元') ,
+           "color":color
+       },
+        "keyword4": {
+           "value":pay_time,
+           "color":color
+        },
+       "keyword5": {
+           "value":order.out_trade_no,
+           "color":color
+       },
+       "remark":{
+           "value":"欢迎再次购买！",
+           "color":color
+       }
+    }
+
+    first = "客户 {0} 订单已经支付成功" if type==0 else "客户 {0} 定制宠粮订单已经支付成功"
+    kf_data ={
+        'first':{
+            "value":first.format(order.username),
+            "color":color
+        },
+        "keyword1":{
+           "value":order.out_trade_no,
+           "color":color
+        },
+        "keyword2":{
+           "value":pay_time,
+           "color":color
+        },
+        "keyword3":{
+           "value":"{0}{1}".format(order.total_fee, '元'),
+           "color":color
+        },
+       "keyword4": {
+           "value":"微信支付",
+           "color":color
+       },
+        "remark":{
+           "value":"请尽快核对订单，为客户发货！",
+           "color":color
+       }
+    }
+
+    ret = client.message.send_template(user_id = order.user_id,template_id = template_custmer, url=url, data=customer_data)
+    if ret['errcode'] == 0:
+        msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
+        for user in msgUsers:
+            ret = client.message.send_template(user_id=user.user.openid,template_id = template_kf, url=url, data=kf_data)
+            print("kf_client", ret)
+    else:
+        print("customer", ret)
 
 
 def dogIndex(request):
