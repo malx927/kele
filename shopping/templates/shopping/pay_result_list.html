@@ -8,7 +8,7 @@
                 <div class="weui-flex">
                     <div><a href="{% url 'shopping-list' %}"><i class="icon iconfont icon-jiantou3 gray" ></i></a></div>
                     <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">我的支付订单</span></div>
-                     <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+                     <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
                  </div>
             </div>
             <div class="weui-panel__bd">
