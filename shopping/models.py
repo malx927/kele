@@ -230,7 +230,7 @@ class OrderItem(models.Model):
         ordering = ['-add_time']
 
     def __str__(self):
-        return '{}'.format(self.id)
+        return '{}'.format(self.goods.name)
 
     def get_cost(self):
         return self.price * self.quantity

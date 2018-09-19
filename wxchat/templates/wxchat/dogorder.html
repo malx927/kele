@@ -12,50 +12,76 @@
         top: 0;
         width: 100%;
         height: 100%;
-        max-width: 23.5em;
-        max-height: 38.4375em;
         z-index: 0;
         right: 0;
+        bottom: 0;
         margin: auto;
         background: url({% static 'wxchat/images/card_bg.png' %}) no-repeat;
-        background-size: 100% auto;
-        -moz-background-size: 100% auto;
-        -webkit-background-size: 100% auto;
+        background-size: 100% 100%;
+        -moz-background-size: 100% 100%;
+        -webkit-background-size: 100% 100%;
     }
 
-    .check_label{
-        height: 40px;
-        line-height: 40px;
-        padding: 0;
-        padding-left:55px;
-        margin-top:20px;
+    .card_middle{
+        width: 80%;
+        height: 70%;
+
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
     }
-    .check_label:first-child{
-        margin-top:34px;
+
+    .card_hd{
+        background: url({% static 'wxchat/images/card_title.png' %}) no-repeat;
+        max-width:297px;
+        max-height: 147px;
+        line-height: 147px;
+        margin: 0 auto;
+        font-size: 1.5625em;
+        text-align: center;
     }
-    .check_label:active{
+    .card_bd{
+        background-color: transparent;
+        margin-top:10px;
+    }
+    .card_bd:before{
+        border: 0px;
+    }
+    .card_bd:after{
+        border: 0px;
+    }
+    .card_item{
+        margin-bottom: 10px;
+        padding-left: 30px;
+        width:100%;
+        min-height: 45px;
+        background: transparent  url({% static 'wxchat/images/card_item.png' %}) no-repeat;
+        background-position: center center;
+        background-size:100% 99%;
+        -webkit-background-size: 100% 99%;
+        -moz-background-size: 100% 99%;
+    }
+    .card_item:active{
          background-color: transparent;
     }
+    .card_item:before{
+        border: 0px;
+    }
+
     </style>
 {% endblock extra %}
 {% block container %}
 <div class="weui-panel cardBg" >
-    <div class="weui-panel__hd">
-        <div class="weui-flex">
-            <div></div>
-            <div class="weui-flex__item" style="text-align: center;"></div>
-            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
-        </div>
-    </div>
-    <div class="weui-panel__bd" style="color: #3a1437;">
+    <div class="weui-panel__bd" style="color: #3a1437;height:100%">
         <form action="" method="post" enctype="multipart/form-data" id="form1" >{% csrf_token %}
         {% for order in orders %}
-            <div id="sort_{{ order.sort }}" style="position: absolute;width:18.563em;max-height:27.188em;left: 2.5em;top: 6.25em;" {% if not forloop.first %} class="hide" {% endif %}>
-                <div class="weui-cells__title" style="padding-left:5px;padding-right:5px;height: 4.8em;line-height: 4.8em;color: #3a1437;text-align: center;font-size: 1.5625em;margin-top: 6px;margin-bottom:0px;" >{{ order.sort }}.{{ order.name }}</div>
-                <div class="weui-cells weui-cells_checkbox" style="background-color: transparent;height:307px;">
+            <div id="sort_{{ order.sort }}"  class="card_middle {% if not forloop.first %} hide {% endif %}" >
+                <div class="card_hd"  >{{ order.sort }}.{{ order.name }}</div>
+                <div class="weui-cells weui-cells_checkbox card_bd">
                     {% for s in order.dogstatustype.all %}
-                        <label class="weui-cell weui-check__label check_label" for="id_{{s.id}}" >
-                            <div class="weui-cell__hd">
+                        <label class="weui-cell weui-check__label card_item" for="id_{{s.id}}" >
+                            <div class="weui-cell__hd" style="width:25%;text-align: center;">
                                 {% if order.is_checkbox == 1 %}
                                     <input type="checkbox" class="weui-check" name="radio_{{order.sort}}_{{ order.id }}" id="id_{{s.id}}" data-item="sort_{{ order.sort }}" value="{{ s.name }}">
                                 {% else %}
@@ -64,11 +90,11 @@
                                 <i class="weui-icon-checked"></i>
                             </div>
                             <div class="weui-cell__bd">
-                                <p>{{ s.name }} {{ order.suffix_name }}</p>
+                                <span>{{ s.name }} {{ order.suffix_name }}</span>
                             </div>
                         </label>
                     {% endfor %}
-                    <div class="weui-flex" style="position: absolute; bottom:10px;width:100%">
+                    <div class="weui-flex" style="bottom:10px;width:100%">
                          {% if not forloop.first %}
                             <div class="weui-flex__item" style="text-align: center"><a href="javascript:void(0);" class="weui-btn weui-btn_mini weui-btn_primary" style="margin-top: 0px;" id="prev_{{ order.sort }}">上一页</a></div>
                          {% endif %}
@@ -114,8 +140,8 @@
                 var id = page_id.split('_')[1];
                 var next_id = parseInt(id) + 1;
 
-                $("#sort_" + id).hide();
-                $("#sort_" + next_id).show();
+                $("#sort_" + id).addClass('hide');
+                $("#sort_" + next_id).removeClass('hide');
 
             });
 
@@ -124,8 +150,8 @@
                 var id = page_id.split('_')[1];
                 var prev_id = parseInt(id) - 1;
 
-                $("#sort_" + id).hide();
-                $("#sort_" + prev_id).show();
+                $("#sort_" + id).addClass('hide');
+                $("#sort_" + prev_id).removeClass('hide');
 
             });
 
