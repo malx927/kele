@@ -261,13 +261,20 @@ class CreateOrderView(View):
             order = Order.objects.get(out_trade_no=out_trade_no, status=0)
 
             mail_cost = MailFee.getMailCost()
-
+            flag = 0   #是否选中金币支付
             if is_member == 1:
                 total_cost = order.get_member_total_cost()  #会员
                 benefits_totals = order.get_total_cost() - total_cost if total_cost > 0 else 0
+                if order.scores_used > 0:
+                    scores_used = order.scores_used
+                    flag = 1    #是否选中金币支付
+                else:
+                    limit_value = ScoresLimit.getLimitValue()
+                    scores_used = int(total_cost * limit_value / 100)
             else:
                 total_cost = order.get_total_cost()         #非会员
                 benefits_totals = 0
+                scores_used = 0
 
             if total_cost <=0:
                 raise Exception
@@ -281,6 +288,8 @@ class CreateOrderView(View):
             'items': items,
             'benefits_totals': benefits_totals,
             'mail_cost': mail_cost,
+            'scores_used': scores_used,
+            'flag': flag,
             'mail_style':order.mailstyle,
             'out_trade_no': out_trade_no,
             'sign': signPackage
@@ -411,7 +420,8 @@ def setMemberScores( order ):
         memberScore.total_scores += total_scores
         memberScore.save()
     #本人减少积分
-    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = -1*scores_used)
+    if scores_used > 0:
+        MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = -1*scores_used)
     #本人增加积分
     MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = total_scores)
     #推荐人增加积分

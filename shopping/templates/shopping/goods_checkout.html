@@ -4,6 +4,11 @@
     <script type="text/javascript">
     wx.ready(function () {
         $('#pay_now').on('click',function(){
+            var radio_price = $("input[name='mail_style']:checked").val();
+            if(radio_price == undefined){
+                weui.alert('请选择邮寄方式?');
+                return;
+            }
             var params ={
               out_trade_no: $("#out_trade_no").text(),
               csrfmiddlewaretoken:'{{ csrf_token }}',
@@ -78,6 +83,22 @@
                         <em class="weui-form-preview__value " style="text-decoration:line-through;color: #c0c0c0;" >¥ {{ benefits_totals|floatformat:"2" }}</em>
                     </div>
                 </div>
+                {% if scores_used %}
+                <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;">
+                    <label class="weui-cell weui-check__label" for="sel_scores">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="sel_scores" id="sel_scores"  {% if flag == 1 %} checked {% endif %}>
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd">
+                            <p>积分支付</p>
+                        </div>
+                         <div class="weui-cell__ft">
+                            <p>{{ scores_used }} <i class="icon iconfont icon-jiaoyi pink" ></i></p>
+                        </div>
+                    </label>
+                </div>
+                {% endif %}
                 <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;display: flex">
                     <label class="weui-cell weui-check__label" for="self_style" style="width:45%">
                         <div class="weui-cell__hd">
@@ -132,6 +153,7 @@
 {% block bottomjs %}
     {{ block.super }}
 <script>
+$(function(){
     $("input[name='mail_style']").on('change', function(){
         var params ={
               out_trade_no: $("#out_trade_no").text(),
@@ -144,8 +166,7 @@
 
     });
 
-    function mail_cost( params )
-    {
+    function mail_cost( params ){
         $.ajax({
               type: 'POST',
               url: '{% url "mail-cost" %}',
@@ -167,5 +188,49 @@
               }
         });
     };
+
+    $("#sel_scores").on('click', function(){
+        var params ={
+              out_trade_no: $("#out_trade_no").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+        };
+        if( $(this).prop("checked") ){
+            params.flag = 1;
+        }
+        else{
+            params.flag = 0;
+        }
+        scoresLimit( params );
+    });
+
+    function scoresLimit( params ){
+        $.ajax({
+              type: 'POST',
+              url: '{% url "scores-limit" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                 if(data.success == "true"){
+                    $('#total_cost_top').text(' ¥ ' + data.total_cost.toFixed(2));
+                    $('#total_cost_bottom').text(' ¥ ' + data.total_cost.toFixed(2));
+                 }
+                 else if( data.success == "false" ){
+                     $("#sel_scores").prop("checked", false)
+                     if( data.errors == "NoScore"){
+                         weui.alert('您目前没有积分!');
+                     }
+                     else if(data.errors == "LessScore"){
+                          weui.alert('您的积分不足,无法使用积分支付!');
+                     }
+                 }
+              },
+              error: function(error){
+                  console.log(error);
+              }
+        });
+    };
+});
+
 </script>
 {% endblock bottomjs %}

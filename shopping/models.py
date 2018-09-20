@@ -195,18 +195,18 @@ class Order(models.Model):
 
     def get_total_cost(self):
         if self.mailstyle == 1:
-            return sum(item.get_cost() for item in self.items.all()) + self.mail_cost
+            return self.total_fee + self.mail_cost
         else:
-            return sum(item.get_cost() for item in self.items.all())
+            return self.total_fee
 
     def get_member_total_cost(self):
         if self.scores_used is None:
             self.scores_used = 0
 
         if self.mailstyle ==1:
-            return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used + self.mail_cost
+            return self.total_fee - self.scores_used + self.mail_cost
         else:
-            return sum(item.get_member_cost() for item in self.items.all()) - self.scores_used
+            return self.total_fee - self.scores_used
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee,pay_time):
         self.status = status

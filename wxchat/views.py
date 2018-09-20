@@ -44,8 +44,10 @@ APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
 client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
-wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY, mch_id=settings.MCH_ID)
+wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
+                  mch_id=settings.MCH_ID, mch_cert=settings.API_CLIENT_CERT_PATH, mch_key=settings.API_CLIENT_KEY_PATH)
 
+SEND_MSG = '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。'
 
 @csrf_exempt
 def wechat(request):
@@ -134,10 +136,11 @@ def getDogOwnerList(request, msg):
 # 已关注的用户成为会员
 def setUserToMember(openid, scene_id=None):
     try:
-        intro_user = WxUserinfo.objects.get(qr_scene=scene_id, is_member=1)
+        intro_user = WxUserinfo.objects.get(qr_scene=int(scene_id), is_member=1)
         user = WxUserinfo.objects.get(openid=openid, is_member=0)
-        intro = WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
-    except WxUserinfo.DoesNotExist:
+        WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
+    except WxUserinfo.DoesNotExist as ex:
+        print(ex)
         print('用户不存在')
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
@@ -149,7 +152,7 @@ def setUserToMember(openid, scene_id=None):
             'introduce_id': intro_user.openid,
         }
         WxIntroduce.objects.get_or_create(openid=user.openid, defaults=defaults)
-        client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
+        client.message.send_text(openid, SEND_MSG)
 
 
 def saveUserinfo(openid, scene_id=None):
@@ -166,7 +169,7 @@ def saveUserinfo(openid, scene_id=None):
                 obj.qr_scene = qr_scene
                 obj.is_member = 1
                 obj.save()
-                ret = client.message.send_text(openid, '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。')
+                ret = client.message.send_text(openid, SEND_MSG)
                 intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
                 # 创建推荐表数据
                 defaults = {
@@ -729,7 +732,6 @@ def orderSuccess(request):
         userName = request.POST.get('userName')
         telNumber = request.POST.get('telNumber')
         postalCode = request.POST.get('postalCode')
-        detailInfo = request.POST.get('detailInfo')
         datalist = request.POST.getlist('datalist[]')
 
         dict_datas = { data.split('|')[0]:data.split('|')[1] for data in datalist if len(data.split('|')) == 2 }
@@ -743,7 +745,6 @@ def orderSuccess(request):
             'username': userName,
             'telnumber': telNumber,
             'postalcode': postalCode,
-            'detailinfo': detailInfo,
             'price': price,
             'goods_nums': nums,
             'product_detail': product_detail,
@@ -1243,7 +1244,7 @@ def myQRCode(user):
     :param user:
     :return:
     """
-    if user.qr_scene == 0:
+    if user.qr_scene is None or user.qr_scene == 0:
         user.qr_scene = WxUserinfo.getSceneMaxValue()
         user.save()
 
@@ -1265,7 +1266,7 @@ def myQRCode(user):
 
     image = mergeImage(image, logo)
 
-    image_url = '{0}.png'.format(openid)
+    image_url = '{0}{1}.png'.format(openid,int(time.time()))
 
     image.save(os.path.join(settings.MEDIA_ROOT, image_url), quality=100)
 
@@ -1312,3 +1313,12 @@ def myScore(request):
     return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
 
+def orderRefund(request):
+
+    transaction_id = '4200000193201809190955214856'
+    out_refund_no = '123'
+    total_fee = '1'
+    refund_fee = '1'
+    ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, transaction_id= transaction_id, out_refund_no=out_refund_no)
+    print('orderRefund', ret)
+    return HttpResponse(ret)

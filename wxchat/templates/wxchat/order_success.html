@@ -3,75 +3,71 @@
 {% block extra %}
       {% include 'shopping/include/jssdk.html' %}
 {% endblock extra%}
-{% block container %}
- <div class="weui-panel">
-    <div class="weui-panel__hd header_bottom">
-         <div class="weui-flex">
-            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠粮定制详情</span></div>
+{% block tab %}
+ <div class="weui-tab__panel">
+     <div class="weui-panel">
+        <div class="weui-panel__hd header_bottom">
+             <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠粮定制详情</span></div>
+            </div>
         </div>
-    </div>
-    <div class="weui-panel__bd">
-        <div class="weui-cells cells_top">
-            <a class="weui-cell weui-cell_access" href="javascript:;" id="wxaddress">
-                <div class="weui-cell__bd" style="height: 60px;">
-                    <p>
-                        <span id="username">收件人姓名及联系方式</span>
-                        <span style="padding-left: 10px;" id="telnumber"></span>
-                        <span id="postalcode" style="display:none"></span>
-                    </p>
-                    <p id="detailInfo">发货详细地址</p>
-                </div>
-                <div class="weui-cell__ft"></div>
-            </a>
-        </div>
-        <div class="weui-cells__title" style="position: relative;">请选择价格和数量：
-             <div class="weui-count weui-count_ex" style="bottom: 2px;">
-                    <span class="weui-count__btn weui-count__decrease"></span>
-                    <input class="weui-count__number" type="number" value="0" readonly="">
-                    <span class="weui-count__btn weui-count__increase"></span>
-             </div>
-        </div>
-        <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;display: flex">
-            {% for price in prices %}
-                <label class="weui-cell weui-check__label" for="price_{{ price.id }}" >
-                    <div class="weui-cell__hd">
-                        <input type="radio" class="weui-check" name="price" value="{{ price.price }}" id="price_{{ price.id }}" >
-                        <i class="weui-icon-checked"></i>
+        <div class="weui-panel__bd">
+            <div class="weui-cells cells_top">
+                <a class="weui-cell weui-cell_access" href="javascript:;" id="wxaddress">
+                    <div class="weui-cell__bd">
+                        <p>
+                            <span id="username">购买人姓名及联系方式</span>
+                            <span style="padding-left: 10px;" id="telnumber"></span>
+                            <span id="postalcode" style="display:none"></span>
+                        </p>
                     </div>
-                    <div class="weui-cell__bd"><p>¥{{ price.price}}</p></div>
-                </label>
-            {% endfor %}
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label" style="text-align: center;color:#5b5a5a;">商品数量:</label> </div>
-                <div class="weui-cell__bd">
-                    <div class="weui-count weui-count_ex">
-                        <span class="weui-count__btn weui-count__decrease"></span>
-                        <input class="weui-count__number" type="number" value="0" readonly="">
-                        <span class="weui-count__btn weui-count__increase"></span>
+                    <div class="weui-cell__ft"></div>
+                </a>
+            </div>
+            <div class="weui-cells__title black" >选择购买价格：</div>
+            <div class="weui-cells weui-cells_checkbox" style="margin-top: 0;display: flex;flex-wrap:wrap">
+                {% for price in prices %}
+                    <label class="weui-cell weui-check__label cell-before" for="price_{{ price.id }}" style="width:40%;border-top:0;">
+                        <div class="weui-cell__hd">
+                            <input type="radio" class="weui-check" name="price" value="{{ price.price }}" id="price_{{ price.id }}" >
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd"><p>{{ price.price|floatformat:0}}元/斤</p></div>
+                    </label>
+                {% endfor %}
+            </div>
+            <div class="weui-cells cells_top">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd" style="font-size: 14px;"><p>选择购买数量：</p></div>
+                    <div class="weui-cell__ft">
+                      <div class="weui-count">
+                        <a class="weui-count__btn weui-count__decrease"></a>
+                        <input class="weui-count__number" type="number" value="1" style="font-size: 1em;">
+                        <a class="weui-count__btn weui-count__increase"></a>
+                      </div> (单位:斤)
                     </div>
                 </div>
             </div>
+            {% if choice_list %}
+            <div class="weui-cells__title black">宠粮定制选项：</div>
+            <div class="weui-cells cells_top">
+                {% for key,value in choice_list.items %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label" style="text-align: center;color:#5b5a5a;">{{ value.0 }}:</label> </div>
+                        <div class="weui-cell__bd js_value" data-item="{{ value.2 }}|{{ value.1 }}"><p> {{ value.1 }}</p></div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
-
-        {% if choice_list %}
-        <div class="weui-cells__title">宠物食品定制选项：</div>
-        <div class="weui-cells cells_top">
-            {% for key,value in choice_list.items %}
-                <div class="weui-cell">
-                    <div class="weui-cell__hd"><label class="weui-label" style="text-align: center;color:#5b5a5a;">{{ value.0 }}:</label> </div>
-                    <div class="weui-cell__bd js_value" data-item="{{ value.2 }}|{{ value.1 }}"><p> {{ value.1 }}</p></div>
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-    </div>
+     </div>
  </div>
-    <div class="weui-tabbar">
-         <a href="javascript:;" class="weui-tabbar__item tabbar_item" id="gotopay">
-            <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
-        </a>
-    </div>
+<div class="weui-tabbar">
+     <a href="javascript:;" class="weui-tabbar__item tabbar_item" id="gotopay">
+        <p class="weui-tabbar__label bg_red"><i class="icon iconfont icon-jiaoyi3" ></i> 提交订单</p>
+    </a>
+</div>
     <script>
 
     wx.ready(function(){
@@ -82,7 +78,6 @@
                   $('#username').text(res.userName);
                   $('#telnumber').text(res.telNumber);
                   $('#postalcode').text(res.postalCode);
-                  $('#detailInfo').text(res.provinceName + res.cityName + res.countryName + res.detailInfo);
               },
               cancel:function (res) {},
               fail:function (res) {}
@@ -122,7 +117,6 @@
                 userName: $("#username").text(),
                 telNumber: $('#telnumber').text(),
                 postalCode: $('#postalcode').text(),
-                detailInfo: $('#detailInfo').text(),
                 datalist: arr,
             };
 
@@ -167,5 +161,5 @@ function counter(){
 }
 </script>
 
-{% endblock container %}
+{% endblock tab %}
 

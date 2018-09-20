@@ -64,18 +64,19 @@ a {
 }
 
 .menu-section {
-  margin: 10px 0;
+  margin: 0;
   margin-bottom: 44px;
 }
 
 .menu-section-title {
   text-transform: uppercase;
-  color: #85888d;
+  color: #fff;
   font-weight: 200;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 1px;
-  padding: 0 20px;
-  margin:0;
+  padding: 5px 10px;
+   margin:0;
+  border-bottom: 1px solid #6a6c6c;
 }
 
 .section-title{
@@ -85,18 +86,20 @@ a {
 
 .menu-section-list {
   padding:0;
-  margin: 10px 0;
+  margin: 0;
   list-style:none;
 }
 
 .menu-section-list li {
   display: block;
-  padding: 4px 15px;
+  padding: 4px 10px;
+  padding-left: 20px;
   text-align: left;
-  font-size:15px;
+  font-size:14px;
   border-bottom: 1px solid #6a6c6c;
-  color: #fff;
+  color: #85888d;
 }
 .menu-active{
   background-color: rgb(128, 129, 124);
+  color:#fff!important;
 }

@@ -240,7 +240,7 @@ class ScoresLimitAPIView(APIView):
             "success": "false",
             "total_cost": 0,
             "scores_used": 0,
-            "error_scores": "false"
+            "errors": ""
         }
         try:
             user_id = request.session.get("openid",None)
@@ -253,9 +253,9 @@ class ScoresLimitAPIView(APIView):
 
             #积分使用数量
             limit_value = ScoresLimit.getLimitValue()
-            scares_used = int( order.get_member_total_cost() * limit_value / 100 )
+            scares_used = int( order.total_fee * limit_value / 100 )
             if myScores < scares_used:
-                ret["error_scores"] ="true"
+                ret["errors"] ="LessScore"
                 return Response(ret)
 
             #额度
@@ -274,10 +274,10 @@ class ScoresLimitAPIView(APIView):
 
         except Order.DoesNotExist as ex:
             print("ScoresLimitAPIView:", ex)
-            ret['errors'] = 'Order Doesnot Exits'
+            ret['errors'] = 'NoOrder'
         except MemberScore.DoesNotExist as ex:
             print("ScoresLimitAPIView:", ex)
-            ret['errors'] = 'MemberScore Doesnot Exits'
+            ret['errors'] = 'NoScore'
 
         return Response(ret)
 
@@ -339,7 +339,7 @@ class MailFeeAPIView(APIView):
 
         except Order.DoesNotExist as ex:
             print("MailFeeAPIView:", ex)
-            ret['errors'] = 'Order Doesnot Exits'
+            ret['errors'] = 'NoOrder'
         except MailFee.DoesNotExist as ex:
             print("MailFeeAPIView:", ex)
             ret['errors'] = 'MailFee Doesnot Exits'

@@ -146,7 +146,7 @@ class FoodPriceAdmin(admin.ModelAdmin):
 
 @admin.register(DogOrder)
 class DogOrderAdmin(admin.ModelAdmin):
-    list_display = ('out_trade_no', 'username','telnumber','detailinfo','total_fee','cash_fee','price','goods_nums','product_detail','status','pay_time')
+    list_display = ('out_trade_no', 'username','telnumber','total_fee','cash_fee','price','goods_nums','product_detail','status','pay_time')
     list_display_links = ('username',)
     list_per_page = 50
 
