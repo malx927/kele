@@ -305,8 +305,8 @@ class PayOrderView(View):
 
         #获得订单信息
         out_trade_no = request.POST.get('out_trade_no', None)
-        user_id = request.session.get('openid')
-        is_member = request.session.get('is_member')
+        user_id = request.session.get('openid', None)
+        is_member = request.session.get('is_member', None)
 
         order =getShoppingOrder(user_id, out_trade_no)
 
@@ -319,13 +319,20 @@ class PayOrderView(View):
             return render( request, template_name='shopping/goods_list.html' )
 
         try:
-            data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
-            prepay_id = data.get('prepay_id','')
-            save_data = dict(data)
-            #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
-            if prepay_id:
-                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
+            if order.prepay_id is None:
+                data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
+                prepay_id = data.get('prepay_id',None)
+                save_data = dict(data)
+                #保存统一订单数据
+                WxUnifiedOrdeResult.objects.create(**save_data)
+                if prepay_id:
+                    order.prepay_id = prepay_id
+                    order.prepay_at = datetime.now()
+                    order.save()
+                    return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
+                    return HttpResponse(json.dumps(return_data))
+            else:
+                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=order.prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
 
         except WeChatPayException as wxe:

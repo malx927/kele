@@ -178,6 +178,8 @@ class Order(models.Model):
     mailstyle = models.IntegerField(verbose_name='发货方式', blank=True , null=True, choices=TYPE_MAIL_STYLE)
     mail_cost = models.IntegerField(verbose_name='邮寄费用', blank=True, null=True, default=0)
     is_mail = models.BooleanField(verbose_name="是否发货", blank=True,  default=0)
+    prepay_id = models.CharField(verbose_name='预支付会话标识',max_length=64,null=True,blank=True)
+    prepay_at = models.DateTimeField(verbose_name='预支付时间', null=True, blank=True)
 
     class Meta:
         verbose_name ='订单'
