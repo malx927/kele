@@ -715,7 +715,7 @@ def orderList(request):
                 DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id).delete()
                 context["success"] = "true"
             elif action == "update":
-                out_trade_no_new =  out_trade_no = '{0}{1}{2}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000),'B')
+                out_trade_no_new = '{0}{1}{2}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000),'B')
                 dogOrder = DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id)
                 dogOrder.out_trade_no = out_trade_no_new
                 dogOrder.save()

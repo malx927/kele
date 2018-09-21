@@ -1,3 +1,8 @@
+@font-face {
+    font-family: tianquan;
+    src: url('./tiantianquan.ttf');
+}
+
 *{
 	margin:0;
 	padding:0;
@@ -53,6 +58,7 @@ html,body{
     margin: 0 auto;
     font-size: 1.5625em;
     text-align: center;
+    font-family: tianquan;
 }
 .card_bd{
     background-color: transparent;
@@ -74,6 +80,7 @@ html,body{
     background-size:100% 99%;
     -webkit-background-size: 100% 99%;
     -moz-background-size: 100% 99%;
+    font-family: tianquan;
 }
 .card_item:active{
      background-color: transparent;

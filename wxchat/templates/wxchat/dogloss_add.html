@@ -1,32 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-{#    <script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>#}
     <script>
-{#        wx.config({#}
-{#            debug: false,#}
-{#            appId: '{{ sign.appId }}',#}
-{#            timestamp:'{{ sign.timestamp }}',#}
-{#            nonceStr: '{{ sign.nonceStr }}',#}
-{#            signature: '{{ sign.signature }}',#}
-{#            jsApiList: [#}
-{#                'chooseImage',#}
-{#            ]#}
-{#        });#}
-{#        wx.ready(function () {#}
-{#          document.querySelector('#id_picture').onclick = function () {#}
-{#              alert('ddddd');#}
-{#              wx.chooseImage({#}
-{#                count: 1,#}
-{#                sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有#}
-{#                sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有#}
-{#                success: function (res) {#}
-{#                    var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片#}
-{#                   // document.querySelector('#img').src = localIds[0];#}
-{#                    alert(localIds);#}
-{#                }#}
-{#            });#}
-{#          };#}
-{#    });#}
      window.history.forward(1);
     </script>
 {% endblock extra%}

@@ -1,15 +1,16 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block extra %}
-    <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}">
+    <link rel="stylesheet" href="{% static 'wxchat/style/style_food.css' %}?ver=20180921">
 {% endblock extra %}
 {% block container %}
 <div class="weui-panel cardBg" >
+    <div style="position: absolute;top:4px;right:4px;"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
     <div class="weui-panel__bd" style="color: #3a1437;height:100%">
         <form action="" method="post" enctype="multipart/form-data" id="form1" >{% csrf_token %}
         {% for order in orders %}
             <div id="sort_{{ order.sort }}"  class="card_middle {% if not forloop.first %} hide {% endif %}" >
-                <div class="card_hd"  >{{ order.sort }}.{{ order.name }}</div>
+                <div class="card_hd"  >{{ order.name }}</div>
                 <div class="weui-cells weui-cells_checkbox card_bd">
                     {% for s in order.dogstatustype.all %}
                         <label class="weui-cell weui-check__label card_item" for="id_{{s.id}}" >
