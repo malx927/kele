@@ -702,17 +702,25 @@ def orderList(request):
         }
         user_id = request.session.get('openid', None)
         action = request.POST.get("action", None)
+
         if user_id is None:
             context["errors"] = "invalid user"
             return  HttpResponse(json.dumps(context))
 
         try:
+            out_trade_no = request.POST.get("out_trade_no", None)
             if action == "remove":
-                out_trade_no = request.POST.get("out_trade_no", None)
                 close_ret = wxPay.order.close( out_trade_no )
                 print("close order",close_ret)
                 DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id).delete()
                 context["success"] = "true"
+            elif action == "update":
+                out_trade_no_new =  out_trade_no = '{0}{1}{2}'.format(datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000),'B')
+                dogOrder = DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id)
+                dogOrder.out_trade_no = out_trade_no_new
+                dogOrder.save()
+                context["success"] = "true"
+                context["out_trade_no"] = dogOrder.out_trade_no
 
         except Order.DoesNotExist as ex:
             context["errors"] = "order errors"

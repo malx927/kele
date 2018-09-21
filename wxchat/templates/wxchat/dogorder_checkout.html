@@ -43,13 +43,42 @@
                     }
                   },
                    cancel: function(res) {
-                       console.log(res);
+                       out_trade_no = $("#out_trade_no").text();
+                       updateDogOrder(out_trade_no);
                    },
-                   fail:function(res) {
-{#                          alert(JSON.stringify(res));#}
+                   fail:function(res){
+                       out_trade_no = $("#out_trade_no").text();
+                       updateDogOrder(out_trade_no);
                    }
             });
         }
+
+        function updateDogOrder(out_trade_no, url){
+            var params ={
+              out_trade_no: out_trade_no,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+              action:"update",
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "order-list" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                if(data.success == "true"){
+                     $("#out_trade_no").text(data.out_trade_no)
+                }
+              },
+              error: function(error){
+                  weui.alert('商品支付失败!');
+                  window.location.href = "{% url 'shopping-list' %}";
+              }
+            });
+        }
+
+
 });
 
 </script>
