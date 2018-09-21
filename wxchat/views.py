@@ -709,6 +709,8 @@ def orderList(request):
         try:
             if action == "remove":
                 out_trade_no = request.POST.get("out_trade_no", None)
+                close_ret = wxPay.order.close( out_trade_no )
+                print("close order",close_ret)
                 DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id).delete()
                 context["success"] = "true"
 

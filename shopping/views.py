@@ -319,26 +319,17 @@ class PayOrderView(View):
             return render( request, template_name='shopping/goods_list.html' )
 
         try:
-            prepay_at = order.prepay_at or datetime.now()
-            cur_date = datetime.now()
-            delta = (cur_date - prepay_at).seconds/60
-            print(delta)
-            if order.prepay_at is None or delta > 110: #2 hours
-                data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
-                prepay_id = data.get('prepay_id',None)
-                print('aaaa:',prepay_id)
-                save_data = dict(data)
-                #保存统一订单数据
-                WxUnifiedOrdeResult.objects.create(**save_data)
-                if prepay_id:
-                    order.prepay_id = prepay_id
-                    order.prepay_at = datetime.now()
-                    order.save()
-                    return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
-                    return HttpResponse(json.dumps(return_data))
-            else:
-                print('bbbb:',order.prepay_id)
-                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=order.prepay_id, jssdk=True)
+            data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
+            prepay_id = data.get('prepay_id',None)
+            print('aaaa:',prepay_id)
+            save_data = dict(data)
+            #保存统一订单数据
+            WxUnifiedOrdeResult.objects.create(**save_data)
+            if prepay_id:
+                order.prepay_id = prepay_id
+                order.prepay_at = datetime.now()
+                order.save()
+                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
 
         except WeChatPayException as wxe:
@@ -455,11 +446,11 @@ def setMemberScores( order ):
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
 
-#订单列表
+#订单列表[my-order-list]
 class OrderView(View):
 
     def get(self,request, *args, **kwargs):
-        user_id = request.session.get('openid','oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        user_id = request.session.get('openid', None)
         out_trade_no = request.GET.get("out_trade_no", None)
 
         context = { }
@@ -500,12 +491,21 @@ class OrderView(View):
             return  HttpResponse(json.dumps(context))
 
         try:
+            out_trade_no = request.POST.get("out_trade_no", None)
             if action == "remove":
-                out_trade_no = request.POST.get("out_trade_no", None)
+                close_ret = wxPay.order.close( out_trade_no )
+                print("close order",close_ret)
                 order = Order.objects.get(out_trade_no = out_trade_no, user_id=user_id)
                 OrderItem.objects.filter(order=order).delete()
                 order.delete()
                 context["success"] = "true"
+            if action == "update":
+                out_trade_no_new = '{0}{1}{2}'.format(settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+                order = Order.objects.get(out_trade_no = out_trade_no, user_id=user_id)
+                order.out_trade_no = out_trade_no_new
+                order.save()
+                context["success"] = "true"
+                context["out_trade_no"] = order.out_trade_no
 
         except Order.DoesNotExist as ex:
             context["errors"] = "order errors"

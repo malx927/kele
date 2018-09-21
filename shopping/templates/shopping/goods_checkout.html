@@ -48,10 +48,41 @@
                     }
                   },
                    cancel: function(res) {
-                       console.log(res);
+                       out_trade_no = $("#out_trade_no").text();
+                       updateOrder(out_trade_no);
+                   },
+                   fail:function(res){
+                       out_trade_no = $("#out_trade_no").text();
+                       updateOrder(out_trade_no);
                    }
             });
         }
+
+        function updateOrder(out_trade_no, url){
+            var params ={
+              out_trade_no: out_trade_no,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+              action:"update",
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "my-order-list" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                if(data.success == "true"){
+                     $("#out_trade_no").text(data.out_trade_no)
+                }
+              },
+              error: function(error){
+                  weui.alert('商品支付失败!');
+                  window.location.href = "{% url 'shopping-list' %}";
+              }
+            });
+        }
+
 });
 
 </script>
@@ -74,7 +105,7 @@
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label>
                         <em class="weui-form-preview__value font16" id="total_cost_top" > ¥ {{ total_cost|floatformat:"2" }}</em>
-                        <span id="out_trade_no" style="display: none" >{{ out_trade_no }}</span>
+                        <span id="out_trade_no" style="display: inline-block" >{{ out_trade_no }}</span>
                     </div>
                 </div>
                 <div class="weui-form-preview__bd" style="text-align: right;">

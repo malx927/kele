@@ -262,12 +262,9 @@ class ScoresLimitAPIView(APIView):
             if int(flag) == 1:
                 if order.scores_used is None or order.scores_used == 0:
                     order.scores_used = scares_used
-                    order.prepay_id = None
-                    order.prepay_at = None
             elif int(flag) == 0:
                 order.scores_used = 0
-                order.prepay_id = None
-                order.prepay_at = None
+
 
             order.save()
 
@@ -331,9 +328,6 @@ class MailFeeAPIView(APIView):
                 order.mail_cost = mail_cost
             elif mail_style == "0":
                 order.mail_cost = 0
-
-            order.prepay_id = None
-            order.prepay_at = None
 
             order.save()
 
