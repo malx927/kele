@@ -101,7 +101,7 @@ class GoodsListAPIView(ListAPIView):
         if typeid and int(typeid) != 0:
             return Goods.objects.filter(goodstype=typeid, is_show=1)
         else:
-            return Goods.objects.filter(is_show=1)
+            return Goods.objects.filter(is_show=1,goodstype__show_index=1)
 
 
 #商品类型

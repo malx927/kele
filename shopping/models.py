@@ -55,6 +55,7 @@ class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
     parent = models.ForeignKey('self', verbose_name='父项', default=None, blank=True, null=True)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
+    show_index = models.BooleanField(verbose_name='是否显示在首页', default=False)
     is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
 
     class Meta:

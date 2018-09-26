@@ -3,10 +3,17 @@ import datetime
 from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit, MailFee
 # Register your models here.
 
+
+admin.site.site_title = u'后台管理'
+    # Text to put in each page's <h1>.
+admin.site.site_header = u'大眼可乐后台管理'
+    # Text to put at the top of the admin index page.
+admin.site.index_title = u'首页'
+
+
 @admin.register(Goods)
 class GoodsAdmin(admin.ModelAdmin):
     list_display = ('name', 'show_goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
-    #fields = ('name','food_sn','images','brief',('type','season'),('func_type','level'),('price','stock_nums'),('click_nums','is_show'),'content',)
     list_filter =('goodstype',)
     search_fields = ('name',)
     # filter_horizontal=('goodstype',)
@@ -44,7 +51,7 @@ class ShopCartAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsType)
 class GoodsTypeAdmin(admin.ModelAdmin):
-    list_display = ('name','parent', 'sort','is_show')
+    list_display = ('name','parent', 'sort','show_index','is_show')
     list_per_page = 50
     list_filter =('parent',)
     search_fields = ('name',)
