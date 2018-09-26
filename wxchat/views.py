@@ -1302,20 +1302,32 @@ def showQRCode(request):
             delta_time = (cur_date - create_date).days
 
         print('delta_time:', delta_time)
+        is_member = 1 if user.is_member else 0
         if user and user.qr_image and delta_time < 28:
-            context['user'] = user
-            context['is_member'] = user.is_member
+            context['img_url'] = user.qr_image.url
+            context['is_member'] = is_member
         else:
             userinfo = myQRCode(user)
-            context['user'] = userinfo
-            context['is_member'] = userinfo.is_member
+            context['img_url'] = userinfo.qr_image.url
+            context['is_member'] = is_member
 
     except WxUserinfo.DoesNotExist:
         print('WxUserinfo.DoesNotExist')
+        context['img_url'] = 'empty'
         context['is_member'] = 0
 
-    return render(request, template_name='wxchat/myqrcode.html', context=context)
+    return HttpResponseRedirect(  reverse("my-qrcode-image",kwargs=context ) )
 
+
+def showMyQRCode(request, *args, **kwargs):
+    is_member = kwargs.get('is_member', None)
+    img_url = kwargs.get('img_url', None)
+    context ={
+        'is_member':int(is_member),
+        'img_url': img_url
+    }
+
+    return render(request, template_name='wxchat/myqrcode.html', context =context)
 
 def myScore(request):
     orders = Order.objects.all()
