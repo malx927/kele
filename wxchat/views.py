@@ -4,7 +4,7 @@ import random, string, time, os
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import model_to_dict
-
+from django.utils.http import urlquote_plus, urlunquote_plus
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -1304,11 +1304,11 @@ def showQRCode(request):
         print('delta_time:', delta_time)
         is_member = 1 if user.is_member else 0
         if user and user.qr_image and delta_time < 28:
-            context['img_url'] = user.qr_image.url
+            context['img_url'] = urlquote_plus( user.qr_image.url )
             context['is_member'] = is_member
         else:
             userinfo = myQRCode(user)
-            context['img_url'] = userinfo.qr_image.url
+            context['img_url'] = urlquote_plus( userinfo.qr_image.url )
             context['is_member'] = is_member
 
     except WxUserinfo.DoesNotExist:
@@ -1322,9 +1322,10 @@ def showQRCode(request):
 def showMyQRCode(request, *args, **kwargs):
     is_member = kwargs.get('is_member', None)
     img_url = kwargs.get('img_url', None)
+
     context ={
         'is_member':int(is_member),
-        'img_url': img_url
+        'img_url': urlunquote_plus(img_url)
     }
 
     return render(request, template_name='wxchat/myqrcode.html', context =context)
