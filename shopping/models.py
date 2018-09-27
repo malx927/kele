@@ -61,7 +61,7 @@ class GoodsType(models.Model):
     class Meta:
         verbose_name ='商品分类'
         verbose_name_plural = verbose_name
-
+        ordering = ['sort']
 
     def __str__(self):
         return self.name
@@ -88,7 +88,6 @@ class Goods(models.Model):
     class Meta:
         verbose_name = '宠物食品'
         verbose_name_plural = verbose_name
-        ordering = ['sort']
 
     def show_goodstype(self):
         return [type.name for type in self.goodstype.all() ]
