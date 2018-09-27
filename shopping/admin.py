@@ -31,7 +31,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ( 'username', 'detailinfo', 'telnumber','total_fee','mail_cost','cash_fee','mailstyle','out_trade_no',  'add_time','pay_time', 'status', 'is_mail')
     list_per_page = 50
-    list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status']
+    list_filter = ['out_trade_no', 'user_id', 'username','telnumber','status','is_mail']
     inlines = [OrderItemInline]
 
     fieldsets = [
