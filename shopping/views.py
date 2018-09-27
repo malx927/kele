@@ -456,17 +456,24 @@ class OrderView(View):
         context = { }
         context['project_name'] = settings.PROJECT_NAME
         context['is_member'] = self.request.session.get('is_member', None)
-
+        print(user_id)
         try:
             if user_id:
                 userinfo = WxUserinfo.objects.get(openid=user_id)
                 context['headimgurl'] = userinfo.headimgurl
         except WxUserinfo.DoesNotExist as ex:
-            pass
+            print(ex)
+
 
         if out_trade_no:
             try:
-                order = Order.objects.get(out_trade_no=out_trade_no,user_id=user_id, status=1)
+                if userinfo and userinfo.company_member:
+                    print('company_member=',userinfo.company_member)
+                    order = Order.objects.get(out_trade_no=out_trade_no, status=1)
+                else:
+                    order = Order.objects.get(out_trade_no=out_trade_no,user_id = user_id, status=1)
+
+                context['company_member'] = userinfo.company_member
                 context['order'] = order
             except Order.DoesNotExist as ex:
                 print(ex)
@@ -486,12 +493,14 @@ class OrderView(View):
         }
         user_id = request.session.get('openid', None)
         action = request.POST.get("action", None)
+        print('action=', action)
         if user_id is None:
             context["errors"] = "invalid user"
             return  HttpResponse(json.dumps(context))
 
         try:
             out_trade_no = request.POST.get("out_trade_no", None)
+            print('out_trade_no=', out_trade_no)
             if action == "remove":
                 close_ret = wxPay.order.close( out_trade_no )
                 print("close order",close_ret)
@@ -499,13 +508,19 @@ class OrderView(View):
                 OrderItem.objects.filter(order=order).delete()
                 order.delete()
                 context["success"] = "true"
-            if action == "update":
+            elif action == "update":
                 out_trade_no_new = '{0}{1}{2}'.format(settings.MCH_ID, datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
                 order = Order.objects.get(out_trade_no = out_trade_no, user_id=user_id)
                 order.out_trade_no = out_trade_no_new
                 order.save()
                 context["success"] = "true"
                 context["out_trade_no"] = order.out_trade_no
+            elif action == "confirm": #订单发货确认
+                order = Order.objects.get(out_trade_no = out_trade_no, status=1)
+                order.is_mail = 1
+                order.save()
+                context["success"] = "true"
+
 
         except Order.DoesNotExist as ex:
             context["errors"] = "order errors"

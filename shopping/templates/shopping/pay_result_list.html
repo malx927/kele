@@ -50,6 +50,9 @@
                             <p>订单编号:{{ order.out_trade_no }}</p>
                         </div>
                     </div>
+                   {% if company_member %}
+                    <a href="javascript:;" class="weui-btn weui-btn_primary" id="send_confirm" data-item="{{order.out_trade_no }}">发货确认</a>
+                   {% endif %}
                 {% endif %}
                 <!--定制食品订单-->
                 {% if dogorder %}
@@ -73,6 +76,7 @@
                     </div>
                 {% endif %}
             </div>
+
         </div>
     </div>
 </div>
@@ -82,5 +86,39 @@
 {% block bottomjs %}
 
     {{ block.super }}
+    {% if company_member %}
+    <script>
+        $(function(){
+            $("#send_confirm").on("click",function(){
+                let out_trade_no = $(this).attr("data-item");
+                alert(out_trade_no);
+                var params ={
+                  out_trade_no: out_trade_no,
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+                  action:"confirm",
+                }
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "my-order-list" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                    if(data.success == "true"){
+                         weui.alert('发货确认成功!');
+                    }
+                    else{
+                        weui.alert('发货确认失败!');
+                    }
+                  },
+                  error: function(error){
+                      window.location.href = "{% url 'shopping-list' %}";
+                  }
+                });
+            });
+        })
+    </script>
+    {% endif %}
+
 
 {% endblock bottomjs %}
