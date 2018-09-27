@@ -13,7 +13,7 @@ admin.site.index_title = u'首页'
 
 @admin.register(Goods)
 class GoodsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'show_goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show'  )
+    list_display = ('name', 'show_goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show','sort'  )
     list_filter =('goodstype',)
     search_fields = ('name',)
     # filter_horizontal=('goodstype',)
@@ -36,7 +36,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     fieldsets = [
         ('订单', {
-            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','mail_cost', 'cash_fee','mailstyle','nationalcode', 'status', 'is_mail')
+            'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','mail_cost', 'cash_fee','mailstyle','nationalcode', 'status', 'is_mail','confirm_at','confirm_user','confirm_openid')
         })
     ]
 

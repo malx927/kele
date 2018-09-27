@@ -99,9 +99,9 @@ class GoodsListAPIView(ListAPIView):
     def get_queryset(self,*args, **kwargs):
         typeid = self.request.GET.get('typeid', None)
         if typeid and int(typeid) != 0:
-            return Goods.objects.filter(goodstype=typeid, is_show=1)
+            return Goods.objects.filter(goodstype=typeid, is_show=1).order_by('sort')
         else:
-            return Goods.objects.filter(is_show=1,goodstype__show_index=1)
+            return Goods.objects.filter(is_show=1,goodstype__show_index=1).order_by('sort')
 
 
 #商品类型

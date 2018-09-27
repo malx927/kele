@@ -450,7 +450,7 @@ def setMemberScores( order ):
 class OrderView(View):
 
     def get(self,request, *args, **kwargs):
-        user_id = request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        user_id = request.session.get('openid', None)
         out_trade_no = request.GET.get("out_trade_no", None)
 
         context = { }
@@ -491,7 +491,7 @@ class OrderView(View):
         context = {
             "success":"false"
         }
-        user_id = request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        user_id = request.session.get('openid', None)
         action = request.POST.get("action", None)
         print('action=', action)
         if user_id is None:

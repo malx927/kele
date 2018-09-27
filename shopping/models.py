@@ -61,7 +61,7 @@ class GoodsType(models.Model):
     class Meta:
         verbose_name ='商品分类'
         verbose_name_plural = verbose_name
-        ordering = ['sort']
+
 
     def __str__(self):
         return self.name
@@ -83,10 +83,12 @@ class Goods(models.Model):
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     click_nums = models.IntegerField(verbose_name='点击量', default=0, null=True, blank=True)
     is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
+    sort = models.IntegerField(verbose_name='顺序', blank=True, null=True,default=0)
 
     class Meta:
         verbose_name = '宠物食品'
         verbose_name_plural = verbose_name
+        ordering = ['sort']
 
     def show_goodstype(self):
         return [type.name for type in self.goodstype.all() ]
