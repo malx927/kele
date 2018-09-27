@@ -450,7 +450,7 @@ def setMemberScores( order ):
 class OrderView(View):
 
     def get(self,request, *args, **kwargs):
-        user_id = request.session.get('openid', None)
+        user_id = request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
         out_trade_no = request.GET.get("out_trade_no", None)
 
         context = { }
@@ -491,7 +491,7 @@ class OrderView(View):
         context = {
             "success":"false"
         }
-        user_id = request.session.get('openid', None)
+        user_id = request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
         action = request.POST.get("action", None)
         print('action=', action)
         if user_id is None:
@@ -516,13 +516,18 @@ class OrderView(View):
                 context["success"] = "true"
                 context["out_trade_no"] = order.out_trade_no
             elif action == "confirm": #订单发货确认
+                userinfo = WxUserinfo.objects.get(openid=user_id)
                 order = Order.objects.get(out_trade_no = out_trade_no, status=1)
                 order.is_mail = 1
+                order.confirm_at = datetime.now()
+                order.confirm_openid = user_id
+                order.confirm_user = userinfo.nickname
                 order.save()
                 context["success"] = "true"
 
-
         except Order.DoesNotExist as ex:
             context["errors"] = "order errors"
+        except WxUserinfo.DoesNotExist as ex :
+            context["errors"] = "invalid user"
 
         return HttpResponse(json.dumps(context))

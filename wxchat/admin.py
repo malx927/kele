@@ -6,7 +6,7 @@ from .models import WxTemplateMsgUser
 
 @admin.register(WxUserinfo)
 class WxUserinfoAdmin(admin.ModelAdmin):
-    list_display = ['openid', 'nickname', 'sex', 'province', 'city', 'country', 'subscribe', 'subscribe_time','company_member', 'is_member', 'score']
+    list_display = ['openid', 'nickname', 'sex', 'province', 'city', 'country', 'subscribe', 'subscribe_time','company_member', 'is_member']
 
 
 @admin.register(Menu)

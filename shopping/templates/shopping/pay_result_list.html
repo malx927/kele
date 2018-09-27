@@ -50,8 +50,17 @@
                             <p>订单编号:{{ order.out_trade_no }}</p>
                         </div>
                     </div>
+                    <div class="weui-cell cell-end">
+                        <div class="weui-cell__bd color_red"  ><B>{% if order.is_mail %} 已发货{% endif %}</B></div>
+                        <div class="weui-cell__ft " style="color:#000000" >
+                            <p>姓名:{{ order.username }}  联系电话:{{ order.telnumber }}</p>
+                        </div>
+                    </div>
+                    <div class="weui-cell cell-end">
+                        <p>发货地址:{{ order.detailinfo }}</p>
+                     </div>
                    {% if company_member %}
-                    <a href="javascript:;" class="weui-btn weui-btn_primary" id="send_confirm" data-item="{{order.out_trade_no }}">发货确认</a>
+                    <a href="javascript:;" class="weui-btn weui-btn_primary" id="send_confirm" data-item="{{order.out_trade_no }}" data-id="{{ order.is_mail }}">发货确认</a>
                    {% endif %}
                 {% endif %}
                 <!--定制食品订单-->
@@ -90,8 +99,9 @@
     <script>
         $(function(){
             $("#send_confirm").on("click",function(){
+                let is_mail = $(this).attr("data-id");
+                if(is_mail == "True") return;
                 let out_trade_no = $(this).attr("data-item");
-                alert(out_trade_no);
                 var params ={
                   out_trade_no: out_trade_no,
                   csrfmiddlewaretoken:'{{ csrf_token }}',
@@ -105,7 +115,9 @@
                   timeout: 5000,
                   success: function(data){
                     if(data.success == "true"){
-                         weui.alert('发货确认成功!');
+                        weui.alert('发货确认成功!', function(){
+                            window.location.href = ('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
+                        });
                     }
                     else{
                         weui.alert('发货确认失败!');

@@ -181,6 +181,9 @@ class Order(models.Model):
     is_mail = models.BooleanField(verbose_name="是否发货", blank=True,  default=0)
     prepay_id = models.CharField(verbose_name='预支付会话标识',max_length=64,null=True,blank=True)
     prepay_at = models.DateTimeField(verbose_name='预支付时间', null=True, blank=True)
+    confirm_user = models.CharField(verbose_name='确认人', max_length=32, blank=True, null=True)
+    confirm_openid = models.CharField(verbose_name='确认人微信ID', max_length=64, blank=True, null=True)
+    confirm_at = models.DateTimeField(verbose_name='发货确认时间',blank=True, null=True)
 
     class Meta:
         verbose_name ='订单'
