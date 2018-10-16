@@ -495,7 +495,7 @@ class Freshman(models.Model):
     class Meta:
         verbose_name = u'新手课堂'
         verbose_name_plural = verbose_name
-        ordering = ['-create_time']
+        #ordering = ['-create_time']
 
 
 # 加盟宠物医疗机构
