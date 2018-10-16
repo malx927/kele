@@ -41,7 +41,8 @@
             wx.checkJsApi({
               jsApiList: [
                 'onMenuShareAppMessage',
-                  'chooseImage'
+                  'chooseImage',
+                  'openLocation',
               ],
               success: function (res) {
                 alert(JSON.stringify(res));
@@ -81,46 +82,32 @@
         });
     });
 
-  document.querySelector('#shareaction').onclick = function () {
-    wx.onMenuShareAppMessage({
-      title: '互联网之子',
-      desc: '在长大的过程中，我才慢慢发现，我身边的所有事，别人跟我说的所有事，那些所谓本来如此，注定如此的事，它们其实没有非得如此，事情是可以改变的。更重要的是，有些事既然错了，那就该做出改变。',
-      link: 'http://movie.douban.com/subject/25785114/',
-      imgUrl: 'http://demo.open.weixin.qq.com/jssdk/images/p2166127561.jpg',
-      trigger: function (res) {
-        // 不要尝试在trigger中使用ajax异步请求修改本次分享的内容，因为客户端分享操作是一个同步操作，这时候使用ajax的回包会还没有返回
-        alert('用户点击发送给朋友');
-      },
-      success: function (res) {
-        alert('已分享');
-      },
-      cancel: function (res) {
-        alert('已取消');
-      },
-      fail: function (res) {
-        alert(JSON.stringify(res));
-      }
+    $("#dog_walk").on('click',function(){
+         wx.openLocation({
+          latitude: 40.7094,
+          longitude: 120.765,
+          name: '宠物乐园',
+          address: '东砬村(葫芦岛市龙港区双树乡东砬村)',
+          scale: 14,
+          infoUrl: ''
+        });
     });
-    alert('已注册获取“发送给朋友”状态事件');
-  };
-
-  document.querySelector('#chooseImage').onclick = function () {
-      wx.chooseImage({
-        count: 1, // 默认9
-        sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-        sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-        success: function (res) {
-            var localIds = res.localIds; // 返回选定照片的本地ID列表，localId可以作为img标签的src属性显示图片
-            document.querySelector('#img').src = localIds[0];
-            alert(localIds);
-        }
-    });
-    //alert('已注册获取“发送给朋友”状态事件');
-  };
 
 });
 </script>
+    <style>
+    .btn_size{
+        height:100px;line-height: 100px;
+        font-size:2em;
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+    .btn_size i{
+        font-size:1.1em;
+        padding-right:1.0em;
+    }
 
+    </style>
 
 {% endblock extra%}
 {% block container %}
@@ -129,8 +116,11 @@
         <a class="weui-btn weui-btn_primary"  id="getNetworkType">网络状态</a>
         <a class="weui-btn weui-btn_primary"  id="scanQRCode0">二维码0</a>
         <a class="weui-btn weui-btn_primary"  id="scanQRCode1">二维码1</a>
-        <a class="weui-btn weui-btn_primary"  id="shareaction">分享</a>
-        <a class="weui-btn weui-btn_primary" href="{% url 'pay-list' %}">微信支付</a>
+
+        <a class="weui-btn weui-btn_primary btn_size"   id="dog_walk"><i class="icon iconfont icon-chongwu" ></i>遛狗</a>
+        <a class="weui-btn weui-btn_primary btn_size"  id="dog_adoption"><i class="icon iconfont icon-chongwu" ></i>宠物寄养</a>
+        <a class="weui-btn weui-btn_primary btn_size"  id="dog_adoption"><i class="icon iconfont icon-chongwu" ></i>宠物洗浴</a>
+        <a class="weui-btn weui-btn_primary btn_size"  id="dog_adoption"><i class="icon iconfont icon-chongwu" ></i>宠物保险</a>
     </div>
 
 {% endblock container %}

@@ -14,7 +14,7 @@ from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, Dogdel
 from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss, dogLossAdd,  DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
     DogOwnerDetailView, dogOwnerAdd, dogAdopt, dogBuyAdd, DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman, dogTrade, updateUserinfo, shareAction, dogIndex, dogLossNav, myInfo, payList, \
+from wxchat.views import freshman, dogTrade, updateUserinfo, petsWorld, dogIndex, dogLossNav, myInfo, payList, \
     getPayInfo, orderRefund
 
 urlpatterns = [
@@ -84,8 +84,8 @@ urlpatterns = [
     url(r'^dogtradnav/$', dogTradeNav, name='dog-trade-nav'),
     # 宠物出售
 
-    #分享
-    url(r'^dogshare/$', shareAction,name='dog-share'),
+    #宠物乐园
+    url(r'^petsworld/$', petsWorld,name='pets-world'),
 
      #首页
     url(r'^dogindex/$', dogIndex,name='dog-index'),

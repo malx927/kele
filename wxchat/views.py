@@ -1072,10 +1072,10 @@ def updateUserinfo(request):
 #         redirect_url = getUrl(item)
 #         return  HttpResponseRedirect(redirect_url)
 
-# 测试jssdk页面
-def shareAction(request):
+# 宠物乐园
+def petsWorld(request):
     signPackage = getJsApiSign(request)
-    return render(request, template_name='wxchat/freshman_bak.html', context={'sign': signPackage})
+    return render(request, template_name='wxchat/petsworld.html', context={'sign': signPackage})
 
 
 def getPayInfo(request):

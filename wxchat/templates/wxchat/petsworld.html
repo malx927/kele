@@ -1,0 +1,81 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script src="http://res.wx.qq.com/open/js/jweixin-1.2.0.js"></script>
+<script>
+    wx.config({
+        debug: false,
+        appId: '{{ sign.appId }}',
+        timestamp:'{{ sign.timestamp }}',
+        nonceStr: '{{ sign.nonceStr }}',
+        signature: '{{ sign.signature }}',
+        jsApiList: [
+            'openLocation',
+            'getLocation',
+
+        ]
+    });
+    wx.ready(function () {
+        $('#checkJsApi').on('click',function(){
+            wx.checkJsApi({
+              jsApiList: [
+                  'openLocation',
+              ],
+              success: function (res) {}
+            });
+      });
+
+    $("#dog_walk").on('click',function(){
+         wx.openLocation({
+          latitude: 40.7094,
+          longitude: 120.765,
+          name: '宠物乐园',
+          address: '东砬村(葫芦岛市龙港区双树乡东砬村)',
+          scale: 14,
+          infoUrl: ''
+        });
+    });
+
+});
+</script>
+<style>
+    .btn_size{
+        height:60px;
+        line-height: 60px;
+        font-size:2em;
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+    .btn_size i{
+        font-size:1.1em;
+        padding-right:1.0em;
+    }
+
+
+</style>
+{% endblock extra%}
+{% block tabpanel %}
+<div class="weui-tab__content" style="display: block">
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><span class="title">宠物乐园</span></div>
+                <div class="weui-flex__item"></div>
+                <div class="weui-flex__item"><a href="{% url 'dog-index' %}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+        </div>
+        <div class="weui-panel__bd">
+            <div style="margin-top: 30px;">
+                <a class="weui-btn weui-btn_primary btn_size"   id="dog_walk"><i class="icon iconfont icon-chongwu" ></i>遛狗</a>
+                <a class="weui-btn weui-btn_primary btn_size"  id="dog_adoption"><i class="icon iconfont icon-chongwufuwu" ></i>宠物寄养</a>
+                <a class="weui-btn weui-btn_primary btn_size"  id="dog_washing"><i class="icon iconfont icon-xizaomuyu" ></i>宠物洗浴</a>
+                <a class="weui-btn weui-btn_primary btn_size"  id="dog_safe"><i class="icon iconfont icon-hashiqi" ></i>宠物保险</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tabpanel %}
+{% block tabbar %}
+    {% include 'wxchat/include/bottom_nav.html' %}
+{% endblock tabbar %}
+
+
