@@ -14,7 +14,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
-from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
+from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply, VideoReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType, FoodPrice, DogOrderItem, \
@@ -83,6 +83,10 @@ def wechat(request):
             reply = VoiceReply(message=msg)
             reply.media_id = msg.media_id
             reply.content = '语音信息'
+        elif msg.type == 'video':
+            reply = VideoReply(message=msg)
+            reply.media_id = msg.media_id
+            reply.content = ''
         elif msg.type == 'event':
             print('eventkey=', msg.event)
             if msg.event == 'subscribe':
@@ -102,6 +106,8 @@ def wechat(request):
                 reply = create_reply('', msg)
             else:
                 reply = create_reply('view', msg)
+        else:
+            reply = create_reply('', msg)
 
         response = HttpResponse(reply.render(), content_type="application/xml")
         return response
