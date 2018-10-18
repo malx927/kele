@@ -522,4 +522,29 @@ class Doginstitution(models.Model):
     def get_absolute_url(self):
         return  reverse('dog-inst-detail',kwargs={'pk':self.id})
 
+class PetWorldType(models.Model):
+    name = models.CharField(verbose_name="乐园类型", max_length=64)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
 
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = u'乐园分类'
+        verbose_name_plural = verbose_name
+
+
+
+class PetWorld(models.Model):
+    title = models.CharField(verbose_name=u'标题', max_length=120)
+    worldtype = models.ForeignKey(PetWorldType, verbose_name = u'乐园类别', on_delete=models.CASCADE)
+    content = RichTextUploadingField(verbose_name=u'内容介绍',null=True,blank=True)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    is_show = models.BooleanField(verbose_name=u'是否显示', default=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = u'乐园介绍'
+        verbose_name_plural = verbose_name

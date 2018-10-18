@@ -7,14 +7,14 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from wxchat.views import doginstitution, DoginstitutionAdd, DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
-    dogAdoptNav, dogTradeNav, showMyQRCode, showQRCode, myScore
+    dogAdoptNav, dogTradeNav, showMyQRCode, showQRCode, myScore, PetWorldView
 
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, DogdeliveryDetailView, FreshmanDetailView, \
     dogOrder, orderSuccess, DogpayNotify, DogPayOrderView, orderList
 from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
     authlist, dogLoss, dogLossAdd,  DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
     DogOwnerDetailView, dogOwnerAdd, dogAdopt, dogBuyAdd, DogBuyDetailView, DogSaleDetailView, dogSaleAdd
-from wxchat.views import freshman, dogTrade, updateUserinfo, petsWorld, dogIndex, dogLossNav, myInfo, payList, \
+from wxchat.views import freshman, dogTrade, updateUserinfo, petWorld, dogIndex, dogLossNav, myInfo, payList, \
     getPayInfo, orderRefund
 
 urlpatterns = [
@@ -85,7 +85,8 @@ urlpatterns = [
     # 宠物出售
 
     #宠物乐园
-    url(r'^petsworld/$', petsWorld,name='pets-world'),
+    url(r'^petworld/$', petWorld,name='pets-world'),
+    url(r'^petworlddetail/$', PetWorldView.as_view(), name='pet-world-detail'),
 
      #首页
     url(r'^dogindex/$', dogIndex,name='dog-index'),

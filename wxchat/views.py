@@ -17,7 +17,8 @@ from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply
 from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
-from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType, FoodPrice, DogOrderItem
+from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType, FoodPrice, DogOrderItem, \
+    PetWorld
 from .forms import DogadoptForm, DogdeliveryForm, DogInstitutionForm
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth
@@ -1073,7 +1074,7 @@ def updateUserinfo(request):
 #         return  HttpResponseRedirect(redirect_url)
 
 # 宠物乐园
-def petsWorld(request):
+def petWorld(request):
     signPackage = getJsApiSign(request)
     return render(request, template_name='wxchat/petsworld.html', context={'sign': signPackage})
 
@@ -1335,7 +1336,7 @@ def myScore(request):
 
     return render(request, template_name='wxchat/myscore.html', context={'orders': orders})
 
-
+#退款测试
 def orderRefund(request):
 
     transaction_id = '4200000193201809190955214856'
@@ -1345,3 +1346,16 @@ def orderRefund(request):
     ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, transaction_id= transaction_id, out_refund_no=out_refund_no)
     print('orderRefund', ret)
     return HttpResponse(ret)
+
+
+class PetWorldView(View):
+
+    def get(self, request, *args, **kwargs):
+        params = request.GET.get('params')
+        if params == "adoption": #寄养
+            pet_world = PetWorld.objects.filter(worldtype = 2).first()
+        elif params == "bath":
+            pet_world = PetWorld.objects.filter(worldtype = 3).first()
+
+        return render(request,template_name="wxchat/petworlddetail.html",context={'object':pet_world})
+
