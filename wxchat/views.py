@@ -1359,9 +1359,9 @@ class PetWorldView(View):
     def get(self, request, *args, **kwargs):
         params = request.GET.get('params')
         if params == "adoption": #寄养
-            pet_world = PetWorld.objects.filter(worldtype = 2).first()
+            pet_world = PetWorld.objects.filter(worldtype = 1).first()
         elif params == "bath":
-            pet_world = PetWorld.objects.filter(worldtype = 3).first()
+            pet_world = PetWorld.objects.filter(worldtype = 2).first()
 
         return render(request,template_name="wxchat/petworlddetail.html",context={'object':pet_world})
 
