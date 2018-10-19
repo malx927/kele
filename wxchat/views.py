@@ -83,10 +83,6 @@ def wechat(request):
             reply = VoiceReply(message=msg)
             reply.media_id = msg.media_id
             reply.content = '语音信息'
-        elif msg.type == 'video':
-            reply = VideoReply(message=msg)
-            reply.media_id = msg.media_id
-            reply.content = ''
         elif msg.type == 'event':
             print('eventkey=', msg.event)
             if msg.event == 'subscribe':
@@ -1253,6 +1249,27 @@ def myInfo(request):
     # return render(request, 'wxchat/myinfo.html')
     return render(request, 'shopping/user_shop_list.html')
 
+
+def createLongQRCode(request):
+    qrcode_data = {
+        'action_name': 'QR_LIMIT_STR_SCENE',
+        'action_info': {
+            'scene': {'scene_str': 'dayankelelianmeng'},
+        }
+    }
+    res = client.qrcode.create(qrcode_data)
+    ret = client.qrcode.show(res)
+    f = BytesIO(ret.content)
+    image = Image.open(f)
+    logo = Image.open(os.path.join(settings.STATIC_ROOT, 'wxchat\images\wx_logo.png'))
+
+    image = mergeImage(image, logo)
+
+    image_url = '{0}{1}.png'.format('dayankelelianmeng',int(time.time()))
+
+    image.save(os.path.join(settings.MEDIA_ROOT, image_url), quality=100)
+
+    return HttpResponse("success")
 
 # 生成我的二维码
 def myQRCode(user):
