@@ -39,6 +39,7 @@ from PIL import Image
 from io import StringIO, BytesIO
 from django.db.models import Q
 
+
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
 APPID = settings.WECHAT_APPID
@@ -49,6 +50,7 @@ wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
                   mch_id=settings.MCH_ID, mch_cert=settings.API_CLIENT_CERT_PATH, mch_key=settings.API_CLIENT_KEY_PATH)
 
 SEND_MSG = '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。'
+SCENE_STR = 'dayankelelianmeng'
 
 @csrf_exempt
 def wechat(request):
@@ -95,9 +97,9 @@ def wechat(request):
             elif msg.event == 'subscribe_scan':
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
                 saveUserinfo(msg.source, msg.scene_id)
+
                 print('scene_id=', msg.scene_id)
             elif msg.event == 'scan':
-                print('scan====', msg.scene_id)
                 setUserToMember(msg.source, msg.scene_id)
                 reply = create_reply('', msg)
             else:
@@ -139,14 +141,18 @@ def getDogOwnerList(request, msg):
 # 已关注的用户成为会员
 def setUserToMember(openid, scene_id=None):
     try:
-        intro_user = WxUserinfo.objects.get(qr_scene=int(scene_id), is_member=1)
         user = WxUserinfo.objects.get(openid=openid, is_member=0)
-        WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
+        if scene_id == SCENE_STR:
+            user.is_member = 1
+            user.save()
+            client.message.send_text(openid, SEND_MSG)
+        else:
+            intro_user = WxUserinfo.objects.get(qr_scene=int(scene_id), is_member=1)
+            WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
     except WxUserinfo.DoesNotExist as ex:
         print(ex)
         print('用户不存在')
     except WxIntroduce.DoesNotExist as ex:
-        print(ex)
         user.is_member = 1
         user.save()
         defaults = {
@@ -159,6 +165,7 @@ def setUserToMember(openid, scene_id=None):
 
 
 def saveUserinfo(openid, scene_id=None):
+    print('scene_id=',scene_id)
     user = client.user.get(openid)
     if 'errcode' not in user:
         sub_time = user.pop('subscribe_time')
@@ -173,14 +180,15 @@ def saveUserinfo(openid, scene_id=None):
                 obj.is_member = 1
                 obj.save()
                 ret = client.message.send_text(openid, SEND_MSG)
-                intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
-                # 创建推荐表数据
-                defaults = {
-                    'nickname': obj.nickname,
-                    'introduce_name': intro_user.nickname,
-                    'introduce_id': intro_user.openid,
-                }
-                WxIntroduce.objects.get_or_create(openid=obj.openid, defaults=defaults)
+                if scene_id != SCENE_STR:
+                    intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
+                    # 创建推荐表数据
+                    defaults = {
+                        'nickname': obj.nickname,
+                        'introduce_name': intro_user.nickname,
+                        'introduce_id': intro_user.openid,
+                    }
+                    WxIntroduce.objects.get_or_create(openid=obj.openid, defaults=defaults)
 
         except WxUserinfo.DoesNotExist:
             print('会员推荐失败.....')
@@ -195,7 +203,6 @@ def unSubUserinfo(openid):
             user.delete()
             WxIntroduce.objects.filter(Q(openid=openid) | Q(introduce_id=openid)).delete()
             MemberScore.objects.filter(user_id=openid).delete()
-            #MemberScoreDetail.objects.filter(user_id=openid).delete()
     except WxUserinfo.DoesNotExist:
         pass
 
@@ -272,6 +279,12 @@ def getUrl(item):
 
 @csrf_exempt
 def redirectUrl(request, item):
+    """
+    2018-09-06
+    :param request:
+    :param item:
+    :return:
+    """
     code = request.GET.get('code', None)
     openid = request.session.get('openid', None)
     print('code=', code)
@@ -581,16 +594,17 @@ class DogPayOrderView(View):
         # 获得订单信息
         out_trade_no = request.POST.get('out_trade_no', None)
         user_id = request.session.get('openid')
-        print('DogPayOrderView',out_trade_no)
+        print('DogPayOrderView',out_trade_no,user_id)
         try:
             order = DogOrder.objects.get( user_id=user_id, out_trade_no=out_trade_no, status=0 )
             total_fee = int(order.total_fee * 100)
 
-            if total_fee > 1 and user_id =='o0AHP0lpCKyadVWg88KeI5JrafYI':
-                total_fee =1
+            # if total_fee > 1 and user_id =='o0AHP0lpCKyadVWg88KeI5JrafYI':
+            #     total_fee =1
 
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URLS, user_id=user_id)
             prepay_id = data.get('prepay_id', '')
+            print('DogPayOrderView',prepay_id)
             save_data = dict(data)
             # 保存统一订单数据
             WxUnifiedOrdeResult.objects.create(**save_data)
@@ -620,7 +634,9 @@ def DogpayNotify(request):
 
         # 查询订单，判断是否正确
         transaction_id = res_data.get('transaction_id', None)
+
         out_trade_no = res_data.get('out_trade_no', None)
+
         openid = res_data.get('openid', None)
         retBool = queryOrder(transaction_id, out_trade_no)  # 查询订单
 
@@ -639,12 +655,13 @@ def DogpayNotify(request):
                 if order and order.status==0:
                     # 更新订单
                     pay_status = 1  # 已支付标志
+
                     cash_fee = res_data['cash_fee'] / 100
                     time_end = res_data['time_end']
-                    pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                    pay_time = datetime.datetime.strptime(time_end,"%Y%m%d%H%M%S")
                     order.update_status_transaction_id(pay_status, transaction_id, cash_fee, pay_time)
                     if openid:
-                        sendTempMessageToUser( order )
+                        sendTempMessageToUser( order,1 )
 
         return HttpResponse(xml)
     except InvalidSignatureException as error:
@@ -663,9 +680,9 @@ def queryOrder(transaction_id, dogorder):
 
 
 # 查询自定义订单
-def getShoppingOrder(openid, dogorder):
+def getShoppingOrder(user_id, out_trade_no):
     try:
-        order = DogOrder.objects.get(openid=openid, dog_code=dogorder)
+        order = DogOrder.objects.get(user_id=user_id, out_trade_no=out_trade_no)
     except Order.DoesNotExist:
         order = None
 
@@ -678,13 +695,15 @@ def orderList(request):
         user_id = request.session.get('openid', None)
         out_trade_no = request.GET.get('out_trade_no',None)
         _result = request.GET.get('_result',None)
-
+        signPackage = getJsApiSign(request)
+        #print(out_trade_no, user_id)
         if _result is None:
             try:
                 signPackage = getJsApiSign(request)
                 order = DogOrder.objects.get( out_trade_no = out_trade_no, user_id=user_id )
             except DogOrder.DoesNotExist:
                 order =None
+
             return render(request,'wxchat/dogorder_checkout.html',{'order':order,'sign':signPackage})
 
         elif _result == 'ok':  #支付成功
@@ -729,6 +748,7 @@ def orderList(request):
             context["errors"] = "order errors"
 
         return HttpResponse(json.dumps(context))
+
 
 # 订单成功
 def orderSuccess(request):
@@ -779,7 +799,6 @@ def orderSuccess(request):
 
 
         return HttpResponse(json.dumps(order_data))
-
 
 # 狗粮订单
 def dogOrder(request):
@@ -1085,6 +1104,7 @@ def getPayInfo(request):
     trade_type = 'JSAPI'
     body = '商品描述测试'
     total_fee = 1
+
     user_id = request.session.get('openid')
 
     userName = request.GET.get('userName', None)
@@ -1100,9 +1120,11 @@ def getPayInfo(request):
         data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, notify_url=settings.NOTIFY_URL,
                                   user_id=user_id)
         prepay_id = data.get('prepay_id', '')
+        # print(prepay_id,data,888888888)
         save_data = dict(data)
         # 保存统一订单数据
         WxUnifiedOrdeResult.objects.create(**save_data)
+
         if prepay_id:
             return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
             return HttpResponse(json.dumps(return_data))
@@ -1167,7 +1189,7 @@ def sendTempMessageToUser( order, type=0 ):
 
     out_trade_no = order.out_trade_no
     url_path = reverse("my-order-list") if type ==0 else reverse("order-list")
-    url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, url_path, out_trade_no )
+    url ="{0}{1}?out_trade_no={2}&_result=ok".format(settings.ROOT_URL, url_path, out_trade_no )
     print(url)
 
     color = "#173177"
@@ -1218,7 +1240,7 @@ def sendTempMessageToUser( order, type=0 ):
            "color":color
         },
         "keyword3":{
-           "value":"{0}{1}".format(order.total_fee, '元'),
+           "value":"{0}{1}".format(order.cash_fee, '元'),
            "color":color
         },
        "keyword4": {
@@ -1249,12 +1271,12 @@ def myInfo(request):
     # return render(request, 'wxchat/myinfo.html')
     return render(request, 'shopping/user_shop_list.html')
 
-
+@login_required
 def createLongQRCode(request):
     qrcode_data = {
         'action_name': 'QR_LIMIT_STR_SCENE',
         'action_info': {
-            'scene': {'scene_str': 'dayankelelianmeng'},
+            'scene': {'scene_str': SCENE_STR},
         }
     }
     res = client.qrcode.create(qrcode_data)
@@ -1350,6 +1372,7 @@ def showMyQRCode(request, *args, **kwargs):
     context ={
         'is_member':int(is_member),
         'img_url': urlunquote_plus(img_url)
+
     }
 
     return render(request, template_name='wxchat/myqrcode.html', context =context)
