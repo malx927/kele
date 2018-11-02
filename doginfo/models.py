@@ -10,7 +10,6 @@ import datetime
 from django.contrib.auth.models import User
 import random
 from ckeditor_uploader.fields import RichTextUploadingField
-from dogbrand.models import Dogbrand
 from dogtype.models import Dogtype
 from easy_thumbnails.files import get_thumbnailer
 from shopping.models import  TYPE_MAIL_STYLE, TYPE_SHOPPING_STATUS
@@ -306,28 +305,28 @@ class DogOrderItem(models.Model):
         return self.dog_status_type
 
 
-# 宠粮录入表
-class Dogfood(models.Model):
-    productname = models.CharField(verbose_name=u'产品名称', max_length=50, )
-    dog_brandid = models.ForeignKey(Dogbrand, verbose_name=u'品牌', on_delete=models.CASCADE)
-    prod_picture = models.ImageField(verbose_name=u'品牌图片', upload_to='imgs', blank=True)
-    dog_age = models.CharField(verbose_name=u'适用犬龄', max_length=20, blank=True)
-    sale_url = models.CharField(verbose_name=u'交易网址', max_length=50, blank=True)
-    food_models = models.CharField(verbose_name=u'规格', max_length=50, blank=True)
-    period = models.CharField(verbose_name=u'保质期', max_length=50, blank=True)
-    netweight = models.CharField(verbose_name=u'净含量', max_length=50, blank=True)
-    dog_desc = RichTextUploadingField(verbose_name=u'简介', max_length=2000)
-    prod_desc = RichTextUploadingField(verbose_name=u'产品介绍', max_length=2000)
-    click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
-    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
-
-    class Meta:
-        verbose_name = u"宠粮录入"
-        verbose_name_plural = u'宠粮录入表'
-        ordering = ['-create_time']
-
-    def __str__(self):
-        return self.productname
+# # 宠粮录入表
+# class Dogfood(models.Model):
+#     productname = models.CharField(verbose_name=u'产品名称', max_length=50, )
+#     dog_brandid = models.ForeignKey(Dogbrand, verbose_name=u'品牌', on_delete=models.CASCADE)
+#     prod_picture = models.ImageField(verbose_name=u'品牌图片', upload_to='imgs', blank=True)
+#     dog_age = models.CharField(verbose_name=u'适用犬龄', max_length=20, blank=True)
+#     sale_url = models.CharField(verbose_name=u'交易网址', max_length=50, blank=True)
+#     food_models = models.CharField(verbose_name=u'规格', max_length=50, blank=True)
+#     period = models.CharField(verbose_name=u'保质期', max_length=50, blank=True)
+#     netweight = models.CharField(verbose_name=u'净含量', max_length=50, blank=True)
+#     dog_desc = RichTextUploadingField(verbose_name=u'简介', max_length=2000)
+#     prod_desc = RichTextUploadingField(verbose_name=u'产品介绍', max_length=2000)
+#     click = models.IntegerField(verbose_name=u'阅读量', blank=True, null=True, default=0)
+#     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+#
+#     class Meta:
+#         verbose_name = u"宠粮录入"
+#         verbose_name_plural = u'宠粮录入表'
+#         ordering = ['-create_time']
+#
+#     def __str__(self):
+#         return self.productname
 
 
 # 宠物配种
