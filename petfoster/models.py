@@ -1,0 +1,182 @@
+from django.db import models
+
+# Create your models here.
+from django.utils import timezone
+from easy_thumbnails.fields import ThumbnailerImageField
+from ckeditor_uploader.fields import RichTextUploadingField
+from wxchat.models import WxUserinfo
+
+
+TYPE_SEX_CHOICE = (
+    (u'公', u'公'),
+    (u'母', u'母'),
+)
+
+TYPE_STERILIZATION_CHOICE = (
+    (0, u'未绝育'),
+    (1, u'已绝育'),
+)
+
+
+class FosterType(models.Model):
+    name = models.CharField(verbose_name='寄养类型', max_length=32)
+    comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = u"02.寄养类型"
+        verbose_name_plural = verbose_name
+
+class PetType(models.Model):
+    name = models.CharField(verbose_name='宠物类型', max_length=32)
+    comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = u"01.宠物类型"
+        verbose_name_plural = verbose_name
+
+
+class FosterNotice(models.Model):
+    title = models.CharField(verbose_name='说明', max_length=128)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    def __str__(self):
+        return  self.title
+
+    class Meta:
+        verbose_name = u"04.寄养注意事项"
+        verbose_name_plural = verbose_name
+
+
+class FosterRoom(models.Model):
+    name = models.CharField(verbose_name='房间名称', max_length=32)
+    comment = models.CharField(verbose_name='备注', max_length=64, null=True, blank=True)
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = u"03.寄养房间"
+        verbose_name_plural = verbose_name
+
+
+
+class FosterStandard(models.Model):
+    foster_type = models.ForeignKey(FosterType, verbose_name='寄养类型', on_delete=models.SET_NULL, blank=True, null=True)
+    pet_type = models.ForeignKey(PetType, verbose_name='宠物类型', on_delete=models.SET_NULL, blank=True, null=True)
+    content = models.CharField(verbose_name='收费标准', max_length=128, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+
+    def __str__(self):
+        return  self.content
+
+    class Meta:
+        verbose_name = u"05.寄养收费标准"
+        verbose_name_plural = verbose_name
+
+#寄养宠物信息
+class PetFosterInfo(models.Model):
+    name = models.CharField(verbose_name=u'宠物名称', max_length=24 )
+    birthdate = models.DateField(verbose_name=u'出生日期')
+    type = models.CharField(verbose_name=u'品种', max_length=24)
+    color = models.CharField(verbose_name=u'毛色', max_length=32)
+    sex = models.CharField(verbose_name=u'性别', max_length=4, choices=TYPE_SEX_CHOICE)
+    sterilization = models.IntegerField(verbose_name=u'是否绝育',  choices=TYPE_STERILIZATION_CHOICE)
+    picture = ThumbnailerImageField(verbose_name=u'宠物图片', upload_to='foster')
+    owner = models.CharField(verbose_name=u'主人姓名', max_length=20)
+    telephone = models.CharField(verbose_name=u'主人电话', max_length=32)
+    address = models.CharField(verbose_name=u'主人地址', max_length=200)
+    create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, null=True, blank=True)
+    room = models.ForeignKey(FosterRoom, verbose_name='房间', blank=True, null=True, on_delete=models.SET_NULL)
+    trainer = models.ForeignKey(WxUserinfo, verbose_name='驯养师',  blank=True, null=True, on_delete=models.SET_NULL )
+    set_time = models.DateTimeField(verbose_name=u'分配时间', default=timezone.now )
+
+    class Meta:
+        verbose_name = u"06.寄养宠物信息"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+class FosterDemand(models.Model):
+    pet = models.ForeignKey(PetFosterInfo, verbose_name='寄养宠物', on_delete=models.CASCADE )
+    day_meals = models.CharField(verbose_name='每天几餐', max_length=32)
+    meals_nums = models.CharField(verbose_name='每餐数量', max_length=32)
+    extra_meal = models.CharField(verbose_name='加餐情况', max_length=64)
+    defecation = models.CharField(verbose_name='排便情况', max_length=128)
+    others = models.CharField(verbose_name='其他情况', max_length=128)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+
+    def __str__(self):
+        return  self.content
+
+    class Meta:
+        verbose_name = u"寄养要求"
+        verbose_name_plural = verbose_name
+
+#寄养协议
+class FosterAgreement(models.Model):
+    title = models.CharField( verbose_name='标题', max_length=64 )
+    content = RichTextUploadingField(verbose_name=u'内容')
+    file = models.FileField(verbose_name='文件附件',upload_to="agreement/", blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+
+    def __str__(self):
+        return  self.title
+
+    class Meta:
+        verbose_name = u"07.寄养协议"
+        verbose_name_plural = verbose_name
+
+#交接记录
+class HandOverList(models.Model):
+    pet = models.ForeignKey( PetFosterInfo, verbose_name='宠物名称', on_delete=models.CASCADE)
+    owner_name = models.CharField(verbose_name='宠物主人', max_length=32)
+    pet_nums   = models.CharField( verbose_name='宠物数量', max_length=128, blank=True, null=True )
+    food_nums = models.CharField( verbose_name= '口粮数量', max_length=128, blank=True, null=True)
+    others_nums = models.CharField( verbose_name='物品数量', max_length=128, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
+
+    def __str__(self):
+        return  self.owner_name + '--' + self.dog_name
+
+    class Meta:
+        verbose_name = u"08.交接记录"
+        verbose_name_plural = verbose_name
+
+
+#宠物喂养记录
+class PetFeedNote(models.Model):
+    pet = models.ForeignKey( PetFosterInfo, verbose_name='宠物名称', on_delete=models.CASCADE)
+    record = models.CharField(verbose_name='喂养记录', max_length=1024)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
+
+    def __str__(self):
+        return  self.pet.name
+
+    class Meta:
+        verbose_name = u"09.宠物喂养记录"
+        verbose_name_plural = verbose_name
+
+#宠物游戏记录
+class PetGameNote(models.Model):
+    pet = models.ForeignKey( PetFosterInfo, verbose_name='宠物名称', on_delete=models.CASCADE)
+    begin_at = models.DateTimeField(verbose_name='开始时间', default=timezone.now )
+    end_at = models.DateTimeField(verbose_name='结束时间', default=timezone.now)
+    remark = models.CharField(verbose_name='备注', max_length=400,  blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
+
+    def __str__(self):
+        return  self.pet.name
+
+    class Meta:
+        verbose_name = u"10.宠物游戏记录"
+        verbose_name_plural = verbose_name
