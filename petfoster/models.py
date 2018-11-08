@@ -1,7 +1,9 @@
+import datetime
 from django.db import models
 
 # Create your models here.
 from django.utils import timezone
+from dateutil.relativedelta import *
 from easy_thumbnails.fields import ThumbnailerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from wxchat.models import WxUserinfo
@@ -17,6 +19,11 @@ TYPE_STERILIZATION_CHOICE = (
     (1, u'已绝育'),
 )
 
+TYPE_SHOPPING_STATUS = (
+    (1,'已支付'),
+    (0,'待支付'),
+
+)
 
 class FosterType(models.Model):
     name = models.CharField(verbose_name='寄养类型', max_length=32)
@@ -179,4 +186,87 @@ class PetGameNote(models.Model):
 
     class Meta:
         verbose_name = u"10.宠物游戏记录"
+        verbose_name_plural = verbose_name
+
+
+
+def next_year_day():
+    now = datetime.date.today()
+    return now + relativedelta(months=+12, days=-1)
+#宠物保险
+class PetInsurance(models.Model):
+    INSURANCE_COPIES = (
+        (1,1),
+        (2,2),
+        (3,3),
+        (4,4),
+        (5,5),
+        (6,6),
+        (7,7),
+        (8,8),
+        (9,9),
+        (10,10),
+    )
+
+    time_limit = models.IntegerField(verbose_name="保险期限", default=1,)
+    money      = models.DecimalField(verbose_name="保险费用", max_digits=6, decimal_places=2,default=100.00)
+    type       = models.CharField(verbose_name="宠物品种", max_length=24)
+    license    = models.CharField(verbose_name="宠物许可证", max_length=24)
+    immune     = models.CharField(verbose_name="宠物免疫证", max_length=24)
+    immune_image = ThumbnailerImageField(verbose_name="免疫证照片", upload_to="insurance/")
+    pet_photo  = ThumbnailerImageField(verbose_name="宠物照片", upload_to="insurance/")
+    group_photo = ThumbnailerImageField(verbose_name="宠物和主人合照", upload_to="insurance/")
+    id_card    = models.CharField(verbose_name="身份证号", max_length=24)
+    name       = models.CharField(verbose_name="投保人姓名", max_length=16)
+    telephone  = models.CharField(verbose_name="手机号码", max_length=16)
+    email      = models.EmailField(verbose_name="邮箱", max_length=24, default="" )
+    copies     = models.IntegerField(verbose_name="投保份数",choices=INSURANCE_COPIES, default=1)
+    openid     = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
+    create_at  = models.DateTimeField(verbose_name="创建时间", auto_now=True)
+    out_trade_no = models.CharField(verbose_name='订单号', max_length=32, default='')
+    cash_fee   = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    status     = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    pay_time   = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
+    transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
+
+    def __str__(self):
+        return  self.name
+
+    class Meta:
+        verbose_name = u"11.宠物保险"
+        verbose_name_plural = verbose_name
+
+    def total_cost(self):
+        return self.money * self.copies
+
+    def update_status_transaction_id(self,status,transaction_id, cash_fee,pay_time):
+        self.status = status
+        self.transaction_id = transaction_id
+        self.cash_fee = cash_fee
+        self.pay_time = pay_time
+        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
+
+class InsurancePlan(models.Model):
+    title = models.CharField(verbose_name="保障内容", max_length=64)
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name = "12.保险内容"
+        verbose_name_plural = verbose_name
+
+class ClaimProcess(models.Model):
+    name = models.CharField(verbose_name="流程名称", max_length=24)
+    content = models.CharField(verbose_name="具体流程", max_length=300)
+    sort = models.IntegerField(verbose_name="序号",)
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "13.理赔流程"
         verbose_name_plural = verbose_name

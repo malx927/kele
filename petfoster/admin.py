@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from .models import FosterType, PetType, FosterStandard, FosterNotice, PetFosterInfo, FosterDemand, FosterRoom
 from .models import FosterAgreement, HandOverList, PetFeedNote, PetGameNote
+from .models import PetInsurance, InsurancePlan, ClaimProcess
 # Register your models here.
 
 @admin.register(FosterType)
@@ -75,4 +76,30 @@ class PetFeedNoteAdmin(admin.ModelAdmin):
 class PetGameNoteAdmin(admin.ModelAdmin):
     list_display = ('pet','begin_at','end_at','create_time','openid' )
     list_display_links = ('pet','begin_at')
+    list_per_page = 50
+
+
+
+# class ClaimProcess(models.Model):
+#     name = models.CharField(verbose_name="流程名称", max_length=24)
+#     content = models.CharField(verbose_name="具体流程", max_length=300)
+#     sort = models.IntegerField(verbose_name="序号",)
+
+
+@admin.register(PetInsurance)
+class PetInsuranceAdmin(admin.ModelAdmin):
+    list_display = ('name', 'type', 'time_limit', 'money','license','immune','id_card','telephone','email' )
+    list_display_links = ('name','type')
+    list_per_page = 50
+
+@admin.register(InsurancePlan)
+class InsurancePlanAdmin(admin.ModelAdmin):
+    list_display = ('title','create_time' )
+    list_display_links = ('title',)
+    list_per_page = 50
+
+@admin.register(ClaimProcess)
+class ClaimProcessAdmin(admin.ModelAdmin):
+    list_display = ('name','content','sort' )
+    list_display_links = ('name',)
     list_per_page = 50

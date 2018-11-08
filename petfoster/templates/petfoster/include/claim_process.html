@@ -1,0 +1,13 @@
+
+<div class="weui-cells" style="margin-top: 0px;">
+    {% for claim in claims %}
+    <div class="weui-cell">
+        <div class="weui-cell__hd"><span class="weui-badge badge {% if forloop.counter == 1 %} badge-bgcolor {% endif %}" >{{claim.sort}}</span></div>
+        <div class="weui-cell__bd"><p class="claim_title">{{claim.name}}</p></div>
+    </div>
+    <div class="weui-cell">
+        <div class="weui-cell__hd"></div>
+        <div class="weui-cell__bd"><p class="claim_content">{{claim.content|safe}}</p></div>
+    </div>
+    {% endfor %}
+</div>

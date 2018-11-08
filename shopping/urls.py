@@ -1,4 +1,5 @@
 #-*-coding:utf-8-*-
+
 __author__ = 'malxin'
 
 
@@ -7,7 +8,7 @@ from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView
 from .views import  ShopCartBuyListView, OrderView
-
+from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify
 
 urlpatterns = [
 
@@ -20,6 +21,9 @@ urlpatterns = [
     url(r'^shopcartlist/$', ShopCartListView.as_view(), name='shop-cart-list'), #购物车列表
     url(r'^cartbuylist/$', ShopCartBuyListView.as_view(), name='cart-buy-list'), #购物车购买列表
     url(r'^myorderlist/$', OrderView.as_view(), name='my-order-list'), #我的订单列表
+    url(r'^pay/insurance$', PetInsuranceView.as_view(), name='pet-insurance'), #保险缴费
+    url(r'^pay/payinsurance$', PayInsuranceView.as_view(), name='pay-insurance'), #缴费支付
+    url(r'^pay/insurnotify/$', insuranceNotify, name='insurance-notify'),
 
     #url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息
 

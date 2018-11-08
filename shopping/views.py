@@ -493,7 +493,7 @@ class OrderView(View):
         }
         user_id = request.session.get('openid', None)
         action = request.POST.get("action", None)
-        print('action=', action)
+
         if user_id is None:
             context["errors"] = "invalid user"
             return  HttpResponse(json.dumps(context))

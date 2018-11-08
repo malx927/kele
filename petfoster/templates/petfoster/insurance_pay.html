@@ -1,0 +1,172 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/include/jssdk.html' %}
+    <script type="text/javascript">
+    wx.ready(function () {
+        $('#pay_now').on('click',function(){
+            var params ={
+              out_trade_no: $("#out_trade_no").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "pay-insurance" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+              },
+              error: function(error){
+                  window.location.href = "{% url 'dog-index' %}";
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        out_trade_no = $("#out_trade_no").text();
+                        window.location.replace('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
+                    } else {
+                       weui.alert('保险支付失败!');
+                    }
+                  },
+                   cancel: function(res) {
+                       out_trade_no = $("#out_trade_no").text();
+                       updateOrder(out_trade_no);
+                   },
+                   fail:function(res){
+                       out_trade_no = $("#out_trade_no").text();
+                       updateOrder(out_trade_no);
+                   }
+            });
+        }
+
+        function updateOrder(out_trade_no, url){
+            var params ={
+              out_trade_no: out_trade_no,
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+              action:"update",
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "pet-insurance" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                if(data.success == "true"){
+                     $("#out_trade_no").text(data.out_trade_no)
+                }
+              },
+              error: function(error){
+                  weui.alert('保险支付失败!');
+                  window.location.href = "{% url 'shopping-list' %}";
+              }
+            });
+        }
+
+});
+
+</script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">收银台</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd" style="text-align: right;">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">付款金额</label>
+                        <em class="weui-form-preview__value font16" id="total_cost_top" > {{ insurance.total_cost|floatformat:"2" }} 元</em>
+                        <span id="out_trade_no" style="display: none" >{{ insurance.out_trade_no }}</span>
+                    </div>
+                </div>
+                <div class="weui-cells" style="margin-top: 0;">
+                    {% if insurance %}
+                    <div class="weui-cells__title">参保信息</div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">保险期限</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.time_limit }} 年 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">保险费用</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.money }} 元 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">投保份数</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.copies }} 份 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物品种</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.type }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物许可证</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.license }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物免疫证</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.immune }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">投保人姓名</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.name }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">身份证号</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.id_card }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">手机号码</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.telephone }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">邮箱</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.email }} </p></div>
+                      </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="weui-tabbar">
+         <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ insurance.total_cost }}</span></p>
+        </a>
+
+    </div>
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

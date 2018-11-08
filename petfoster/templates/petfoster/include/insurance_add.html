@@ -1,0 +1,163 @@
+{% if form %}
+<form action="{% url 'pet-insurance' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+    <div class="weui-cells weui-cells_form cells_top" id="uploader">
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">{{ form.time_limit.label }}</label></div>
+            <div class="weui-cell__bd"><input type="hidden" name="time_limit" value="{{ form.time_limit.value}}">
+                <a href="javascript:;" class="weui-btn weui-btn_mini weui-btn_plain-primary">{{ form.time_limit.value}}年</a>
+            </div>
+        </div>
+         <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.money.label }}</label></div>
+            <div class="weui-cell__bd" style="color:#d4164e;"><input type="hidden" name="money" id="id_money" value="{{ form.money.value}}">
+                {{ form.money.value|floatformat:"2"}} 元
+            </div>
+        </div>
+        <div class="weui-cell weui-cell_select weui-cell_select-after">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.copies.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.copies }}</div>
+         </div>
+         <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.type.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.type }}
+            </div>
+        </div>
+         <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.license.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.license }}
+            </div>
+        </div>
+         <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.immune.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.immune }}
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">{{ form.immune_image.label }}</label></div>
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="immuneFiles"></ul>
+                        <div class="weui-uploader__input-box">{{ form.immune_image }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.id_card.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.id_card }}
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.name.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.name }}
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.telephone.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.telephone }}
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.email.label }}</label></div>
+            <div class="weui-cell__bd">
+                {{ form.email }}
+            </div>
+        </div>
+
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">{{ form.pet_photo.label }}</label></div>
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="petphotoFiles"></ul>
+                        <div class="weui-uploader__input-box">{{ form.pet_photo }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui-cell">
+            <div class="weui-cell__hd"><label class="weui-label">{{ form.group_photo.label }}</label></div>
+            <div class="weui-cell__bd">
+                <div class="weui-uploader">
+                    <div class="weui-uploader__bd">
+                        <ul class="weui-uploader__files" id="groupphotoFiles"></ul>
+                        <div class="weui-uploader__input-box">{{ form.group_photo }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" class="weui-btn weui-btn_primary">
+                <span  style="margin-right: 20px;">总费用: <em id="totals">100.00</em> 元</span> <span>立即投保</span>
+            </button>
+        </div>
+
+    </div>
+</form>
+
+{% endif  %}
+<script>
+
+$(function(){
+    $immuneInput = $("#id_immune_image");
+    $immuneFiles = $("#immuneFiles");
+
+    $immuneInput.on("change", function(e){
+        var  files = e.target.files;
+        $('#immuneFiles li').remove();
+        setSrcImage(files, $immuneFiles );
+    });
+
+    $petphotoInput = $("#id_pet_photo");
+    $petphotoFiles = $("#petphotoFiles");
+    $petphotoInput.on("change", function(e){
+        var  files = e.target.files;
+        $('#petphotoFiles li').remove();
+        setSrcImage(files, $petphotoFiles );
+    });
+
+    $groupphotoInput = $("#id_group_photo");
+    $groupphotoFiles = $("#groupphotoFiles");
+    $groupphotoInput.on("change", function(e){
+        var  files = e.target.files;
+        $('#groupphotoFiles li').remove();
+        setSrcImage(files, $groupphotoFiles );
+    });
+
+    $("#id_copies").on("change", function(){
+       console.log($("#id_copies").val());
+        var total_value = $("#id_copies").val() * $("#id_money").val();
+       $("#totals").text( total_value.toFixed(2)  );
+    });
+});
+
+
+function setSrcImage(files, dstTarget){
+    var tmpl = '<li class="weui-uploader__file" style="background-image:url(#url#)"></li>';
+    var src, url = window.URL || window.webkitURL || window.mozURL;
+    for (var i = 0, len = files.length; i < len; ++i) {
+        var file = files[i];
+
+        if(file.size > 6 * 1024 * 1024) {
+            weui.alert('请上传不超过6M的图片');
+            return false;
+        }
+        if (url) {
+            src = url.createObjectURL(file);
+        } else {
+            src = e.target.result;
+        }
+
+        dstTarget.append($(tmpl.replace('#url#', src)));
+    }
+}
+</script>
