@@ -9,8 +9,9 @@ from .views import PetInsuranceView
 
 
 
-# urlpatterns = [
-#
-#     url(r'^insurance/$', PetInsuranceView.as_view(), name='insurance-index'), #购物车列表
-#
-# ]
+urlpatterns = [
+
+   # url(r'^insurance/$', PetInsuranceView.as_view(), name='insurance-index'), #购物车列表
+   url(r'^success/$', TemplateView.as_view(template_name="petfoster/message.html"), name='foster-success'), #购物车列表
+   url(r'^insurance/$', PetInsuranceView.as_view(), name='insurance-index')
+]

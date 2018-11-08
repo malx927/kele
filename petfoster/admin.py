@@ -88,7 +88,7 @@ class PetGameNoteAdmin(admin.ModelAdmin):
 
 @admin.register(PetInsurance)
 class PetInsuranceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'time_limit', 'money','license','immune','id_card','telephone','email' )
+    list_display = ('name', 'type', 'time_limit', 'money','license','immune','immune_image','id_card','telephone','email' )
     list_display_links = ('name','type')
     list_per_page = 50
 

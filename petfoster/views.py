@@ -20,19 +20,27 @@ from wxchat.views import getJsApiSign, sendTemplateMesToKf
 
 class PetInsuranceView(View):
 
+    def getInsurance( self, out_trade_no , user_id):
+        try:
+            insurance = PetInsurance.objects.get( out_trade_no = out_trade_no, openid=user_id )
+        except PetInsurance.DoesNotExist:
+            insurance =None
+        return insurance
+
+
     def get(self, request, *args, **kwargs):
         user_id = request.session.get('openid')
         print('openid=', user_id)
         flag = request.GET.get('flag', None)
         if flag == "pay":
-            try:
-                out_trade_no = request.GET.get('out_trade_no', None)
-                signPackage = getJsApiSign(request)
-                insurance = PetInsurance.objects.get( out_trade_no = out_trade_no, openid=user_id )
-            except PetInsurance.DoesNotExist:
-                insurance =None
-
+            out_trade_no = request.GET.get('out_trade_no', None)
+            signPackage = getJsApiSign(request)
+            insurance = self.getInsurance( out_trade_no, user_id )
             return render(request, 'petfoster/insurance_pay.html', {'insurance':insurance,'sign':signPackage})
+        elif flag == "get":
+            out_trade_no = request.GET.get('out_trade_no', None)
+            insurance = self.getInsurance( out_trade_no, user_id )
+            return render(request, 'petfoster/insurance_detail.html', {'insurance':insurance})
         else:
             form = PetInsuranceForm
             plans = InsurancePlan.objects.all();
@@ -166,7 +174,7 @@ def insuranceNotify(request):
                         status = 1  #已支付标志
                         cash_fee = res_data['cash_fee'] / 100
                         time_end = res_data['time_end']
-                        pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                        pay_time = datetime.datetime.strptime(time_end, "%Y%m%d%H%M%S")
                         insurance.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
                         sendTemplateMesToKf(insurance)
 

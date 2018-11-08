@@ -1269,29 +1269,25 @@ def sendTempMessageToUser( order, type=0 ):
 #{{first.DATA}} 商品名称：{{product.DATA}} 商品价格：{{price.DATA}} 购买时间：{{time.DATA}}{{remark.DATA}}
 def sendTemplateMesToKf(instance):
     template_kf = 'w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays'
-
+    url ="{0}{1}?out_trade_no={2}&flag=get".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
     color = "#173177"
     kf_data ={
         'first':{
             "value":"{0}成功购买宠物保险".format(instance.name),
             "color":color
         },
-        "keyword1":{
+        "product":{
            "value":instance.out_trade_no,
            "color":color
         },
-        "keyword2":{
-           "value":instance.pay_time.strftime('%Y-%m-%d'),
-           "color":color
-        },
-        "keyword3":{
+        "price":{
            "value":"{0}{1}".format(instance.cash_fee, '元'),
            "color":color
         },
-       "keyword4": {
-           "value":"微信支付",
+        "time":{
+           "value":instance.pay_time.strftime('%Y-%m-%d'),
            "color":color
-       },
+        },
         "remark":{
            "value":"请尽快核对订单，为客户办理！",
            "color":color
@@ -1300,7 +1296,7 @@ def sendTemplateMesToKf(instance):
 
     msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
     for user in msgUsers:
-        ret = client.message.send_template(user_id=user.user.openid, template_id = template_kf,  data=kf_data)
+        ret = client.message.send_template(user_id=user.user.openid, template_id = template_kf,url=url, data=kf_data)
         print("kf_client", ret)
 
 

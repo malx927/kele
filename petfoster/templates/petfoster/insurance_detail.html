@@ -1,0 +1,82 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">保险订单</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-cells" style="margin-top: 0;">
+                    {% if insurance %}
+                    <div class="weui-cells__title">参保信息</div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">保险期限</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.time_limit }} 年 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">保险费用</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.money }} 元 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">总费用</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.total_cost }} 元 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">投保份数</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.copies }} 份 </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物品种</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.type }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物许可证</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.license }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">宠物免疫证</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.immune }} </p></div>
+                      </div>
+                      <div class="weui-cell">
+                        <div class="weui-cell__bd">投保人姓名</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.name }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">身份证号</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.id_card }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">手机号码</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.telephone }} </p></div>
+                      </div>
+                       <div class="weui-cell">
+                        <div class="weui-cell__bd">邮箱</div>
+                        <div class="weui-cell__ft"><p>{{ insurance.email }} </p></div>
+                      </div>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

@@ -35,8 +35,7 @@
                   paySign:  data.paySign,
                   success: function(res){
                     if (res.errMsg == "chooseWXPay:ok") {
-                        out_trade_no = $("#out_trade_no").text();
-                        window.location.replace('{% url "my-order-list" %}?out_trade_no=' + out_trade_no);
+                        window.location.replace('{% url "foster-success" %}');
                     } else {
                        weui.alert('保险支付失败!');
                     }
@@ -72,7 +71,7 @@
               },
               error: function(error){
                   weui.alert('保险支付失败!');
-                  window.location.href = "{% url 'shopping-list' %}";
+                  window.location.href = "{% url 'pet-insurance' %}";
               }
             });
         }
