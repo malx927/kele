@@ -22,14 +22,17 @@ class PetInsuranceView(View):
 
     def getInsurance( self, out_trade_no , user_id):
         try:
-            insurance = PetInsurance.objects.get( out_trade_no = out_trade_no, openid=user_id )
+            if user_id:
+                insurance = PetInsurance.objects.get( out_trade_no = out_trade_no )
+            else:
+                insurance =None
         except PetInsurance.DoesNotExist:
             insurance =None
         return insurance
 
 
     def get(self, request, *args, **kwargs):
-        user_id = request.session.get('openid')
+        user_id = request.session.get('openid',None)
         print('openid=', user_id)
         flag = request.GET.get('flag', None)
         if flag == "pay":
@@ -121,6 +124,9 @@ class PayInsuranceView(View):
         else:
             return render( request, template_name='petfoster/pet_insurance.html' )
 
+
+        total_fee =1
+
         try:
             data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
             prepay_id = data.get('prepay_id',None)
@@ -161,6 +167,7 @@ def insuranceNotify(request):
             'return_code': result_data.get('return_code'),
             'return_msg': result_data.get('return_msg')
         }
+        print(res_data)
         xml = dict_to_xml( data,'' )
         if not retBool: #订单不存在
             return  HttpResponse(xml)
@@ -172,7 +179,7 @@ def insuranceNotify(request):
                     if insurance.status==0:
                         #更新订单
                         status = 1  #已支付标志
-                        cash_fee = res_data['cash_fee'] / 100
+                        cash_fee = res_data['cash_fee'] / 100.0
                         time_end = res_data['time_end']
                         pay_time = datetime.datetime.strptime(time_end, "%Y%m%d%H%M%S")
                         insurance.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
@@ -185,4 +192,3 @@ def insuranceNotify(request):
     except InvalidSignatureException as error:
         print(error)
 
-    return  HttpResponse(xml)

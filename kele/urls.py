@@ -46,5 +46,6 @@ urlpatterns = [
     url(r'^favicon\.ico$',RedirectView.as_view(url=r'static/favicon.ico')),
     url(r'^shopping/', include('shopping.urls')),
     url(r'^shopping/api/', include('shopping.api.urls')),
+    url(r'^foster/', include('petfoster.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
