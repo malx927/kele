@@ -15,7 +15,7 @@ from wxchat.models import WxUnifiedOrdeResult, WxPayResult
 from wxchat.utils import changeImage
 from .models import InsurancePlan, ClaimProcess, PetInsurance
 from .forms import PetInsuranceForm
-from wxchat.views import getJsApiSign
+from wxchat.views import getJsApiSign, sendTemplateMesToKf
 
 
 class PetInsuranceView(View):
@@ -168,6 +168,7 @@ def insuranceNotify(request):
                         time_end = res_data['time_end']
                         pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
                         insurance.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
+                        sendTemplateMesToKf(insurance)
 
                 except PetInsurance.DoesNotExist as ex:
                     print(ex)

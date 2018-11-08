@@ -1182,6 +1182,7 @@ def getJsApiSign(request):
 # 消费店铺：{{keyword1.DATA}}购买商品：{{keyword2.DATA}}消费金额：{{keyword3.DATA}}消费时间：{{keyword4.DATA}}交易流水：{{keyword5.DATA}}{{remark.DATA}}
 #订单付款成功通知
 # {{first.DATA}}订单号：{{keyword1.DATA}}支付时间：{{keyword2.DATA}}支付金额：{{keyword3.DATA}}支付方式：{{keyword4.DATA}}{{remark.DATA}}
+
 def sendTempMessageToUser( order, type=0 ):
 
     template_custmer = 'mDKP_vnNSYF-EGt7d_TuqfGNngnExvPVrZiVTiKbc5Q' #消费通知
@@ -1261,6 +1262,46 @@ def sendTempMessageToUser( order, type=0 ):
             print("kf_client", ret)
     else:
         print("customer", ret)
+
+
+# 购买成功通知
+# w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays
+#{{first.DATA}} 商品名称：{{product.DATA}} 商品价格：{{price.DATA}} 购买时间：{{time.DATA}}{{remark.DATA}}
+def sendTemplateMesToKf(instance):
+    template_kf = 'w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays'
+
+    color = "#173177"
+    kf_data ={
+        'first':{
+            "value":"{0}成功购买宠物保险".format(instance.name),
+            "color":color
+        },
+        "keyword1":{
+           "value":instance.out_trade_no,
+           "color":color
+        },
+        "keyword2":{
+           "value":instance.pay_time.strftime('%Y-%m-%d'),
+           "color":color
+        },
+        "keyword3":{
+           "value":"{0}{1}".format(instance.cash_fee, '元'),
+           "color":color
+        },
+       "keyword4": {
+           "value":"微信支付",
+           "color":color
+       },
+        "remark":{
+           "value":"请尽快核对订单，为客户办理！",
+           "color":color
+       }
+    }
+
+    msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
+    for user in msgUsers:
+        ret = client.message.send_template(user_id=user.user.openid, template_id = template_kf,  data=kf_data)
+        print("kf_client", ret)
 
 
 def dogIndex(request):
