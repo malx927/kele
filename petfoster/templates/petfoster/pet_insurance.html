@@ -25,6 +25,9 @@
     .weui-btn_mini{
         min-width: 85px;
     }
+    .weui-cell__bd a{
+        color:  #4e9f78;
+    }
 </style>
 {% endblock extra %}
 
@@ -62,14 +65,15 @@
 
     {{ block.super }}
     <script>
+    $(function(){
+        defIndex = sessionStorage.getItem('insurance');
         weui.tab('#tab',{
-            defaultIndex: 0,
+            defaultIndex: defIndex ==null?0:defIndex,
             onChange: function(index){
-                if(index == 0)
-                    $("#tab_bottom").show();
-                else
-                    $("#tab_bottom").hide();
+                 sessionStorage.setItem('insurance',index);
             }
         });
+    });
+
     </script>
 {% endblock bottomjs %}

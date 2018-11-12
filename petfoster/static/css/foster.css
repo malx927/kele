@@ -1,0 +1,10 @@
+
+.nav_return{
+    position: absolute;
+    left:10px;
+    top:10px;
+}
+
+.nav_return a{
+    color:#fff;
+}

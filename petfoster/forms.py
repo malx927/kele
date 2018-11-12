@@ -20,12 +20,12 @@ class PetInsuranceForm(forms.ModelForm):
         self.fields['type'].widget.attrs['placeholder'] = '请输入宠物品种'
 
         self.fields['license'].widget.attrs['class'] = 'weui-input'
-        self.fields['license'].widget.attrs['placeholder'] = '请输入宠物许可证'
+        self.fields['license'].widget.attrs['placeholder'] = '请输入身份证后六位'
 
         self.fields['copies'].widget.attrs['class'] = 'weui-select'
 
         self.fields['immune'].widget.attrs['class'] = 'weui-input'
-        self.fields['immune'].widget.attrs['placeholder'] = '请输入宠物免疫证'
+        self.fields['immune'].widget.attrs['placeholder'] = '请输入身份证后六位'
 
         self.fields['immune_image'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['immune_image'].widget.attrs['accept'] = 'image/*'

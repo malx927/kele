@@ -249,6 +249,7 @@ class PetInsurance(models.Model):
 
 class InsurancePlan(models.Model):
     title = models.CharField(verbose_name="保障内容", max_length=64)
+    content = models.CharField(verbose_name="解释说明", max_length=256, default='')
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
 
     def __str__(self):
