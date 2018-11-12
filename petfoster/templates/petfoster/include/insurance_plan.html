@@ -1,19 +1,32 @@
 {% load static %}
 <div class="weui-cells" style="margin-top: 0px;">
     {% for plan in plans %}
-    <div class="weui-cell">
+    <a class="weui-cell">
         <div class="weui-cell__hd"><span class="weui-badge badge badge-bgcolor" >{{forloop.counter}}</span></div>
         <div class="weui-cell__bd"><p>{{plan.title}}</p></div>
-    </div>
-    <div class="weui-cell">
+        <div class="weui-cell__ft" id="footer-{{ forloop.counter }}" data-item="#content-{{ forloop.counter }}" ><i class="icon iconfont icon-jiantou" style="font-size: 22px;"></i></div>
+    </a>
+    <div class="weui-cell" id="content-{{ forloop.counter }}"  style="display:none;">
         <div class="weui-cell__hd"></div>
         <div class="weui-cell__bd"><p class="claim_content">{{plan.content|safe}}</p></div>
     </div>
     {% endfor %}
 </div>
-    <div class="weui-cell">
-        <div class="weui-cell__hd"></div>
-        <div class="weui-cell__bd" style="font-size: 15px;">
-            <p>更多详情请阅读<a href="{% url 'foster-tbxz'%}"><<投保须知>></a>和<a href="{% url 'foster-bxtk'%}"><<保险条款>></a></p>
-        </div>
-    </div>
+ {% include "petfoster/include/insurance_reading.html" %}
+<script>
+    $(function(){
+        $("div[id^=footer-]").on("click", function(){
+            if( $(this).children("i").hasClass("icon-jiantou") ) {
+                $(this).children("i").removeClass("icon-jiantou").addClass("icon-jiantou_down");
+                var itemdata = $(this).attr("data-item");
+                $(itemdata).css("display","");
+            }
+            else{
+                $(this).children("i").removeClass("icon-jiantou_down").addClass("icon-jiantou");
+                var itemdata = $(this).attr("data-item");
+                $(itemdata).css("display","none");
+            }
+
+        })
+    })
+</script>
