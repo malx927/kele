@@ -38,14 +38,22 @@ import datetime
 from PIL import Image
 from io import StringIO, BytesIO
 from django.db.models import Q
-
+from wechatpy.session.redisstorage import RedisStorage
+from redis import Redis
 
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
 APPID = settings.WECHAT_APPID
 APPSECRET = settings.WECHAT_SECRET
 
-client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
+
+redis_client = Redis.from_url(settings.REDIS_URL)
+session_interface = RedisStorage(
+    redis_client,
+    prefix="wechatpy"
+)
+
+client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET, session=session_interface)
 wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
                   mch_id=settings.MCH_ID, mch_cert=settings.API_CLIENT_CERT_PATH, mch_key=settings.API_CLIENT_KEY_PATH)
 

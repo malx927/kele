@@ -32,6 +32,7 @@ from .serializers import (
     CodeProvinceSerializer,
     DogOwnerDetailSerializer)
 from wxchat.models import SwiperImage
+from django.views.decorators.cache import cache_page
 
 __author__ = 'malixin'
 
@@ -140,7 +141,7 @@ class DogInstitutionListAPIView(ListAPIView):
     def get_queryset(self):
         return  Doginstitution.objects.filter(is_show=1)
 
-
+#@cache_page(60*5)
 class SwiperImageListAPIView(ListAPIView):
     permission_classes = [AllowAny]
     queryset = SwiperImage.objects.all()

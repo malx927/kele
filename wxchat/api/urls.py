@@ -1,5 +1,6 @@
 #-*-coding:utf-8-*-
 from django.conf.urls import url
+from django.views.decorators.cache import cache_page
 
 __author__ = 'malixin'
 
@@ -38,7 +39,7 @@ urlpatterns = [
     url(r'^dogbuylist/$', DogBuyListAPIView.as_view(), name='dog-buy-list'),
     url(r'^dogsalelist/$', DogSaleListAPIView.as_view(), name='dog-sale-list'),
     url(r'^freshmanlist/$', DogFreshmanListAPIView.as_view(), name='dog-freshman-list'),
-    url(r'^swiperimagelist/$', SwiperImageListAPIView.as_view(), name='swiper-image-list'),
+    url(r'^swiperimagelist/$',  cache_page(60 * 15)(SwiperImageListAPIView.as_view()), name='swiper-image-list'),
     url(r'^doginstitutionlist/$', DogInstitutionListAPIView.as_view(), name='dog-institution-list'),
     url(r'^arealist/$', AreaCodeListAPIView.as_view(), name='area-code-list'),
     url(r'^myinfolist/$', MyInfoListAPIView.as_view(), name='my-info-list'),
