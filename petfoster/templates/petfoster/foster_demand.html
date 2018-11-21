@@ -1,0 +1,57 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+<script type="application/javascript">
+ window.history.forward(1);
+</script>
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物寄养要求</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+
+    <div class="weui-panel__bd">
+        <form action="{% url 'foster-pet-info' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top" id="uploader">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.pet.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.pet }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.day_meals.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.day_meals }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.meals_nums.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.meals_nums }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.extra_meal.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.extra_meal }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.defecation.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.defecation }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.others.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.others }}</div>
+            </div>
+
+            <div class="weui-btn-area">
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >下一步</button>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}

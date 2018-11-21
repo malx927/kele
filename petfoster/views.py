@@ -13,11 +13,11 @@ from kele import settings
 from shopping.views import wxPay, queryOrder
 from wxchat.models import WxUnifiedOrdeResult, WxPayResult
 from wxchat.utils import changeImage
-from .models import InsurancePlan, ClaimProcess, PetInsurance
-from .forms import PetInsuranceForm
+from .models import InsurancePlan, ClaimProcess, PetInsurance, FosterStandard, FosterType, PetFosterInfo, FosterDemand
+from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm
 from wxchat.views import getJsApiSign, sendTemplateMesToKf
 
-
+#宠物保险
 class PetInsuranceView(View):
 
     def getInsurance( self, out_trade_no , user_id):
@@ -32,7 +32,7 @@ class PetInsuranceView(View):
 
 
     def get(self, request, *args, **kwargs):
-        user_id = request.session.get('openid',None)
+        user_id = request.session.get('openid',"oX5Zn04Imn5RlCGlhEVg-aEUCHNs")
         print('openid=', user_id)
         flag = request.GET.get('flag', None)
         if flag == "pay":
@@ -45,13 +45,20 @@ class PetInsuranceView(View):
             insurance = self.getInsurance( out_trade_no, user_id )
             return render(request, 'petfoster/insurance_detail.html', {'insurance':insurance})
         else:
-            form = PetInsuranceForm
+            insurance = PetInsurance.objects.filter(openid=user_id, status=0).order_by("-create_at").first()
+            if insurance:
+                form = PetInsuranceForm(instance=insurance)
+                obj_id = insurance.id
+            else:
+                form = PetInsuranceForm()
+                obj_id = None
             plans = InsurancePlan.objects.all();
             claims = ClaimProcess.objects.all().order_by("sort")
             context = {
                 "plans":  plans,
                 "claims": claims,
-                "form":   form
+                "form":   form,
+                "obj_id": obj_id,
             }
             return render(request,template_name="petfoster/pet_insurance.html", context=context)
 
@@ -76,8 +83,14 @@ class PetInsuranceView(View):
 
             return HttpResponse(json.dumps(context))
         else:
+            id = request.POST.get("id", None)
             out_trade_no = '{0}{1}{2}'.format('S',datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
-            form = PetInsuranceForm(request.POST, request.FILES)
+            if id:
+                insurance = PetInsurance.objects.get(id=id)
+                form = PetInsuranceForm(request.POST, request.FILES, instance=insurance)
+            else:
+                form = PetInsuranceForm(request.POST, request.FILES)
+
             if form.is_valid():
                 instance = form.save(commit=False)
                 instance.openid = user_id
@@ -192,3 +205,79 @@ def insuranceNotify(request):
     except InvalidSignatureException as error:
         print(error)
 
+
+#宠物寄养收费标准
+class FosterFeeScale(View):
+
+    def get(self, request):
+        fosterTypes = FosterType.objects.all()
+
+        return render(request,template_name="petfoster/foster_fee_scale.html", context={"fosterTypes": fosterTypes})
+
+#寄养宠物信息
+class PetFosterInfoView(View):
+
+    def get(self, request, *args, **kwargs):
+        user_id = request.session.get('openid', 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        petInfo = PetFosterInfo.objects.filter(openid=user_id, is_complete=False).order_by("-create_time").first()
+        if petInfo:
+            form = PetFosterInfoForm(instance=petInfo)
+            obj_id = petInfo.id
+        else:
+            form = PetFosterInfoForm()
+        return render(request, template_name="petfoster/foster_petinfo.html", context={"form": form,"obj_id":obj_id})
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.session.get('openid')
+        obj_id = request.POST.get("obj_id", None)
+        print(obj_id)
+        if obj_id:
+            instance = PetFosterInfo.objects.get(id=obj_id)
+            form = PetFosterInfoForm(request.POST, request.FILES, instance=instance)
+        else:
+            form = PetFosterInfoForm(request.POST or None, request.FILES or None)
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.openid = user_id
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
+
+            return HttpResponseRedirect(reverse("foster-pet-demand", args=(instance.id,)))
+        else:
+            print(form.errors)
+            return HttpResponseRedirect(reverse("foster-pet-info"))
+
+
+class FosterDemandView(View):
+
+    def get(self, request, petid):
+
+        try:
+            pet_id = petid
+            instance = FosterDemand.objects.get(id=pet_id)
+            form = FosterDemandForm(instance=instance)
+        except FosterDemand.DoesNotExist as ex:
+            form = FosterDemandForm()
+            return render(request, template_name="petfoster/foster_demand.html", context={"form": form})
+        else:
+            return render(request, template_name="petfoster/foster_demand.html", context={"form": form})
+
+    def post(self, request, *args, **kwargs):
+        user_id = request.session.get('openid')
+        form = PetFosterInfoForm(request.POST, request.FILES)
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.openid = user_id
+            instance.save()
+            if instance.picture:
+                path = instance.picture.path
+                image = changeImage(path)
+                image.save(path)
+
+            return HttpResponseRedirect(reverse("foster-pet-info"))
+        else:
+            return HttpResponseRedirect(reverse("foster-pet-info"))

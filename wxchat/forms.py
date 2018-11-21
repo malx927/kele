@@ -113,7 +113,7 @@ class DogBreedForm(forms.ModelForm):
         fields = ['name', 'typeid','birth','sex', 'desc', 'picture', 'price', 'ownername', 'telephone']
 
         widgets = {
-            'birth': forms.DateTimeInput({'class': 'weui-input', 'type': 'date', 'placeholder': '请输入时间'}),
+            'birth': forms.DateInput({'class': 'weui-input', 'type': 'date', 'placeholder': '请输入时间'}),
             'telephone': forms.NumberInput(
                 {'class': 'weui-input', 'placeholder': '请输入手机号', 'pattern': '^\d{11}$', 'maxlength': '11'}),
             'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物特点', 'rows': '3'})

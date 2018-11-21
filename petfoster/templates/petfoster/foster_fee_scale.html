@@ -1,0 +1,65 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+ <style>
+    .type_title{
+        color: #0e7845;
+    }
+    .claim_content{
+        font-size: 14px;
+        color: #6C6C6C;
+        margin-right: 20px;
+        margin-left: 5px;
+    }
+    .badge{
+        margin-left:15px;
+        margin-right:4px;
+        background-color: #4e9f78;
+    }
+</style>
+{% endblock %}
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+      <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养收费标准</span></div>
+                <div ><a href="{% url 'shopping-list' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+          <div class="weui-cells" style="margin-top: 0px;">
+              {% for type in fosterTypes %}
+                 <div class="weui-cell">
+                    <div class="weui-cell__hd"></div>
+                    <div class="weui-cell__bd type_title"><p>{{type.title}}</p></div>
+                    <div class="weui-cell__ft"></div>
+                 </div>
+                {% regroup type.fosterstandard_set.all by pet_type as standard_list %}
+                {% for standard in standard_list %}
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"></div>
+                    <div class="weui-cell__bd"><p>{{standard.grouper}}</p></div>
+                    <div class="weui-cell__ft" >({{ standard.grouper.comment }})</div>
+                </div>
+                 {% for st in standard.list %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><span class="weui-badge badge" >{{forloop.counter}}</span></div>
+                        <div class="weui-cell__bd"><p class="claim_content">{{st.content|safe}}</p></div>
+                    </div>
+                 {% endfor %}
+                {% endfor %}
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="weui-tabbar">
+         <a href="{% url 'foster-pet-info' %}" class="weui-tabbar__item tabbar_item ">
+            <p class="weui-tabbar__label bg_red" style="font-size:18px;"><i class="icon iconfont icon-buy2" ></i> 寄养预约</p>
+        </a>
+    </div>
+</div>
+
+{% endblock container %}

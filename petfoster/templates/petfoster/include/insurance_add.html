@@ -1,6 +1,9 @@
-{% if form %}
+{% if form %}{% load static %}
 <form action="{% url 'pet-insurance' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
     <div class="weui-cells weui-cells_form cells_top" id="uploader">
+        {% if obj_id is not None %}
+            <input type="hidden" name="id" value="{{ obj_id }}">
+        {% endif %}
         <div class="weui-cell">
             <div class="weui-cell__hd"><label class="weui-label">{{ form.time_limit.label }}</label></div>
             <div class="weui-cell__bd"><input type="hidden" name="time_limit" value="{{ form.time_limit.value}}">
@@ -42,8 +45,16 @@
             <div class="weui-cell__bd">
                 <div class="weui-uploader">
                     <div class="weui-uploader__bd">
-                        <ul class="weui-uploader__files" id="immuneFiles"></ul>
-                        <div class="weui-uploader__input-box">{{ form.immune_image }}</div>
+                        <ul class="weui-uploader__files" id="immuneFiles">
+                                {% if form.immune_image.value is not None %}
+                                     {% get_media_prefix  as prefix %}
+                                     <li class="weui-uploader__file" style="background-image:url('{{ prefix }}{{ form.immune_image.value}}')"></li>
+                                 {% endif %}
+                        </ul>
+                        <div class="weui-uploader__input-box">
+{#                            {{ form.immune_image }}#}
+                            <input accept="image/*" class="weui-uploader__input" id="id_immune_image" name="immune_image" type="file" {% if form.immune_image.value is  None %} required="" {% endif %}>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -78,8 +89,16 @@
             <div class="weui-cell__bd">
                 <div class="weui-uploader">
                     <div class="weui-uploader__bd">
-                        <ul class="weui-uploader__files" id="petphotoFiles"></ul>
-                        <div class="weui-uploader__input-box">{{ form.pet_photo }}</div>
+                        <ul class="weui-uploader__files" id="petphotoFiles">
+                            {% if form.pet_photo.value is not None %}
+                                     {% get_media_prefix  as prefix %}
+                                     <li class="weui-uploader__file" style="background-image:url('{{ prefix }}{{ form.pet_photo.value}}')"></li>
+                            {% endif %}
+                        </ul>
+                        <div class="weui-uploader__input-box">
+                            <input accept="image/*" class="weui-uploader__input" id="id_pet_photo" name="pet_photo" type="file" {% if form.pet_photo.value is  None %} required="" {% endif %}>
+{#                            {{ form.pet_photo }}#}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -89,8 +108,16 @@
             <div class="weui-cell__bd">
                 <div class="weui-uploader">
                     <div class="weui-uploader__bd">
-                        <ul class="weui-uploader__files" id="groupphotoFiles"></ul>
-                        <div class="weui-uploader__input-box">{{ form.group_photo }}</div>
+                        <ul class="weui-uploader__files" id="groupphotoFiles">
+                            {% if form.group_photo.value is not None %}
+                                     {% get_media_prefix  as prefix %}
+                                     <li class="weui-uploader__file" style="background-image:url('{{ prefix }}{{ form.group_photo.value}}')"></li>
+                            {% endif %}
+                        </ul>
+                        <div class="weui-uploader__input-box">
+                            <input accept="image/*" class="weui-uploader__input" id="id_group_photo" name="group_photo" type="file" {% if form.group_photo.value is  None %} required="" {% endif %}>
+{#                            {{ form.group_photo }}#}
+                        </div>
                     </div>
                 </div>
             </div>

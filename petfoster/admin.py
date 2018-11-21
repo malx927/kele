@@ -18,11 +18,10 @@ class PetTypeAdmin(admin.ModelAdmin):
 
 @admin.register(FosterStandard)
 class FosterStandardAdmin(admin.ModelAdmin):
-    list_display = ('foster_type', 'pet_type','content','create_time')
+    list_display = ('foster_type', 'pet_type','content','create_time','is_show')
     list_display_links = ('content',)
     list_per_page = 50
     list_filter = ['foster_type', 'pet_type']
-
 
 @admin.register(FosterNotice)
 class FosterNoticeAdmin(admin.ModelAdmin):
@@ -39,7 +38,7 @@ class FosterDemandInline(admin.TabularInline):
 
 @admin.register(PetFosterInfo)
 class PetFosterInfoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'birthdate','type','color','sex','sterilization','owner','telephone' )
+    list_display = ('name', 'birthdate','type','color','sex','picture','sterilization','owner','telephone','is_complete' )
     list_display_links = ('name','birthdate','type')
     list_per_page = 50
     inlines = [FosterDemandInline]
