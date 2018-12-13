@@ -1,0 +1,164 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/include/jssdk.html' %}
+    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+    <script type="text/javascript">
+    wx.ready(function () {
+        $('#pay_now').on('click',function(){
+            var params ={
+              out_trade_no: $("#id").text(),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "foster-pay" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+              },
+              error: function(error){
+                  window.location.href = "{% url 'dog-index' %}";
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        window.location.replace('{% url "foster-success" %}');
+                    } else {
+                       weui.alert('保险支付失败!');
+                    }
+                  },
+                   cancel: function(res) {
+
+                   },
+                   fail:function(res){
+
+                   }
+            });
+        }
+
+});
+
+</script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+      <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 寄养订单详情 {% endif %}</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd" style="text-align: right;">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">付款金额</label><span id="id" style="display: none" >{{ instance.id }}</span>
+                        <em class="weui-form-preview__value font16 color-danger" id="total_cost_top" > {{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                </div>
+                <div class="weui-cells  cells_top">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养类型:</label></div>
+                        <div class="weui-cell__bd">{{ instance.foster_type }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养方式:</label></div>
+                        <div class="weui-cell__bd">{{ instance.foster_mode }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间:</label></div>
+                        <div class="weui-cell__bd">
+                            <p>开始: {{ instance.begin_time }}</p>
+                            <p>结束: {{ instance.end_time }}</p>
+                        </div>
+                        <div class="weui-cell__ft">
+                           共{{ instance.get_days }}天
+                        </div>
+                    </div>
+                </div>
+                <div class="weui-cells weui-cells_form cells_top flex" >
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd"><label class="weui-label">大型犬数量:</label></div>
+                        <div class="weui-cell__bd">{{ instance.big_dog|default:'' }}</div>
+                    </div>
+                    <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd"><label class="weui-label">每日费用(元):</label></div>
+                        <div class="weui-cell__bd color-danger">{{ instance.big_price|floatformat:2 }}</div>
+                    </div>
+                 </div>
+                 <div class="weui-cells weui-cells_form cells_top flex" >
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">中型犬数量:</label>
+                        </div>
+                        <div class="weui-cell__bd">{{ instance.middle_dog|default:'' }}</div>
+                    </div>
+                     <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">每日费用(元):</label>
+                        </div>
+                        <div class="weui-cell__bd color-danger">{{ instance.middle_price|floatformat:2 }}</div>
+                    </div>
+                 </div>
+                 <div class="weui-cells weui-cells_form cells_top flex">
+                    <div class="weui-cell" style="width:35%">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">小型犬数量:</label></div>
+                        <div class="weui-cell__bd">{{ instance.small_dog|default:'' }}</div>
+                    </div>
+                     <div class="weui-cell" style="width:55%">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">每日费用(元):</label></div>
+                        <div class="weui-cell__bd color-danger">{{ instance.small_price|floatformat:2 }}</div>
+                    </div>
+                </div>
+                <div class="weui-cells__title">寄养宠物</div>
+                <div class="weui-cells flex_wrap" >
+                    {% for pet in pets %}
+                    <label class="weui-cell" style="width: 38%;min-width: 38%;max-width: 38%">
+                        <div class="weui-cell__hd">
+                            <img src="{{ pet.picture.url }}"  width="60px" height="60px">
+                        </div>
+                        <div class="weui-cell__bd"><p> {{ pet.name }} </p></div>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% if instance.status == 0 %}
+    <div class="weui-tabbar">
+         <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

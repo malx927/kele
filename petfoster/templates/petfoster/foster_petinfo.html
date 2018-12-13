@@ -1,8 +1,5 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-<script type="application/javascript">
- window.history.forward(1);
-</script>
 {% endblock extra%}
 {% block container %}
 <div class="weui-panel">
@@ -14,16 +11,12 @@
         </div>
     </div>
     <div class="weui-panel__bd">
-        <form action="{% url 'foster-pet-info' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
         <div class="weui-cells weui-cells_form cells_top" id="uploader">
-            {% if obj_id %}
-                <input type="hidden" name="obj_id" value="{{ obj_id }}">
-            {% endif %}
+
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
-                <div class="weui-cell__bd">
-                    {{ form.name }}
-                </div>
+                <div class="weui-cell__bd">{{ form.name }}</div>
             </div>
             <div class="weui-cell">
                 <div class="weui-cell__hd">
@@ -63,8 +56,7 @@
                                  {% endif %}
                              </ul>
                              <div class="weui-uploader__input-box">
-{#                                 <input accept="image/*" class="weui-uploader__input" id="id_picture" name="picture" type="file" value="">#}
-                                 {{ form.picture }}
+                                 <input accept="image/*" class="weui-uploader__input" id="id_picture" name="picture" type="file" {% if form.picture.value is  None %} required="" {% endif %}>
                              </div>
                          </div>
                     </div>
@@ -85,10 +77,9 @@
                     {{ form.address }}
                 </div>
             </div>
-
-            <div class="weui-btn-area">
-                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >下一步</button>
-            </div>
+        </div>
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
         </div>
         </form>
     </div>

@@ -1,0 +1,42 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养房间选择</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form id="form1" action="" method="post" enctype="multipart/form-data" onsubmit="return checkeValue();">{% csrf_token %}
+        <div class="weui-cells__title">宠物房间列表</div>
+        <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
+            {% for room in rooms %}
+            <label class="weui-cell weui-check__label" for="id_{{ room.id }}"style="width: 38%;min-width: 38%;max-width: 38%">
+                <div class="weui-cell__hd">
+                    <input type="radio" class="weui-check" name="roomid" value="{{ room.id }}" id="id_{{ room.id }}" >
+                    <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd"><p>{{ room.name }}</p></div>
+                <div class="weui-cell__ft">{{ room.petcounts }}</div>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >提交</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+
+    </script>
+{% endblock bottomjs %}

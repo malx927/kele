@@ -1,0 +1,91 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .pet_img{
+        width:6.5em;height:6.5em;margin-right:5px;display:block;
+    }
+    .weui-flex__item{
+        font-size: 16px;
+    }
+    .weui-flex__item span{
+        color:#c0c0c0;
+        font-size: 14px;
+    }
+    .pet_bgcolor{
+       background-color:#f46253;
+    }
+    </style>
+{% endblock %}
+{% block tabpanel %}
+<div class="weui-tab__content weui-tab__panel_active" >
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >我的宠物</span></div>
+                <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+             </div>
+        </div>
+        <div class="weui-panel__bd" id="pets">
+            <div class="weui-cells__title">宠物列表</div>
+            <div class="weui-cells">
+
+                {% for object in object_list %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-update' object.id %}">
+                    <div class="weui-cell__hd"><img src="{{ object.picture.url }}" class="pet_img"></div>
+                    <div class="weui-cell__bd">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item"><span>昵称：</span>{{ object.name }} </div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>品种：</span>{{ object.type }}</div>
+                            <div class="weui-flex__item"><span>毛色：</span>{{ object.color }}</div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>生日：</span>{{ object.birthdate }}</div>
+                         </div>
+                         <div class="weui-flex">
+                             <div class="weui-flex__item"><span>性别：</span>{{ object.get_sex_display }}</div>
+                            <div class="weui-flex__item"><span>绝育：</span>{{ object.get_sterilization_display }}</div>
+                         </div>
+
+                    </div>
+                    <div class="weui-cell__ft">
+                    </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tabpanel %}
+ {% block tabbar %}
+        <a href="{% url 'foster-pet-info' %}" class="weui-tabbar__item tabbar_item">
+             <p class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jian" ></i> 增加宠物</p>
+        </a>
+        <a href="{% url 'foster-order' %}" class="weui-tabbar__item tabbar_item" id="gotoorder">
+            <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-orderlisto" ></i><span> 订单</span></p>
+        </a>
+         <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="gotopay">
+            <p class="weui-tabbar__label pet_bgcolor"><span id="btn_text"> 寄养缴费</span><i class="icon iconfont icon-jiantou" ></i></p>
+        </a>
+{% endblock tabbar %}
+
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+    $(function(){
+        var obj_counts = {{ object_list|length }}
+        $("#gotopay").on("click", function(){
+            if(obj_counts == 0){
+                weui.alert('请先录入寄养宠物信息!<div style="color:green">点击左下方增加宠物按钮</div>');
+                return false;
+            }
+
+            window.location.href = "{% url 'foster-style-calc' %}";
+        })
+    });
+
+    </script>
+{% endblock bottomjs %}

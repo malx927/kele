@@ -1,8 +1,6 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-<script type="application/javascript">
- window.history.forward(1);
-</script>
+  <link rel="stylesheet" href="{% static 'css/foster.css' %}">
 {% endblock extra%}
 {% block container %}
 <div class="weui-panel">
@@ -15,14 +13,25 @@
     </div>
 
     <div class="weui-panel__bd">
-        <form action="{% url 'foster-pet-info' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <form action="{% url 'foster-pet-demand-create' %}" method="post"  onsubmit="showing()">{% csrf_token %}
         <div class="weui-cells weui-cells_form cells_top" id="uploader">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.pet.label }}:</label></div>
                 <div class="weui-cell__bd">
-                    {{ form.pet }}
+                    {% if petinfo %}
+                        <input type="hidden"  id="id_pet" name="pet" value="{{ petinfo.id }}">
+                         {{ petinfo.name }}
+                    {% endif %}
+                    {% if id and form.pet %}
+                        <input type="hidden" name="id" value="{{ id }}">
+                        <input type="hidden" name="pet" value="{{ form.pet.value }}">
+                        {{ form.instance.pet }}
+                    {% endif %}
                 </div>
             </div>
+        </div>
+        <div class="weui-cells__title"><span class="weui-badge badge-bgcolor" >1</span>  饮食习惯</div>
+        <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
                 <div class="weui-cell__hd">
                     <label for="" class="weui-label">{{ form.day_meals.label }}:</label>
@@ -37,17 +46,22 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.extra_meal.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.extra_meal }}</div>
             </div>
+        </div>
+        <div class="weui-cells__title"><span class="weui-badge badge-bgcolor" >2</span>  排便情况</div>
+        <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.defecation.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.defecation }}</div>
             </div>
+        </div>
+        <div class="weui-cells__title"><span class="weui-badge badge-bgcolor" >3</span>  其他情况</div>
+        <div class="weui-cells weui-cells_form">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.others.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.others }}</div>
             </div>
-
             <div class="weui-btn-area">
-                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >下一步</button>
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
             </div>
         </div>
         </form>

@@ -1,0 +1,119 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .weui-select{
+        height: 1.47058824em;
+        line-height: 1.47058824;
+    }
+    </style>
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养费用计算</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form id="form1" action="" method="post" enctype="multipart/form-data" onsubmit="return checkeValue();">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top" id="uploader">
+            {% if flag %}
+                <input type="hidden" name="flag" id="flag" value="{{ flag }}">
+            {% endif %}
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.big_dog.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.big_dog }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.middle_dog.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.middle_dog }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.small_dog.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.small_dog }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_type.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.foster_type }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_mode.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.foster_mode }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.begin_time.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.begin_time }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.end_time.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.end_time }}</div>
+            </div>
+
+        </div>
+         {% if flag is None and request.session.is_member%}
+        <div class="weui-cells__title">选中寄养宠物</div>
+        <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
+            {% for pet in pets %}
+            <label class="weui-cell weui-check__label" for="id_{{ pet.id }}"style="width: 38%;min-width: 38%;max-width: 38%">
+                <div class="weui-cell__hd">
+                    <input type="checkbox" class="weui-check" name="pet_list" value="{{ pet.id }}" id="id_{{ pet.id }}" checked>
+                    <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd"><p>{{ pet.name }}</p></div>
+                <div class="weui-cell__ft"></div>
+            </label>
+            {% endfor %}
+        </div>
+         {% endif %}
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >提交</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    function checkeValue(){
+
+       var bigCount =  $("#id_big_dog").val();
+       var midCount =  $("#id_middle_dog").val();
+       var smlCount =  $("#id_small_dog").val();
+
+       var nCount = parseInt(bigCount) || parseInt(midCount) || parseInt(smlCount);
+
+        if( nCount == 0 || isNaN(nCount) ){
+             weui.alert("请填写寄养宠物数量");
+             $("#id_big_dog").focus();
+            return false
+        }
+       var begin_time = $("#id_begin_time").val();
+       var end_time = $("#id_end_time").val();
+       var curDate = getCurrDate();
+
+       if( begin_time < curDate ){
+           weui.alert("开始时间不能小于当前时间");
+           $("#id_begin_time").focus();
+           return false
+       }
+        if( end_time < begin_time ){
+           weui.alert("结束时间不能小于开始时间");
+           $("#id_end_time").focus();
+           return false
+       }
+      {% if flag is None and request.session.is_member%}
+       if($("input[name='pet_list']:checked").size()==0){
+           weui.alert("请选择要寄养宠物");
+           return false
+       }
+      {% endif %}
+       showing();
+    }
+    </script>
+{% endblock bottomjs %}

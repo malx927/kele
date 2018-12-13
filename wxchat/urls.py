@@ -93,6 +93,7 @@ urlpatterns = [
 
     #我的
     url(r'^myinfo/$', myInfo,name='my-info'),
+    url(r'^contactinfo/$', TemplateView.as_view(template_name="wxchat/contact_info.html"), name='contact-info'),
 
     #微信支付
     url(r'^pay/paylist$', payList,name='pay-list'),

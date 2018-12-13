@@ -16,6 +16,21 @@ def getSceneMaxValue():
      else:
         return 1
 
+
+
+#员工角色
+class MemberRole(models.Model):
+    name = models.CharField(verbose_name="角色名称", max_length=20)
+    remark = models.CharField(verbose_name="说明", max_length=100, blank=True, null=True)
+
+    class Meta:
+        verbose_name = "员工角色"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
 class WxUserinfo(models.Model):
     subscribe = models.NullBooleanField(verbose_name='是否订阅', default=0)
     openid = models.CharField(verbose_name='唯一标识', max_length=120)
@@ -39,6 +54,7 @@ class WxUserinfo(models.Model):
     qr_image = models.ImageField(verbose_name='场景图片', upload_to='wxchat', blank=True, null=True)
     qr_time = models.DateTimeField(verbose_name='图片创建时间', blank=True, null=True)
     company_member = models.BooleanField(verbose_name='公司员工', default=False, blank=True)
+    member_role = models.ForeignKey(MemberRole, verbose_name="员工角色", blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.nickname

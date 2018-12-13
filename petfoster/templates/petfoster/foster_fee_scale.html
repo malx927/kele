@@ -6,20 +6,28 @@
     }
     .claim_content{
         font-size: 14px;
-        color: #6C6C6C;
+        color: #201a1a;
         margin-right: 20px;
         margin-left: 5px;
     }
     .badge{
         margin-left:15px;
         margin-right:4px;
-        background-color: #4e9f78;
+        background-color: #bbc0be;
+    }
+     .notice_title{
+         color: #f46253;
+     }
+     .notice_badge{
+        margin-left:15px;
+        margin-right:4px;
+        background-color: #f46253;
     }
 </style>
 {% endblock %}
 {% block container %}
-<div class="weui-tab" id="tab">
-    <div class="weui-tab__panel">
+{#<div class="weui-tab" id="tab">#}
+{#    <div class="weui-tab__panel">#}
       <div class="weui-panel weui-panel_access">
        <div class="weui-panel__hd">
             <div class="weui-flex">
@@ -51,15 +59,27 @@
                  {% endfor %}
                 {% endfor %}
               {% endfor %}
+                 <div class="weui-cell">
+                    <div class="weui-cell__hd"></div>
+                    <div class="weui-cell__bd notice_title"><p>*寄养注意事项</p></div>
+                    <div class="weui-cell__ft"></div>
+                 </div>
+                  {% for notice in notices %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><span class="weui-badge badge" >{{forloop.counter}}</span>  </div>
+                        <div class="weui-cell__bd"><p>{{notice.title}}</p></div>
+                        <div class="weui-cell__ft" ></div>
+                    </div>
+                  {% endfor %}
           </div>
         </div>
       </div>
-    </div>
-    <div class="weui-tabbar">
-         <a href="{% url 'foster-pet-info' %}" class="weui-tabbar__item tabbar_item ">
-            <p class="weui-tabbar__label bg_red" style="font-size:18px;"><i class="icon iconfont icon-buy2" ></i> 寄养预约</p>
-        </a>
-    </div>
-</div>
+{#    </div>#}
+{#    <div class="weui-tabbar">#}
+{#         <a href="{% url 'foster-pet-agreement' %}" class="weui-tabbar__item tabbar_item ">#}
+{#            <p class="weui-tabbar__label bg_red" style="font-size:18px;"><i class="icon iconfont icon-buy2" ></i> 下一步</p>#}
+{#        </a>#}
+{#    </div>#}
+{#</div>#}
 
 {% endblock container %}

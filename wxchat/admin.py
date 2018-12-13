@@ -2,11 +2,17 @@ from django.contrib import admin
 
 # Register your models here.
 from .models import WxUserinfo,Menu,SwiperImage,WxPayResult,WxUnifiedOrdeResult,OrderAddress, WxIntroduce
-from .models import WxTemplateMsgUser
+from .models import WxTemplateMsgUser, MemberRole
+
+
+@admin.register(MemberRole)
+class MemberRoleAdmin(admin.ModelAdmin):
+    list_display = ['name', 'remark']
+
 
 @admin.register(WxUserinfo)
 class WxUserinfoAdmin(admin.ModelAdmin):
-    list_display = ['openid', 'nickname', 'sex', 'province', 'city', 'country', 'subscribe', 'subscribe_time','company_member', 'is_member']
+    list_display = ['openid', 'nickname', 'sex', 'province', 'city', 'country', 'subscribe', 'subscribe_time','company_member', 'is_member','member_role']
 
 
 @admin.register(Menu)

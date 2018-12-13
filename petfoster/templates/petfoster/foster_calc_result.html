@@ -1,0 +1,75 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养费用结果</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <div class="weui-cells weui-cells_form cells_top">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_type.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.instance.foster_type }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_mode.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.instance.foster_mode }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间:</label></div>
+                <div class="weui-cell__bd">{{ form.begin_time.value }} 至 {{ form.end_time.value }}</div>
+            </div>
+        </div>
+        <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
+            <div class="weui-cell" style="width:35%">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.big_dog.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.big_dog.value }}</div>
+            </div>
+            <div class="weui-cell" style="width:55%">
+                <div class="weui-cell__hd"><label class="weui-label">每日费用(元):</label></div>
+                <div class="weui-cell__bd color-danger">{{ result_data.big_price|floatformat:2 }}</div>
+            </div>
+         </div>
+         <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
+            <div class="weui-cell" style="width:35%">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.middle_dog.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.middle_dog.value }}</div>
+            </div>
+             <div class="weui-cell" style="width:55%">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">每日费用(元):</label>
+                </div>
+                <div class="weui-cell__bd color-danger">{{ result_data.mid_price|floatformat:2 }}</div>
+            </div>
+        </div>
+         <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
+            <div class="weui-cell" style="width:35%">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.small_dog.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.small_dog.value }}</div>
+            </div>
+             <div class="weui-cell" style="width:55%">
+                <div class="weui-cell__hd"><label for="" class="weui-label">每日费用(元):</label></div>
+                <div class="weui-cell__bd color-danger">{{ result_data.sml_price|floatformat:2 }}</div>
+            </div>
+        </div>
+         <div class="weui-cells weui-cells_form cells_top">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间(天):</label></div>
+                <div class="weui-cell__bd color-danger">{{ result_data.days|floatformat:0 }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">费用合计(元):</label></div>
+                <div class="weui-cell__bd color-danger">{{ result_data.total_price|floatformat:2 }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}

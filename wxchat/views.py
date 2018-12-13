@@ -328,6 +328,7 @@ def redirectUrl(request, item):
         userinf = get_object_or_404(WxUserinfo, openid=openid)
         request.session['is_member'] = userinf.is_member
         request.session['headimgurl'] = userinf.headimgurl
+        request.session['role'] = userinf.member_role.id if userinf.member_role else 0
 
         redirect_url = getUrl(item)
         return HttpResponseRedirect(redirect_url)
@@ -1277,11 +1278,19 @@ def sendTempMessageToUser( order, type=0 ):
 #{{first.DATA}} 商品名称：{{product.DATA}} 商品价格：{{price.DATA}} 购买时间：{{time.DATA}}{{remark.DATA}}
 def sendTemplateMesToKf(instance):
     template_kf = 'w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays'
-    url ="{0}{1}?out_trade_no={2}&flag=get".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
+    out_trade_no = instance.out_trade_no
+    url = name = ""
+    if out_trade_no.startWith("S"):
+        url ="{0}{1}?out_trade_no={2}&flag=get".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
+        name = "{0}成功购买宠物保险".format(instance.name)
+    elif out_trade_no.startWith("F"):
+        url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
+        name = "宠物寄养订单"
+
     color = "#173177"
     kf_data ={
         'first':{
-            "value":"{0}成功购买宠物保险".format(instance.name),
+            "value":name,
             "color":color
         },
         "product":{
@@ -1309,6 +1318,13 @@ def sendTemplateMesToKf(instance):
 
 
 def dogIndex(request):
+    if 'HTTP_X_FORWARDED_FOR' in request.META:
+        ip =  request.META['HTTP_X_FORWARDED_FOR']
+        print("ip1=",ip)
+    else:
+        ip = request.META['REMOTE_ADDR']
+        print("ip2=",ip)
+
     return render(request, 'wxchat/dogindex.html')
 
 

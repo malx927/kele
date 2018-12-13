@@ -1,4 +1,5 @@
 import datetime
+from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
 
 # Create your models here.
@@ -39,6 +40,20 @@ class FosterType(models.Model):
         verbose_name = u"02.寄养类型"
         verbose_name_plural = verbose_name
 
+class FosterMode(models.Model):
+    name = models.CharField(verbose_name='寄养方式', max_length=32)
+    comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
+
+    def __str__(self):
+        return  self.name
+
+    def title(self):
+        return "{0}({1})".format( self.name, self.comment)
+
+    class Meta:
+        verbose_name = u"02.寄养方式"
+        verbose_name_plural = verbose_name
+
 class PetType(models.Model):
     name = models.CharField(verbose_name='宠物类型', max_length=32)
     comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
@@ -50,6 +65,19 @@ class PetType(models.Model):
         verbose_name = u"01.宠物类型"
         verbose_name_plural = verbose_name
 
+
+class FosterPrice(models.Model):
+    foster_type = models.ForeignKey(FosterType, verbose_name='寄养类型', on_delete=models.SET_NULL, blank=True, null=True)
+    pet_type = models.ForeignKey(PetType, verbose_name='宠物类型', on_delete=models.SET_NULL, blank=True, null=True)
+    vipprice = models.IntegerField(verbose_name="会员价")
+    price = models.IntegerField(verbose_name="非会员价")
+
+    def __str__(self):
+        return "{0}-{1}".format( self.foster_type,self.pet_type)
+
+    class Meta:
+        verbose_name = u"03.寄养价格表"
+        verbose_name_plural = verbose_name
 
 class FosterNotice(models.Model):
     title = models.CharField(verbose_name='说明', max_length=128)
@@ -66,6 +94,8 @@ class FosterNotice(models.Model):
 class FosterRoom(models.Model):
     name = models.CharField(verbose_name='房间名称', max_length=32)
     comment = models.CharField(verbose_name='备注', max_length=64, null=True, blank=True)
+    petcounts = models.IntegerField(verbose_name="宠物数量", blank=True, null=True, default=0)
+
     def __str__(self):
         return  self.name
 
@@ -92,7 +122,7 @@ class FosterStandard(models.Model):
 
 #寄养宠物信息
 class PetFosterInfo(models.Model):
-    name = models.CharField(verbose_name=u'宠物名称', max_length=24 )
+    name = models.CharField(verbose_name=u'宠物昵称', max_length=24 )
     birthdate = models.DateField(verbose_name=u'出生日期', default=timezone.now)
     type = models.CharField(verbose_name=u'品种', max_length=24)
     color = models.CharField(verbose_name=u'毛色', max_length=32)
@@ -106,8 +136,11 @@ class PetFosterInfo(models.Model):
     openid = models.CharField(verbose_name='微信标识', max_length=120, null=True, blank=True)
     room = models.ForeignKey(FosterRoom, verbose_name='房间', blank=True, null=True, on_delete=models.SET_NULL)
     trainer = models.ForeignKey(WxUserinfo, verbose_name='驯养师',  blank=True, null=True, on_delete=models.SET_NULL )
-    set_time = models.DateTimeField(verbose_name=u'分配时间', null=True, blank=True )
-    is_complete = models.BooleanField(verbose_name="是否寄养",default=False)
+    foster_type = models.ForeignKey(FosterType, verbose_name="寄养方式", blank=True, null=True, on_delete=models.SET_NULL)
+    begin_time = models.DateTimeField(verbose_name="开始时间", blank=True, null=True)
+    end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
+    set_time = models.DateField(verbose_name=u'分配时间', null=True, blank=True )
+    is_end = models.BooleanField(verbose_name="寄养结束",default=False)
 
     class Meta:
         verbose_name = u"06.寄养宠物信息"
@@ -124,6 +157,7 @@ class FosterDemand(models.Model):
     defecation = models.CharField(verbose_name='排便情况', max_length=128)
     others = models.CharField(verbose_name='其他情况', max_length=128)
     create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, null=True, blank=True)
 
 
     def __str__(self):
@@ -278,3 +312,84 @@ class ClaimProcess(models.Model):
     class Meta:
         verbose_name = "13.理赔流程"
         verbose_name_plural = verbose_name
+
+
+#宠物主人
+class PetOwner(models.Model):
+    openid  = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
+    name    = models.CharField(verbose_name="姓名", max_length=32, blank=True, null=True)
+    telephone = models.CharField(verbose_name="电话", max_length=16, blank=True, null=True)
+    address = models.CharField(verbose_name="地址", max_length=128, blank=True, null=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "宠物主人信息"
+        verbose_name_plural = verbose_name
+
+
+#寄养方式选择
+class FosterStyleChoose(models.Model):
+    big_dog = models.IntegerField(verbose_name="大型犬",  blank=True, null=True)
+    middle_dog = models.IntegerField(verbose_name="中型犬",  blank=True, null=True)
+    small_dog = models.IntegerField(verbose_name="小型犬",  blank=True, null=True)
+    foster_type = models.ForeignKey(FosterType, verbose_name="寄养类型")
+    foster_mode = models.ForeignKey(FosterMode, verbose_name='寄养方式')
+    begin_time = models.DateField(verbose_name="开始时间")
+    end_time = models.DateField(verbose_name="结束时间")
+    big_price = models.IntegerField(verbose_name="大型价格", default=0, blank=True, null=True)
+    middle_price = models.IntegerField(verbose_name="中型价格", default=0, blank=True, null=True)
+    small_price = models.IntegerField(verbose_name="小型价格", default=0, blank=True, null=True)
+    total_price = models.DecimalField(verbose_name="应收款", max_digits=7, decimal_places=2, blank=True, null=True)
+    room = models.ForeignKey(FosterRoom, verbose_name="房间", blank=True, null=True)
+    openid     = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
+    out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True)
+    cash_fee   = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    status     = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    pay_time   = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
+    transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
+    pet_list = models.CharField(validators=[validate_comma_separated_integer_list],max_length=100, blank=True, null=True, default='')
+    create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
+
+    def __str__(self):
+        return self.foster_type.name
+
+    class Meta:
+        verbose_name = "14.寄养方式选择"
+        verbose_name_plural = verbose_name
+        ordering = ("-status", '-create_time')
+
+    def get_totals(self):
+        big_dog = self.big_dog if self.big_dog else 0
+        middle_dog = self.middle_dog if self.middle_dog else 0
+        small_dog = self.small_dog if self.small_dog else 0
+        return  big_dog + middle_dog  + small_dog
+
+    def get_days(self):
+        return (self.end_time - self.begin_time).days + 1
+
+    def get_total_price(self):
+        days = self.get_days()
+        return (self.big_price + self.middle_price + self.small_price) * days
+
+    def big_total_cost(self):
+        days = self.get_days()
+        return self.big_price  * days
+
+    def middle_total_cost(self):
+        days = self.get_days()
+        return self.middle_price  * days
+
+    def small_total_cost(self):
+        days = self.get_days()
+        return self.small_price  * days
+
+    def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
+        self.status = status
+        self.transaction_id = transaction_id
+        self.cash_fee = cash_fee
+        self.pay_time = pay_time
+        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
+

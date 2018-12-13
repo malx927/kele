@@ -8,3 +8,21 @@
 .nav_return a{
     color:#fff;
 }
+
+.flex{
+    display: flex;
+}
+
+.flex_wrap{
+    display: flex;
+    flex-wrap: wrap;
+    width:100%;
+}
+
+.badge{
+    margin-left:8px;
+    margin-right:12px;
+}
+.badge-bgcolor{
+   background-color:  #4e9f78;
+}

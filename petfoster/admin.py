@@ -1,8 +1,8 @@
 from django.contrib import admin
 
 from .models import FosterType, PetType, FosterStandard, FosterNotice, PetFosterInfo, FosterDemand, FosterRoom
-from .models import FosterAgreement, HandOverList, PetFeedNote, PetGameNote
-from .models import PetInsurance, InsurancePlan, ClaimProcess
+from .models import FosterAgreement, HandOverList, PetFeedNote, PetGameNote, FosterMode
+from .models import PetInsurance, InsurancePlan, ClaimProcess, FosterPrice, FosterStyleChoose
 # Register your models here.
 
 @admin.register(FosterType)
@@ -10,10 +10,21 @@ class FosterTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'comment')
     list_display_links = ('name',)
 
+@admin.register(FosterMode)
+class FosterModeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'comment')
+    list_display_links = ('name',)
+
+
 @admin.register(PetType)
 class PetTypeAdmin(admin.ModelAdmin):
     list_display = ('name', 'comment')
     list_display_links = ('name',)
+
+@admin.register(FosterPrice)
+class FosterPriceAdmin(admin.ModelAdmin):
+    list_display = ('foster_type', 'pet_type','vipprice','price')
+    list_display_links = ('foster_type', 'pet_type')
 
 
 @admin.register(FosterStandard)
@@ -38,7 +49,7 @@ class FosterDemandInline(admin.TabularInline):
 
 @admin.register(PetFosterInfo)
 class PetFosterInfoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'birthdate','type','color','sex','picture','sterilization','owner','telephone','is_complete' )
+    list_display = ('name', 'birthdate','type','color','sex','sterilization','owner','telephone','room','foster_type','begin_time','begin_time','is_end' )
     list_display_links = ('name','birthdate','type')
     list_per_page = 50
     inlines = [FosterDemandInline]
@@ -46,7 +57,7 @@ class PetFosterInfoAdmin(admin.ModelAdmin):
 
 @admin.register(FosterRoom)
 class FosterRoomAdmin(admin.ModelAdmin):
-    list_display = ('name', 'comment')
+    list_display = ('name', 'comment','petcounts')
     list_display_links = ('name',)
     list_per_page = 50
 
@@ -78,16 +89,9 @@ class PetGameNoteAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
-
-# class ClaimProcess(models.Model):
-#     name = models.CharField(verbose_name="流程名称", max_length=24)
-#     content = models.CharField(verbose_name="具体流程", max_length=300)
-#     sort = models.IntegerField(verbose_name="序号",)
-
-
 @admin.register(PetInsurance)
 class PetInsuranceAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'time_limit', 'money','license','immune','immune_image','id_card','telephone','email' )
+    list_display = ('name', 'type','status', 'time_limit', 'money','license','immune','immune_image','id_card','telephone','email' )
     list_display_links = ('name','type')
     list_per_page = 50
 
@@ -102,3 +106,14 @@ class ClaimProcessAdmin(admin.ModelAdmin):
     list_display = ('name','content','sort' )
     list_display_links = ('name',)
     list_per_page = 50
+
+
+@admin.register(FosterStyleChoose)
+class FosterStyleChooseAdmin(admin.ModelAdmin):
+    list_display = ('foster_type', 'big_dog','big_price','middle_dog','middle_price','small_dog','small_price', 'begin_time','end_time','total_price','room','cash_fee','status','out_trade_no' )
+    list_display_links = ('foster_type',)
+    list_filter = ['foster_type','foster_mode', ]
+    search_fields = ['out_trade_no']
+    date_hierarchy = 'begin_time'
+    list_per_page = 50
+

@@ -4,27 +4,35 @@
     {% include "shopping/include/myheader.html" %}
     <div class="page_body">
         <div class="weui-grids">
+            {% if request.session.role == 2 or request.session.role == 1 %}
             <a id="pet_loss" href="javascript:void(0);" class="weui-grid weui-grid_4">
                 <div class="weui-grid__icon">
-                    <i class="icon iconfont icon-zengsong1"></i>
+                    <i class="icon iconfont icon-ichongwu"></i>
                 </div>
-                <p class="weui-grid__label">我的预约</p>
+                <p class="weui-grid__label">寄养宠物</p>
             </a>
-            <a id="pet_loss" href="javascript:void(0);" class="weui-grid weui-grid_4">
+            {% endif %}
+             <a href="{% url 'foster-order' %}" class="weui-grid weui-grid_4">
                 <div class="weui-grid__icon">
-                             <i class="icon iconfont icon-gongxianggeiwo"></i>
+                    <i class="icon iconfont icon-orderlisto"></i>
+                </div>
+                <p class="weui-grid__label">寄养订单</p>
+            </a>
+            <a id="pet_loss" href="{% url 'contact-info' %}" class="weui-grid weui-grid_4">
+                <div class="weui-grid__icon">
+                     <i class="icon iconfont icon-gongxianggeiwo"></i>
                 </div>
                 <p class="weui-grid__label">关于我们</p>
             </a>
             <a id="pet_loss" href="javascript:void(0);" class="weui-grid weui-grid_4">
                 <div class="weui-grid__icon">
-                             <i class="icon iconfont icon-shangcheng2"></i>
+                    <i class="icon iconfont icon-shangcheng2"></i>
                 </div>
                 <p class="weui-grid__label">联盟商家</p>
             </a>
             <a id="pet_loss" href="javascript:void(0);" class="weui-grid weui-grid_4">
                 <div class="weui-grid__icon">
-                             <i class="icon iconfont icon-man12"></i>
+                     <i class="icon iconfont icon-man12"></i>
                 </div>
                 <p class="weui-grid__label">设置</p>
             </a>

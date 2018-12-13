@@ -1,10 +1,10 @@
 #-*-coding:utf-8-*-
 from django.forms import ClearableFileInput
-
+import datetime
 __author__ = 'malxin'
 
 from django import forms
-from .models import PetInsurance, PetFosterInfo, FosterDemand
+from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose
 
 
 #宠物保险登记表单
@@ -26,6 +26,7 @@ class PetInsuranceForm(forms.ModelForm):
         self.fields['license'].widget.attrs['placeholder'] = '请输入身份证后六位'
 
         self.fields['copies'].widget.attrs['class'] = 'weui-select'
+        self.fields['copies'].empty_label = "份数"
 
         self.fields['immune'].widget.attrs['class'] = 'weui-input'
         self.fields['immune'].widget.attrs['placeholder'] = '请输入身份证后六位'
@@ -72,6 +73,7 @@ class PetFosterInfoForm(forms.ModelForm):
 
         self.fields['birthdate'].widget.attrs['class'] = 'weui-input'
         self.fields['birthdate'].widget.attrs['placeholder'] = '请选择时间'
+        self.fields["birthdate"].initial = datetime.date.today()
 
         self.fields['type'].widget.attrs['class'] = 'weui-input'
         self.fields['type'].widget.attrs['placeholder'] = '请输入宠物品种'
@@ -80,8 +82,10 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['color'].widget.attrs['placeholder'] = '请输入宠物毛色'
 
         self.fields['sex'].widget.attrs['class'] = 'weui-select'
+        self.fields['sex'].empty_label='请选择性别'
 
         self.fields['sterilization'].widget.attrs['class'] = 'weui-select'
+        self.fields['sterilization'].empty_label='请选择'
 
         self.fields['owner'].widget.attrs['class'] = 'weui-input'
         self.fields['owner'].widget.attrs['placeholder'] = '请输入姓名'
@@ -110,7 +114,8 @@ class FosterDemandForm(forms.ModelForm):
     def __init__(self, *args,**kwargs):
         super(FosterDemandForm,self).__init__(*args,**kwargs)
 
-        self.fields['pet'].widget.attrs['class'] = 'weui-select'
+        self.fields['pet'].widget.attrs['class'] = 'weui-input'
+        self.fields['pet'].widget.attrs['readonly'] = 'true'
 
         self.fields['day_meals'].widget.attrs['class'] = 'weui-input'
         self.fields['day_meals'].widget.attrs['placeholder'] = '请输入每天几餐'
@@ -121,14 +126,52 @@ class FosterDemandForm(forms.ModelForm):
         self.fields['extra_meal'].widget.attrs['class'] = 'weui-input'
         self.fields['extra_meal'].widget.attrs['placeholder'] = '请输入加餐情况'
 
-        self.fields['defecation'].widget.attrs['class'] = 'weui-input'
-        self.fields['defecation'].widget.attrs['placeholder'] = '排便情况'
-
-        self.fields['others'].widget.attrs['class'] = 'weui-input'
-        self.fields['others'].widget.attrs['placeholder'] = '其他情况'
+        # self.fields['defecation'].widget.attrs['class'] = 'weui-input'
+        # self.fields['defecation'].widget.attrs['placeholder'] = '排便情况'
+        #
+        # self.fields['others'].widget.attrs['class'] = 'weui-input'
+        # self.fields['others'].widget.attrs['placeholder'] = '其他情况'
 
 
     class Meta:
         model = FosterDemand
-        fields = ['id','pet','day_meals','meals_nums','extra_meal','defecation','others']
+        fields = ['pet','day_meals','meals_nums','extra_meal','defecation','others']
+        widgets = {
+            'defecation': forms.Textarea({'class': 'weui-textarea', 'placeholder': '排便情况', 'rows': '2'}),
+            'others': forms.Textarea({'class': 'weui-textarea', 'placeholder': '其他情况', 'rows': '2'})
+        }
+
+
+#寄养方式选择
+class FosterStyleChooseForm(forms.ModelForm):
+
+    def __init__(self, *args,**kwargs):
+        super(FosterStyleChooseForm,self).__init__(*args,**kwargs)
+
+        self.fields['big_dog'].widget.attrs['class'] = 'weui-input'
+        self.fields['big_dog'].widget.attrs['placeholder'] = '大型犬数量'
+
+        self.fields['middle_dog'].widget.attrs['class'] = 'weui-input'
+        self.fields['middle_dog'].widget.attrs['placeholder'] = '中型犬数量'
+
+        self.fields['small_dog'].widget.attrs['class'] = 'weui-input'
+        self.fields['small_dog'].widget.attrs['placeholder'] = '小型犬数量'
+
+        self.fields['foster_type'].widget.attrs['class'] = 'weui-select'
+        self.fields['foster_type'].empty_label='寄养类型'
+
+        self.fields['foster_mode'].widget.attrs['class'] = 'weui-select'
+        self.fields['foster_mode'].empty_label = '寄养方式'
+        #
+        # self.fields['end_time'].widget.attrs['class'] = 'weui-input'
+        # self.fields['end_time'].widget.attrs['placeholder'] = '其他情况'
+
+    class Meta:
+        model = FosterStyleChoose
+        fields = ['big_dog','middle_dog','small_dog','foster_type','foster_mode','begin_time','end_time','pet_list']
+        widgets = {
+             'begin_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
+             'end_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
+        }
+
 
