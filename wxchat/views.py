@@ -1280,10 +1280,10 @@ def sendTemplateMesToKf(instance):
     template_kf = 'w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays'
     out_trade_no = instance.out_trade_no
     url = name = ""
-    if out_trade_no.startWith("S"):
+    if out_trade_no.startswith("S"):
         url ="{0}{1}?out_trade_no={2}&flag=get".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
         name = "{0}成功购买宠物保险".format(instance.name)
-    elif out_trade_no.startWith("F"):
+    elif out_trade_no.startswith("F"):
         url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
         name = "宠物寄养订单"
 

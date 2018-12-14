@@ -37,8 +37,8 @@
                 <a class="weui-btn weui-btn_primary btn_size"  id="myfoster" href="#">我要寄养</a>
             </div>
             <div id="op_list">
-{#                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member" {% if request.session.is_member %}  href="{% url 'foster-pet-list'  %}" {% endif %}>会员</a>#}
-                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member"  href="{% url 'foster-pet-list'  %}">会员</a>
+                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member" {% if request.session.is_member %}  href="{% url 'foster-pet-list'  %}" {% endif %}>会员</a>
+{#                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member"  href="{% url 'foster-pet-list'  %}">会员</a>#}
                 <a class="weui-btn weui-btn_plain-primary btn_size"  id="common"  href="{% url 'foster-fee-scale'  %}">非会员</a>
             </div>
         </div>

@@ -6,7 +6,7 @@
     wx.ready(function () {
         $('#pay_now').on('click',function(){
             var params ={
-              out_trade_no: $("#id").text(),
+              id: $("#id").text(),
               csrfmiddlewaretoken:'{{ csrf_token }}',
             }
 
@@ -38,7 +38,7 @@
                     if (res.errMsg == "chooseWXPay:ok") {
                         window.location.replace('{% url "foster-success" %}');
                     } else {
-                       weui.alert('保险支付失败!');
+                       weui.alert('宠物寄养订单支付失败!');
                     }
                   },
                    cancel: function(res) {

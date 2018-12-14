@@ -187,9 +187,9 @@ def insuranceNotify(request):
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
                 try:
                     instance = None
-                    if out_trade_no.startWidth('S'):    #保险
+                    if out_trade_no.startswith('S'):    #保险
                         instance = PetInsurance.objects.get(openid=openid, out_trade_no=out_trade_no)
-                    elif out_trade_no.startWidth('F'):  #寄养
+                    elif out_trade_no.startswith('F'):  #寄养
                         instance = FosterStyleChoose.objects.get(openid=openid, out_trade_no=out_trade_no)
 
                     if instance.status==0:
@@ -394,15 +394,17 @@ class FosterPayView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            id = request.GET.get("id")
+            id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get(pk=int(id))
             pet_ids = instance.pet_list
             petList = pet_ids.split(',')
 
             pets = PetFosterInfo.objects.filter(id__in=petList)
-
-            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance,"pets":pets})
+            signPackage = getJsApiSign(self.request)
+            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance,"pets":pets,'sign': signPackage})
         except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponseRedirect(reverse("foster-style-calc"))
+        except:
             return HttpResponseRedirect(reverse("foster-style-calc"))
 
 
@@ -463,7 +465,6 @@ class FosterOrderView(View):
         if id is None:
             user_id = request.session.get("openid", None)
             role = request.session.get("role", None)
-            user_id = 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
             if user_id:
                 if role == 1 or role == 2:
                     fosterOrders = FosterStyleChoose.objects.filter(status=1)

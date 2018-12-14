@@ -300,6 +300,7 @@ class InsurancePlan(models.Model):
         verbose_name = "12.保险内容"
         verbose_name_plural = verbose_name
 
+
 class ClaimProcess(models.Model):
     name = models.CharField(verbose_name="流程名称", max_length=24)
     content = models.CharField(verbose_name="具体流程", max_length=300)
@@ -329,7 +330,7 @@ class PetOwner(models.Model):
         verbose_name_plural = verbose_name
 
 
-#寄养方式选择
+# 寄养订单
 class FosterStyleChoose(models.Model):
     big_dog = models.IntegerField(verbose_name="大型犬",  blank=True, null=True)
     middle_dog = models.IntegerField(verbose_name="中型犬",  blank=True, null=True)
@@ -356,7 +357,7 @@ class FosterStyleChoose(models.Model):
         return self.foster_type.name
 
     class Meta:
-        verbose_name = "14.寄养方式选择"
+        verbose_name = "14.寄养订单"
         verbose_name_plural = verbose_name
         ordering = ("-status", '-create_time')
 
