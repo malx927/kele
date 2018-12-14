@@ -16,11 +16,16 @@ class GoodsAdmin(admin.ModelAdmin):
     list_display = ('name', 'show_goodstype', 'price', 'benefits', 'scores', 'stock_nums', 'click_nums', 'is_show','sort'  )
     list_filter =('goodstype',)
     search_fields = ('name',)
-    # filter_horizontal=('goodstype',)
     list_per_page = 50
+    actions = ['make_goods_hidden', 'make_goods_show']
 
-    # def show_goodstype(self,obj):
-    #     return [type.name for type in obj.goodstype.all() ]
+    def make_goods_hidden(self, request, queryset):
+        queryset.update(is_show=False)
+    make_goods_hidden.short_description = "商品下架"
+
+    def make_goods_show(self, request, queryset):
+        queryset.update(is_show=True)
+    make_goods_show.short_description = "商品上架"
 
 
 class OrderItemInline(admin.TabularInline):
