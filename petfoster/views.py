@@ -479,3 +479,20 @@ class FosterOrderView(View):
             return HttpResponseRedirect(url)
 
 
+class FosterOrderDetailView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            out_trade_no = kwargs.get("out_trade_no", None)
+            instance = FosterStyleChoose.objects.get(out_trade_no=out_trade_no, status=1)
+            pet_ids = instance.pet_list
+            petList = pet_ids.split(',')
+            pets = PetFosterInfo.objects.filter(id__in=petList)
+            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance,"pets":pets})
+        except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponseRedirect(reverse("foster-style-calc"))
+        except:
+            return HttpResponseRedirect(reverse("foster-style-calc"))
+
+
+

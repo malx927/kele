@@ -5,7 +5,8 @@ __author__ = 'malxin'
 from django.conf.urls import url
 from django.views.generic import TemplateView
 
-from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView
+from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
+   FosterOrderDetailView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView
 
@@ -29,4 +30,5 @@ urlpatterns = [
    url(r'^fostercalc/$', FosterCalculateView.as_view(), name='foster-style-calc'),
    url(r'^fosterorder/$', FosterOrderView.as_view(), name='foster-order'),
    url(r'^fosterorder/(?P<id>\d+)/$', FosterOrderView.as_view(), name='foster-order-detail'),
+   url(r'^fosterorderdetail/(?P<out_trade_no>\w+)/$', FosterOrderDetailView.as_view(), name='foster-order-detail-over'),
 ]

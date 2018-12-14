@@ -1284,7 +1284,7 @@ def sendTemplateMesToKf(instance):
         url ="{0}{1}?out_trade_no={2}&flag=get".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
         name = "{0}成功购买宠物保险".format(instance.name)
     elif out_trade_no.startswith("F"):
-        url ="{0}{1}?out_trade_no={2}".format(settings.ROOT_URL, reverse("insurance-index"), instance.out_trade_no )
+        url ="{0}{1}".format(settings.ROOT_URL, reverse("foster-order-detail-over", args=(instance.out_trade_no,)) )
         name = "宠物寄养订单"
 
     color = "#173177"

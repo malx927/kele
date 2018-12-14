@@ -75,6 +75,16 @@
                     </div>
                 </div>
                 <div class="weui-cells  cells_top">
+                    {% if instance.status == 1 %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
+                        <div class="weui-cell__bd">{{ instance.out_trade_no }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">支付时间:</label></div>
+                        <div class="weui-cell__bd">{{ instance.pay_time }}</div>
+                    </div>
+                    {% endif %}
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">寄养类型:</label></div>
                         <div class="weui-cell__bd">{{ instance.foster_type }}</div>
