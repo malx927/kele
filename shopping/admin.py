@@ -108,7 +108,7 @@ class MemberRechargeAmountAdmin(admin.ModelAdmin):
 
 @admin.register(MemberDeposit)
 class MemberDepositAdmin(admin.ModelAdmin):
-    list_display = ['openid', 'nickname', 'total_money', 'prev_money' ,'add_time']
+    list_display = ['openid', 'nickname', 'total_money', 'consume_money', 'prev_money' ,'add_time', 'balance']
     list_per_page = 50
     search_fields = ['openid', 'nickname']
 

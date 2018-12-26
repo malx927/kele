@@ -338,8 +338,9 @@ class MemberRechargeAmount(models.Model):
 class MemberDeposit(models.Model):
     openid = models.CharField(verbose_name='微信标识', max_length=120)
     nickname = models.CharField(verbose_name="昵称", max_length=64, blank=True, null=True)
-    total_money = models.DecimalField(verbose_name="储值金额", max_digits=10, decimal_places=2)
-    prev_money = models.DecimalField(verbose_name="上次储值金额", max_digits=10, decimal_places=2)
+    total_money = models.DecimalField(verbose_name="储值总金额", max_digits=10, decimal_places=2, default=0)
+    consume_money = models.DecimalField(verbose_name='消费总金额', max_digits=10, decimal_places=2, default=0)
+    prev_money = models.DecimalField(verbose_name="上次储值金额", max_digits=10, decimal_places=2, default=0)
     add_time = models.DateTimeField(verbose_name="充值时间",)
 
     class Meta:
@@ -348,6 +349,12 @@ class MemberDeposit(models.Model):
 
     def __str__(self):
         return "{0}-{1}".format(self.nickname, self.total_money)
+
+    def balance(self):
+        return self.total_money - self.consume_money
+    balance.short_description = "余额"
+
+
 
 
 # 会员充值明细
