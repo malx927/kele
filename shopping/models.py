@@ -337,7 +337,7 @@ class MemberRechargeAmount(models.Model):
 # 会员储值表
 class MemberDeposit(models.Model):
     openid = models.CharField(verbose_name='微信标识', max_length=120)
-    nickname = models.CharField(verbose_name="昵称", max_length=64)
+    nickname = models.CharField(verbose_name="昵称", max_length=64, blank=True, null=True)
     total_money = models.DecimalField(verbose_name="储值金额", max_digits=10, decimal_places=2)
     prev_money = models.DecimalField(verbose_name="上次储值金额", max_digits=10, decimal_places=2)
     add_time = models.DateTimeField(verbose_name="充值时间",)

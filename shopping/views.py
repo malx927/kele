@@ -597,7 +597,7 @@ class RechargeAmountView(View):
         except MemberRechargeAmount.DoesNotExist:
             return HttpResponseRedirect(reverse("member-recharge-amount"))
 
-        if user_id == "oX5Zn04Imn5RlCGlhEVg-aEUCHNs":
+        if user_id == "o0AHP0lpCKyadVWg88KeI5JrafYI":
             total_fee =1
 
         try:
