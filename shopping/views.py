@@ -1,5 +1,5 @@
 #coding:utf-8
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json
 from datetime import datetime
@@ -12,7 +12,8 @@ from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
 from doginfo.models import DogOrder
 from kele import settings
-from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee
+from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
+    MemberRechargeAmount, MemberRechargeRecord, MemberDeposit
 from wxchat.views import getJsApiSign, sendTempMessageToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
@@ -228,7 +229,6 @@ class CreateOrderView(View):
                 order_data['success'] = 'true'
                 order_data['out_trade_no'] = order.out_trade_no
         except Goods.DoesNotExist:
-            print('good does not exist.')
             order_data['goods'] = 'invalid goods'
 
         return order_data
@@ -321,7 +321,7 @@ class PayOrderView(View):
         try:
             data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
             prepay_id = data.get('prepay_id',None)
-            print('aaaa:',prepay_id)
+
             save_data = dict(data)
             #保存统一订单数据
             WxUnifiedOrdeResult.objects.create(**save_data)
@@ -367,23 +367,59 @@ def payNotify(request):
         else:
             #验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
-                order =getShoppingOrder(openid, res_data['out_trade_no'])
-                if order and order.status==0 :
-                    #更新订单
-                    status = 1  #已支付标志
-                    cash_fee = res_data['cash_fee'] / 100
+
+                if out_trade_no.startswith('M'):    # 会员充值
                     time_end = res_data['time_end']
                     pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
-                    order.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
-                    #更新会员积分
-                    setMemberScores( order )
-                    #发送模板消息
-                    if openid:
-                        sendTempMessageToUser( order )
+                    nickname = request.session.get("nickname", None)
+                    cash_fee = res_data['cash_fee'] / 100
+                    data={
+                        "out_trade_no": out_trade_no,
+                        "openid": openid,
+                        "nickname": nickname,
+                        "total_fee": res_data['total_fee'] / 100,
+                        "transaction_id": res_data['transaction_id'],
+                        "cash_fee": cash_fee,
+                        "status": 1,
+                        "pay_time": pay_time
+                    }
+                    MemberRechargeRecord.objects.create(**data)
+                    try:
+                        deposit = MemberDeposit.objects.get(openid=openid)
+                        deposit.total_money += cash_fee
+                        deposit.prev_money = cash_fee
+                        deposit.add_time = pay_time
+                        deposit.save()
+                    except MemberDeposit.DoesNotExist:
+                        values = {
+                            "openid": openid,
+                            "nickname": nickname,
+                            "total_money": cash_fee,
+                            "prev_money": cash_fee,
+                            "add_time": pay_time
+                        }
+                        MemberDeposit.objects.create(**values)
+
+                    #更新储值卡
+
+                else:
+                    order =getShoppingOrder(openid, res_data['out_trade_no'])
+                    if order and order.status==0 :
+                        #更新订单
+                        status = 1  #已支付标志
+                        cash_fee = res_data['cash_fee'] / 100
+                        time_end = res_data['time_end']
+                        pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
+                        order.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
+                        #更新会员积分
+                        setMemberScores( order )
+                        #发送模板消息
+                        if openid:
+                            sendTempMessageToUser( order )
 
         return  HttpResponse(xml)
     except InvalidSignatureException as error:
-        print(error)
+        pass
 
 #查询微信订单是否存在
 def queryOrder( transaction_id, out_trade_no):
@@ -456,13 +492,13 @@ class OrderView(View):
         context = { }
         context['project_name'] = settings.PROJECT_NAME
         context['is_member'] = self.request.session.get('is_member', None)
-        print(user_id)
+
         try:
             if user_id:
                 userinfo = WxUserinfo.objects.get(openid=user_id)
                 context['headimgurl'] = userinfo.headimgurl
         except WxUserinfo.DoesNotExist as ex:
-            print(ex)
+            pass
 
 
         if out_trade_no:
@@ -476,7 +512,7 @@ class OrderView(View):
                 context['company_member'] = userinfo.company_member
                 context['order'] = order
             except Order.DoesNotExist as ex:
-                print(ex)
+                pass
             return render(request, template_name='shopping/pay_result_list.html', context=context )
         else:
             orders = Order.objects.filter(user_id = user_id).order_by('status','-add_time')
@@ -531,3 +567,55 @@ class OrderView(View):
             context["errors"] = "invalid user"
 
         return HttpResponse(json.dumps(context))
+
+
+# 会员充值金额列表
+class RechargeAmountView(View):
+
+    def get(self, request, *args, **kwargs):
+        amounts = MemberRechargeAmount.objects.all()
+        signPackage = getJsApiSign(self.request)
+        context={
+            'amounts': amounts,
+            'sign': signPackage
+        }
+        return render(request, template_name="shopping/member_recharge_amount.html", context=context)
+
+    def post(self, request, *args, **kwargs):
+        trade_type ='JSAPI'
+        body = '会员充值'
+
+        try:
+            id = request.POST.get("id", None)
+            user_id = request.session.get("openid", None)
+            print(id,user_id)
+            amount = MemberRechargeAmount.objects.get(pk=id)
+            money = amount.money
+            #生成订单号
+            out_trade_no = '{0}{1}{2}'.format('M', datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+            total_fee = int(money * 100)
+        except MemberRechargeAmount.DoesNotExist:
+            return HttpResponseRedirect(reverse("member-recharge-amount"))
+
+        if user_id == "oX5Zn04Imn5RlCGlhEVg-aEUCHNs":
+            total_fee =1
+
+        try:
+            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
+            prepay_id = data.get('prepay_id',None)
+            save_data = dict(data)
+            #保存统一订单数据
+            WxUnifiedOrdeResult.objects.create(**save_data)
+            if prepay_id:
+                return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
+                return HttpResponse(json.dumps(return_data))
+
+        except WeChatPayException as wxe:
+            errors = {
+                'return_code': wxe.return_code,
+                'result_code': wxe.result_code,
+                'return_msg':  wxe.return_msg,
+                'errcode':  wxe.errcode,
+                'errmsg':   wxe.errmsg
+            }
+            return HttpResponse(json.dumps(errors))

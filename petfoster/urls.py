@@ -6,9 +6,9 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
-   FosterOrderDetailView
+   FosterOrderDetailView, FosterRoomUpdateView
 
-from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView
+from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView
 
 
 
@@ -31,4 +31,6 @@ urlpatterns = [
    url(r'^fosterorder/$', FosterOrderView.as_view(), name='foster-order'),
    url(r'^fosterorder/(?P<id>\d+)/$', FosterOrderView.as_view(), name='foster-order-detail'),
    url(r'^fosterorderdetail/(?P<out_trade_no>\w+)/$', FosterOrderDetailView.as_view(), name='foster-order-detail-over'),
+   url(r'^fosterupdateroom/$', FosterRoomUpdateView.as_view(), name='foster-room-update'),
+   url(r'^handoverlist/$', HandOverListView.as_view(), name='hand-over-list'),
 ]

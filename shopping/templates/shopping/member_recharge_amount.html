@@ -1,0 +1,102 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    {% include 'shopping/include/jssdk.html' %}
+    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+    <script type="text/javascript">
+    wx.ready(function () {
+        $('.pay').on('click',function(){
+            var params ={
+              id: $(this).attr("data-item"),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "member-recharge-amount" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  alert(JSON.stringify(data));
+                  if(data.package !=undefined){
+                      wxpay(data)
+                  }
+                  else{
+
+                  }
+              },
+              error: function(error){
+                  window.location.href = "{% url 'dog-index' %}";
+              }
+            });
+        });
+
+        function wxpay(data){
+            wx.chooseWXPay({
+                  timestamp:data.timestamp,
+                  nonceStr: data.nonceStr,
+                  package:  data.package ,
+                  signType: data.signType,
+                  paySign:  data.paySign,
+                  success: function(res){
+                    if (res.errMsg == "chooseWXPay:ok") {
+                        weui.alert('会员充值成功!');
+                    } else {
+                       weui.alert('会员充值失败!');
+                    }
+                  },
+                   cancel: function(res) {
+
+                   },
+                   fail:function(res){
+
+                   }
+            });
+        }
+
+});
+
+</script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+        <div class="weui-panel weui-panel_access">
+           <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                    <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">会员充值</span></div>
+                    <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+                </div>
+           </div>
+            <div class="weui-panel__bd">
+                <div class="weui-cells__title">充值列表</div>
+                <div class="weui-cells " >
+                  <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        {% for amount in amounts %}
+                            <div class="weui-btn-area">
+                                <a href="javascript:;" class="weui-btn  weui-btn_plain-primary pay" data-item="{{ amount.id }}">{{ amount.name }}</a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                  </div>
+                </div>
+                <div class="weui-cells__title"> <p>充值500元及500以上，自动成为会员，享有购买商品优惠折扣</p></div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

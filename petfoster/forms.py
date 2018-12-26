@@ -4,7 +4,7 @@ import datetime
 __author__ = 'malxin'
 
 from django import forms
-from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose
+from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose, HandOverList
 
 
 #宠物保险登记表单
@@ -175,3 +175,25 @@ class FosterStyleChooseForm(forms.ModelForm):
         }
 
 
+
+# 物品交接
+class HandOverListForm(forms.ModelForm):
+
+    def __init__(self, *args,**kwargs):
+        super(HandOverListForm,self).__init__(*args,**kwargs)
+
+        self.fields['order'].widget.attrs['class'] = 'weui-input'
+        self.fields['order'].widget.attrs['readonly'] = 'true'
+
+        self.fields['pet_nums'].widget.attrs['class'] = 'weui-input'
+        self.fields['pet_nums'].widget.attrs['placeholder'] = '宠物数量'
+
+        self.fields['food_nums'].widget.attrs['class'] = 'weui-input'
+        self.fields['food_nums'].widget.attrs['placeholder'] = '口粮数量'
+
+    class Meta:
+        model = HandOverList
+        fields = ['order', 'pet_nums', 'food_nums', 'others_nums']
+        widgets = {
+            'others_nums': forms.Textarea({'class': 'weui-textarea', 'placeholder': '物品数量', 'rows': '2'}),
+        }

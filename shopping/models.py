@@ -319,3 +319,54 @@ class MailFee(models.Model):
         mailFee = MailFee.objects.all().first()
         mail_cost = mailFee.mail_cost if mailFee else 3
         return mail_cost
+
+
+# 会员充值金额设置表
+class MemberRechargeAmount(models.Model):
+    name = models.CharField(verbose_name="金额描述", max_length=32,)
+    money = models.DecimalField(verbose_name="充值金额", max_digits=10, decimal_places=2)
+
+    class Meta:
+        verbose_name = "会员充值金额"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+# 会员储值表
+class MemberDeposit(models.Model):
+    openid = models.CharField(verbose_name='微信标识', max_length=120)
+    nickname = models.CharField(verbose_name="昵称", max_length=64)
+    total_money = models.DecimalField(verbose_name="储值金额", max_digits=10, decimal_places=2)
+    prev_money = models.DecimalField(verbose_name="上次储值金额", max_digits=10, decimal_places=2)
+    add_time = models.DateTimeField(verbose_name="充值时间",)
+
+    class Meta:
+        verbose_name="会员储值表"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "{0}-{1}".format(self.nickname, self.total_money)
+
+
+# 会员充值明细
+class MemberRechargeRecord(models.Model):
+    out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32)
+    openid = models.CharField(verbose_name='用户微信ID', max_length=64)
+    nickname = models.CharField(verbose_name='姓名', max_length=64, null=True, blank=True)
+    add_time = models.DateTimeField(verbose_name='充值时间', auto_now_add=True,auto_now=False)
+    pay_time = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
+    status = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
+    total_fee = models.DecimalField(verbose_name='应收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    cash_fee = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
+    prepay_id = models.CharField(verbose_name='预支付会话标识',max_length=64,null=True,blank=True)
+    prepay_at = models.DateTimeField(verbose_name='预支付时间', null=True, blank=True)
+
+    class Meta:
+        verbose_name="会员充值明细"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return "{0}-{1}".format(self.out_trade_no, self.cash_fee)

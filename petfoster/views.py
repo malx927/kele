@@ -14,8 +14,8 @@ from shopping.views import wxPay, queryOrder
 from wxchat.models import WxUnifiedOrdeResult, WxPayResult
 from wxchat.utils import changeImage
 from .models import InsurancePlan, ClaimProcess, PetInsurance, FosterStandard, FosterType, PetFosterInfo, FosterDemand, \
-    FosterNotice, FosterAgreement, FosterStyleChoose, PetOwner, FosterRoom
-from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm
+    FosterNotice, FosterAgreement, FosterStyleChoose, PetOwner, FosterRoom, HandOverList
+from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm, HandOverListForm
 from wxchat.views import getJsApiSign, sendTemplateMesToKf
 from .utils import foster_calc_price
 
@@ -396,15 +396,28 @@ class FosterPayView(View):
         try:
             id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get(pk=int(id))
+
+            rooms = None
+            if instance.status == 1:
+                rooms = FosterRoom.objects.all()
+
             pet_ids = instance.pet_list
             petList = pet_ids.split(',')
 
             pets = PetFosterInfo.objects.filter(id__in=petList)
             signPackage = getJsApiSign(self.request)
-            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance,"pets":pets,'sign': signPackage})
+
+            context ={
+                "instance": instance,
+                "pets": pets,
+                'sign': signPackage,
+                "rooms": rooms
+            }
+
+            return render(request, template_name="petfoster/foster_checkout.html", context=context)
         except FosterStyleChoose.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("foster-style-calc"))
-        except:
+        except Exception as ex:
             return HttpResponseRedirect(reverse("foster-style-calc"))
 
 
@@ -426,9 +439,8 @@ class FosterPayView(View):
 
         # total_fee =1
         try:
-            data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
+            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
             prepay_id = data.get('prepay_id',None)
-            print('aaaa:',prepay_id)
             save_data = dict(data)
             #保存统一订单数据
             WxUnifiedOrdeResult.objects.create(**save_data)
@@ -466,12 +478,12 @@ class FosterOrderView(View):
             user_id = request.session.get("openid", None)
             role = request.session.get("role", None)
             if user_id:
-                if role == 1 or role == 2:
+                if role == 1 or role == 2:   # 老板or驯养师
                     fosterOrders = FosterStyleChoose.objects.filter(status=1)
                 else:
                     fosterOrders = FosterStyleChoose.objects.filter(openid=user_id)
 
-                return render(request,template_name="petfoster/foster_order_list.html", context={"fosterOrders": fosterOrders})
+                return render(request, template_name="petfoster/foster_order_list.html", context={"fosterOrders": fosterOrders})
             else:
                 return  HttpResponseRedirect(reverse("foster-menu"))
         else:
@@ -488,11 +500,95 @@ class FosterOrderDetailView(View):
             pet_ids = instance.pet_list
             petList = pet_ids.split(',')
             pets = PetFosterInfo.objects.filter(id__in=petList)
-            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance,"pets":pets})
+            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance, "pets": pets})
         except FosterStyleChoose.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("foster-style-calc"))
         except:
             return HttpResponseRedirect(reverse("foster-style-calc"))
 
 
+class FosterRoomUpdateView(View):
 
+    def post(self, request, *args, **kwargs):
+        order_id = request.POST.get("id", None)
+        room_id = request.POST.get("room_id", None)
+        context = {
+            "success": "false",
+        }
+        if order_id is None or room_id is None:
+            context["errors"] = "Invalid Order ID or Invalid Room ID"
+            return HttpResponse(json.dumps(context))
+        else:
+            try:
+                room = FosterRoom.objects.get(pk=room_id)
+                order = FosterStyleChoose.objects.get(pk=order_id)
+                order.room = room
+                order.save(update_fields=["room"])
+                pet_ids = order.pet_list
+                petList = pet_ids.split(',')
+
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room)
+
+                if order.foster_mode == 3:
+                    room.petcounts += nRows
+                else:
+                    room.petcounts = nRows
+
+                room.save(update_fields=["petcounts"])
+
+                # 修改宠物的房间
+                context["success"] = "true"
+                return HttpResponse(json.dumps(context))
+            except FosterStyleChoose.DoesNotExist as ex:
+                context["errors"] = "Order Not Exists"
+                return HttpResponse(json.dumps(context))
+            except Exception as ex:
+                context["errors"] = "Order Save Failure"
+                return HttpResponse(json.dumps(context))
+
+
+# 物品交接记录
+class HandOverListView(View):
+
+    def get(self, request, *args, **kwargs):
+        try:
+            order_id = request.GET.get("orderid", None)
+            order = FosterStyleChoose.objects.get(pk=order_id)
+            hand_over_list = HandOverList.objects.get(order=order)
+            form = HandOverListForm(instance= hand_over_list)
+            return render(request, template_name="petfoster/foster_hand_over.html", context={"form": form, "order": order})
+        except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponseRedirect(reverse("foster-order"))
+        except HandOverList.DoesNotExist as ex:
+            form = HandOverListForm()
+            return render(request, template_name="petfoster/foster_hand_over.html", context={"form": form, "order": order })
+        except:
+            return HttpResponseRedirect(reverse("foster-order"))
+
+    def post(self, request, *args, **kwargs):
+        id = request.POST.get("id", None)
+        user_id = request.session.get("openid", None)
+
+        if id:
+            insurance = HandOverList.objects.get(id=id)
+            form = HandOverListForm(request.POST, instance=insurance)
+        else:
+            form = HandOverListForm(request.POST)
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            instance.openid = user_id
+            instance.save()
+
+        url = "{0}?id={1}".format(reverse("foster-pay"), instance.order.id)
+
+        return HttpResponseRedirect(url)
+
+
+class FosterPetListView(ListView):
+    context_object_name = "pets"
+    template_name = 'petfoster/pets_list.html'
+
+    def get_queryset(self):
+        companies = PetFosterInfo.objects.filter(room__isnull=False)
+        return companies

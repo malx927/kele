@@ -1,0 +1,44 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养交接记录</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top" >
+            <input type="hidden" name="order" value="{{ order.id }}">
+            <input type="hidden" name="id" value="{{ form.instance.id|default:'' }}">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.order.label }}:</label></div>
+                <div class="weui-cell__bd">{{ order.out_trade_no }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.pet_nums.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.pet_nums }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.food_nums.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.food_nums }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.others_nums.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.others_nums }}</div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}

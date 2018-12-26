@@ -158,8 +158,7 @@ def setUserToMember(openid, scene_id=None):
             intro_user = WxUserinfo.objects.get(qr_scene=int(scene_id), is_member=1)
             WxIntroduce.objects.get(openid=openid, introduce_id=intro_user.openid)
     except WxUserinfo.DoesNotExist as ex:
-        print(ex)
-        print('用户不存在')
+        pass
     except WxIntroduce.DoesNotExist as ex:
         user.is_member = 1
         user.save()
@@ -173,7 +172,6 @@ def setUserToMember(openid, scene_id=None):
 
 
 def saveUserinfo(openid, scene_id=None):
-    print('scene_id=',scene_id)
     user = client.user.get(openid)
     if 'errcode' not in user:
         sub_time = user.pop('subscribe_time')
@@ -199,9 +197,9 @@ def saveUserinfo(openid, scene_id=None):
                     WxIntroduce.objects.get_or_create(openid=obj.openid, defaults=defaults)
 
         except WxUserinfo.DoesNotExist:
-            print('会员推荐失败.....')
+            pass
     else:
-        print(user)
+        pass
 
 
 def unSubUserinfo(openid):
@@ -217,7 +215,6 @@ def unSubUserinfo(openid):
 
 # @login_required
 def createMenu(request):
-    print('createMenu', client.access_token)
     resp = client.menu.create({
         "button": [
             {
@@ -225,12 +222,6 @@ def createMenu(request):
                 "name": "宠物社区",
                 "url": APP_URL + "/redirect/dogindex"
             },
-            # {
-            #     "type": "view",
-            #     "name": "会员中心",
-            #     "url": APP_URL + "/redirect/dogindex"
-            # },
-            #
             {
                 "name": "会员中心",
                 "sub_button": [
@@ -244,16 +235,6 @@ def createMenu(request):
                         "name": "我的积分",
                         "url": APP_URL + "/redirect/myscore"
                     },
-                    # {
-                    #     "type": "view",
-                    #     "name": "一键导航",
-                    #     "url": APP_URL + "/redirect/dogloss"
-                    # },
-                    # {
-                    #     "type": "view",
-                    #     "name": "小程序",
-                    #     "url": APP_URL + "/redirect/dogloss"
-                    # }
                 ]
 
             }
@@ -262,19 +243,16 @@ def createMenu(request):
     return HttpResponse(json.dumps(resp))
 
 
-# @login_required
+@login_required
 def deleteMenu(request):
     print('deleteMenu', client.access_token)
     resp = client.menu.delete()
     return HttpResponse(json.dumps(resp))
 
 
-# @login_required
+@login_required
 def getMenu(request):
-    # client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET)
-    print('getMenu', client.access_token)
     resp = client.menu.get()
-    # print(resp)
     return HttpResponse(json.dumps(resp, ensure_ascii=False))
 
 
@@ -295,14 +273,12 @@ def redirectUrl(request, item):
     """
     code = request.GET.get('code', None)
     openid = request.session.get('openid', None)
-    print('code=', code)
-    print('openid=', openid)
+
     if openid is None:
         if code is None:  # 获取授权码code
             redirect_url = '%s/redirect/%s' % (APP_URL, item)
             webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
             authorize_url = webchatOAuth.authorize_url
-            print(authorize_url)
             return HttpResponseRedirect(authorize_url)
         else:  # 同意授权，通过授权码获取ticket,根据ticket拉取用户信息
             webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
@@ -312,7 +288,6 @@ def redirectUrl(request, item):
             else:
                 open_id = webchatOAuth.open_id
                 userinfo = webchatOAuth.get_user_info()
-                print(userinfo)
                 userinfo.pop('privilege')
 
                 obj, created = WxUserinfo.objects.update_or_create(openid=open_id, defaults=userinfo)
@@ -344,7 +319,6 @@ def dogLossAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=', openid, nickname)
         next = request.GET.get('next', None)
 
         form = DogLossForm(request.POST, request.FILES)
@@ -369,7 +343,6 @@ def dogLossAdd(request):
         noncestr = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(15))
         timestamp = int(time.time())
         url = request.build_absolute_uri()
-        print(url)
         signature = jsApi.get_jsapi_signature(noncestr, ticket, timestamp, url)
 
         signPackage = {

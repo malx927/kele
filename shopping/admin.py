@@ -1,6 +1,7 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit, MailFee
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit, MailFee, \
+    MemberRechargeAmount, MemberDeposit, MemberRechargeRecord
 # Register your models here.
 
 
@@ -99,3 +100,22 @@ class MailFeeAdmin(admin.ModelAdmin):
     list_per_page = 50
 
 
+@admin.register(MemberRechargeAmount)
+class MemberRechargeAmountAdmin(admin.ModelAdmin):
+    list_display = ['name', 'money']
+    list_per_page = 50
+
+
+@admin.register(MemberDeposit)
+class MemberDepositAdmin(admin.ModelAdmin):
+    list_display = ['openid', 'nickname', 'total_money', 'prev_money' ,'add_time']
+    list_per_page = 50
+    search_fields = ['openid', 'nickname']
+
+
+
+@admin.register(MemberRechargeRecord)
+class MemberRechargeRecordAdmin(admin.ModelAdmin):
+    list_display = ['out_trade_no', 'nickname', 'pay_time', 'total_fee' ,'cash_fee','transaction_id', 'status']
+    list_per_page = 50
+    search_fields = ['out_trade_no', 'nickname']

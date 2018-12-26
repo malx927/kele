@@ -70,10 +70,14 @@ class FosterAgreementAdmin(admin.ModelAdmin):
 
 @admin.register(HandOverList)
 class HandOverListAdmin(admin.ModelAdmin):
-    list_display = ('pet','owner_name', 'pet_nums','food_nums','create_time' )
-    list_display_links = ('pet','owner_name')
+    list_display = ('order','owner_name', 'pet_nums','food_nums','create_time' )
+    list_display_links = ('order','owner_name')
     list_per_page = 50
 
+    def formfield_for_foreignkey(self, db_field, request, *args, **kwargs):
+        if db_field.name == 'order':
+            kwargs["queryset"] = FosterStyleChoose.objects.filter(status=1)
+        return super(HandOverListAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 @admin.register(PetFeedNote)
 class PetFeedNoteAdmin(admin.ModelAdmin):

@@ -40,7 +40,7 @@
                     <div class="weui-cell__bd">
                         {% if order.status == 1 %}
                          <div class="weui-flex">
-                            <div class="weui-flex__item"><span>订单号：</span>{{ order.out_trade_no }}元 </div>
+                            <div class="weui-flex__item"><span>订单号：</span>{{ order.out_trade_no|default:'' }} </div>
                          </div>
                         {% endif %}
                         <div class="weui-flex">
@@ -63,7 +63,9 @@
                             <div class="weui-flex__item"><span>寄养方式：</span>{{ order.foster_mode }}</div>
                          </div>
                     </div>
-                    <div class="weui-cell__ft"></div>
+                    <div class="weui-cell__ft">
+
+                    </div>
                     </a>
                 {% endfor %}
             </div>
@@ -76,17 +78,7 @@
 
     {{ block.super }}
     <script type="application/javascript">
-    $(function(){
-        var obj_counts = {{ object_list|length }}
-        $("#gotopay").on("click", function(){
-            if(obj_counts == 0){
-                weui.alert('请先录入寄养宠物信息!<div style="color:green">点击左下方增加宠物按钮</div>');
-                return false;
-            }
 
-            window.location.href = "{% url 'foster-style-calc' %}";
-        })
-    });
 
     </script>
 {% endblock bottomjs %}

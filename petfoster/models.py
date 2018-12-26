@@ -97,7 +97,7 @@ class FosterRoom(models.Model):
     petcounts = models.IntegerField(verbose_name="宠物数量", blank=True, null=True, default=0)
 
     def __str__(self):
-        return  self.name
+        return  "{0}({1})".format(self.name, self.petcounts)
 
     class Meta:
         verbose_name = u"03.寄养房间"
@@ -181,22 +181,6 @@ class FosterAgreement(models.Model):
         verbose_name = u"07.寄养协议"
         verbose_name_plural = verbose_name
 
-#交接记录
-class HandOverList(models.Model):
-    pet = models.ForeignKey( PetFosterInfo, verbose_name='宠物名称', on_delete=models.CASCADE)
-    owner_name = models.CharField(verbose_name='宠物主人', max_length=32)
-    pet_nums   = models.CharField( verbose_name='宠物数量', max_length=128, blank=True, null=True )
-    food_nums = models.CharField( verbose_name= '口粮数量', max_length=128, blank=True, null=True)
-    others_nums = models.CharField( verbose_name='物品数量', max_length=128, blank=True, null=True)
-    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
-    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
-
-    def __str__(self):
-        return  self.owner_name + '--' + self.dog_name
-
-    class Meta:
-        verbose_name = u"08.交接记录"
-        verbose_name_plural = verbose_name
 
 
 #宠物喂养记录
@@ -301,6 +285,7 @@ class InsurancePlan(models.Model):
         verbose_name_plural = verbose_name
 
 
+# 理赔流程
 class ClaimProcess(models.Model):
     name = models.CharField(verbose_name="流程名称", max_length=24)
     content = models.CharField(verbose_name="具体流程", max_length=300)
@@ -332,9 +317,9 @@ class PetOwner(models.Model):
 
 # 寄养订单
 class FosterStyleChoose(models.Model):
-    big_dog = models.IntegerField(verbose_name="大型犬",  blank=True, null=True)
-    middle_dog = models.IntegerField(verbose_name="中型犬",  blank=True, null=True)
-    small_dog = models.IntegerField(verbose_name="小型犬",  blank=True, null=True)
+    big_dog = models.IntegerField(verbose_name="大型犬",  blank=True, null=True, default=0)
+    middle_dog = models.IntegerField(verbose_name="中型犬",  blank=True, null=True, default=0)
+    small_dog = models.IntegerField(verbose_name="小型犬",  blank=True, null=True, default=0)
     foster_type = models.ForeignKey(FosterType, verbose_name="寄养类型")
     foster_mode = models.ForeignKey(FosterMode, verbose_name='寄养方式')
     begin_time = models.DateField(verbose_name="开始时间")
@@ -354,7 +339,7 @@ class FosterStyleChoose(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
 
     def __str__(self):
-        return self.foster_type.name
+        return self.out_trade_no if self.out_trade_no is not None else "{0}-{1}-{2}".format(self.big_dog,self.middle_dog,self.small_dog)
 
     class Meta:
         verbose_name = "14.寄养订单"
@@ -394,3 +379,19 @@ class FosterStyleChoose(models.Model):
         self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
 
 
+#交接记录
+class HandOverList(models.Model):
+    order = models.ForeignKey( FosterStyleChoose, verbose_name='寄养订单', on_delete=models.CASCADE)
+    owner_name = models.CharField(verbose_name='宠物主人', max_length=32, blank=True, null=True)
+    pet_nums   = models.CharField( verbose_name='宠物数量', max_length=128, blank=True, null=True )
+    food_nums = models.CharField( verbose_name= '口粮数量', max_length=128, blank=True, null=True)
+    others_nums = models.CharField( verbose_name='物品数量', max_length=128, blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
+
+    def __str__(self):
+        return   self.order.out_trade_no
+
+    class Meta:
+        verbose_name = u"08.交接记录"
+        verbose_name_plural = verbose_name
