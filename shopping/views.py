@@ -371,10 +371,14 @@ def payNotify(request):
                 if out_trade_no.startswith('M'):    # 会员充值
                     time_end = res_data['time_end']
                     pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
-                    nickname = request.session.get("nickname", None)
+                    try:
+                        user = WxUserinfo.objects.get(openid=openid)
+                        nickname = user.nickname
+                    except WxUserinfo.DoesNotExist:
+                        nickname = ''
+
                     cash_fee = res_data['cash_fee'] / 100
                     data={
-                        "out_trade_no": out_trade_no,
                         "openid": openid,
                         "nickname": nickname,
                         "total_fee": res_data['total_fee'] / 100,
@@ -383,13 +387,16 @@ def payNotify(request):
                         "status": 1,
                         "pay_time": pay_time
                     }
-                    MemberRechargeRecord.objects.create(**data)
+
+                    MemberRechargeRecord.objects.update_or_create( defaults=data, out_trade_no=out_trade_no )
+
                     try:
                         deposit = MemberDeposit.objects.get(openid=openid)
-                        deposit.total_money += cash_fee
-                        deposit.prev_money = cash_fee
-                        deposit.add_time = pay_time
-                        deposit.save()
+                        if deposit.add_time != pay_time:
+                            deposit.total_money += cash_fee
+                            deposit.prev_money = cash_fee
+                            deposit.add_time = pay_time
+                            deposit.save()
                     except MemberDeposit.DoesNotExist:
                         values = {
                             "openid": openid,
