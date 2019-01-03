@@ -54,6 +54,7 @@ TYPE_MAIL_STYLE = (
 class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
     parent = models.ForeignKey('self', verbose_name='父项', default=None, blank=True, null=True)
+    link_url = models.CharField(verbose_name="链接地址", max_length=120, blank=True, null=True)
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True)
     show_index = models.BooleanField(verbose_name='是否显示在首页', default=False)
     is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
@@ -377,3 +378,23 @@ class MemberRechargeRecord(models.Model):
 
     def __str__(self):
         return "{0}-{1}".format(self.out_trade_no, self.cash_fee)
+
+
+#会员限额设置
+class MemberLimit(models.Model):
+    limitvalue = models.IntegerField(verbose_name='会员限额(元)', blank=True, null=True)
+    create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
+
+    class Meta:
+        verbose_name = '会员限额设置'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return  "{0}%".format(self.limitvalue)
+
+    @classmethod
+    def getLimitValue(cls):
+        score_limit = ScoresLimit.objects.all().first()
+        limitValue = score_limit.limitvalue if score_limit else 20
+        return limitValue
+

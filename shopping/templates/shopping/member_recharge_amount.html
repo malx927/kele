@@ -17,7 +17,7 @@
               data: params,
               timeout: 5000,
               success: function(data){
-                  alert(JSON.stringify(data));
+
                   if(data.package !=undefined){
                       wxpay(data)
                   }
@@ -42,14 +42,14 @@
                     if (res.errMsg == "chooseWXPay:ok") {
                         weui.alert('会员充值成功!');
                     } else {
-                       weui.alert('会员充值失败!');
+
                     }
                   },
                    cancel: function(res) {
 
                    },
                    fail:function(res){
-
+                        weui.alert('会员充值失败!');
                    }
             });
         }
@@ -57,6 +57,16 @@
 });
 
 </script>
+    <style>
+    .money_btn{
+        width: 30%;
+        height: 4.5em;
+        line-height: 4.5em;
+        font-size:16px;
+        margin-left:2px;
+        margin-right:2px;
+    }
+    </style>
 {% endblock extra %}
 
 {% block container %}
@@ -74,11 +84,9 @@
                 <div class="weui-cells__title">充值列表</div>
                 <div class="weui-cells " >
                   <div class="weui-cell">
-                    <div class="weui-cell__bd">
+                    <div class="weui-cell__bd" style="text-align: center">
                         {% for amount in amounts %}
-                            <div class="weui-btn-area">
-                                <a href="javascript:;" class="weui-btn  weui-btn_plain-primary pay" data-item="{{ amount.id }}">{{ amount.name }}</a>
-                            </div>
+                            <a href="javascript:;" class="weui-btn  weui-btn_mini weui-btn_plain-primary pay money_btn" data-item="{{ amount.id }}">{{ amount.name }}</a>
                         {% endfor %}
                     </div>
                   </div>

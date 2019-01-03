@@ -4,14 +4,6 @@ import datetime
 from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import Doginfo
-from doginfo.models import (
-    PAGE_TYPE_CHOICE,
-    Vaccine_TYPE_CHOICE,
-    Type_TYPE_CHOICE,
-    bodytype_TYPE_CHOICE
-)
-from dogtype.models import Dogtype
 
 __author__ = 'malixin'
 

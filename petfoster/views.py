@@ -329,7 +329,8 @@ class FosterAgreementView(View):
 class FosterCalculateView(View):
 
     def get(self,request):
-        flag = request.GET.get("flag",None)
+        flag = request.GET.get("flag", None)
+        member = request.GET.get("member", None)
         user_id = request.session.get("openid", None)
         form =  FosterStyleChooseForm()
         myPets = None
@@ -339,6 +340,7 @@ class FosterCalculateView(View):
         context={
             "form": form,
             "flag": flag,
+            "member": member,
             "pets": myPets,
         }
         return render(request, template_name="petfoster/foster_calc.html", context=context )

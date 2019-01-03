@@ -1,6 +1,6 @@
 from django.contrib import admin
 import datetime
-from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, ScoresLimit, MailFee, \
+from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, MemberLimit, MailFee, \
     MemberRechargeAmount, MemberDeposit, MemberRechargeRecord
 # Register your models here.
 
@@ -57,7 +57,7 @@ class ShopCartAdmin(admin.ModelAdmin):
 
 @admin.register(GoodsType)
 class GoodsTypeAdmin(admin.ModelAdmin):
-    list_display = ('name','parent', 'sort','show_index','is_show')
+    list_display = ('name','parent','link_url', 'sort','show_index','is_show')
     list_per_page = 50
     list_filter =('parent',)
     search_fields = ('name',)
@@ -74,22 +74,22 @@ class MemberScoreDetailInline(admin.TabularInline):
     #readonly_fields = ['member','scores','from_user','user_id','create_time']
 
 
-@admin.register(MemberScore)
-class MemberScoreAdmin(admin.ModelAdmin):
-    list_display = ('nickname', 'user_id', 'total_scores','update_time')
-    list_per_page = 50
-    list_filter = ['nickname']
-    inlines = [MemberScoreDetailInline]
+# @admin.register(MemberScore)
+# class MemberScoreAdmin(admin.ModelAdmin):
+#     list_display = ('nickname', 'user_id', 'total_scores','update_time')
+#     list_per_page = 50
+#     list_filter = ['nickname']
+#     inlines = [MemberScoreDetailInline]
+#
+#     fieldsets = [
+#         ('会员积分', {
+#             'fields': ('nickname', 'user_id', 'total_scores')
+#         })
+#     ]
+#
 
-    fieldsets = [
-        ('会员积分', {
-            'fields': ('nickname', 'user_id', 'total_scores')
-        })
-    ]
-
-
-@admin.register(ScoresLimit)
-class ScoresLimitAdmin(admin.ModelAdmin):
+@admin.register(MemberLimit)
+class MemberLimitAdmin(admin.ModelAdmin):
     list_display = ('limitvalue', 'create_time')
     list_per_page = 50
 

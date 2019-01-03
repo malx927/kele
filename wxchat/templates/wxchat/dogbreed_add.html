@@ -9,13 +9,19 @@
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">GG登记表</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if sex == '0' %}GG登记表{% else %}MM登记表{% endif %}</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
     <div class="weui-panel__bd">
         <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
         <div class="weui-cells weui-cells_form cells_top" id="uploader">
+           <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.pet_class.label }}:</label></div>
+                <div class="weui-cell__bd">
+                    {{ form.pet_class }}
+                </div>
+            </div>
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
                 <div class="weui-cell__bd">
@@ -37,7 +43,11 @@
                 </div>
             </div>
             <div class="weui-cell__bd">
+                {% if sex == "0" %}
                 <input class="weui-input" id="id_sex" name="sex" value="公" type="hidden" />
+                {% else %}
+                <input class="weui-input" id="id_sex" name="sex" value="母" type="hidden" />
+                {% endif %}
             </div>
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.desc.label }}:</label></div>
@@ -61,12 +71,12 @@
                     <div class="weui-cells__tips"></div>
                 </div>
             </div>
+            {% if sex == "0" %}
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.price.label }}:</label></div>
-                <div class="weui-cell__bd">
-                    {{ form.price }}
-                </div>
+                <div class="weui-cell__bd">{{ form.price }}</div>
             </div>
+            {% endif %}
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.ownername.label }}:</label></div>
                 <div class="weui-cell__bd">

@@ -6,28 +6,26 @@
 </div>
 <div class="nav_header">
     <div class="weui-flex">
-      <a href="{% url 'my-order-list' %}" class="weui-flex__item placeholder"><i class="icon iconfont icon-orderlisto" ></i> 我的订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></a>
-      <a class="weui-flex__item placeholder" href="{% url 'my-score' %}"><i class="icon iconfont icon-jiaoyi1" ></i> 我的积分 <span id="myscore"></span></a>
+      <a href="{% url 'my-order-list' %}" class="weui-flex__item placeholder"><i class="icon iconfont icon-orderlisto" ></i>我的订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></a>
+      <a class="weui-flex__item placeholder" href="{% url 'my-recharge-consume-list' %}"><i class="icon iconfont icon-jiaoyi1" ></i>余额<span id="mybalance">0.00</span>元</a>
     </div>
 </div>
 <script>
     $(function(){
 
-        getMyScore();
+        getMyDeposit();
         getMyOrderCount();
     });
 
-    function getMyScore(){
+    function getMyDeposit(){
         $.ajax({
               type: 'GET',
-              url: '{% url "member-score" %}',
+              url: '{% url "member-deposit" %}',
               dataType: 'json',
               timeout: 5000,
               success: function(data){
-                  $("#myscore").text(data.total_scores || 0);
-                  if(data.total_scores){
-                     appendItem(data.details);
-                  }
+{#                  alert(JSON.stringify(data));#}
+                  $("#mybalance").text(data.balance.toFixed(2) || 0.00);
               },
               error: function(error){}
             });

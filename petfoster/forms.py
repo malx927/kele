@@ -4,7 +4,7 @@ import datetime
 __author__ = 'malxin'
 
 from django import forms
-from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose, HandOverList
+from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose, HandOverList, FosterMode
 
 
 #宠物保险登记表单
@@ -147,6 +147,7 @@ class FosterStyleChooseForm(forms.ModelForm):
 
     def __init__(self, *args,**kwargs):
         super(FosterStyleChooseForm,self).__init__(*args,**kwargs)
+        # self.fields["foster_mode"].widget.choices=FosterMode.objects.values_list("id", "name")
 
         self.fields['big_dog'].widget.attrs['class'] = 'weui-input'
         self.fields['big_dog'].widget.attrs['placeholder'] = '大型犬数量'
@@ -158,10 +159,11 @@ class FosterStyleChooseForm(forms.ModelForm):
         self.fields['small_dog'].widget.attrs['placeholder'] = '小型犬数量'
 
         self.fields['foster_type'].widget.attrs['class'] = 'weui-select'
-        self.fields['foster_type'].empty_label='寄养类型'
+        self.fields['foster_type'].empty_label=''
+        self.fields['foster_type'].widget.attrs['disabled'] = 'true'
 
         self.fields['foster_mode'].widget.attrs['class'] = 'weui-select'
-        self.fields['foster_mode'].empty_label = '寄养方式'
+        self.fields['foster_mode'].empty_label = ''
         #
         # self.fields['end_time'].widget.attrs['class'] = 'weui-input'
         # self.fields['end_time'].widget.attrs['placeholder'] = '其他情况'
@@ -172,6 +174,8 @@ class FosterStyleChooseForm(forms.ModelForm):
         widgets = {
              'begin_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
              'end_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
+
+
         }
 
 

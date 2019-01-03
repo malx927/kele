@@ -1,10 +1,7 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 
 {% block tabpanel %}
-{#      <div class="weui-flex">#}
-{#        <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary" >出售发布</a></div>#}
-{#        <div class="weui-flex__item" style="text-align: center;padding-top: 10px;"><a href="{% url 'dog-buy-add' %}?next={{ request.get_full_path }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">求购发布</a></div>#}
-{#      </div>#}
+
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
                 <div class="weui-panel__hd">
@@ -166,10 +163,11 @@
 
     function appendBuyItem(results){
         $.each(results,function(index,item){
-          var sexImage = getSexImage(item);
-          buyitem ='<div class="weui-media-box weui-media-box_text">' +
+            var sexImage = getSexImage(item);
+            var pet_img = getIcon(item.pet_class);
+            buyitem ='<div class="weui-media-box weui-media-box_text">' +
                         '<a href="/wechat/dogbuydetail/' + item.id + '">' +
-                        '<h4 class="weui-media-box__title">'+ sexImage  + item.typeid + '</h4>' +
+                        '<h4 class="weui-media-box__title">'+ sexImage  + item.typeid + pet_img +'</h4>' +
                         '<p class="weui-media-box__desc">价格: '+ item.price +'</p>'  +
                         '</a>' +
                      '</div>' ;
@@ -193,10 +191,11 @@
                 age = '【' + age + '】'
 
             var setImage = getSexImage(item);
+            var pet_img = getIcon(item.pet_class);
             saleitem =  '<a  href="/wechat/dogsaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
                             '<div class="weui-media-box__hd">' + img_url + '</div>'+
                             '<div class="weui-media-box__bd">' +
-                               '<h4 class="weui-media-box__title">'+ setImage + item.typeid + age +'</h4>' +
+                               '<h4 class="weui-media-box__title">'+ setImage + item.typeid + age + pet_img +'</h4>' +
                                '<ul class="weui-media-box__info">' +
 								  '<li class="weui-media-box__info__meta">价格 : ' + item.price +'</li>' +
 								'</ul>' +
@@ -226,23 +225,16 @@
         });
     });
 
-{#     $('#pet_trade').on("click",function(){#}
-{#            weui.actionSheet([#}
-{#             {#}
-{#                 label: ' <i class="icon iconfont icon-rongquanmaichu1 icon_pink"></i> 宠物出售',#}
-{#                 className:'color-primary',#}
-{#                 onClick: function () {#}
-{#                     window.location.href="{% url 'dog-sale-add' %}?next={{ request.get_full_path }}";#}
-{#                 }#}
-{#             }, {#}
-{#                 label: '<i class="icon iconfont icon-mairu1 icon_pink" ></i> 宠物求购',#}
-{#                 className:'color-success',#}
-{#                 onClick: function () {#}
-{#                     window.location.href="{% url 'dog-buy-add' %}?sex=1&next={{ request.get_full_path }}";#}
-{#                 }#}
-{#             },#}
-{#             ]);#}
-{#        });#}
+    function getIcon(pet_class){
+        var pet_img = '';
+        if(pet_class == 0){
+             pet_img = '<span class="r"><b><i class="icon iconfont icon-pet7 color-warning" ></i></b></span>';
+        }
+        else{
+            pet_img = '<span class="r"><b><i class="icon iconfont icon-maomi color-warning" ></i></b></span>';
+        }
+        return pet_img;
+    }
 
     </script>
 {% endblock bottomjs %}

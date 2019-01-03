@@ -26,20 +26,15 @@
     <div class="weui-panel weui-panel_access">
         <div class="weui-panel__hd">
             <div class="weui-flex">
-                <div class="weui-flex__item"><span class="title">宠物寄养</span></div>
+                <div class="weui-flex__item"><span class="title">寄养计算</span></div>
                 <div class="weui-flex__item"></div>
                 <div class="weui-flex__item"><a href="{% url 'dog-index' %}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
             </div>
         </div>
         <div class="weui-panel__bd">
-            <div style="margin-top: 30px;">
-                <a class="weui-btn weui-btn_primary btn_size" href="{% url 'foster-style-calc-nav' %}">寄养费用计算</a>
-                <a class="weui-btn weui-btn_primary btn_size"  id="myfoster" href="#">我要寄养</a>
-            </div>
-            <div id="op_list">
-                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member" {% if request.session.is_member %}  href="{% url 'foster-pet-list'  %}" {% endif %}>会员</a>
-{#                <a class="weui-btn weui-btn_plain-primary btn_size"  id="member"  href="{% url 'foster-pet-list'  %}">会员</a>#}
-                <a class="weui-btn weui-btn_plain-primary btn_size"  id="common"  href="{% url 'foster-fee-scale'  %}">非会员</a>
+            <div style="margin-top: 50px;">
+                <a class="weui-btn weui-btn_plain-primary btn_size"  href="{% url 'foster-style-calc' %}?flag=test&member=1">会员计算</a>
+                <a class="weui-btn weui-btn_plain-primary btn_size"  href="{% url 'foster-style-calc' %}?flag=test&member=0">非会员计算</a>
             </div>
         </div>
     </div>
@@ -53,11 +48,7 @@
     {{ block.super }}
     <script type="application/javascript">
     $(function(){
-            $("#myfoster").on("click", function(e){
-                e.preventDefault();
-                $("#op_list").css("display","block");
-            })
-    });
 
+    });
     </script>
 {% endblock bottomjs %}

@@ -31,7 +31,7 @@ class FosterType(models.Model):
     comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
 
     def __str__(self):
-        return  self.name
+        return  "{0}({1})".format( self.name, self.comment)
 
     def title(self):
         return "{0}({1})".format( self.name, self.comment)
@@ -53,6 +53,7 @@ class FosterMode(models.Model):
     class Meta:
         verbose_name = u"02.寄养方式"
         verbose_name_plural = verbose_name
+        ordering = ("-id",)
 
 class PetType(models.Model):
     name = models.CharField(verbose_name='宠物类型', max_length=32)
@@ -317,9 +318,9 @@ class PetOwner(models.Model):
 
 # 寄养订单
 class FosterStyleChoose(models.Model):
-    big_dog = models.IntegerField(verbose_name="大型犬",  blank=True, null=True, default=0)
-    middle_dog = models.IntegerField(verbose_name="中型犬",  blank=True, null=True, default=0)
-    small_dog = models.IntegerField(verbose_name="小型犬",  blank=True, null=True, default=0)
+    big_dog = models.IntegerField(verbose_name="大型犬数量",  blank=True, null=True)
+    middle_dog = models.IntegerField(verbose_name="中型犬数量",  blank=True, null=True)
+    small_dog = models.IntegerField(verbose_name="小型犬数量",  blank=True, null=True)
     foster_type = models.ForeignKey(FosterType, verbose_name="寄养类型")
     foster_mode = models.ForeignKey(FosterMode, verbose_name='寄养方式')
     begin_time = models.DateField(verbose_name="开始时间")
@@ -339,7 +340,7 @@ class FosterStyleChoose(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
 
     def __str__(self):
-        return self.out_trade_no if self.out_trade_no is not None else "{0}-{1}-{2}".format(self.big_dog,self.middle_dog,self.small_dog)
+        return self.out_trade_no
 
     class Meta:
         verbose_name = "14.寄养订单"

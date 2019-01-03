@@ -27,6 +27,7 @@ urlpatterns = [
    url(r'^petdemand/(?P<petid>\d+)/$', FosterDemandView.as_view(), name='foster-pet-demand'),
    url(r'^petdemand/create/$', FosterDemandCreateUpdateView.as_view(), name='foster-pet-demand-create'),
    url(r'^petagreement/$', FosterAgreementView.as_view(), name='foster-pet-agreement'),
+   url(r'^fostercalcnav/$', TemplateView.as_view(template_name="petfoster/foster_calc_nav.html"), name='foster-style-calc-nav'),
    url(r'^fostercalc/$', FosterCalculateView.as_view(), name='foster-style-calc'),
    url(r'^fosterorder/$', FosterOrderView.as_view(), name='foster-order'),
    url(r'^fosterorder/(?P<id>\d+)/$', FosterOrderView.as_view(), name='foster-order-detail'),

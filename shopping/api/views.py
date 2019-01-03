@@ -1,5 +1,6 @@
 #-*-coding:utf-8-*-
 from django.http import Http404
+from rest_framework.exceptions import APIException
 
 __author__ = 'malixin'
 
@@ -12,9 +13,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore, MailFee
+from shopping.models import Goods,Order,OrderItem, ShopCart, GoodsType, ScoresLimit, MemberScore, MailFee, MemberDeposit
 from .paginations import PagePagination
-from .serializers import GoodsListSerializer, GoodsTypeSerializer, ShopCartSerializer, MemberScoreSerializer
+from .serializers import GoodsListSerializer, GoodsTypeSerializer, ShopCartSerializer, MemberScoreSerializer, \
+    MemberDepositSerializer
 from shopping.views import getShopCartTotals
 
 
@@ -291,10 +293,8 @@ class MemberScoreAPIView(APIView):
         try:
             user_id = request.session.get("openid", None)
             is_member = request.session.get("is_member", None)
-            print('is_member=',is_member)
             scores = MemberScore.objects.get(user_id=user_id) if is_member==1 else None
         except MemberScore.DoesNotExist as ex:
-            print(ex)
             raise Http404
 
         serializer = MemberScoreSerializer(scores)
@@ -339,16 +339,29 @@ class MailFeeAPIView(APIView):
             ret['success'] = "true"
 
         except Order.DoesNotExist as ex:
-            print("MailFeeAPIView:", ex)
             ret['errors'] = 'NoOrder'
         except MailFee.DoesNotExist as ex:
-            print("MailFeeAPIView:", ex)
             ret['errors'] = 'MailFee Doesnot Exits'
 
         return Response(ret)
 
 
 
+class MemberDepositAPIView(APIView):
+    """
+        会员储值
+    """
+    permission_classes = [AllowAny]
+    def get(self, request, *args, **kwargs):
+        try:
+            user_id = request.session.get("openid", None)
+            deposit = MemberDeposit.objects.get(openid=user_id)
+        except MemberDeposit.DoesNotExist as ex:
+            raise Http404
+
+        serializer = MemberDepositSerializer(deposit)
+
+        return Response(serializer.data)
 
 
 

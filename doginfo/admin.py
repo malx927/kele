@@ -34,7 +34,7 @@ from doginfo.models import  DogOwner,  DogBreed, DogLoss, DogAdoption, DogDelive
 
 
 class DogBreedAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sex', 'typeid', 'price', 'ownername', 'telephone', 'create_time', 'nickname')
+    list_display = ('name', 'sex', 'pet_class', 'typeid', 'price', 'ownername', 'telephone', 'create_time', 'nickname')
     list_display_links = ('name',)
     list_per_page = 50
 
@@ -81,7 +81,7 @@ admin.site.register(DogDelivery, DogDeliveryAdmin)
 
 # 宠物出售
 class DogSaleAdmin(admin.ModelAdmin):
-    list_display = ('typeid', 'ages', 'sex', 'desc', 'price', 'create_time', 'is_show', 'nickname')
+    list_display = ('typeid', 'pet_class', 'ages', 'sex', 'desc', 'price', 'create_time', 'is_show', 'nickname')
     list_per_page = 50
 
 
@@ -90,7 +90,7 @@ admin.site.register(DogSale, DogSaleAdmin)
 
 # 宠物求购
 class DogBuyAdmin(admin.ModelAdmin):
-    list_display = ('typeid', 'ages', 'sex', 'buyname', 'telephone', 'create_time', 'is_show', 'nickname')
+    list_display = ('typeid', 'pet_class', 'ages', 'sex', 'buyname', 'telephone', 'create_time', 'is_show', 'nickname')
     list_per_page = 50
 
 

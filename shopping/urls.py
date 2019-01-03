@@ -7,7 +7,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView
-from .views import  ShopCartBuyListView, OrderView, RechargeAmountView
+from .views import  ShopCartBuyListView, OrderView, RechargeAmountView, MemberRechargeConsumeListView
 from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify, FosterPayView
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^pay/insurnotify/$', insuranceNotify, name='insurance-notify'),
     url(r'^pay/fosterpay$', FosterPayView.as_view(), name='foster-pay'),
     url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),
+    url(r'^pay/rechargeconsumelist/$', MemberRechargeConsumeListView.as_view(), name='my-recharge-consume-list'),
     #url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息
 
     # url(r'^redirect/(?P<item>[\w-]+)$', redirectUrl),

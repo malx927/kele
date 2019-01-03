@@ -120,7 +120,7 @@
               $('#goods p').remove();
               if( data.length == 0)
               {
-                  $('#goods').append('<p class="empty-content">暂无商品,看看别的分类吧</p>');
+                  $('#goods').append('<p class="empty-content">暂无商品,看看别的分类吧( ⊙ o ⊙ )</p>');
               }
               appendItem(data);
               loading.hide();
@@ -208,8 +208,12 @@
           timeout: 5000,
           context: $('#typelist'),
           success: function(data){
-              $.each(data,function(inde,item){
-                 if(item.counts > 0){
+              $.each(data,function(index,item){
+                 if(item.link_url){
+                     var title = '<h3 class="menu-section-title menu-item" link-url="'+ item.link_url +'">'+ item.name +'</h3>';
+                     $("#typelist").append(title);
+                 }
+                 else if(item.counts > 0){
                      var title = '<h3 class="menu-section-title">'+ item.name +'</h3>';
                      var children = item.children;
                      var listItem =  '<ul class="menu-section-list">';
@@ -227,6 +231,11 @@
               });
 
               $('.menu-item').on('click', function(event){
+
+                  if( $(this).attr("link-url") != undefined ){
+                        window.location.href = $(this).attr("link-url");
+                        return;
+                  }
                   typeid = $(this).attr('data-typeid');
                   getGoodsList('{% url 'goods-list' %}' ,typeid );
                   $(".menu-item").removeClass('menu-active');

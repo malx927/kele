@@ -90,6 +90,8 @@ class DogBreedForm(forms.ModelForm):
         self.fields['name'].widget.attrs['class'] = 'weui-input'
         self.fields['name'].widget.attrs['placeholder'] = '请输入昵称'
 
+        self.fields['pet_class'].widget.attrs['class'] = 'weui-select'
+
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
 
@@ -110,7 +112,7 @@ class DogBreedForm(forms.ModelForm):
 
     class Meta:
         model = DogBreed
-        fields = ['name', 'typeid','birth','sex', 'desc', 'picture', 'price', 'ownername', 'telephone']
+        fields = ['pet_class', 'name', 'typeid','birth','sex', 'desc', 'picture', 'price', 'ownername', 'telephone']
 
         widgets = {
             'birth': forms.DateInput({'class': 'weui-input', 'type': 'date', 'placeholder': '请输入时间'}),
@@ -187,6 +189,8 @@ class DogBuyForm(forms.ModelForm):
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
 
+        self.fields['pet_class'].widget.attrs['class'] = 'weui-select'
+
         self.fields['ages'].widget.attrs['class'] = 'weui-input'
         self.fields['ages'].widget.attrs['placeholder'] = '请输入宠物年龄'
 
@@ -200,7 +204,7 @@ class DogBuyForm(forms.ModelForm):
 
     class Meta:
         model = DogBuy
-        fields = ['typeid','ages','sex','price','buyname','telephone']
+        fields = ['typeid','pet_class','ages','sex','price','buyname','telephone']
         widgets  = {
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
         }
@@ -213,6 +217,8 @@ class DogSaleForm(forms.ModelForm):
 
         self.fields['typeid'].widget.attrs['class'] = 'weui-input'
         self.fields['typeid'].widget.attrs['placeholder'] = '请输入品种'
+
+        self.fields['pet_class'].widget.attrs['class'] = 'weui-select'
 
         self.fields['ages'].widget.attrs['class'] = 'weui-input'
         self.fields['ages'].widget.attrs['placeholder'] = '请输入年龄'
@@ -231,7 +237,7 @@ class DogSaleForm(forms.ModelForm):
 
     class Meta:
         model = DogSale
-        fields = ['typeid','ages','price','desc','picture','ownername','telephone']
+        fields = ['typeid','ages', 'pet_class', 'price','desc','picture','ownername','telephone']
         widgets  = {
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
         }

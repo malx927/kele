@@ -36,10 +36,12 @@
                    <label class="weui-form-preview__label">宠物特征:</label>
                    <span class="weui-form-preview__value">{{ object.desc }}</span>
                </div>
+               {% if object.sex == "公" %}
                 <div class="weui-form-preview__item">
                    <label class="weui-form-preview__label">价格区间:</label>
                    <span class="weui-form-preview__value">{{ object.price }}</span>
                </div>
+               {% endif %}
                 <div class="weui-form-preview__item">
                    <label class="weui-form-preview__label">主人电话:</label>
                    <span class="weui-form-preview__value">{{ object.telephone }}</span>

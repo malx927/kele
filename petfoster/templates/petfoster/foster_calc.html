@@ -18,9 +18,12 @@
     </div>
     <div class="weui-panel__bd">
         <form id="form1" action="" method="post" enctype="multipart/form-data" onsubmit="return checkeValue();">{% csrf_token %}
-        <div class="weui-cells weui-cells_form cells_top" id="uploader">
+        <div class="weui-cells weui-cells_form weui-cells_checkbox cells_top" id="uploader">
             {% if flag %}
                 <input type="hidden" name="flag" id="flag" value="{{ flag }}">
+            {% endif %}
+            {% if member %}
+                <input type="hidden" name="member" id="member" value="{{ member }}">
             {% endif %}
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.big_dog.label }}:</label></div>
@@ -37,14 +40,6 @@
                 <div class="weui-cell__bd">{{ form.small_dog }}</div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_type.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.foster_type }}</div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_mode.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.foster_mode }}</div>
-            </div>
-            <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.begin_time.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.begin_time }}</div>
             </div>
@@ -52,8 +47,26 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.end_time.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.end_time }}</div>
             </div>
+             <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_type.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.foster_type }}</div>
+            </div>
+          </div>
+          <div class="weui-cells__title black" style="font-size:17px;">{{ form.foster_mode.label }}</div>
+          <div class="weui-cells weui-cells_checkbox">
+            {% for chioce in form.fields.foster_mode.choices %}
+                {% if chioce.0 != "" %}
+                <label class="weui-cell weui-check__label" for="id_foster_mode_{{ chioce.0 }}">
+                    <div class="weui-cell__hd">
+                        <input type="radio" class="weui-check" name="foster_mode" value="{{ chioce.0 }}" id="id_foster_mode_{{ chioce.0 }}" >
+                        <i class="weui-icon-checked"></i>
+                    </div>
+                    <div class="weui-cell__bd"><p>{{ chioce.1 }}</p></div>
+                </label>
+                {% endif %}
+            {% endfor %}
+          </div>
 
-        </div>
          {% if flag is None and request.session.is_member%}
         <div class="weui-cells__title">选中寄养宠物</div>
         <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
@@ -70,7 +83,9 @@
         </div>
          {% endif %}
         <div class="weui-btn-area">
-            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >提交</button>
+            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >
+                {% if flag == "test" %}计算{% else %}提交{% endif %}
+            </button>
         </div>
         </form>
     </div>
@@ -80,13 +95,81 @@
 {% block bottomjs %}
      {{ block.super }}
     <script>
+    $(function(){
+        $("#id_begin_time").on("change", function(event){
+            var beginDate = event.target.value;
+            var endDate = $("#id_end_time").val();
+            if (beginDate.length == 0 || endDate.length == 0) return;
+            if(endDate.length > 0 && endDate < beginDate ){
+                 weui.alert("开始时间不能大于结束时间");
+                 $("#id_begin_time").focus();
+            }
+            var days = dateDiff(beginDate, endDate);
+            setFosterType(days);
+        });
+        $("#id_end_time").on("change", function(event){
+            var endDate = event.target.value;
+            var beginDate = $("#id_begin_time").val();
+            if (beginDate.length == 0 || endDate.length == 0) return;
+            if(beginDate.length > 0 && endDate < beginDate){
+                weui.alert("结束时间不能小于开始时间");
+                $("#id_end_time").focus();
+            }
+            var days = dateDiff(beginDate, endDate);
+            setFosterType(days);
+         });
+
+        $("#id_big_dog, #id_middle_dog, #id_small_dog").on("input", function( event ){
+            var bigCount =  $("#id_big_dog").val() || 0;
+            var midCount =  $("#id_middle_dog").val() || 0;
+            var smlCount =  $("#id_small_dog").val() || 0;
+            var nCount = parseInt(midCount) + parseInt(bigCount) + parseInt(smlCount);
+            console.log(nCount, parseInt(bigCount), parseInt(midCount), parseInt(smlCount));
+            if( nCount > 1){
+                $("#id_foster_mode_1").hide();
+                $("#id_foster_mode_3").hide();
+                $("#id_foster_mode_2").click();
+            }
+            else if( parseInt(bigCount) == 1 ){
+                $("#id_foster_mode_2").hide();
+                $("#id_foster_mode_3").hide();
+                $("#id_foster_mode_1").click();
+            }
+            else if( parseInt(midCount) ==1 || parseInt(smlCount) ==1 ){
+                $("#id_foster_mode_1").hide();
+                $("#id_foster_mode_2").hide();
+                $("#id_foster_mode_3").click();
+            }
+            else{
+
+            }
+        })
+
+    });
+
+    function setFosterType(days){
+        if(days <=30){
+            $("#id_foster_type").val(1);   ///短期寄养
+        }
+        else{
+            $("#id_foster_type").val(2);   ////长期寄养
+        }
+    }
+
+    function dateDiff(beginDate, endDate){
+        var bDate = new Date(beginDate);
+        var eDate = new Date(endDate);
+        var days  =  parseInt(Math.abs(eDate - bDate)/1000/60/60/24) + 1 ;
+        return days;
+    }
+
     function checkeValue(){
 
-       var bigCount =  $("#id_big_dog").val();
-       var midCount =  $("#id_middle_dog").val();
-       var smlCount =  $("#id_small_dog").val();
+       var bigCount =  $("#id_big_dog").val()||0;
+       var midCount =  $("#id_middle_dog").val()||0;
+       var smlCount =  $("#id_small_dog").val()||0;
 
-       var nCount = parseInt(bigCount) || parseInt(midCount) || parseInt(smlCount);
+       var nCount = parseInt(bigCount) + parseInt(midCount) + parseInt(smlCount);
 
         if( nCount == 0 || isNaN(nCount) ){
              weui.alert("请填写寄养宠物数量");
@@ -115,5 +198,8 @@
       {% endif %}
        showing();
     }
+
+
+
     </script>
 {% endblock bottomjs %}

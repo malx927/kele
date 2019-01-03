@@ -7,7 +7,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from wxchat.views import doginstitution, DoginstitutionAdd, DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
-    dogAdoptNav, dogTradeNav, showMyQRCode, showQRCode, myScore, PetWorldView, createLongQRCode
+    dogAdoptNav, dogTradeNav, showMyQRCode, showQRCode, myScore, PetWorldView, createLongQRCode, ContactUsView
 
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, DogdeliveryDetailView, FreshmanDetailView, \
     dogOrder, orderSuccess, DogpayNotify, DogPayOrderView, orderList
@@ -93,7 +93,7 @@ urlpatterns = [
 
     #我的
     url(r'^myinfo/$', myInfo,name='my-info'),
-    url(r'^contactinfo/$', TemplateView.as_view(template_name="wxchat/contact_info.html"), name='contact-info'),
+    url(r'^contactus/$', ContactUsView.as_view(), name='contact-us'),
 
     #微信支付
     url(r'^pay/paylist$', payList,name='pay-list'),

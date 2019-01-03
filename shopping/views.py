@@ -390,6 +390,7 @@ def payNotify(request):
 
                     MemberRechargeRecord.objects.update_or_create( defaults=data, out_trade_no=out_trade_no )
 
+
                     try:
                         deposit = MemberDeposit.objects.get(openid=openid)
                         if deposit.add_time != pay_time:
@@ -543,10 +544,8 @@ class OrderView(View):
 
         try:
             out_trade_no = request.POST.get("out_trade_no", None)
-            print('out_trade_no=', out_trade_no)
             if action == "remove":
                 close_ret = wxPay.order.close( out_trade_no )
-                print("close order",close_ret)
                 order = Order.objects.get(out_trade_no = out_trade_no, user_id=user_id)
                 OrderItem.objects.filter(order=order).delete()
                 order.delete()
@@ -626,3 +625,15 @@ class RechargeAmountView(View):
                 'errmsg':   wxe.errmsg
             }
             return HttpResponse(json.dumps(errors))
+
+class MemberRechargeConsumeListView(View):
+
+    def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", None)
+        recharges = MemberRechargeRecord.objects.filter(openid=openid, status=1)
+        orders = Order.objects.filter(user_id=openid, status=1)
+        context = {
+            "recharges": recharges,
+            "orders": orders
+        }
+        return render(request, template_name="shopping/my_recharge_consume_list.html", context=context)

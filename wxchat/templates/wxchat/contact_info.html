@@ -1,5 +1,23 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% include 'shopping/include/jssdk.html' %}
+<script>
+ wx.ready(function () {
 
+    $("#dog_walk").on('click',function(){
+         wx.openLocation({
+          latitude: 40.7094,
+          longitude: 120.765,
+          name: '宠物乐园',
+          address: '东砬村(葫芦岛市龙港区双树乡东砬村)',
+          scale: 14,
+          infoUrl: ''
+        });
+    });
+
+});
+</script>
+{% endblock extra %}
 {% block container %}
 <div class="weui-panel">
     <div class="weui-panel__hd header_bottom">
@@ -18,6 +36,10 @@
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">联系电话:</label></div>
                 <div class="weui-cell__bd">18104299771</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">地理位置:</label></div>
+                <div class="weui-cell__bd"><a id="dog_walk" class="weui-btn weui-btn_mini weui-btn_plain-primary">点击查看</a></div>
             </div>
         </div>
     </div>

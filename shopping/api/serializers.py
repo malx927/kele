@@ -12,7 +12,7 @@ from easy_thumbnails.files import get_thumbnailer
 
 
 from shopping.models import Goods,Order,OrderItem, GoodsType, ShopCart, MemberScore, MemberScoreDetail
-
+from shopping.models import MemberDeposit, MemberRechargeRecord
 from rest_framework import serializers
 
 
@@ -39,7 +39,7 @@ class GoodsTypeSerializer(serializers.ModelSerializer):
     counts = SerializerMethodField()
     class Meta:
         model = GoodsType
-        fields = ('id','name','counts','children','sort')
+        fields = ('id','name','link_url','counts','children','sort')
 
     def get_children(self,obj):
         types = GoodsType.objects.filter(parent=obj.id)
@@ -79,3 +79,12 @@ class MemberScoreSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('id','nickname','user_id','total_scores','details')
 
 
+
+# 会员储值
+class MemberDepositSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MemberDeposit
+        fields = ('id', 'total_money', 'consume_money', 'balance')
+
+# 会员充值明细

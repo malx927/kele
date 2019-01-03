@@ -62,7 +62,12 @@ class DogbreedListAPIView(ListAPIView):
     queryset = DogBreed.objects.all()
     serializer_class = DogbreedListSerializer
     def get_queryset(self):
-        return  DogBreed.objects.filter(is_show=1)
+        queryset = DogBreed.objects.filter(is_show=1)
+        sex = self.request.query_params.get('sex', None)
+        if sex is not None:
+            queryset = queryset.filter(sex=sex)
+        return queryset
+
 
 class DogBreedDetailAPIView(RetrieveAPIView):
     queryset = DogBreed.objects.all()

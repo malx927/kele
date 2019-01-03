@@ -26,9 +26,9 @@ Vaccine_TYPE_CHOICE = (
     (1, u'是'),
 )
 
-Type_TYPE_CHOICE = (
-    (0, u'犬'),
-    (1, u'猫'),
+PET_TYPE_CHOICE = (
+    (0, u'狗狗'),
+    (1, u'猫咪'),
 )
 
 bodytype_TYPE_CHOICE = (
@@ -332,7 +332,8 @@ class DogOrderItem(models.Model):
 # 宠物配种
 class DogBreed(models.Model):
     name = models.CharField(verbose_name=u'宠物昵称', max_length=50)
-    sex = models.CharField(verbose_name=u'宠物性别', max_length=10,choices=TYPE_SEX_CHOICE,null=True,blank=True)
+    pet_class = models.IntegerField(verbose_name=u'宠物种类', choices=PET_TYPE_CHOICE, default=0)
+    sex = models.CharField(verbose_name=u'宠物性别', max_length=10,choices=TYPE_SEX_CHOICE, null=True, blank=True)
     ages = models.CharField(verbose_name=u'狗龄', max_length=50 ,blank=True)
     birth =  models.DateField(verbose_name=u'出生日期',blank=True,null=True)
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
@@ -407,6 +408,7 @@ class DogDelivery(models.Model):
 # 宠物求购
 class DogBuy(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
+    pet_class = models.IntegerField(verbose_name=u'宠物种类', choices=PET_TYPE_CHOICE, default=0)
     ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True)
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
@@ -431,6 +433,7 @@ class DogBuy(models.Model):
 # 宠物出售
 class DogSale(models.Model):
     typeid = models.CharField(verbose_name=u'宠物品种',max_length=32)
+    pet_class = models.IntegerField(verbose_name=u'宠物种类', choices=PET_TYPE_CHOICE, default=0)
     ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
     desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)

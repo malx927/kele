@@ -32,8 +32,7 @@
             </div>
             <div class="weui-panel__bd" id="dogMM"></div>
             <div class="weui-panel__ft">
-                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogMMmore"
-                   style="display: none">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="dogMMmore" style="display: none">
                     <div class="weui-cell__bd">查看更多</div>
                     <span class="weui-cell__ft"></span>
                 </a>
@@ -66,15 +65,15 @@
         <div class="weui-actionsheet">
             <div class="weui-actionsheet__menu">
                 <div class="weui-actionsheet__cell">
-                   <a href="{% url 'dog-breed-add' %}?next={{ next }}" >
+                   <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=0" >
                         <img  src="{% static 'wxchat/images/gg.png' %}">
-                        <p><h4>GG相亲<h4></p>
+                        <p><h4>GG相亲</h4></p>
                     </a>
                 </div>
                 <div class="weui-actionsheet__cell">
                       <a href="{% url 'dog-breed-add' %}?next={{ next }}&sex=1" >
                             <img src="{% static 'wxchat/images/mm.png' %}">
-                            <p><h4>MM相亲<h4></p>
+                            <p><h4>MM相亲</h4></p>
                       </a>
                 </div>
             </div>
@@ -103,28 +102,33 @@
             });
 
             $('#dogGGmore').on('click', function () {
-                getDataList(nextUrl);
+                next_url = $(this).attr("data-item");
+                getDataList(next_url, 'dogGG');
             });
             $('#dogMMmore').on('click', function () {
-                getDogOwnerList(nextUrl);
+                next_url = $(this).attr("data-item");
+                getDataList(next_url, 'dogMM');
             });
-            getDogMMList(nextUrl);
-            getDataList(nextUrl);
+
+            getDataList(nextUrl + "?sex=公", 'dogGG');
+            getDataList(nextUrl + "?sex=母", 'dogMM');
         });
-        function getDataList(url) {
+        function getDataList(url, obj_id) {
             $.ajax({
                 type: 'GET',
                 url: url,
                 dataType: 'json',
                 timeout: 5000,
-                context: $('#dogGG'),
+                context: $('#'+obj_id),
                 success: function (data) {
                     nextUrl = data.next;
-                    appendItem(data.results);
+
+                    appendItem(data.results, obj_id);
                     if (nextUrl == null)
-                        $('#dogGGmore').css('display', 'none');
+                        $('#' + obj_id + 'more').css('display', 'none');
                     else
-                        $('#dogGGmore').css('display', '');
+                        $('#' + obj_id + 'more').css('display', '');
+                        $('#' + obj_id + 'more').attr('data-item', nextUrl);
                     loading.hide();
                     setScollPos();
                 },
@@ -134,74 +138,34 @@
             });
         }
 
-        function appendItem(results) {
+        function appendItem(results, obj_id) {
             $.each(results, function (index, item) {
-                var sex = item.sex;
-                if ( sex == '公'){
-                    img_url = item.thumb_url;
-                    if(img_url == null){
-                        img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
-                    }
-                    else{
-                        img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
-                    }
-                    lossitem = '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd">' + img_url + '</div>' +
-                            '<div class="weui-media-box__bd">' +
-                            '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
-                            '<p class="weui-media-box__desc">' + item.desc + '</p>' +
-                            '</div>' +
-                            '</a>';
-                    $('#dogGG').append(lossitem);
+                var img_url = item.thumb_url;
+                if(img_url == null){
+                    img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
                 }
+                else{
+                    img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+                }
+
+                var pet_img = '';
+                if(item.pet_class == 0){
+                     pet_img = '<span class="r"><b><i class="icon iconfont icon-pet7 color-warning" ></i></b></span>';
+                }
+                else{
+                    pet_img = '<span class="r"><b><i class="icon iconfont icon-maomi color-warning" ></i></b></span>';
+                }
+
+                item = '<a href="/wechat/dogbreeddetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
+                        '<div class="weui-media-box__hd">' + img_url + '</div>' +
+                        '<div class="weui-media-box__bd">' +
+                        '<h4 class="weui-media-box__title">' + item.name + pet_img +'</h4>' +
+                        '<p class="weui-media-box__desc">' + item.desc + '</p>' +
+                        '</div>' +
+                        '</a>';
+                $('#'+obj_id).append(item);
             });
 
-        }
-        function getDogMMList(url) {
-            $.ajax({
-                type: 'GET',
-                url: url,
-                dataType: 'json',
-                timeout: 5000,
-                context: $('#dogMM'),
-                success: function (data) {
-                    nextUrl = data.next;
-                    appendDogMMItem(data.results);
-                    if (nextUrl == null)
-                        $('#dogMMmore').css('display', 'none');
-                    else
-                        $('#dogMMmore').css('display', '');
-                    loading.hide();
-                    setScollPos();
-                },
-                error: function (xhr, type, error) {
-                    console.log(type);
-                }
-            });
-        }
-
-        function appendDogMMItem(results) {
-            $.each(results, function (index, item) {
-                var img_url = item.picture;
-                var sex = item.sex;
-                if ( sex == '母'){
-                    img_url = item.thumb_url;
-                    if(img_url == null){
-                        img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
-                    }
-                    else{
-                        img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
-                    }
-                    lossitem = '<a href="/wechat/dogfemaledetail/' + item.id + '" class="weui-media-box weui-media-box_appmsg">' +
-                            '<div class="weui-media-box__hd">' + img_url + '</div>' +
-                            '<div class="weui-media-box__bd">' +
-                            '<h4 class="weui-media-box__title">' + item.name + '</h4>' +
-                            '<p class="weui-media-box__desc">' + item.desc + '</p>' +
-                            '</div>' +
-                            '</a>';
-                    $('#dogMM').append(lossitem);
-                }
-            });
         }
 
         ////设置滚动条位置
@@ -223,23 +187,7 @@
             });
         });
 
-{#        $('#pet_breed').on("click",function(){#}
-{#            weui.actionSheet([#}
-{#             {#}
-{#                 label: '<i class="icon iconfont icon-man icon_pink"></i> GG相亲',#}
-{#                 className:'color-primary',#}
-{#                 onClick: function () {#}
-{#                     window.location.href="{% url 'dog-breed-add' %}?next={{ request.get_full_path }}";#}
-{#                 }#}
-{#             }, {#}
-{#                 label: '<i class="icon iconfont icon-female4 icon_pink"></i> MM相亲',#}
-{#                 className:'color-success',#}
-{#                 onClick: function () {#}
-{#                     window.location.href="{% url 'dog-breed-add' %}?sex=1&next={{ request.get_full_path }}";#}
-{#                 }#}
-{#             },#}
-{#             ]);#}
-{#        });#}
+
 
     </script>
 {% endblock bottomjs %}

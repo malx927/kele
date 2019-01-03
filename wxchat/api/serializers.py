@@ -183,6 +183,7 @@ class DogbreedListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'pet_class',
             'ages',
             'birth',
             'sex',
@@ -244,7 +245,7 @@ class DogBuySerializer(serializers.ModelSerializer):
     # typename = serializers.CharField(source='typeid.typename',read_only=True)
     class Meta:
         model = DogBuy
-        fields = ['id', 'typeid', 'ages','sex','price','buyname','telephone']
+        fields = ['id', 'typeid', 'pet_class', 'ages','sex','price','buyname','telephone']
 
 
 class DogSaleSerializer(serializers.ModelSerializer):
@@ -252,7 +253,7 @@ class DogSaleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DogSale
-        fields = ['id', 'typeid', 'ages','desc','sex','price','thumb_url','picture','ownername','telephone']
+        fields = ['id', 'typeid', 'pet_class', 'ages', 'desc', 'sex', 'price', 'thumb_url', 'picture', 'ownername', 'telephone']
 
     def get_thumb_url(self,obj):
         if obj.picture:

@@ -222,22 +222,28 @@ def createMenu(request):
                 "name": "宠物社区",
                 "url": APP_URL + "/redirect/dogindex"
             },
-            {
-                "name": "会员中心",
-                "sub_button": [
-                    {
-                        "type": "view",
-                        "name": "我的推广码",
-                        "url": APP_URL + "/redirect/myqrcode"
-                    },
-                    {
-                        "type": "view",
-                        "name": "我的积分",
-                        "url": APP_URL + "/redirect/myscore"
-                    },
-                ]
+             {
+                "type": "view",
+                "name": "个人中心",
+                "url": APP_URL + "/redirect/myinfo"
+            },
 
-            }
+            # {
+            #     "name": "会员中心",
+            #     "sub_button": [
+            #         {
+            #             "type": "view",
+            #             "name": "我的推广码",
+            #             "url": APP_URL + "/redirect/myqrcode"
+            #         },
+            #         {
+            #             "type": "view",
+            #             "name": "我的积分",
+            #             "url": APP_URL + "/redirect/myscore"
+            #         },
+            #     ]
+            #
+            # }
         ]
     })
     return HttpResponse(json.dumps(resp))
@@ -381,11 +387,10 @@ def dogBreed(request):
 
 
 def dogBreedAdd(request):
-    sex = request.GET.get('sex')
+    sex = request.GET.get('sex', '0')
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=', openid)
         next = request.GET.get('next', None)
         form = DogBreedForm(request.POST, request.FILES)
         if form.is_valid():
@@ -404,9 +409,7 @@ def dogBreedAdd(request):
     else:
         form = DogBreedForm()
         next = request.GET.get('next', '')
-        if sex == '1':
-            return render(request, 'wxchat/dogfemale_add.html', {'form': form, 'next': next})
-        return render(request, 'wxchat/dogbreed_add.html', {'form': form, 'next': next})
+        return render(request, 'wxchat/dogbreed_add.html', {'form': form, 'next': next, "sex": sex})
 
 
 # 配种详细视图
@@ -715,7 +718,6 @@ def orderList(request):
             out_trade_no = request.POST.get("out_trade_no", None)
             if action == "remove":
                 close_ret = wxPay.order.close( out_trade_no )
-                print("close order",close_ret)
                 DogOrder.objects.get(out_trade_no = out_trade_no, user_id=user_id).delete()
                 context["success"] = "true"
             elif action == "update":
@@ -887,7 +889,6 @@ def dogBuyAdd(request):
     if request.method == 'POST':
         openid = request.session.get('openid')
         nickname = request.session.get('nickname')
-        print('openid=', openid)
         next = request.GET.get('next', None)
         form = DogBuyForm(request.POST)
         if form.is_valid():
@@ -1142,7 +1143,7 @@ def payNotify(request):
         xml = dict_to_xml(data, '')
         return HttpResponse(xml)
     except InvalidSignatureException as error:
-        print(error)
+        pass
 
 
 def getJsApiSign(request):
@@ -1302,8 +1303,7 @@ def dogIndex(request):
 
 
 def myInfo(request):
-    # return render(request, 'wxchat/myinfo.html')
-    return render(request, 'shopping/user_shop_list.html')
+    return render(request, 'wxchat/myinfo.html')
 
 @login_required
 def createLongQRCode(request):
@@ -1381,7 +1381,6 @@ def showQRCode(request):
             print(cur_date)
             delta_time = (cur_date - create_date).days
 
-        print('delta_time:', delta_time)
         is_member = 1 if user.is_member else 0
         if user and user.qr_image and delta_time < 28:
             context['img_url'] = urlquote_plus( user.qr_image.url )
@@ -1392,7 +1391,6 @@ def showQRCode(request):
             context['is_member'] = is_member
 
     except WxUserinfo.DoesNotExist:
-        print('WxUserinfo.DoesNotExist')
         context['img_url'] = 'empty'
         context['is_member'] = 0
 
@@ -1424,7 +1422,7 @@ def orderRefund(request):
     total_fee = '1'
     refund_fee = '1'
     ret = wxPay.refund.apply(total_fee=total_fee, refund_fee=refund_fee, transaction_id= transaction_id, out_refund_no=out_refund_no)
-    print('orderRefund', ret)
+
     return HttpResponse(ret)
 
 
@@ -1439,3 +1437,9 @@ class PetWorldView(View):
 
         return render(request,template_name="wxchat/petworlddetail.html",context={'object':pet_world})
 
+
+class ContactUsView(View):
+
+    def get(self, request, *args, **kwargs):
+        sign = getJsApiSign(request)
+        return render(request, template_name="wxchat/contact_info.html", context={"sign": sign})
