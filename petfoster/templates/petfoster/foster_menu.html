@@ -34,7 +34,7 @@
         <div class="weui-panel__bd">
             <div style="margin-top: 30px;">
                 <a class="weui-btn weui-btn_primary btn_size" href="{% url 'foster-style-calc-nav' %}">寄养费用计算</a>
-                <a class="weui-btn weui-btn_primary btn_size"  id="myfoster" href="#">我要寄养</a>
+                <a class="weui-btn weui-btn_primary btn_size"  id="myfoster" href="{% url 'foster-pet-list'  %}">我要寄养</a>
             </div>
             <div id="op_list">
                 <a class="weui-btn weui-btn_plain-primary btn_size"  id="member" {% if request.session.is_member %}  href="{% url 'foster-pet-list'  %}" {% endif %}>会员</a>
@@ -53,10 +53,7 @@
     {{ block.super }}
     <script type="application/javascript">
     $(function(){
-            $("#myfoster").on("click", function(e){
-                e.preventDefault();
-                $("#op_list").css("display","block");
-            })
+
     });
 
     </script>

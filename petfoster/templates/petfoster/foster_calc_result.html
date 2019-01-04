@@ -1,12 +1,18 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
+    <style>
+    .btn_width{
+        width: 45%!important;
+        font-size:16px;
+    }
+    </style>
 {% endblock extra%}
 {% block container %}
 <div class="weui-panel">
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养费用结果</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if member == "1" %}会员{% else %}非会员{% endif %}寄养费用结果</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
@@ -28,11 +34,11 @@
         <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
             <div class="weui-cell" style="width:35%">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.big_dog.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.big_dog.value }}</div>
+                <div class="weui-cell__bd">{{ form.big_dog.value|default:0 }}</div>
             </div>
             <div class="weui-cell" style="width:55%">
                 <div class="weui-cell__hd"><label class="weui-label">每日费用(元):</label></div>
-                <div class="weui-cell__bd color-danger">{{ result_data.big_price|floatformat:2 }}</div>
+                <div class="weui-cell__bd color-danger">{{ form.instance.big_price|floatformat:2 }}</div>
             </div>
          </div>
          <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
@@ -40,34 +46,50 @@
                 <div class="weui-cell__hd">
                     <label for="" class="weui-label">{{ form.middle_dog.label }}:</label>
                 </div>
-                <div class="weui-cell__bd">{{ form.middle_dog.value }}</div>
+                <div class="weui-cell__bd">{{ form.middle_dog.value|default:0 }}</div>
             </div>
              <div class="weui-cell" style="width:55%">
                 <div class="weui-cell__hd">
                     <label for="" class="weui-label">每日费用(元):</label>
                 </div>
-                <div class="weui-cell__bd color-danger">{{ result_data.mid_price|floatformat:2 }}</div>
+                <div class="weui-cell__bd color-danger">{{ form.instance.middle_price|floatformat:2 }}</div>
             </div>
         </div>
          <div class="weui-cells weui-cells_form cells_top" style="display: flex;">
             <div class="weui-cell" style="width:35%">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.small_dog.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.small_dog.value }}</div>
+                <div class="weui-cell__bd">{{ form.small_dog.value|default:0 }}</div>
             </div>
              <div class="weui-cell" style="width:55%">
                 <div class="weui-cell__hd"><label for="" class="weui-label">每日费用(元):</label></div>
-                <div class="weui-cell__bd color-danger">{{ result_data.sml_price|floatformat:2 }}</div>
+                <div class="weui-cell__bd color-danger">{{ form.instance.small_price|floatformat:2 }}</div>
             </div>
         </div>
          <div class="weui-cells weui-cells_form cells_top">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间(天):</label></div>
-                <div class="weui-cell__bd color-danger">{{ result_data.days|floatformat:0 }}</div>
+                <div class="weui-cell__bd color-danger">{{ form.days|floatformat:0 }}</div>
             </div>
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">费用合计(元):</label></div>
-                <div class="weui-cell__bd color-danger">{{ result_data.total_price|floatformat:2 }}</div>
+                <div class="weui-cell__bd color-danger">{{ form.instance.total_price|floatformat:2 }}</div>
             </div>
+        </div>
+         <div class="weui-btn-area" style="display: flex">
+             {% if request.session.is_member == 0 %}
+                <a href="{% url 'member-recharge-amount' %}" class="weui-btn weui-btn_mini weui-btn_plain-primary btn_width" >我要成为会员</a>
+             {% else %}
+                 <a href="{% url 'member-recharge-amount' %}" class="weui-btn weui-btn_mini weui-btn_plain-primary btn_width" >会员充值</a>
+             {% endif %}
+             <a href="{% url 'foster-pet-list'  %}" class="weui-btn weui-btn_mini weui-btn_plain-primary btn_width cells_top" >我要寄养</a>
+        </div>
+         <div class="weui-btn-area">
+             {% if member == "1" %}
+                 <a class="weui-btn weui-btn_primary btn_size"  href="{% url 'foster-style-calc' %}?flag=test&member=0">非会员计算</a>
+             {% else %}
+                 <a class="weui-btn weui-btn_primary btn_size"  href="{% url 'foster-style-calc' %}?flag=test&member=1">会员计算</a>
+             {% endif %}
+
         </div>
     </div>
 </div>

@@ -436,7 +436,7 @@ class DogSale(models.Model):
     pet_class = models.IntegerField(verbose_name=u'宠物种类', choices=PET_TYPE_CHOICE, default=0)
     ages = models.CharField(verbose_name=u'年龄', max_length=50 ,blank=True,null=True,default='')
     sex = models.CharField(verbose_name=u'性别', max_length=10,choices=TYPE_SEX_CHOICE,blank=True,null=True)
-    desc = models.CharField(verbose_name=u'特点', max_length=50,blank=True,null=True)
+    desc = models.CharField(verbose_name=u'特点', max_length=200,blank=True,null=True)
     picture = ThumbnailerImageField(verbose_name=u'照片',  upload_to='sale/%Y%m%d/', blank=True,null=True)
     price = models.CharField(verbose_name=u'价格区间', max_length=50,blank=True,null=True)
     ownername = models.CharField(verbose_name=u'主人姓名', max_length=20,null=True,blank=True)

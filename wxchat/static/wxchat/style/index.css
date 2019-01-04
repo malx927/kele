@@ -66,7 +66,8 @@ a{
     clear:both;
 }
 .title{
-    font-size:14px;
+    color: #000000!important;
+    font-size:14px!important;
 }
 .center{
     text-align: center;
@@ -293,7 +294,7 @@ a{
 }
 
 .cells_top {
-    margin-top: 0px;
+    margin-top: 0px!important;
 }
 
 .male{

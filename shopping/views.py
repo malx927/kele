@@ -409,6 +409,7 @@ def payNotify(request):
                         MemberDeposit.objects.create(**values)
 
                     #更新储值卡
+                    #判断是否是会员，不是会员更新为会员
 
                 else:
                     order =getShoppingOrder(openid, res_data['out_trade_no'])

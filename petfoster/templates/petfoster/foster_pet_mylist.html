@@ -48,11 +48,13 @@
                              <div class="weui-flex__item"><span>性别：</span>{{ object.get_sex_display }}</div>
                             <div class="weui-flex__item"><span>绝育：</span>{{ object.get_sterilization_display }}</div>
                          </div>
-
                     </div>
-                    <div class="weui-cell__ft">
-                    </div>
+                    <div class="weui-cell__ft"></div>
                     </a>
+                    {% empty %}
+                    <div style="height: 50vh;line-height: 50vh;text-align: center">
+                        <a class="weui-btn weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-pet-info' %}">宠物录入</a>
+                    </div>
                 {% endfor %}
             </div>
         </div>

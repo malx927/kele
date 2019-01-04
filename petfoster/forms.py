@@ -162,9 +162,9 @@ class FosterStyleChooseForm(forms.ModelForm):
         self.fields['foster_type'].empty_label=''
         self.fields['foster_type'].widget.attrs['disabled'] = 'true'
 
-        self.fields['foster_mode'].widget.attrs['class'] = 'weui-select'
-        self.fields['foster_mode'].empty_label = ''
-        #
+        # self.fields['foster_mode'].widget.attrs['class'] = 'weui-select'
+        # self.fields['foster_mode'].empty_label = ''
+        # #
         # self.fields['end_time'].widget.attrs['class'] = 'weui-input'
         # self.fields['end_time'].widget.attrs['placeholder'] = '其他情况'
 

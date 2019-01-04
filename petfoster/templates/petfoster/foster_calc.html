@@ -12,13 +12,13 @@
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养费用计算</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if member == "1" %}会员{% elif member == "0" %}非会员{% endif %}寄养费用计算</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
     <div class="weui-panel__bd">
-        <form id="form1" action="" method="post" enctype="multipart/form-data" onsubmit="return checkeValue();">{% csrf_token %}
-        <div class="weui-cells weui-cells_form weui-cells_checkbox cells_top" id="uploader">
+        <form  action="" method="post" enctype="multipart/form-data" onsubmit="return checkValue();">{% csrf_token %}
+        <div class="weui-cells weui-cells_form weui-cells_checkbox cells_top" >
             {% if flag %}
                 <input type="hidden" name="flag" id="flag" value="{{ flag }}">
             {% endif %}
@@ -67,7 +67,7 @@
             {% endfor %}
           </div>
 
-         {% if flag is None and request.session.is_member%}
+         {% if flag is None %}
         <div class="weui-cells__title">选中寄养宠物</div>
         <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
             {% for pet in pets %}
@@ -84,7 +84,7 @@
          {% endif %}
         <div class="weui-btn-area">
             <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >
-                {% if flag == "test" %}计算{% else %}提交{% endif %}
+                {% if flag == "test" %}{% if member == "1" %}会员{% elif member == "0" %}非会员{% endif %}计算{% else %}提交{% endif %}
             </button>
         </div>
         </form>
@@ -126,22 +126,27 @@
             var nCount = parseInt(midCount) + parseInt(bigCount) + parseInt(smlCount);
             console.log(nCount, parseInt(bigCount), parseInt(midCount), parseInt(smlCount));
             if( nCount > 1){
-                $("#id_foster_mode_1").hide();
-                $("#id_foster_mode_3").hide();
+                $("Label[for='id_foster_mode_1']").hide();
+                $("Label[for='id_foster_mode_2']").show();
+                $("Label[for='id_foster_mode_3']").hide();
                 $("#id_foster_mode_2").click();
             }
             else if( parseInt(bigCount) == 1 ){
-                $("#id_foster_mode_2").hide();
-                $("#id_foster_mode_3").hide();
+                $("Label[for='id_foster_mode_2']").hide();
+                $("Label[for='id_foster_mode_3']").hide();
+                $("Label[for='id_foster_mode_1']").show();
                 $("#id_foster_mode_1").click();
             }
             else if( parseInt(midCount) ==1 || parseInt(smlCount) ==1 ){
-                $("#id_foster_mode_1").hide();
-                $("#id_foster_mode_2").hide();
+                $("Label[for='id_foster_mode_1']").show();
+                $("Label[for='id_foster_mode_2']").hide();
+                $("Label[for='id_foster_mode_3']").show();
                 $("#id_foster_mode_3").click();
             }
             else{
-
+                $("Label[for='id_foster_mode_1']").show();
+                $("Label[for='id_foster_mode_2']").show();
+                $("Label[for='id_foster_mode_3']").show();
             }
         })
 
@@ -163,7 +168,7 @@
         return days;
     }
 
-    function checkeValue(){
+    function checkValue(){
 
        var bigCount =  $("#id_big_dog").val()||0;
        var midCount =  $("#id_middle_dog").val()||0;
@@ -196,6 +201,7 @@
            return false
        }
       {% endif %}
+      $("#id_foster_type").removeAttr("disabled")
        showing();
     }
 

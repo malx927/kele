@@ -346,49 +346,56 @@ class FosterCalculateView(View):
         return render(request, template_name="petfoster/foster_calc.html", context=context )
 
     def post(self,request):
-        user_id = request.session.get("openid", None)
-        is_member = request.session.get("is_member", None)
-        form = FosterStyleChooseForm(request.POST or None)
-        pet_list = request.POST.getlist("pet_list")
         flag = request.POST.get("flag", None)
-
-        pet_list_str = ''
-        if pet_list:
-            pet_list_str = ','.join(pet_list)
-
+        form = FosterStyleChooseForm(request.POST or None)
         if form.is_valid():
-            begin_time = form.cleaned_data["begin_time"]
-            end_time = form.cleaned_data["end_time"]
-            days = (end_time - begin_time).days + 1
-            data = {
-                "is_member": is_member,
-                "big_dog": form.cleaned_data["big_dog"] or 0,
-                "middle_dog": form.cleaned_data["middle_dog"] or 0,
-                "small_dog": form.cleaned_data["small_dog"] or 0,
-                "foster_type": form.cleaned_data["foster_type"].id,
-                "foster_mode": form.cleaned_data["foster_mode"].id,
-                "days": days or 0
-            }
-            result_data = foster_calc_price( data )
-            if result_data:
-                result_data["days"] = days
+            if flag == "test":      #测试计算
+                member = request.POST.get("member", None)
+                form = self.calculate_price( form, int(member))
+                return render(request, template_name="petfoster/foster_calc_result.html", context={"form": form, "member": member})
+            else:
+                user_id = request.session.get("openid", None)
+                is_member = request.session.get("is_member", None)
+                pet_list = request.POST.getlist("pet_list")
+                pet_list_str = ''
+                if pet_list:
+                    pet_list_str = ','.join(pet_list)
+                form = self.calculate_price( form, is_member)
 
-            instance = form.save(False)
-            instance.openid = user_id
-            instance.pet_list = pet_list_str
-            instance.big_price = result_data["big_price"] or 0
-            instance.middle_price = result_data["mid_price"] or 0
-            instance.small_price = result_data["sml_price"] or 0
-            instance.total_price = result_data["total_price"] or 0
-
-            if is_member and flag is None:
+                form.instance.openid = user_id
+                form.instance.pet_list = pet_list_str
                 instance = form.save()
                 url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
                 return HttpResponseRedirect(url)
-            else:
-                return render(request, template_name="petfoster/foster_calc_result.html", context={"form": form, "result_data": result_data })
         else:
+
             return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
+
+
+    def calculate_price(self, obj, is_member):
+        begin_time = obj.cleaned_data["begin_time"]
+        end_time = obj.cleaned_data["end_time"]
+        days = (end_time - begin_time).days + 1
+        data = {
+            "is_member": is_member,
+            "big_dog": obj.cleaned_data["big_dog"] or 0,
+            "middle_dog": obj.cleaned_data["middle_dog"] or 0,
+            "small_dog": obj.cleaned_data["small_dog"] or 0,
+            "foster_type": obj.cleaned_data["foster_type"].id,
+            "foster_mode": obj.cleaned_data["foster_mode"].id,
+            "days": days or 0
+        }
+        result_data = foster_calc_price( data )
+        if result_data:
+            result_data["days"] = days
+
+        instance = obj.save(False)
+        instance.big_price = result_data["big_price"] or 0
+        instance.middle_price = result_data["mid_price"] or 0
+        instance.small_price = result_data["sml_price"] or 0
+        instance.total_price = result_data["total_price"] or 0
+        obj.days = days
+        return  obj
 
 
 #宠物保险订单支付
