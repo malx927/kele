@@ -1,0 +1,107 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">交易密码修改</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="return checkValue()">{% csrf_token %}
+        <div class="weui-cells__title">请输入六位密码</div>
+        {% if error %}
+        <div class="weui-cells  cells_top" >
+           <div class="weui-cell">
+               <div class="weui-cell__hd"><i class="weui-icon-warn"></i></div>
+               <div class="weui-cell__bd"><p>{{ error }}</p></div>
+           </div>
+        </div>
+        {% endif %}
+        {% if form.errors %}
+         <div class="weui-cells  cells_top" >
+           <div class="weui-cell">
+               <div class="weui-cell__hd">
+                    <i class="weui-icon-warn"></i>
+                </div>
+                <div class="weui-cell__bd">
+                    <p>{{ form.errors.confirmpasswd.0 }}</p>
+                </div>
+            </div>
+          </div>
+           {% endif %}
+        <div class="weui-cells weui-cells_form cells_top" >
+           <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">原密码:</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="password" name="oldpasswd" id="id_oldpasswd"  maxlength="6" pattern="[A-Za-z0-9]+" placeholder="请输入原密码">
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">新密码:</label></div>
+                <div class="weui-cell__bd">
+                   <input class="weui-input" type="password" name="newpasswd"  id="id_newpasswd" maxlength="6" pattern="[A-Za-z0-9]+" placeholder="请输入新密码">
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">确认密码:</label>
+                </div>
+                <div class="weui-cell__bd">
+                      <input class="weui-input" type="password" name="confirmpasswd"  id="id_confirmpasswd" maxlength="6" pattern="[A-Za-z0-9]+" placeholder="请输入确认密码">
+                </div>
+            </div>
+            <div class="weui-btn-area">
+                <button type="submit" name="submit" class="weui-btn weui-btn_primary" >修改密码</button>
+                <a name="reset" class="weui-btn weui-btn_plain-primary" >密码重置</a>
+            </div>
+        </div>
+        </form>
+    </div>
+</div>
+<div id="toast" style="display:none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast" style="min-height:4.6em;">
+        <p class="weui-toast__content" style="margin-top:20px;"></p>
+    </div>
+</div>
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    $(function(){
+
+
+    });
+
+    function checkValue(){
+       let oldpwd = $("#id_oldpasswd").val();
+       let newpwd = $("#id_newpasswd").val();
+       let confirmpwd = $("#id_confirmpasswd").val();
+       if(oldpwd.length !=6 || newpwd.length !=6 || confirmpwd.length != 6){
+           showToast('请正确<br>填写密码');
+           return false;
+       }
+       if(newpwd != confirmpwd){
+           showToast('新密码和确认密码不一致');
+           return false;
+       }
+
+       showing();
+    }
+
+    function showToast(msg){
+       var $toast = $('#toast');
+       if ($toast.css('display') != 'none') return;
+        $('#toast .weui-toast__content').html(msg);
+        $toast.fadeIn(100);
+        setTimeout(function () {
+            $toast.fadeOut(100);
+        }, 2000);
+    }
+
+    </script>
+{% endblock bottomjs %}

@@ -12,6 +12,7 @@ from django.views.generic import DetailView, View
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.hashers import make_password, check_password
 # Create your views here.
 from wechatpy.events import UnsubscribeEvent, SubscribeEvent, ViewEvent
 from wechatpy.replies import TextReply, ImageReply, VoiceReply, ArticlesReply, TransferCustomerServiceReply, VideoReply
@@ -19,7 +20,7 @@ from wechatpy.utils import check_signature, ObjectDict
 from wechatpy.exceptions import InvalidSignatureException
 from doginfo.models import DogDelivery, DogAdoption, Freshman, DogOrder, DogStatus, DogStatusType, FoodPrice, DogOrderItem, \
     PetWorld
-from .forms import DogadoptForm, DogdeliveryForm, DogInstitutionForm
+from .forms import DogadoptForm, DogdeliveryForm, DogInstitutionForm, PasswordForm
 from wechatpy import parse_message, create_reply, WeChatClient
 from wechatpy.oauth import WeChatOAuth
 from wechatpy.client.api import WeChatJSAPI
@@ -32,7 +33,7 @@ from .forms import DogBreedForm, DogSaleForm
 from doginfo.models import DogLoss, DogOwner, Doginstitution
 from .models import WxUserinfo, WxUnifiedOrdeResult, WxPayResult, WxIntroduce, WxTemplateMsgUser
 from .forms import DogLossForm, DogOwnerForm, DogBuyForm
-from shopping.models import Order, MemberScore, MemberScoreDetail
+from shopping.models import Order, MemberScore, MemberScoreDetail, MemberDeposit
 from .utils import changeImage, mergeImage
 import datetime
 from PIL import Image
@@ -1247,11 +1248,12 @@ def sendTempMessageToUser( order, type=0 ):
         print("customer", ret)
 
 
-# 购买成功通知
+# 购买成功通知【保险和寄养通知】
 # w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays
 #{{first.DATA}} 商品名称：{{product.DATA}} 商品价格：{{price.DATA}} 购买时间：{{time.DATA}}{{remark.DATA}}
-def sendTemplateMesToKf(instance):
+def sendTemplateMesToKf(instance, toUser=0):
     template_kf = 'w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays'
+    template_custom = '0GW3-fx7BgKybE_e5IIhXJfH35Vparkv8dYrD8ewQ1I' #订单付款成功通知
     out_trade_no = instance.out_trade_no
     url = name = ""
     if out_trade_no.startswith("S"):
@@ -1289,6 +1291,35 @@ def sendTemplateMesToKf(instance):
     for user in msgUsers:
         ret = client.message.send_template(user_id=user.user.openid, template_id = template_kf,url=url, data=kf_data)
         print("kf_client", ret)
+
+    if toUser == 1:
+        custom_data ={
+            'first':{
+                "value":'您的订单已经购买成功！',
+                "color": color,
+            },
+            "keyword1":{
+               "value": instance.out_trade_no,
+               "color": color,
+            },
+            "keyword2":{
+               "value": instance.pay_time.strftime('%Y-%m-%d'),
+               "color": color,
+            },
+            "keyword3":{
+               "value":"{0}{1}".format(instance.cash_fee, '元'),
+               "color":color,
+            },
+            "keyword4": {
+               "value": "储值卡支付" if instance.pay_style ==1 else "微信支付",
+               "color": color,
+           },
+            "remark":{
+               "value": "感谢您的惠顾",
+               "color": color
+           }
+        }
+        client.message.send_template(user_id=instance.openid, template_id = template_custom , url=url, data=custom_data)
 
 
 def dogIndex(request):
@@ -1443,3 +1474,39 @@ class ContactUsView(View):
     def get(self, request, *args, **kwargs):
         sign = getJsApiSign(request)
         return render(request, template_name="wxchat/contact_info.html", context={"sign": sign})
+
+
+class PasswordView(View):
+    def get(self, request, *args, **kwargs):
+        form = PasswordForm()
+        return render(request, template_name="wxchat/change_pwd.html", context={"form": form })
+
+    def post(self, request, *args, **kwargs):
+
+        form = PasswordForm(request.POST)
+        if form.is_valid():
+            try:
+                openid = request.session.get("openid", None)
+                oldpwd = request.POST.get("oldpasswd", None)
+                newpasswd = request.POST.get("newpasswd", None)
+
+                user = MemberDeposit.objects.get(openid=openid)
+                bFlag = check_password(oldpwd, user.password)
+                if bFlag:
+                    new_password = make_password(newpasswd)
+                    user.password = new_password
+                    user.save()
+                    return HttpResponseRedirect(reverse('my-info'))
+                else:
+                    error = u"原密码错误"
+            except  MemberDeposit.DoesNotExist as ex :
+                error = u"用户不存在"
+
+            context = {
+                "form": form,
+                "error": error,
+            }
+            return  render(request, template_name="wxchat/change_pwd.html", context=context)
+        else:
+            return render(request, template_name="wxchat/change_pwd.html", context={"form": form })
+

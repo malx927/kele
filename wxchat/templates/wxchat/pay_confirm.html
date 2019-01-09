@@ -1,0 +1,85 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">支付确认</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form action="" method="post" enctype="multipart/form-data" onsubmit="return checkValue()">{% csrf_token %}
+        <div class="weui-cells__title">请输入支付密码</div>
+        {% if error %}
+        <div class="weui-cells" >
+           <div class="weui-cell">
+               <div class="weui-cell__hd"></div>
+               <div class="weui-cell__bd"><p class="weui-icon-warn">{{ error }}</p></div>
+           </div>
+        </div>
+        {% endif %}
+        <div class="weui-cells weui-cells_form cells_top" >
+            <input type="hidden" name="id" value="{{ instance.id }}">
+            <div class="weui-cell">
+                <div class="weui-cell__bd" style="text-align: center;">
+                    <p><i class="icon iconfont icon-pet pink" ></i>大眼可乐宠物联盟</p>
+                </div>
+            </div>
+             <div class="weui-cell">
+                <div class="weui-cell__bd" style="text-align: center;">
+                    <p>¥ {{ instance.total_price|floatformat:"2" }}</p>
+                </div>
+            </div>
+
+           <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">支付密码:</label></div>
+                <div class="weui-cell__bd">
+                    <input class="weui-input" type="password" name="password" id="id_passwd"  maxlength="6" pattern="[A-Za-z0-9]+" placeholder="请输入支付密码">
+                </div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <button type="submit" name="submit" class="weui-btn weui-btn_primary" >支付确认</button>
+        </div>
+        </form>
+    </div>
+</div>
+<div id="toast" style="display:none;">
+    <div class="weui-mask_transparent"></div>
+    <div class="weui-toast" style="min-height:4.6em;">
+        <p class="weui-toast__content" style="margin-top:20px;"></p>
+    </div>
+</div>
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    $(function(){
+
+
+    });
+
+    function checkValue(){
+       let password = $("#id_passwd").val();
+       if(password.length == 0){
+           showToast('支付密码<br>不能为空');
+           return false;
+       }
+       showing();
+    }
+
+    function showToast(msg){
+       var $toast = $('#toast');
+       if ($toast.css('display') != 'none') return;
+        $('#toast .weui-toast__content').html(msg);
+        $toast.fadeIn(100);
+        setTimeout(function () {
+            $toast.fadeOut(100);
+        }, 2000);
+    }
+
+    </script>
+{% endblock bottomjs %}

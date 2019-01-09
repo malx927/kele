@@ -1,6 +1,7 @@
 #-*-coding:utf-8-*-
 __author__ = 'malxin'
-
+import string
+import random
 from PIL import Image
 
 def changeImage(im):
@@ -57,3 +58,9 @@ def mergeImage(imgdst, imgsrc):
     imgdst.paste(imgsrc, (l_w, l_h), imgsrc)
 
     return imgdst
+
+
+def random_number(length=6):
+    rule =  string.digits
+    rand_list = random.sample(rule, length)
+    return ''.join(rand_list)

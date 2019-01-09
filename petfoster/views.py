@@ -1,5 +1,6 @@
 import  datetime,random
 import json
+from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
@@ -10,6 +11,7 @@ from wechatpy import WeChatPayException
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.pay import dict_to_xml
 from kele import settings
+from shopping.models import MemberDeposit
 from shopping.views import wxPay, queryOrder
 from wxchat.models import WxUnifiedOrdeResult, WxPayResult
 from wxchat.utils import changeImage
@@ -18,6 +20,10 @@ from .models import InsurancePlan, ClaimProcess, PetInsurance, FosterStandard, F
 from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm, HandOverListForm
 from wxchat.views import getJsApiSign, sendTemplateMesToKf
 from .utils import foster_calc_price
+import logging
+
+logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 #宠物保险
 class PetInsuranceView(View):
@@ -103,7 +109,6 @@ class PetInsuranceView(View):
                     path = instance.immune_image.path
                     image = changeImage(path)
                     image.save(path)
-
                 if instance.pet_photo:
                     path = instance.pet_photo.path
                     image = changeImage(path)
@@ -198,9 +203,8 @@ def insuranceNotify(request):
                         cash_fee = res_data['cash_fee'] / 100.0
                         time_end = res_data['time_end']
                         pay_time = datetime.datetime.strptime(time_end, "%Y%m%d%H%M%S")
-                        instance.update_status_transaction_id(status, transaction_id, cash_fee,pay_time)
+                        instance.update_status_transaction_id(status, transaction_id, cash_fee, pay_time)
                         sendTemplateMesToKf(instance)
-
                 except PetInsurance.DoesNotExist as ex:
                     print(ex)
                 except FosterStyleChoose.DoesNotExist as ex:
@@ -368,7 +372,7 @@ class FosterCalculateView(View):
                 url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
                 return HttpResponseRedirect(url)
         else:
-
+            print(form.errors)
             return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
 
 
@@ -398,13 +402,25 @@ class FosterCalculateView(View):
         return  obj
 
 
-#宠物保险订单支付
+#宠物寄养订单支付
 class FosterPayView(View):
 
     def get(self, request, *args, **kwargs):
         try:
             id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get(pk=int(id))
+            # 得到用户的储值数据，判断是否需要微信支付
+            try:
+                openid = request.session.get("openid", None)   #-------------
+                deposit = MemberDeposit.objects.get(openid=openid)
+                balance = deposit.balance()
+                total_fee = instance.total_price
+                if balance >= total_fee:
+                    weixin_pay = False
+                else:
+                    weixin_pay = True
+            except MemberDeposit.DoesNotExist as ex:
+                weixin_pay = True
 
             rooms = None
             if instance.status == 1:
@@ -420,7 +436,8 @@ class FosterPayView(View):
                 "instance": instance,
                 "pets": pets,
                 'sign': signPackage,
-                "rooms": rooms
+                "rooms": rooms,
+                "weixin_pay": weixin_pay,
             }
 
             return render(request, template_name="petfoster/foster_checkout.html", context=context)
@@ -477,7 +494,7 @@ class FosterRoomView(View):
         # return HttpResponseRedirect(url)
         pass
 
-#寄养订单
+#寄养订单列表
 class FosterOrderView(View):
 
     def get(self, request, *args, **kwargs):
@@ -599,5 +616,58 @@ class FosterPetListView(ListView):
     template_name = 'petfoster/pets_list.html'
 
     def get_queryset(self):
-        companies = PetFosterInfo.objects.filter(room__isnull=False)
-        return companies
+        querySet = PetFosterInfo.objects.filter(room__isnull=False)
+        return querySet
+
+
+# 储值余额支付
+class FosterBalancePayView(View):
+
+    def get(self, request, *args, **kwargs):
+        # 支付前出现密码输入窗口
+        try:
+            id = request.GET.get("id", None)
+            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            return render(request, template_name="wxchat/pay_confirm.html", context={"instance": instance})
+        except:
+            return HttpResponseRedirect(reverse("foster-pet-list"))
+
+    def post(self, request, *args, **kwargs):
+        try:
+            id = request.POST.get("id", None)
+            password = request.POST.get("password", None)
+            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            openid = request.session.get('openid', None)
+            if not password:
+                error_msg = u'支付密码不能为空'
+                return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
+            else:
+                user = MemberDeposit.objects.get(openid=openid)
+                bFlag = check_password(password, user.password)
+                if not bFlag:
+                    error_msg = u'支付密码错误'
+                    return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
+
+            #生成订单号
+            out_trade_no = '{0}{1}{2}'.format('F', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            deposit = MemberDeposit.objects.get(openid = openid)
+
+            total_price = instance.total_price
+            instance.out_trade_no = out_trade_no
+            instance.cash_fee = total_price             #实际付款金额
+            instance.pay_time = datetime.datetime.now()
+            instance.pay_style = 1      # 支付类型( 储值卡消费--1 )
+            instance.status = 1
+
+            deposit.consume_money = deposit.consume_money + total_price     #消费累加
+            instance.save()
+            deposit.save()
+            # sendTemplateMesToKf(instance, 1)
+            return render(request, template_name="petfoster/message.html")
+        except FosterStyleChoose.DoesNotExist as ex:
+            print(ex)
+            return HttpResponseRedirect(reverse("foster-pet-list"))
+        except MemberDeposit.DoesNotExist as ex:
+            print(ex)
+            return HttpResponseRedirect(reverse("foster-pet-list"))

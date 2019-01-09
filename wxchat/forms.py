@@ -223,8 +223,8 @@ class DogSaleForm(forms.ModelForm):
         self.fields['ages'].widget.attrs['class'] = 'weui-input'
         self.fields['ages'].widget.attrs['placeholder'] = '请输入年龄'
 
-        self.fields['desc'].widget.attrs['class'] = 'weui-input'
-        self.fields['desc'].widget.attrs['placeholder'] = '请输入特点'
+        # self.fields['desc'].widget.attrs['class'] = 'weui-input'
+        # self.fields['desc'].widget.attrs['placeholder'] = '请输入特点'
 
         self.fields['price'].widget.attrs['class'] = 'weui-input'
         self.fields['price'].widget.attrs['placeholder'] = '请输入价格区间'
@@ -240,6 +240,7 @@ class DogSaleForm(forms.ModelForm):
         fields = ['typeid','ages', 'pet_class', 'price','desc','picture','ownername','telephone']
         widgets  = {
             'telephone':forms.TextInput({'class':'weui-input','type':'tel','placeholder':'请输入手机号','pattern':'^\d{11}$', 'maxlength':'11'}),
+            'desc': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入宠物特点', 'rows': '3'}),
         }
 
 
@@ -275,3 +276,18 @@ class DogInstitutionForm(forms.ModelForm):
             'address': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入详细地址', 'rows': '3'}),
             'brief': forms.Textarea({'class': 'weui-textarea', 'placeholder': '请输入机构简介', 'rows': '3'})
         }
+
+
+class PasswordForm(forms.Form):
+    oldpasswd = forms.CharField(max_length=12, required=True,)
+    newpasswd = forms.CharField(max_length=12, required=True,)
+    confirmpasswd = forms.CharField(max_length=12, required=True,)
+
+    def clean_confirmpasswd(self):
+        newpasswd = self.cleaned_data.get("newpasswd")
+        confirmpasswd = self.cleaned_data.get("confirmpasswd")
+        if confirmpasswd and newpasswd and newpasswd != confirmpasswd:
+            raise forms.ValidationError(u"两次输入的新密码不一样")
+        return confirmpasswd
+
+

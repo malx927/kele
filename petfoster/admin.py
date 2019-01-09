@@ -114,7 +114,7 @@ class ClaimProcessAdmin(admin.ModelAdmin):
 
 @admin.register(FosterStyleChoose)
 class FosterStyleChooseAdmin(admin.ModelAdmin):
-    list_display = ('foster_type', 'big_dog','big_price','middle_dog','middle_price','small_dog','small_price', 'begin_time','end_time','total_price','room','cash_fee','status','out_trade_no' )
+    list_display = ('foster_type', 'big_dog','big_price','middle_dog','middle_price','small_dog','small_price', 'begin_time','end_time','total_price','room','balance_fee','cash_fee','status','out_trade_no' )
     list_display_links = ('foster_type',)
     list_filter = ['foster_type','foster_mode', ]
     search_fields = ['out_trade_no']

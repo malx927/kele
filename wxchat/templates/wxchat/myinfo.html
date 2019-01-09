@@ -1,34 +1,70 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <style>
+        .img_icon{
+            width:20px;
+            margin-right:10px;
+            display:block;
+        }
+        .height30{
+            line-height:35px;
+        }
+    </style>
+{% endblock extra%}
 {% block container %}
 <div class="page">
     {% include "shopping/include/myheader.html" %}
     <div class="page_body">
-        <div class="weui-grids">
+{#        <div class="weui-cells__title">带图标、说明、跳转的列表项</div>#}
+        <div class="weui-cells height30">
             {% if request.session.role == 2 or request.session.role == 1 %}
-            <a id="pet_loss" href="javascript:void(0);" class="weui-grid weui-grid_4">
-                <div class="weui-grid__icon">
-                    <i class="icon iconfont icon-ichongwu"></i>
-                </div>
-                <p class="weui-grid__label">寄养宠物</p>
+            <a id="pet_loss" class="weui-cell weui-cell_access" href="javascript:void(0);">
+                <div class="weui-cell__hd"><img src="{% static 'wxchat/images/foster_pet.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd"><p>寄养宠物</p></div>
+                <div class="weui-cell__ft"></div>
             </a>
             {% endif %}
-             <a href="{% url 'foster-order' %}" class="weui-grid weui-grid_4">
-                <div class="weui-grid__icon">
-                    <i class="icon iconfont icon-orderlisto"></i>
+            <a class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
+                <div class="weui-cell__hd"><img src="{% static 'wxchat/images/document_32.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>寄养订单</p>
                 </div>
-                <p class="weui-grid__label">寄养订单</p>
+                <div class="weui-cell__ft"></div>
             </a>
-            <a id="recharge" href="{% url 'member-recharge-amount' %}" class="weui-grid_4 weui-grid" style="color: #f6383a;">
-                <div class="weui-grid__icon">
-                    <i class="icon iconfont icon-jiaoyi"></i>
+            <a id="recharge" href="{% url 'member-recharge-amount' %}" class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
+                <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/currency _new.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>会员充值</p>
                 </div>
-                <p class="weui-grid__label">会员充值</p>
+                <div class="weui-cell__ft"></div>
             </a>
-             <a  href="{% url 'contact-us' %}" class="weui-grid weui-grid_4">
-                <div class="weui-grid__icon">
-                     <i class="icon iconfont icon-gongxianggeiwo"></i>
+            <a id="recharge" href="{% url 'my-recharge-consume-list' %}" class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
+                <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/recharge_list.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>充值明细</p>
                 </div>
-                <p class="weui-grid__label">关于我们</p>
+                <div class="weui-cell__ft"></div>
+            </a>
+           <a id="recharge" href="{% url 'my-recharge-consume-list' %}" class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
+                <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/consumer.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>消费明细</p>
+                </div>
+                <div class="weui-cell__ft"></div>
+            </a>
+            <a href="{% url 'contact-us' %}"  class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
+                <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/contact_us.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>关于我们</p>
+                </div>
+                <div class="weui-cell__ft"></div>
+            </a>
+            <a href="{% url 'password-change' %}"  class="weui-cell weui-cell_access" >
+                <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/password.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd">
+                    <p>交易密码</p>
+                </div>
+                <div class="weui-cell__ft"></div>
             </a>
         </div>
     </div>

@@ -26,6 +26,12 @@ TYPE_SHOPPING_STATUS = (
 
 )
 
+TYPE_PAY_STYLE = (
+    (0,'微信支付'),
+    (1,'储值卡支付'),
+
+)
+
 class FosterType(models.Model):
     name = models.CharField(verbose_name='寄养类型', max_length=32)
     comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
@@ -332,8 +338,10 @@ class FosterStyleChoose(models.Model):
     room = models.ForeignKey(FosterRoom, verbose_name="房间", blank=True, null=True)
     openid     = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
     out_trade_no = models.CharField(verbose_name='订单号', max_length=32, blank=True, null=True)
+    balance_fee   = models.DecimalField(verbose_name='储值卡支付',  max_digits=10, decimal_places=2, blank=True, null=True)
     cash_fee   = models.DecimalField(verbose_name='实收款',  max_digits=10, decimal_places=2,blank=True,null=True)
-    status     = models.IntegerField(verbose_name='支付状态',default=0,choices=TYPE_SHOPPING_STATUS)
+    status     = models.IntegerField(verbose_name='支付状态', default=0, choices=TYPE_SHOPPING_STATUS)
+    pay_style  = models.IntegerField(verbose_name="支付方式", default=0, choices=TYPE_PAY_STYLE)
     pay_time   = models.DateTimeField(verbose_name='支付时间', blank=True, null=True)
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
     pet_list = models.CharField(validators=[validate_comma_separated_integer_list],max_length=100, blank=True, null=True, default='')

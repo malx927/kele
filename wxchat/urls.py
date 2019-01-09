@@ -15,7 +15,7 @@ from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, r
     authlist, dogLoss, dogLossAdd,  DogLossDetailView, dogBreedAdd, dogBreed, DogBreedDetailView, \
     DogOwnerDetailView, dogOwnerAdd, dogAdopt, dogBuyAdd, DogBuyDetailView, DogSaleDetailView, dogSaleAdd
 from wxchat.views import freshman, dogTrade, updateUserinfo, petWorld, dogIndex, dogLossNav, myInfo, payList, \
-    getPayInfo, orderRefund
+    getPayInfo, orderRefund, PasswordView
 
 urlpatterns = [
 
@@ -111,4 +111,5 @@ urlpatterns = [
     url(r'^authlist/$', authlist),
 
     url(r'^updateuserinfo/$', updateUserinfo),
+    url(r'^password/$', PasswordView.as_view(), name='password-change'),
 ]

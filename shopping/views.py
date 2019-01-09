@@ -1,4 +1,5 @@
 #coding:utf-8
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json
@@ -14,6 +15,7 @@ from doginfo.models import DogOrder
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
     MemberRechargeAmount, MemberRechargeRecord, MemberDeposit
+from wxchat.utils import random_number
 from wxchat.views import getJsApiSign, sendTempMessageToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
@@ -390,7 +392,6 @@ def payNotify(request):
 
                     MemberRechargeRecord.objects.update_or_create( defaults=data, out_trade_no=out_trade_no )
 
-
                     try:
                         deposit = MemberDeposit.objects.get(openid=openid)
                         if deposit.add_time != pay_time:
@@ -406,10 +407,20 @@ def payNotify(request):
                             "prev_money": cash_fee,
                             "add_time": pay_time
                         }
-                        MemberDeposit.objects.create(**values)
+                        deposit = MemberDeposit.objects.create(**values)
 
                     #更新储值卡
                     #判断是否是会员，不是会员更新为会员
+                    # 产生随机密码：保存到数据库
+                    if user and user.is_member == 0 and cash_fee >=500:
+                        newpasswd = random_number()
+                        print(newpasswd)
+                        new_password = make_password(newpasswd)
+                        print(new_password)
+                        deposit.password = new_password
+                        deposit.save()
+                        user.is_member = 1
+                        user.save()
 
                 else:
                     order =getShoppingOrder(openid, res_data['out_trade_no'])
@@ -513,7 +524,6 @@ class OrderView(View):
         if out_trade_no:
             try:
                 if userinfo and userinfo.company_member:
-                    print('company_member=',userinfo.company_member)
                     order = Order.objects.get(out_trade_no=out_trade_no, status=1)
                 else:
                     order = Order.objects.get(out_trade_no=out_trade_no,user_id = user_id, status=1)
@@ -595,7 +605,6 @@ class RechargeAmountView(View):
         try:
             id = request.POST.get("id", None)
             user_id = request.session.get("openid", None)
-            print(id,user_id)
             amount = MemberRechargeAmount.objects.get(pk=id)
             money = amount.money
             #生成订单号
@@ -630,6 +639,12 @@ class RechargeAmountView(View):
 class MemberRechargeConsumeListView(View):
 
     def get(self, request, *args, **kwargs):
+        # deposit = MemberDeposit.objects.get(openid='oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
+        # newpasswd = random_number()
+        # new_password = make_password(newpasswd)
+        # deposit.password = new_password
+        # deposit.save()
+
         openid = request.session.get("openid", None)
         recharges = MemberRechargeRecord.objects.filter(openid=openid, status=1)
         orders = Order.objects.filter(user_id=openid, status=1)
@@ -637,4 +652,6 @@ class MemberRechargeConsumeListView(View):
             "recharges": recharges,
             "orders": orders
         }
+
         return render(request, template_name="shopping/my_recharge_consume_list.html", context=context)
+

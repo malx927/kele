@@ -4,6 +4,12 @@
     <link rel="stylesheet" href="{% static 'css/foster.css' %}">
     <script type="text/javascript">
     wx.ready(function () {
+
+        $('#pay_now_balance').on('click',function(){
+            window.location.href = "{% url 'foster-pay-balance' %}?id=" + $("#id").text();
+        });
+
+
         $('#pay_now').on('click',function(){
             var params ={
               id: $("#id").text(),
@@ -68,11 +74,24 @@
        </div>
         <div class="weui-panel__bd">
             <div class="weui-form-preview">
-                <div class="weui-form-preview__hd" style="text-align: right;">
+                <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label><span id="id" style="display: none" >{{ instance.id }}</span>
-                        <em class="weui-form-preview__value font16 color-danger" id="total_cost_top" > {{ instance.total_price|floatformat:"2" }} 元</em>
+                        <em class="weui-form-preview__value  color-danger" id="total_cost_top" > {{ instance.total_price|floatformat:"2" }} 元</em>
                     </div>
+                </div>
+                 <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
+                     {% if not weixin_pay %}
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">储值卡</label>
+                        <em class="weui-form-preview__value "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                     {% elif weixin_pay %}
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">微信支付</label>
+                        <em class="weui-form-preview__value  "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                    </div>
+                     {% endif %}
                 </div>
                 <div class="weui-cells  cells_top">
                     {% if instance.status == 1 %}
@@ -176,9 +195,15 @@
     </div>
     {% if instance.status == 0 %}
     <div class="weui-tabbar">
+        {% if weixin_pay %}
          <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
             <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
         </a>
+        {% elif not weixin_pay%}
+        <a href="#" id="pay_now_balance" class="weui-tabbar__item tabbar_item bg-warning" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 </div>

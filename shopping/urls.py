@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView
 from .views import  ShopCartBuyListView, OrderView, RechargeAmountView, MemberRechargeConsumeListView
-from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify, FosterPayView
+from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify, FosterPayView, FosterBalancePayView
 
 urlpatterns = [
 
@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^pay/payinsurance$', PayInsuranceView.as_view(), name='pay-insurance'), #缴费支付
     url(r'^pay/insurnotify/$', insuranceNotify, name='insurance-notify'),
     url(r'^pay/fosterpay$', FosterPayView.as_view(), name='foster-pay'),
+    url(r'^pay/fosterbalancepay$', FosterBalancePayView.as_view(), name='foster-pay-balance'),
     url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),
     url(r'^pay/rechargeconsumelist/$', MemberRechargeConsumeListView.as_view(), name='my-recharge-consume-list'),
     #url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息

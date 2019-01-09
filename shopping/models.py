@@ -342,6 +342,8 @@ class MemberDeposit(models.Model):
     total_money = models.DecimalField(verbose_name="储值总金额", max_digits=10, decimal_places=2, default=0)
     consume_money = models.DecimalField(verbose_name='消费总金额', max_digits=10, decimal_places=2, default=0)
     prev_money = models.DecimalField(verbose_name="上次储值金额", max_digits=10, decimal_places=2, default=0)
+    password = models.CharField(verbose_name="支付密码", max_length=128, blank=True, null=True)
+    pwd_time = models.DateTimeField(verbose_name="密码修改时间", blank=True, null=True)
     add_time = models.DateTimeField(verbose_name="充值时间",)
 
     class Meta:
@@ -354,8 +356,6 @@ class MemberDeposit(models.Model):
     def balance(self):
         return self.total_money - self.consume_money
     balance.short_description = "余额"
-
-
 
 
 # 会员充值明细
