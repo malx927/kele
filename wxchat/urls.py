@@ -8,7 +8,6 @@ from django.views.generic import TemplateView
 
 from wxchat.views import doginstitution, DoginstitutionAdd, DogFemaleDetailView, DogInstitutionDetailView, dogBreedNav, \
     dogAdoptNav, dogTradeNav, showMyQRCode, showQRCode, myScore, PetWorldView, createLongQRCode, ContactUsView
-
 from wxchat.views import DogAdoptDetailView, dogadoptAdd, DogdeliveryAdd, DogdeliveryDetailView, FreshmanDetailView, \
     dogOrder, orderSuccess, DogpayNotify, DogPayOrderView, orderList
 from wxchat.views import wechat, createMenu, deleteMenu, getMenu, getUserinfo, redirectUrl, auth2, \
@@ -112,4 +111,5 @@ urlpatterns = [
 
     url(r'^updateuserinfo/$', updateUserinfo),
     url(r'^password/$', PasswordView.as_view(), name='password-change'),
+
 ]

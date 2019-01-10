@@ -16,7 +16,7 @@ from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
     MemberRechargeAmount, MemberRechargeRecord, MemberDeposit
 from wxchat.utils import random_number
-from wxchat.views import getJsApiSign, sendTempMessageToUser
+from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
@@ -25,6 +25,18 @@ from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 from django.db.models import Sum,F, FloatField,Count
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
+
+
+def resetPassword(deposit):
+    newpasswd = random_number()
+    new_password = make_password(newpasswd)
+    deposit.password = new_password
+    deposit.pwd_time = datetime.now()
+    deposit.save()
+    # 发送密码给用户
+    deposit.new_password = newpasswd
+    print(newpasswd, new_password)
+    # sendPasswordTemplateMesToUser(deposit, mode=0)
 
 #获得购物车统计数据
 def getShopCartTotals(user_id, is_member):
@@ -413,15 +425,10 @@ def payNotify(request):
                     #判断是否是会员，不是会员更新为会员
                     # 产生随机密码：保存到数据库
                     if user and user.is_member == 0 and cash_fee >=500:
-                        newpasswd = random_number()
-                        print(newpasswd)
-                        new_password = make_password(newpasswd)
-                        print(new_password)
-                        deposit.password = new_password
-                        deposit.save()
                         user.is_member = 1
                         user.save()
-
+                        # 发送密码给用户
+                        resetPassword(deposit)
                 else:
                     order =getShoppingOrder(openid, res_data['out_trade_no'])
                     if order and order.status==0 :
@@ -655,3 +662,18 @@ class MemberRechargeConsumeListView(View):
 
         return render(request, template_name="shopping/my_recharge_consume_list.html", context=context)
 
+# 支付密码重置
+class PasswordReset(View):
+    def post(self, request):
+        context = {
+            "success": "false"
+        }
+        try:
+            openid = request.session.get("openid", None)
+            deposit = MemberDeposit.objects.get(openid = openid)
+            resetPassword(deposit)
+            context["success"] = "true"
+        except MemberDeposit.DoesNotExist as ex:
+            context["error"] = ex
+
+        return HttpResponse(json.dumps(context))

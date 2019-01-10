@@ -1322,6 +1322,69 @@ def sendTemplateMesToKf(instance, toUser=0):
         client.message.send_template(user_id=instance.openid, template_id = template_custom , url=url, data=custom_data)
 
 
+
+# 密码重置: {{first.DATA}}新密码：{{keyword1.DATA}}时间：{{keyword2.DATA}}{{remark.DATA}}
+# 修改交易密码提醒：{{first.DATA}}用户名：{{keyword1.DATA}}交易密码：{{keyword2.DATA}}商城名称：{{keyword3.DATA}}{{remark.DATA}}
+
+def sendPasswordTemplateMesToUser(instance, mode=0):
+    '''
+    :param instance:
+    :param mode: 0为密码重置, 1为密码修改
+    :return:
+    '''
+
+    template_reset = 'ZHmCLx3GeUwBp-tv1eR0Ph5H3Pxy2H9g0APRaQYdjc0' # 重置密码通知
+    template_modify = 'zDlfdgfhSGgdFjwKN2wheRQv1lf0EjCxXH20dJg5TrY' #会员修改交易密码提醒
+
+    color = "#173177"
+    if mode == 0:
+        reset_data ={
+            'first':{
+                "value": u'重置密码',
+                "color":color
+            },
+            "keyword1":{
+               "value":instance.new_password,
+               "color":color
+            },
+            "keyword2":{
+               "value":instance.pwd_time.strftime('%Y-%m-%d'),
+               "color":color
+            },
+            "remark":{
+               "value":"重置密码成功, 请妥善保管您的密码",
+               "color":color
+           }
+        }
+
+        ret = client.message.send_template(user_id=instance.openid, template_id = template_reset,url='', data=reset_data)
+
+    elif mode == 1:
+        modify_data ={
+            'first':{
+                "value": u'您的交易密码已经修改',
+                "color":color
+            },
+            "keyword1":{
+               "value":instance.nickname,
+               "color":color
+            },
+            "keyword2":{
+               "value":instance.new_password,
+               "color":color
+            },
+            "keyword3":{
+               "value": u'大眼可乐宠物联盟',
+               "color":color
+            },
+            "remark":{
+               "value":"密码成功, 请妥善保管您的密码",
+               "color":color
+           }
+        }
+        client.message.send_template(user_id=instance.openid, template_id = template_modify , url='', data=modify_data)
+
+
 def dogIndex(request):
     if 'HTTP_X_FORWARDED_FOR' in request.META:
         ip =  request.META['HTTP_X_FORWARDED_FOR']
@@ -1495,7 +1558,11 @@ class PasswordView(View):
                 if bFlag:
                     new_password = make_password(newpasswd)
                     user.password = new_password
+                    user.pwd_time = datetime.datetime.now()
                     user.save()
+                    user.new_password = newpasswd
+                    #发送消息给用户
+                    sendPasswordTemplateMesToUser(user, mode = 1 )
                     return HttpResponseRedirect(reverse('my-info'))
                 else:
                     error = u"原密码错误"
@@ -1509,4 +1576,7 @@ class PasswordView(View):
             return  render(request, template_name="wxchat/change_pwd.html", context=context)
         else:
             return render(request, template_name="wxchat/change_pwd.html", context={"form": form })
+
+
+
 
