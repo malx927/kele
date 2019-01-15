@@ -350,7 +350,7 @@ class DogBreed(models.Model):
     nickname = models.CharField(verbose_name='昵称', max_length=64, null=True, blank=True)
 
     class Meta:
-        verbose_name = u"宠物配种"
+        verbose_name = u"宠物相亲"
         verbose_name_plural = verbose_name
         ordering = ['-create_time']
 

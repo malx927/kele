@@ -10,27 +10,6 @@ from doginfo.models import  DogOwner,  DogBreed, DogLoss, DogAdoption, DogDelive
 # Register your models here.
 
 
-# # 宠物简介
-# class DoginfoAdmin(admin.ModelAdmin):
-#     list_display = (
-#     'dog_code', 'dog_name', 'dog_color', 'owner_address', 'owner_telephone', 'remarks', 'dog_picture', 'create_time')
-#     list_display_links = ('dog_code',)
-#     search_fields = ('dog_name', 'owner_telephone', 'dog_code')
-#     ordering = ("-create_time",)
-#     list_per_page = 50
-#
-#
-# admin.site.register(Doginfo, DoginfoAdmin)
-#
-#
-# # 公司简介
-# class CompanyAdmin(admin.ModelAdmin):
-#     list_display = ('name', 'telephone', 'phone', 'profile', 'dynamic', 'create_time')
-#     list_display_links = ('name',)
-#     list_per_page = 50
-
-
-# admin.site.register(Company, CompanyAdmin)
 
 
 class DogBreedAdmin(admin.ModelAdmin):
@@ -43,40 +22,40 @@ admin.site.register(DogBreed, DogBreedAdmin)
 
 
 # 寻宠表
-class DogLossAdmin(admin.ModelAdmin):
-    list_display = ('dog_name', 'typeid','sex','lostplace', 'lostdate', 'ownername', 'telephone','result', 'create_time', 'nickname')
-    list_display_links = ('dog_name',)
-    list_per_page = 50
+# class DogLossAdmin(admin.ModelAdmin):
+#     list_display = ('dog_name', 'typeid','sex','lostplace', 'lostdate', 'ownername', 'telephone','result', 'create_time', 'nickname')
+#     list_display_links = ('dog_name',)
+#     list_per_page = 50
+#
+#
+# admin.site.register(DogLoss, DogLossAdmin)
+#
+#
+# # 寻宠表
+# class DogOwnerAdmin(admin.ModelAdmin):
+#     list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'result','create_time', 'nickname')
+#     list_per_page = 50
+#
+#
+# admin.site.register(DogOwner, DogOwnerAdmin)
+#
 
-
-admin.site.register(DogLoss, DogLossAdmin)
-
-
-# 寻宠表
-class DogOwnerAdmin(admin.ModelAdmin):
-    list_display = ('typeid', 'desc', 'findplace', 'finddate', 'findname', 'telephone', 'result','create_time', 'nickname')
-    list_per_page = 50
-
-
-admin.site.register(DogOwner, DogOwnerAdmin)
-
-
-# 宠物领养
-class DogAdoptionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'telephone', 'record', 'requirement', 'create_time', 'is_show', 'nickname')
-    list_per_page = 50
-
-
-admin.site.register(DogAdoption, DogAdoptionAdmin)
-
-
-# 宠物送养
-class DogDeliveryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'typeid', 'ages', 'sex', 'ownername', 'telephone', 'create_time', 'is_show', 'nickname')
-    list_per_page = 50
-
-
-admin.site.register(DogDelivery, DogDeliveryAdmin)
+# # 宠物领养
+# class DogAdoptionAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'telephone', 'record', 'requirement', 'create_time', 'is_show', 'nickname')
+#     list_per_page = 50
+#
+#
+# admin.site.register(DogAdoption, DogAdoptionAdmin)
+#
+#
+# # 宠物送养
+# class DogDeliveryAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'typeid', 'ages', 'sex', 'ownername', 'telephone', 'create_time', 'is_show', 'nickname')
+#     list_per_page = 50
+#
+#
+# admin.site.register(DogDelivery, DogDeliveryAdmin)
 
 
 # 宠物出售

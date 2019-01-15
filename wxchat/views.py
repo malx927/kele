@@ -1352,12 +1352,12 @@ def sendPasswordTemplateMesToUser(instance, mode=0):
                "color":color
             },
             "remark":{
-               "value":"重置密码成功, 请妥善保管您的密码",
+               "value":"重置密码成功, 修改密码位置:个人中心->交易密码",
                "color":color
            }
         }
 
-        ret = client.message.send_template(user_id=instance.openid, template_id = template_reset,url='', data=reset_data)
+        ret = client.message.send_template(user_id=instance.openid, template_id = template_reset, url='', data=reset_data)
 
     elif mode == 1:
         modify_data ={

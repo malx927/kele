@@ -646,11 +646,6 @@ class RechargeAmountView(View):
 class MemberRechargeConsumeListView(View):
 
     def get(self, request, *args, **kwargs):
-        # deposit = MemberDeposit.objects.get(openid='oX5Zn04Imn5RlCGlhEVg-aEUCHNs')
-        # newpasswd = random_number()
-        # new_password = make_password(newpasswd)
-        # deposit.password = new_password
-        # deposit.save()
 
         openid = request.session.get("openid", None)
         recharges = MemberRechargeRecord.objects.filter(openid=openid, status=1)

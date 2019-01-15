@@ -221,3 +221,16 @@ class WxTemplateMsgUser(models.Model):
 
     def __str__(self):
         return self.user.nickname
+
+
+class CompanyInfo(models.Model):
+    name = models.CharField(verbose_name='公司名称', max_length=64)
+    telephone = models.CharField(verbose_name='公司电话', max_length=24)
+    address = models.CharField(verbose_name='地址', max_length=150)
+
+    class Meta:
+        verbose_name = "公司信息"
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return  self.name

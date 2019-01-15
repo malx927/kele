@@ -4,7 +4,8 @@ import datetime
 __author__ = 'malxin'
 
 from django import forms
-from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose, HandOverList, FosterMode
+from .models import PetInsurance, PetFosterInfo, FosterDemand, FosterStyleChoose, HandOverList, FosterMode, \
+    ContractInfo
 
 
 #宠物保险登记表单
@@ -58,7 +59,6 @@ class PetInsuranceForm(forms.ModelForm):
         }
 
 
-
 #寄养宠物信息登记表
 class PetFosterInfoForm(forms.ModelForm):
 
@@ -81,11 +81,26 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['color'].widget.attrs['class'] = 'weui-input'
         self.fields['color'].widget.attrs['placeholder'] = '请输入宠物毛色'
 
-        self.fields['sex'].widget.attrs['class'] = 'weui-select'
+        self.fields['sex'].widget.attrs['class'] = 'weui-select height'
         self.fields['sex'].empty_label='请选择性别'
 
-        self.fields['sterilization'].widget.attrs['class'] = 'weui-select'
+        self.fields['weight'].widget.attrs['class'] = 'weui-input'
+        self.fields['weight'].widget.attrs['placeholder'] = '请输入体重'
+
+        self.fields['sterilization'].widget.attrs['class'] = 'weui-select height'
         self.fields['sterilization'].empty_label='请选择'
+
+        self.fields['vaccine'].widget.attrs['class'] = 'weui-select height'
+        self.fields['vaccine'].empty_label='请选择'
+
+        self.fields['parasite'].widget.attrs['class'] = 'weui-select height'
+        self.fields['parasite'].empty_label='请选择'
+
+        self.fields['illness'].widget.attrs['class'] = 'weui-select height'
+        self.fields['illness'].empty_label='请选择'
+
+        self.fields['infection'].widget.attrs['class'] = 'weui-select height'
+        self.fields['infection'].empty_label='请选择'
 
         self.fields['owner'].widget.attrs['class'] = 'weui-input'
         self.fields['owner'].widget.attrs['placeholder'] = '请输入姓名'
@@ -96,10 +111,12 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['address'].widget.attrs['class'] = 'weui-input'
         self.fields['address'].widget.attrs['placeholder'] = '请输入地址'
 
+        self.fields['id_card'].widget.attrs['class'] = 'weui-input'
+        self.fields['id_card'].widget.attrs['placeholder'] = '请输入身份证号码'
 
     class Meta:
         model = PetFosterInfo
-        fields = ['name','birthdate','type','color','sex','sterilization','owner','picture','telephone','address']
+        fields = ['name','birthdate','type','color','sex','weight', 'sterilization','vaccine','parasite','illness','infection','owner','picture','telephone','address', 'id_card']
         # fields ="__all__"
         widgets  = {
             'birthdate': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
@@ -179,7 +196,6 @@ class FosterStyleChooseForm(forms.ModelForm):
         }
 
 
-
 # 物品交接
 class HandOverListForm(forms.ModelForm):
 
@@ -201,3 +217,42 @@ class HandOverListForm(forms.ModelForm):
         widgets = {
             'others_nums': forms.Textarea({'class': 'weui-textarea', 'placeholder': '物品数量', 'rows': '2'}),
         }
+
+
+#寄养合同
+class ContractInfoForm(forms.ModelForm):
+
+    def __init__(self, *args,**kwargs):
+        super(ContractInfoForm, self).__init__(*args,**kwargs)
+
+        self.fields['first_party'].widget.attrs['class'] = 'weui-input'
+        self.fields['first_party'].widget.attrs['readonly'] = 'true'
+
+        self.fields['first_telephone'].widget.attrs['class'] = 'weui-input'
+        self.fields['first_telephone'].widget.attrs['readonly'] = 'true'
+
+        self.fields['first_address'].widget.attrs['class'] = 'weui-input'
+        self.fields['first_address'].widget.attrs['readonly'] = 'true'
+
+        self.fields['second_party'].widget.attrs['class'] = 'weui-input'
+        self.fields['second_party'].widget.attrs['placeholder'] = '请输入乙方名称'
+
+        self.fields['second_telephone'].widget.attrs['class'] = 'weui-input'
+        self.fields['second_telephone'].widget.attrs['placeholder'] = '请输入乙方电话'
+
+        self.fields['second_address'].widget.attrs['class'] = 'weui-input'
+        self.fields['second_address'].widget.attrs['placeholder'] = '请输入乙方地址'
+
+        self.fields['second_idcard'].widget.attrs['class'] = 'weui-input'
+        self.fields['second_idcard'].widget.attrs['placeholder'] = '请输入乙方身份证号'
+
+        self.fields['foster_type'].widget.attrs['class'] = 'weui-input'
+        self.fields['foster_type'].widget.attrs['readonly'] = 'true'
+
+        self.fields['total_fee'].widget.attrs['class'] = 'weui-input'
+        self.fields['total_fee'].widget.attrs['readonly'] = 'true'
+
+    class Meta:
+        model = ContractInfo
+        fields = ['first_party','first_telephone','first_address','second_party','second_telephone','second_address','second_idcard','foster_type', 'total_fee', 'order']
+

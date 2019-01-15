@@ -1,6 +1,7 @@
 from django.contrib import admin
 
-from .models import FosterType, PetType, FosterStandard, FosterNotice, PetFosterInfo, FosterDemand, FosterRoom
+from .models import FosterType, PetType, FosterStandard, FosterNotice, PetFosterInfo, FosterDemand, FosterRoom, \
+    ContractFixInfo, ContractInfo
 from .models import FosterAgreement, HandOverList, PetFeedNote, PetGameNote, FosterMode
 from .models import PetInsurance, InsurancePlan, ClaimProcess, FosterPrice, FosterStyleChoose
 # Register your models here.
@@ -121,3 +122,18 @@ class FosterStyleChooseAdmin(admin.ModelAdmin):
     date_hierarchy = 'begin_time'
     list_per_page = 50
 
+
+@admin.register(ContractFixInfo)
+class ContractFixInfoAdmin(admin.ModelAdmin):
+    list_display = ('content', 'number')
+    list_per_page = 50
+
+
+@admin.register(ContractInfo)
+class ContractInfoAdmin(admin.ModelAdmin):
+    list_display = ('sn', 'second_party', 'second_telephone', 'second_address', 'second_idcard', 'foster_type', 'total_fee', 'sign_date','confirm')
+    list_per_page = 50
+    search_fields = ['second_party', 'second_telephone', 'sn', 'second_idcard']
+    list_filter = ['confirm']
+    date_hierarchy = 'sign_date'
+    readonly_fields = ['picture']

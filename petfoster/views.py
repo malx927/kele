@@ -1,23 +1,30 @@
 import  datetime,random
 import json
+from PIL import Image
+import os, base64, time
 from django.contrib.auth.hashers import check_password
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import  View, ListView, DetailView
+from django.db.models import Max
 # Create your views here.
+from io import BytesIO
 from wechatpy import WeChatPayException
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.pay import dict_to_xml
 from kele import settings
 from shopping.models import MemberDeposit
 from shopping.views import wxPay, queryOrder
-from wxchat.models import WxUnifiedOrdeResult, WxPayResult
+from wxchat.models import WxUnifiedOrdeResult, WxPayResult, CompanyInfo
 from wxchat.utils import changeImage
 from .models import InsurancePlan, ClaimProcess, PetInsurance, FosterStandard, FosterType, PetFosterInfo, FosterDemand, \
-    FosterNotice, FosterAgreement, FosterStyleChoose, PetOwner, FosterRoom, HandOverList
-from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm, HandOverListForm
+    FosterNotice, FosterAgreement, FosterStyleChoose, PetOwner, FosterRoom, HandOverList, ContractFixInfo, \
+    ContractInfo
+
+from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm, HandOverListForm, \
+    ContractInfoForm
 from wxchat.views import getJsApiSign, sendTemplateMesToKf
 from .utils import foster_calc_price
 import logging
@@ -249,6 +256,7 @@ class PetFosterInfoView(View):
                 form["owner"].field.initial = owner.name
                 form["telephone"].field.initial = owner.telephone
                 form["address"].field.initial = owner.address
+                form["id_card"].field.initial = owner.id_card
             except PetOwner.DoesNotExist as ex:
                 pass
         return render(request, template_name="petfoster/foster_petinfo.html", context={"form": form})
@@ -276,7 +284,6 @@ class PetFosterInfoView(View):
 
             return HttpResponseRedirect(reverse("foster-pet-demand", args=(instance.id,)))
         else:
-            print(form.errors)
             return HttpResponseRedirect(reverse("foster-pet-info"))
 
     def savePetOwnerInfo(self, instance):
@@ -284,6 +291,7 @@ class PetFosterInfoView(View):
             "name": instance.owner,
             "telephone": instance.telephone,
             "address": instance.address,
+            "id_card": instance.id_card,
         }
         PetOwner.objects.update_or_create(defaults=defaults, openid=instance.openid)
 
@@ -357,7 +365,7 @@ class FosterCalculateView(View):
                 member = request.POST.get("member", None)
                 form = self.calculate_price( form, int(member))
                 return render(request, template_name="petfoster/foster_calc_result.html", context={"form": form, "member": member})
-            else:
+            else:               #寄养缴费
                 user_id = request.session.get("openid", None)
                 is_member = request.session.get("is_member", None)
                 pet_list = request.POST.getlist("pet_list")
@@ -369,10 +377,11 @@ class FosterCalculateView(View):
                 form.instance.openid = user_id
                 form.instance.pet_list = pet_list_str
                 instance = form.save()
-                url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
-                return HttpResponseRedirect(url)
+                # url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
+                # return HttpResponseRedirect(url)        # 跳转到签订合同
+                url = "{0}?orderid={1}".format(reverse("foster-contract"), instance.id)
+                return HttpResponseRedirect(url)        # 跳转到签订合同
         else:
-            print(form.errors)
             return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
 
 
@@ -513,8 +522,19 @@ class FosterOrderView(View):
             else:
                 return  HttpResponseRedirect(reverse("foster-menu"))
         else:
-            url = "{0}?id={1}".format(reverse("foster-pay"), id)
-            return HttpResponseRedirect(url)
+
+            try:
+                contract = ContractInfo.objects.get(order=id)
+                if contract.confirm:            #合同已经签订
+                    url = "{0}?id={1}".format(reverse("foster-pay"), id)
+                else:                           #合同未签
+                    url = "{0}?orderid={1}".format(reverse("foster-contract"), id)
+                return HttpResponseRedirect(url)
+
+            except ContractInfo.DoesNotExist as ex:
+                url = "{0}?orderid={1}".format(reverse("foster-contract"), id)
+                return HttpResponseRedirect(url)
+
 
 
 class FosterOrderDetailView(View):
@@ -663,11 +683,143 @@ class FosterBalancePayView(View):
             deposit.consume_money = deposit.consume_money + total_price     #消费累加
             instance.save()
             deposit.save()
-            # sendTemplateMesToKf(instance, 1)
+            sendTemplateMesToKf(instance, 1)
             return render(request, template_name="petfoster/message.html")
         except FosterStyleChoose.DoesNotExist as ex:
-            print(ex)
             return HttpResponseRedirect(reverse("foster-pet-list"))
         except MemberDeposit.DoesNotExist as ex:
-            print(ex)
+
             return HttpResponseRedirect(reverse("foster-pet-list"))
+
+
+#寄养合同
+class ContractView(View):
+    def get(self, request, *args, **kwargs):
+        # 得到订单信息
+        orderID = request.GET.get('orderid', None)
+        try:
+            contract = ContractInfo.objects.get(order=orderID)
+            form = ContractInfoForm(instance=contract)
+        except ContractInfo.DoesNotExist as ex :
+            order = FosterStyleChoose.objects.get(pk=orderID)
+            foster_type = order.foster_type.name + '[' + order.foster_mode.name + ']'
+            total_fee = order.total_price
+            orderid = order.id
+            initial = {
+                "foster_type": foster_type,
+                "total_fee": total_fee,
+                "order": orderid,
+            }
+
+            try:                 # 乙方信息
+                openid = request.session.get('openid', None)
+                secondParty = PetOwner.objects.get(openid=openid)
+                initial['second_party'] = secondParty.name
+                initial['second_telephone'] = secondParty.telephone
+                initial['second_address'] = secondParty.address
+                initial['second_idcard'] = secondParty.id_card
+            except:
+                pass
+
+            try:                  # 甲方信息
+                firstParty = CompanyInfo.objects.first()
+                initial['first_party'] = firstParty.name
+                initial['first_telephone'] = firstParty.telephone
+                initial['first_address'] = firstParty.address
+            except:
+                pass
+
+            form = ContractInfoForm(initial=initial)
+        except FosterStyleChoose.DoesNotExist as ex:
+            HttpResponseRedirect(reverse("foster-pet-list"))
+
+        context = {
+            "form": form,
+        }
+        return render(request, template_name="petfoster/foster_contract_input.html", context=context)
+
+    def post(self, request, *args, **kwargs):
+        id = request.POST.get("id", None)   #合同id
+        if id:
+            contract = ContractInfo.objects.get(pk=id)
+            form = ContractInfoForm(request.POST, instance=contract)
+        else:
+            try:
+                orderid = request.POST.get("order", None)
+                contract = ContractInfo.objects.get(order=orderid)
+                form = ContractInfoForm(request.POST, instance=contract)
+            except:
+                form = ContractInfoForm(request.POST)
+
+        if form.is_valid():
+            instance = form.save(commit=False)
+            sn = self.get_max_sn()
+            if instance.sn == '':
+                instance.sn = sn
+            openid = request.session.get("openid", None)
+            instance.openid = openid
+            instance.add_time = datetime.datetime.now()
+            instance.save()
+            return HttpResponseRedirect(reverse("foster-contract-page", args=(instance.id,)))
+        else:
+            return HttpResponseRedirect(reverse("foster-pet-list"))
+
+
+    def get_max_sn(self):
+        yearmon = datetime.datetime.now().strftime('H%Y%m')
+        maxVal = ContractInfo.objects.filter(sn__startswith=yearmon).aggregate(sn_max=Max("sn"))
+        max_value = maxVal['sn_max']
+        if max_value is None:
+            num = '001'
+        else:
+            num = str(int(max_value[-3:]) + 1).rjust(3,'0')
+
+        return '{0}{1}'.format(yearmon, num)
+
+
+
+
+class ContractPageView(View):
+    def get(self, request, *args, **kwargs):
+        id = kwargs.get("id")
+        contract = ContractInfo.objects.get(pk=id)
+        contract.sign_date = datetime.date.today()
+        contractfix = ContractFixInfo.objects.all()
+        pet_ids = contract.order.pet_list
+        petList = pet_ids.split(',')
+        pets = PetFosterInfo.objects.filter(id__in=petList)
+        context = {
+            'contract': contract,
+            'contractfix': contractfix,
+            'pets': pets,
+        }
+        return render(request, template_name='petfoster/foster_contract_page.html', context=context)
+
+    def post(self,request, *args, **kwargs):
+
+        sign_date = request.POST.get('sign_date', None)
+        confirm = request.POST.get('confirm', None)
+        content = request.POST.get('content', None)
+        contract_id  = request.POST.get('contractId', None)
+        try:
+            contract = ContractInfo.objects.get(id=int(contract_id))
+            contract.sign_date = sign_date
+            sn = contract.sn
+            contract.confirm = True if confirm == "true" else False
+            upload_path = contract.picture.field.upload_to
+            dirs = os.path.join(settings.MEDIA_ROOT, upload_path)
+
+            if not os.path.exists(dirs):
+                os.makedirs(dirs)
+            imgdata = base64.b64decode(content)
+            f = BytesIO( imgdata )
+            image = Image.open(f)
+            image_url = '{0}_{1}.png'.format(sn, int(time.time()))
+            image.save(os.path.join(dirs , image_url), quality=100)
+
+            contract.picture = '{0}{1}'.format(upload_path,image_url)
+            contract.save()
+        except Exception as ex:
+            return HttpResponse(json.dumps({"success":"false"}))
+
+        return HttpResponse(json.dumps({"success":"true", "orderid":contract.order.id}))

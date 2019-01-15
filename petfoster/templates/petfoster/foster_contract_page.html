@@ -1,0 +1,188 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <script type="text/javascript" src="{% static 'wxchat/js/html2canvas.min.js' %}"></script>
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">合同信息</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd" >
+        <div id="contract_content">
+        <div class="weui-cells__title" style="text-align: center; color: #000000"><h1>寄养协议</h1></div>
+        <div class="weui-cells">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">日期：</label></div>
+                <div class="weui-cell__bd text-underline">{{ contract.add_time|date:'Y-m-d' }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">合同编号：</label></div>
+                <div class="weui-cell__bd text-underline" >{{ contract.sn }}</div>
+            </div>
+        </div>
+        <div class="weui-cells weui-cells_checkbox cells_top">
+            {% for item in contractfix %}
+                {% if item.number == 2 %}
+                <style type="text/css">
+                    table { border-collapse:collapse;width:100%;  }
+                    table{margin-top: 5px;}
+                    table, td, th { border:1px solid black;text-align: center }
+                </style>
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p>{{ item.number }}、{{ item.content }}</p>
+                        {% for pet in pets %}
+                        <table>
+                            <tr><td>犬名</td><td>{{ pet.name }}</td><td>品种</td><td>{{ pet.type }}</td></tr>
+                            <tr><td>性别</td><td>{{ pet.sex }}</td><td>毛色</td><td>{{ pet.color }}</td></tr>
+                            <tr><td>年龄</td><td>{{ pet.get_age }}</td><td>体重</td><td>{{ pet.weight|default:'' }}</td></tr>
+                            <tr><td>绝育</td><td>{{ pet.get_sterilization_display }}</td><td>其他</td><td></td></tr>
+                            <tr><td colspan="3">是否有完整的疫苗注射记录</td><td>{{ pet.get_vaccine_display }}</td></tr>
+                            <tr><td colspan="3">三月内是否做过体内外驱虫</td><td>{{ pet.get_parasite_display }}</td></tr>
+                            <tr><td colspan="3">15天内有没有生病记录</td><td>{{ pet.get_illness_display }}</td></tr>
+                            <tr><td colspan="3">130天内是否重大传染病记录</td><td>{{ pet.get_infection_display }}</td></tr>
+                        </table>
+
+                        {% endfor %}
+                    </div>
+                </div>
+                {% elif item.number == 3 %}
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.foster_type}}</span></p>
+                    </div>
+                </div>
+                {% elif item.number == 13 %}
+                 <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.total_fee}}元</span></p>
+                    </div>
+                 </div>
+                 {% elif item.number == 99 %}
+                 <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p><b>{{ item.content }}</b></p>
+                    </div>
+                 </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">甲方名称：</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.first_party }}</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">甲方电话:</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.first_telephone }}</div>
+                </div>
+                 <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">甲方地址:</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.first_address }}</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">乙方名称：</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.second_party }}</div>
+                </div>
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">乙方电话:</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.second_telephone }}</div>
+                </div>
+                 <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">乙方地址:</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.second_address }}</div>
+                </div>
+                 <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">身份证号:</label></div>
+                    <div class="weui-cell__bd text-underline">{{ contract.second_idcard }}</div>
+                 </div>
+                  <div class="weui-cell">
+                    <div class="weui-cell__hd"><label class="weui-label">签约时间:</label></div>
+                    <div class="weui-cell__bd"><input class="weui-input" type="date" name="sign_date" id="id_sign_date" value="{{ contract.sign_date|date:'Y-m-d' }}"> </div>
+                 </div>
+                 {% elif item.number == 100 %}
+{#                     <label for="weuiAgree" class="weui-agree">#}
+{#                        <input type="checkbox" class="weui-agree__checkbox" name="confirm" id="id_confirm" {% if contract.confirm %}checked{% endif %}>#}
+{#                        <span class="weui-agree__text">#}
+{#                            {{ item.content }}#}
+{#                        </span>#}
+{#                    </label>#}
+                    <label class="weui-cell weui-check__label" for="id_confirm">
+                        <div class="weui-cell__hd">
+                            <input type="checkbox" class="weui-check" name="confirm" id="id_confirm" {% if contract.confirm %}checked{% endif %}>
+                            <i class="weui-icon-checked"></i>
+                        </div>
+                        <div class="weui-cell__bd"><p>{{ item.content }}</p></div>
+                        <div class="weui-cell__ft"></div>
+                    </label>
+                {% else %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__bd">
+                            <p>{{ item.number }}、{{ item.content }}</p>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        </div>
+        <div class="weui-btn-area">
+            <input type="hidden" id="contractId" value="{{ contract.id }}">
+            <button type="button" id="signBtn" class="weui-btn weui-btn_primary" >签订合同</button>
+        </div>
+    </div>
+</div>
+ <div id="imgShot" style="display: none"></div>
+
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    $(function(){
+        $("#signBtn").on("click", function(event){
+             var confirm = $("#id_confirm").get(0).checked;
+            if(!confirm){
+                weui.alert('请阅读并同意合同条款')
+                $("#id_confirm").focus()
+                return false;
+            }
+            var loading = weui.loading('正在处理数据...');
+            html2canvas(document.getElementById('contract_content')).then(function(canvas){
+                var pic = canvas.toDataURL("image/png");
+                pic = pic.replace(/^data:image\/(png|jpg);base64,/, "")
+                var sign_date = $("#id_sign_date").val();
+                var contractId = $("#contractId").val();
+
+                var params ={
+                     sign_date: sign_date,
+                     confirm: confirm,
+                     contractId: contractId,
+{#                     content:pic,#}
+                     csrfmiddlewaretoken:'{{ csrf_token }}',
+                  }
+
+                   $.ajax({
+                      type: 'POST',
+                      url: '{{ request.get_full_path }}',
+                      dataType: 'json',
+                      data: params,
+                      timeout: 20000,
+                      success: function(data){
+                          loading.hide();
+                          if(data.success == "true"){
+                              orderid = data.orderid;
+                               alert(orderid)
+                              window.location.href = "{% url 'foster-pay' %}?id=" + orderid
+                          }
+                      },
+                      error: function(error){
+                          loading.hide();
+                          weui.alert('合同签订失败');
+                      }
+                    });
+                });
+
+            });
+    });
+
+    </script>
+{% endblock bottomjs %}

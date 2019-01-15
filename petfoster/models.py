@@ -1,3 +1,4 @@
+# coding=utf8
 import datetime
 from django.core.validators import validate_comma_separated_integer_list
 from django.db import models
@@ -30,6 +31,17 @@ TYPE_PAY_STYLE = (
     (0,'微信支付'),
     (1,'储值卡支付'),
 
+)
+
+TYPE_YESNO_STYLE = (
+    (1,'是'),
+    (0,'否'),
+
+)
+
+TYPE_HAVEORNOT_STYLE = (
+    (1,'有'),
+    (0,'无'),
 )
 
 class FosterType(models.Model):
@@ -133,12 +145,18 @@ class PetFosterInfo(models.Model):
     birthdate = models.DateField(verbose_name=u'出生日期', default=timezone.now)
     type = models.CharField(verbose_name=u'品种', max_length=24)
     color = models.CharField(verbose_name=u'毛色', max_length=32)
-    sex = models.CharField(verbose_name=u'性别', max_length=4, choices=TYPE_SEX_CHOICE)
-    sterilization = models.IntegerField(verbose_name=u'是否绝育',  choices=TYPE_STERILIZATION_CHOICE)
+    sex = models.CharField(verbose_name=u'性别', max_length=4, choices=TYPE_SEX_CHOICE, default=0)
+    weight = models.CharField(verbose_name='体重', max_length=12, blank=True, null=True)
+    sterilization = models.IntegerField(verbose_name=u'是否绝育',  choices=TYPE_STERILIZATION_CHOICE, default=0)
+    vaccine = models.IntegerField(verbose_name=u'完整的疫苗注射记录',  choices=TYPE_HAVEORNOT_STYLE, default=0)
+    parasite = models.IntegerField(verbose_name=u'三月内做过体内外驱虫',  choices=TYPE_YESNO_STYLE, default=0)
+    illness = models.IntegerField(verbose_name=u'15天内生病记录',  choices=TYPE_HAVEORNOT_STYLE, default=0)
+    infection = models.IntegerField(verbose_name=u'30天内重大传染病记录',  choices=TYPE_HAVEORNOT_STYLE, default=0)
     picture = models.ImageField(verbose_name=u'宠物图片', upload_to='foster')
     owner = models.CharField(verbose_name=u'主人姓名', max_length=20)
     telephone = models.CharField(verbose_name=u'主人电话', max_length=32)
     address = models.CharField(verbose_name=u'主人地址', max_length=200)
+    id_card = models.CharField(verbose_name=u'身份证', max_length=20, default='')
     create_time = models.DateTimeField(verbose_name=u'创建时间', auto_now_add=True)
     openid = models.CharField(verbose_name='微信标识', max_length=120, null=True, blank=True)
     room = models.ForeignKey(FosterRoom, verbose_name='房间', blank=True, null=True, on_delete=models.SET_NULL)
@@ -152,6 +170,11 @@ class PetFosterInfo(models.Model):
     class Meta:
         verbose_name = u"06.寄养宠物信息"
         verbose_name_plural = verbose_name
+
+    def get_age(self):
+        today_year = datetime.datetime.today().year
+        birth_year = self.birthdate.year
+        return  today_year - birth_year
 
     def __str__(self):
         return self.name
@@ -168,7 +191,7 @@ class FosterDemand(models.Model):
 
 
     def __str__(self):
-        return  self.content
+        return  self.pet.name
 
     class Meta:
         verbose_name = u"寄养要求"
@@ -313,6 +336,7 @@ class PetOwner(models.Model):
     name    = models.CharField(verbose_name="姓名", max_length=32, blank=True, null=True)
     telephone = models.CharField(verbose_name="电话", max_length=16, blank=True, null=True)
     address = models.CharField(verbose_name="地址", max_length=128, blank=True, null=True)
+    id_card = models.CharField(verbose_name="身份证号", max_length=20, blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -348,7 +372,10 @@ class FosterStyleChoose(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
 
     def __str__(self):
-        return self.out_trade_no
+        if self.out_trade_no:
+            return  self.out_trade_no
+        else:
+            return '{0}-{1}'.format(self.foster_type.name, self.foster_mode.name)
 
     class Meta:
         verbose_name = "14.寄养订单"
@@ -404,3 +431,48 @@ class HandOverList(models.Model):
     class Meta:
         verbose_name = u"08.交接记录"
         verbose_name_plural = verbose_name
+
+
+# 合同固定内容
+class ContractFixInfo(models.Model):
+    number = models.IntegerField(verbose_name='序号',)
+    content = models.CharField(verbose_name='内容', max_length=2000)
+
+    class Meta:
+        verbose_name = '15.合同固定内容'
+        verbose_name_plural = verbose_name
+        ordering =('number',)
+
+    def __str__(self):
+        return  self.content
+
+
+# 合同内容
+class ContractInfo(models.Model):
+    sn = models.CharField(verbose_name='合同编号', max_length=32)
+    first_party = models.CharField(verbose_name='甲方名称', max_length=64)
+    first_telephone = models.CharField(verbose_name='甲方电话', max_length=32)
+    first_address = models.CharField(verbose_name='甲方地址', max_length=64)
+    second_party = models.CharField(verbose_name='乙方名称', max_length=64)
+    second_telephone = models.CharField(verbose_name='乙方电话', max_length=32)
+    second_address = models.CharField(verbose_name='乙方地址', max_length=64)
+    second_idcard = models.CharField(verbose_name='身份证号', max_length=20)
+    add_time = models.DateTimeField(verbose_name='日期', default=timezone.now)
+    foster_type = models.CharField(verbose_name='寄养方式', max_length=64)
+    other_fee = models.DecimalField(verbose_name='其他费用', max_digits=9 ,decimal_places=2, blank=True, null=True)
+    total_fee = models.DecimalField(verbose_name='费用总计', max_digits=9, decimal_places=2, default=0)
+    sign_date = models.DateField(verbose_name='签约日期', blank=True, null=True)
+    confirm = models.BooleanField(verbose_name='合同确认', default=False)
+    picture = models.ImageField(verbose_name='合同文本', upload_to="contracts/", blank=True, null=True)
+    order = models.ForeignKey(FosterStyleChoose, verbose_name='寄养订单', blank=True, null=True, on_delete=models.CASCADE)
+    openid = models.CharField(verbose_name='微信标识', max_length=120, blank=True, null=True)
+
+    def __str__(self):
+        return self.second_party
+
+    class Meta:
+        verbose_name = '16.合同内容'
+        verbose_name_plural = verbose_name
+
+
+
