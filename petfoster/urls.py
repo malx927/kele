@@ -6,7 +6,7 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
-   FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView
+   FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView
 
@@ -22,6 +22,7 @@ urlpatterns = [
    url(r'^feescale/$', FosterFeeScale.as_view(), name='foster-fee-scale'),
    url(r'^petinfo/$', PetFosterInfoView.as_view(), name='foster-pet-info'),   #增加宠物信息
    url(r'^petinfo/(?P<pk>\d+)/$', PetFosterInfoView.as_view(), name='foster-pet-update'), #修改宠物信息
+   url(r'^petinfo/(?P<pk>\d+)/detail$', FosterPetDetailView.as_view(), name='foster-pet-detail'), #修改宠物信息
    url(r'^petinfolist/$', PetFosterInfoListView.as_view(), name='foster-pet-list'),   #宠物信息列表
    url(r'^petdemand/(?P<petid>\d+)/$', FosterDemandView.as_view(), name='foster-pet-demand'),
    url(r'^petdemand/create/$', FosterDemandCreateUpdateView.as_view(), name='foster-pet-demand-create'),

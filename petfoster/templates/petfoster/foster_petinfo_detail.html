@@ -1,0 +1,92 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养宠物详情</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        {% if object.picture %}
+         <div class="detail_header">
+            <img src="{{ pet.picture.url }}" >
+         </div>
+        {% endif %}
+        <div class="weui-cells  cells_top">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">昵称:</label></div>
+                <div class="weui-cell__bd">{{ pet.name }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">性别:</label></div>
+                <div class="weui-cell__bd">{{ pet.sex }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">生日:</label>
+                </div>
+                <div class="weui-cell__bd">{{ pet.birthdate }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">品种:</label></div>
+                <div class="weui-cell__bd">{{ pet.type }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">毛色:</label></div>
+                <div class="weui-cell__bd">{{ pet.color }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">体重:</label></div>
+                <div class="weui-cell__bd">{{ pet.weight }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">是否绝育:</label></div>
+                <div class="weui-cell__bd">{{ pet.get_sterilization_display }}</div>
+            </div>
+             <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">完整的疫苗注射记录:</label></div>
+                <div class="weui-cell__bd">{{ pet.get_vaccine_display }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">三月内做过体内外驱虫:</label></div>
+                <div class="weui-cell__bd">{{ pet.get_parasite_display }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">15天内生病记录:</label></div>
+                <div class="weui-cell__bd">{{ pet.get_illness_display }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">30天内重大传染病记录:</label></div>
+                <div class="weui-cell__bd">{{ pet.get_infection_display }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">主人姓名:</label></div>
+                <div class="weui-cell__bd">{{ pet.owner }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">主人电话:</label></div>
+                <div class="weui-cell__bd">
+                    {{ pet.telephone }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">主人地址:</label></div>
+                <div class="weui-cell__bd">
+                    {{ pet.address }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">身份证号:</label></div>
+                <div class="weui-cell__bd">
+                    {{ pet.id_card }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}

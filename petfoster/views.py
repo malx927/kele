@@ -296,6 +296,15 @@ class PetFosterInfoView(View):
         PetOwner.objects.update_or_create(defaults=defaults, openid=instance.openid)
 
 
+# 宠物明细
+class FosterPetDetailView(View):
+    def get(self, request, *args, **kwargs):
+        petId = kwargs.get("pk", None)
+        pet = PetFosterInfo.objects.get(pk=petId)
+        return render(request, template_name="petfoster/foster_petinfo_detail.html",context={"pet": pet})
+
+
+# 宠物寄养要求
 class FosterDemandView(View):
 
     def get(self, request, petid):

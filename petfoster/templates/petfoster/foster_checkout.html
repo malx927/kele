@@ -178,30 +178,30 @@
                         <div class="weui-cell__bd color-danger">{{ instance.small_price|floatformat:2 }}</div>
                     </div>
                 </div>
-                <div class="weui-cells__title">用户信息</div>
+                <div class="weui-cells__title">客户信息</div>
                 <div class="weui-cells" >
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">姓名：</label></div>
-                        <div class="weui-cell__bd text-underline">{{ petowner.name }}</div>
+                        <div class="weui-cell__bd">{{ petowner.name }}</div>
                     </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
-                        <div class="weui-cell__bd text-underline">{{ contract.telephone }}</div>
+                        <div class="weui-cell__bd">{{ petowner.telephone }}</div>
                     </div>
                      <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">地址:</label></div>
-                        <div class="weui-cell__bd text-underline">{{ contract.address }}</div>
+                        <div class="weui-cell__bd">{{ petowner.address }}</div>
                     </div>
                 </div>
                 <div class="weui-cells__title">寄养宠物</div>
                 <div class="weui-cells flex_wrap" >
                     {% for pet in pets %}
-                    <label class="weui-cell" style="width: 38%;min-width: 38%;max-width: 38%">
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-detail' pet.id %}" style="width: 38%;min-width: 38%;max-width: 38%">
                         <div class="weui-cell__hd">
                             <img src="{{ pet.picture.url }}"  width="60px" height="60px">
                         </div>
-                        <div class="weui-cell__bd"><p> {{ pet.name }} </p></div>
-                    </label>
+                        <div class="weui-cell__bd"><p class="center"> {{ pet.name }} </p></div>
+                    </a>
                     {% endfor %}
                 </div>
             </div>
