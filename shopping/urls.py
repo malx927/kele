@@ -7,8 +7,8 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView, \
-    PasswordReset
-from .views import  ShopCartBuyListView, OrderView, RechargeAmountView, MemberRechargeConsumeListView
+    PasswordReset, ConsumeListView
+from .views import  ShopCartBuyListView, OrderView, RechargeAmountView, MemberRechargeListView
 from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify, FosterPayView, FosterBalancePayView
 
 urlpatterns = [
@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^pay/fosterpay$', FosterPayView.as_view(), name='foster-pay'),
     url(r'^pay/fosterbalancepay$', FosterBalancePayView.as_view(), name='foster-pay-balance'),
     url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),
-    url(r'^pay/rechargeconsumelist/$', MemberRechargeConsumeListView.as_view(), name='my-recharge-consume-list'),
+    url(r'^pay/rechargeconsumelist/$', MemberRechargeListView.as_view(), name='my-recharge-consume-list'),
+    url(r'^pay/consumelist/$', ConsumeListView.as_view(), name='my-consume-list'),
     url(r'^passwordreset/$', PasswordReset.as_view(), name='password-reset'),
     #url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息
 

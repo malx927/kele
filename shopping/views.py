@@ -15,6 +15,7 @@ from doginfo.models import DogOrder
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
     MemberRechargeAmount, MemberRechargeRecord, MemberDeposit
+from petfoster.models import FosterStyleChoose
 from wxchat.utils import random_number
 from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser
 from wechatpy.pay import WeChatPay
@@ -643,7 +644,9 @@ class RechargeAmountView(View):
             }
             return HttpResponse(json.dumps(errors))
 
-class MemberRechargeConsumeListView(View):
+
+# 充值明细表
+class MemberRechargeListView(View):
 
     def get(self, request, *args, **kwargs):
 
@@ -655,7 +658,24 @@ class MemberRechargeConsumeListView(View):
             "orders": orders
         }
 
-        return render(request, template_name="shopping/my_recharge_consume_list.html", context=context)
+        return render(request, template_name="shopping/my_recharge_list.html", context=context)
+
+
+# 消费明细
+class ConsumeListView(View):
+
+    def get(self, request, *args, **kwargs):
+        openid = request.session.get("openid", None)
+        orders = Order.objects.filter(user_id=openid, status=1)
+        fosterOrders = FosterStyleChoose.objects.filter(openid=openid, status=1)
+        context = {
+            "orders": orders,
+            "fosterOrders": fosterOrders
+        }
+
+        return render(request, template_name="shopping/my_consume_list.html", context=context)
+
+
 
 # 支付密码重置
 class PasswordReset(View):

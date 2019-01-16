@@ -1,0 +1,52 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block container %}
+<div class="page">
+    {% include "shopping/include/myheader.html" %}
+    <div class="page_body">
+        <div class="weui-panel weui-panel_access margin_top2">
+            <div class="weui-panel__bd">
+                <!--充值明细开始-->
+                <div class="weui-cells__title">充值明细列表</div>
+                <div class="weui-cells">
+                    {% for recharge in recharges %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><span class="weui-badge badge badge-bgcolor" >{{ forloop.counter }}</span></div>
+                        <div class="weui-cell__bd"><p class="center">{{ recharge.cash_fee }}元</p></div>
+                        <div class="weui-cell__ft">{{ recharge.pay_time|date:'Y-m-d H:i'}}</div>
+                    </div>
+                    {% empty %}
+                    <div class="weui-cell cell-end">
+                        <div class="weui-cell__bd" >
+                           <p class="center">( ⊙ o ⊙ ) 啊哦，没有充值哦</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                     <div class="weui-cell cell-end">
+                        <div class="weui-cell__bd" >
+                           <p class="center">( ⊙ o ⊙ ) 啊哦，更多的充值记录喽</p>
+                        </div>
+                    </div>
+                </div>
+                <!--充值明细结束-->
+        </div>
+    </div>
+</div>
+{% endblock container %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+
+    $(function(){
+        defIndex = sessionStorage.getItem('myrecharge');
+
+        weui.tab('#navbar',{
+            defaultIndex: defIndex ==null?0:defIndex,
+            onChange: function(index){
+                sessionStorage.setItem('myrecharge',index);
+            }
+        });
+
+    });
+
+    </script>
+{% endblock bottomjs %}
