@@ -419,8 +419,8 @@ class FosterPayView(View):
             id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get(pk=int(id))
             # 得到用户的储值数据，判断是否需要微信支付
+            openid = request.session.get("openid", None)   #-------------
             try:
-                openid = request.session.get("openid", None)   #-------------
                 deposit = MemberDeposit.objects.get(openid=openid)
                 balance = deposit.balance()
                 total_fee = instance.total_price
@@ -439,6 +439,7 @@ class FosterPayView(View):
             petList = pet_ids.split(',')
 
             pets = PetFosterInfo.objects.filter(id__in=petList)
+            petOwner = PetOwner.objects.get(openid=openid)
             signPackage = getJsApiSign(self.request)
 
             context ={
@@ -447,6 +448,7 @@ class FosterPayView(View):
                 'sign': signPackage,
                 "rooms": rooms,
                 "weixin_pay": weixin_pay,
+                'petowner': petOwner,
             }
 
             return render(request, template_name="petfoster/foster_checkout.html", context=context)

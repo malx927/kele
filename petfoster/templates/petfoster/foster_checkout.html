@@ -178,6 +178,21 @@
                         <div class="weui-cell__bd color-danger">{{ instance.small_price|floatformat:2 }}</div>
                     </div>
                 </div>
+                <div class="weui-cells__title">用户信息</div>
+                <div class="weui-cells" >
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">姓名：</label></div>
+                        <div class="weui-cell__bd text-underline">{{ petowner.name }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
+                        <div class="weui-cell__bd text-underline">{{ contract.telephone }}</div>
+                    </div>
+                     <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">地址:</label></div>
+                        <div class="weui-cell__bd text-underline">{{ contract.address }}</div>
+                    </div>
+                </div>
                 <div class="weui-cells__title">寄养宠物</div>
                 <div class="weui-cells flex_wrap" >
                     {% for pet in pets %}
