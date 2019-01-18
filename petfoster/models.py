@@ -9,6 +9,8 @@ from dateutil.relativedelta import *
 from easy_thumbnails.fields import ThumbnailerImageField
 from ckeditor_uploader.fields import RichTextUploadingField
 from wxchat.models import WxUserinfo
+# from django.contrib.auth.models import User,Group
+# from django.contrib.auth import authenticate
 
 
 TYPE_SEX_CHOICE = (

@@ -1,0 +1,29 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+      <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养协议</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+        </div>
+        <div class="weui-panel__bd">
+            <div class="weui-cells__title">寄养协议内容</div>
+            <div class="weui-cells" >
+                <div class="weui-cell">
+                    <div class="weui-cell__hd"></div>
+                    <div class="weui-cell__bd" >
+                        <img src="{{ contract_url }}" width="100%"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+    </div>
+</div>
+
+{% endblock container %}

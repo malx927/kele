@@ -5,7 +5,7 @@ wechatpy==1.7.0
 easy-thumbnails==2.5
 django-jet==1.0.7
 django-ckeditor==5.5.0
-PyMySQL==0.8.0
+PyMySQL==0.9.3
 python-dateutil==*.*
 redis==*.*
 django-redis==4.7

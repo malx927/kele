@@ -425,8 +425,8 @@ class FosterPayView(View):
 
     def get(self, request, *args, **kwargs):
         try:
-            id = request.GET.get("id", None)
-            instance = FosterStyleChoose.objects.get(pk=int(id))
+            order_id = request.GET.get("id", None)
+            instance = FosterStyleChoose.objects.get(pk=int(order_id))
             # 得到用户的储值数据，判断是否需要微信支付
             openid = request.session.get("openid", None)   #-------------
             try:
@@ -449,6 +449,14 @@ class FosterPayView(View):
 
             pets = PetFosterInfo.objects.filter(id__in=petList)
             petOwner = PetOwner.objects.get(openid=openid)
+
+            # 合同内容
+            try:
+                contract = ContractInfo.objects.get(order=order_id)
+                contract_id = contract.id
+            except:
+                contract_id = ''
+
             signPackage = getJsApiSign(self.request)
 
             context ={
@@ -458,6 +466,7 @@ class FosterPayView(View):
                 "rooms": rooms,
                 "weixin_pay": weixin_pay,
                 'petowner': petOwner,
+                'contract_id': contract_id
             }
 
             return render(request, template_name="petfoster/foster_checkout.html", context=context)
@@ -535,11 +544,15 @@ class FosterOrderView(View):
         else:
 
             try:
-                contract = ContractInfo.objects.get(order=id)
-                if contract.confirm:            #合同已经签订
+                fosterOrder = FosterStyleChoose.objects.get(pk=id)
+                if fosterOrder.status == 1:
                     url = "{0}?id={1}".format(reverse("foster-pay"), id)
-                else:                           #合同未签
-                    url = "{0}?orderid={1}".format(reverse("foster-contract"), id)
+                else:
+                    contract = ContractInfo.objects.get(order=id)
+                    if contract.confirm:            #合同已经签订
+                        url = "{0}?id={1}".format(reverse("foster-pay"), id)
+                    else:                           #合同未签
+                        url = "{0}?orderid={1}".format(reverse("foster-contract"), id)
                 return HttpResponseRedirect(url)
 
             except ContractInfo.DoesNotExist as ex:
@@ -788,8 +801,7 @@ class ContractView(View):
         return '{0}{1}'.format(yearmon, num)
 
 
-
-
+# 寄养合同生产文本
 class ContractPageView(View):
     def get(self, request, *args, **kwargs):
         id = kwargs.get("id")
@@ -834,3 +846,17 @@ class ContractPageView(View):
             return HttpResponse(json.dumps({"success":"false"}))
 
         return HttpResponse(json.dumps({"success":"true", "orderid":contract.order.id}))
+
+
+# 合同查询
+class ContractList(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            contract_id = request.GET.get("contract_id", None)
+            contract = ContractInfo.objects.get(pk=contract_id)
+            contract_url = contract.picture.url
+        except:
+            contract_url = ''
+
+        return render(request, template_name="petfoster/foster_contract_detail.html", context={"contract_url": contract_url})
+

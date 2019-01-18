@@ -203,6 +203,12 @@
                         <div class="weui-cell__bd"><p class="center"> {{ pet.name }} </p></div>
                     </a>
                     {% endfor %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">查看协议：</div>
+                        <div class="weui-cell__bd" >
+                            <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-contract-detail' %}?contract_id={{ contract_id }}">寄养协议</a></p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
