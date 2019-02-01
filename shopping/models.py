@@ -38,7 +38,6 @@ TYPE_CARTITEM_STATUS = (
 TYPE_SHOPPING_STATUS = (
     (1,'已支付'),
     (0,'待支付'),
-
 )
 
 TYPE_MAIL_STYLE = (
@@ -51,6 +50,27 @@ TYPE_MAIL_STYLE = (
 #     (0,'商品'),
 # )
 
+CHOICE_MEMBER_TYPE = (
+    (0,'全部'),
+    (1,'会员'),
+    (2,'非会员'),
+)
+
+CHOICE_SALE_TYPE = (
+    (1, '买赠'),
+    (2, '赠券'),
+    (3, '打折')
+)
+
+CHOICE_DISCOUNT_TYPE =(
+    (6, '6折'),
+    (7, '7折'),
+    (8, '8折'),
+    (9, '9折'),
+)
+
+
+# 商品分类
 class GoodsType(models.Model):
     name = models.CharField(verbose_name='分类名称', max_length=64)
     parent = models.ForeignKey('self', verbose_name='父项', default=None, blank=True, null=True)
@@ -115,8 +135,43 @@ class Goods(models.Model):
         self.click_nums += 1
         self.save(update_fields=['click_nums'])
 
-#购物车
 
+# 商品销售策略
+class MarketPlan(models.Model):
+    goods = models.ForeignKey(Goods, verbose_name='商品', on_delete=models.CASCADE, help_text='参加活动的商品')
+    sale_type = models.IntegerField(verbose_name='销售类型', choices=CHOICE_SALE_TYPE)
+    member_type = models.IntegerField(verbose_name='销售对象', choices=CHOICE_MEMBER_TYPE)
+    present = models.ForeignKey(Goods, verbose_name='赠品', related_name="presents", on_delete=models.CASCADE, blank=True, null=True, help_text='选择买赠活动，需要填写')
+    ticket = models.IntegerField(verbose_name='赠券数量', blank=True, null=True, help_text='选择赠券活动，需要填写')
+    sale_one = models.IntegerField(verbose_name='购买数量1', blank=True, null=True, help_text='打折活动，需要填写')
+    discount_one = models.DecimalField(verbose_name='折扣1', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
+    sale_two = models.IntegerField(verbose_name='购买数量2', blank=True, null=True, help_text='打折活动，需要填写')
+    discount_two = models.DecimalField(verbose_name='折扣2', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
+    is_enabled = models.BooleanField(verbose_name='是否有效', default=True, help_text='设置有效才能参加活动')
+
+    def __str__(self):
+        return self.sale_type
+
+    class Meta:
+        verbose_name = '销售策略'
+        verbose_name_plural = verbose_name
+
+
+# 满减销售活动
+class OrderMarketPlan(models.Model):
+    member_type = models.IntegerField(verbose_name='销售对象', choices=CHOICE_MEMBER_TYPE)
+    total_money = models.DecimalField(verbose_name='消费金额', max_digits=7, decimal_places=2)
+    minus_money = models.DecimalField(verbose_name='减免金额', max_digits=7, decimal_places=2)
+    is_enabled = models.BooleanField(verbose_name='是否有效', default=True, help_text='设置有效才能参加活动')
+
+    def __str__(self):
+        return self.sale_type
+
+    class Meta:
+        verbose_name = '满减销售活动'
+        verbose_name_plural = verbose_name
+
+# 购物车
 class ShopCart(models.Model):
     user_id = models.CharField(verbose_name='用户ID',max_length=64)  #openid
     goods = models.ForeignKey(Goods,verbose_name='商品')

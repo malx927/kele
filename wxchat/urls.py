@@ -111,5 +111,6 @@ urlpatterns = [
 
     url(r'^updateuserinfo/$', updateUserinfo),
     url(r'^password/$', PasswordView.as_view(), name='password-change'),
+    url(r'^wxerror/$', TemplateView.as_view(template_name='wxchat/wxerror.html'), name='wx-error'),
 
 ]

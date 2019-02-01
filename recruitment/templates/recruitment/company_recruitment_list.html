@@ -1,0 +1,217 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+
+{% block tabpanel %}
+    <div class="weui-tab__content" id="tab1">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div class="weui-flex__item"><span class="title">公司招聘信息</span></div>
+                    <div class="weui-flex__item"></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                </div>
+            </div>
+            <div class="weui-panel__bd" id="company">
+
+            </div>
+            <div class="weui-panel__ft">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="companymore" style="display: none">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="weui-tab__content" id="tab2">
+        <div class="weui-panel weui-panel_access">
+            <div class="weui-panel__hd">
+                <div class="weui-flex">
+                    <div class="weui-flex__item"><span class="title">个人求职信息</span></div>
+                    <div class="weui-flex__item"></div>
+                    <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                </div>
+            </div>
+            <div class="weui-panel__bd" id="person"></div>
+            <div class="weui-panel__ft">
+                <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="personmore" style="display: none">
+                    <div class="weui-cell__bd">查看更多</div>
+                    <span class="weui-cell__ft"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock tabpanel %}
+{% block tabbar %}
+    <a href="#tab1" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">
+             <i class="icon iconfont icon-lingyangjihua"></i>
+        </div>
+        <p class="weui-tabbar__label">公司招聘</p>
+    </a>
+    <a href="#tab2" class="weui-tabbar__item">
+        <div class="weui-tabbar__icon">
+            <i class="icon iconfont icon-man5"></i>
+        </div>
+        <p class="weui-tabbar__label">个人求职</p>
+    </a>
+{% endblock tabbar %}
+{% block add %}
+      <a id="pet_breed" class="circle" href="javascript:;">
+          <div class="circle_icon"><i class="icon iconfont icon-zengjia16"></i></div>
+          <p>发布</p>
+      </a>
+    <div class="weui-skin_android" id="actionsheet" style="display: none">
+        <div class="weui-mask"></div>
+        <div class="weui-actionsheet">
+            <div class="weui-actionsheet__menu">
+                <div class="weui-actionsheet__cell">
+                   <a href="{% url 'company-recruit-add' %}" >
+                        <img  src="{% static 'images/qyzp.png' %}">
+                        <p><h4>企业招聘</h4></p>
+                    </a>
+                </div>
+                <div class="weui-actionsheet__cell">
+                      <a href="{% url 'person-job-add' %}" >
+                            <img src="{% static 'images/grqz.png' %}">
+                            <p><h4>个人求职</h4></p>
+                      </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock add %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+        var companyNextUrl = '{% url 'company-recruit-list' %}';
+        var personNextUrl = '{% url 'person-job-list' %}';
+
+        var loading = weui.loading('加载中...');
+        ///缓存滚动条位置
+        $('.weui-tab__panel').scroll(function () {
+            if ($(this).scrollTop() != 0) {
+                sessionStorage.setItem('offsetTop', $(this).scrollTop());
+            }
+        });
+        $(function () {
+            defIndex = sessionStorage.getItem('recruit');
+            console.log('defindex='+ defIndex);
+            weui.tab('#tab',{
+                defaultIndex: defIndex ==null?0:defIndex,
+                onChange: function(index){
+                    sessionStorage.setItem('recruit',index);
+                }
+            });
+
+            $('#companymore').on('click', function () {
+                companyNextUrl = $(this).attr("data-item");
+                getDataList(companyNextUrl, 'company');
+            });
+            $('#personmore').on('click', function () {
+                personNextUrl = $(this).attr("data-item");
+                getDataList(personNextUrl, 'person');
+            });
+
+            getCompanyDataList(companyNextUrl);
+            getPersonDataList(personNextUrl);
+        });
+        function getCompanyDataList( url ) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                timeout: 5000,
+                context: $('#company'),
+                success: function (data) {
+                    companyNextUrl = data.next;
+
+                    appendCompanyItem(data.results);
+                    if (companyNextUrl == null)
+                        $('#companymore').css('display', 'none');
+                    else
+                        $('#companymore').css('display', '');
+                        $('#companymore').attr('data-item', companyNextUrl);
+                    loading.hide();
+                    setScollPos();
+                },
+                error: function (xhr, type, error) {
+                    console.log(type);
+                }
+            });
+        }
+
+        function appendCompanyItem(results) {
+            $.each(results, function (index, item) {
+
+                item = '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
+                        '<div class="weui-media-box__bd">' +
+                        '<h4 class="weui-media-box__title">职位名: ' + item.name  +'<span style="float:right;color:gray;font-size:14px;">'+ item.pubtime +'</span></h4>' +
+                        '<p class="weui-media-box__desc">职位需求: ' + item.requirements + '</p>' +
+                        '</div>' +
+                        '</a>';
+                $('#company').append(item);
+            });
+
+        }
+
+        function getPersonDataList( url ) {
+            $.ajax({
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                timeout: 5000,
+                context: $('#person'),
+                success: function (data) {
+                    personNextUrl = data.next;
+                    appendPersonItem(data.results);
+                    if (personNextUrl == null)
+                        $('#personmore').css('display', 'none');
+                    else
+                        $('#personmore').css('display', '');
+                        $('#personmore').attr('data-item', personNextUrl);
+                    loading.hide();
+                    setScollPos();
+                },
+                error: function (xhr, type, error) {
+                    console.log(type);
+                }
+            });
+        }
+
+         function appendPersonItem(results) {
+            $.each(results, function (index, item) {
+
+                item = '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
+                        '<div class="weui-media-box__bd">' +
+                        '<h4 class="weui-media-box__title">姓名: ' + item.name + '<span style="float:right;color:gray;font-size:14px;">'+ item.pubtime +'</span></h4>' +
+                        '<p class="weui-media-box__desc">求职意向: ' + item.job_intension + '</p>' +
+                        '</div>' +
+                        '</a>';
+                $('#person').append(item);
+            });
+
+        }
+
+        ////设置滚动条位置
+        function setScollPos() {
+            var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+            $('.weui-tab__panel').scrollTop(_offset);
+        }
+
+          // android
+        $(function(){
+            var $actionSheet = $('#actionsheet');
+            var $mask = $actionSheet.find('.weui-mask');
+
+            $("#pet_breed").on('click', function(){
+                $actionSheet.fadeIn(200);
+                $mask.on('click',function () {
+                    $actionSheet.fadeOut(200);
+                });
+            });
+        });
+
+
+
+    </script>
+{% endblock bottomjs %}

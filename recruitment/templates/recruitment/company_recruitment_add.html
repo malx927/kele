@@ -1,0 +1,85 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <script>
+     window.history.forward(1);
+    </script>
+{% endblock extra%}
+{% block container %}
+    <div class="weui-panel">
+        <div class="weui-panel__hd header_bottom">
+             <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">公司招聘登记</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+        </div>
+        <div class="weui-panel__bd">
+            <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+                <div class="weui-cells weui-cells_form cells_top" id="uploader">
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
+                        <div class="weui-cell__bd">
+                            {{ form.name }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">{{ form.requirements.label }}:</label>
+                        </div>
+                        <div class="weui-cell__bd">
+                            {{ form.requirements }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd">
+                            <label for="" class="weui-label">{{ form.job_place.label }}:</label>
+                        </div>
+                        <div class="weui-cell__bd">
+                            {{ form.job_place }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.company_name.label }}:</label></div>
+                        <div class="weui-cell__bd">
+                            {{ form.company_name }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.contact_way.label }}:</label></div>
+                        <div class="weui-cell__bd">
+                            {{ form.contact_way }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.company_intro.label }}:</label></div>
+                        <div class="weui-cell__bd">
+                            {{ form.company_intro }}
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label class="weui-label">{{ form.picture.label }}:</label></div>
+                        <div class="weui-cell__bd">
+                            <div class="weui-uploader">
+                                <div class="weui-uploader__bd">
+                                    <ul class="weui-uploader__files" id="uploaderFiles"></ul>
+                                    <div class="weui-uploader__input-box">
+                                        {{ form.picture }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="weui-cell__ft">
+                            <div class="weui-cells__tips"></div>
+                        </div>
+                    </div>
+                    <div class="weui-btn-area">
+                        <button type="submit" name="submit" class="weui-btn weui-btn_primary">提交</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock container %}
+{% block bottomjs %}
+    {{ block.super }}
+{% endblock bottomjs %}

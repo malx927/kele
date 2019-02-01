@@ -1,0 +1,70 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block container %}
+<div class="weui-panel weui-panel_access">
+   <div class="weui-panel__hd">
+        <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">招聘详情</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+   </div>
+    <div class="weui-panel__bd">
+
+       <div class="weui-form-preview">
+       <div class="weui-form-preview__bd">
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">姓名 :</label>
+               <span class="weui-form-preview__value"> {{ object.name }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">性别 :</label>
+               <span class="weui-form-preview__value">{{ object.gender }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">年龄 :</label>
+               <span class="weui-form-preview__value">{{ object.age }}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">学历 :</label>
+               <span class="weui-form-preview__value">{{ object.education }}</span>
+           </div>
+            <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">工作年限 :</label>
+               <span class="weui-form-preview__value">{{ object.working_life }}</span>
+           </div>
+            <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">期望薪资 :</label>
+               <span class="weui-form-preview__value">{{ object.salary}}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">工作地点 :</label>
+               <span class="weui-form-preview__value">{{ object.work_place}}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">求职意向 :</label>
+               <span class="weui-form-preview__value">{{ object.job_intension}}</span>
+           </div>
+            <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">联系方式 :</label>
+               <span class="weui-form-preview__value">{{ object.contact_way}}</span>
+           </div>
+           <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">工作经验 :</label>
+               <span class="weui-form-preview__value">{{ object.experience}}</span>
+           </div>
+            <div class="weui-form-preview__item">
+               <label class="weui-form-preview__label">发布时间 :</label>
+               <span class="weui-form-preview__value">{{ object.pub_time|date:'Y-m-d'}}</span>
+           </div>
+           {% if object.picture %}
+             <div class="detail_header">
+                <img src="{{ object.picture.url }}" >
+             </div>
+          {% endif %}
+       </div>
+    </div>
+    </div>
+</div>
+
+{% endblock container %}
+

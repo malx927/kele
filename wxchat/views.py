@@ -301,6 +301,9 @@ def redirectUrl(request, item):
 
                 request.session['openid'] = open_id
                 userinf = get_object_or_404(WxUserinfo, openid=open_id)
+                if userinf.is_member == 0:
+                    userinf.is_member = 1
+                    userinf.save()
                 request.session['nickname'] = userinf.nickname
                 request.session['is_member'] = userinf.is_member
                 request.session['headimgurl'] = userinf.headimgurl
@@ -308,6 +311,9 @@ def redirectUrl(request, item):
                 return HttpResponseRedirect(redirect_url)
     else:
         userinf = get_object_or_404(WxUserinfo, openid=openid)
+        if userinf.is_member == 0:
+            userinf.is_member = 1
+            userinf.save()
         request.session['is_member'] = userinf.is_member
         request.session['headimgurl'] = userinf.headimgurl
         request.session['role'] = userinf.member_role.id if userinf.member_role else 0

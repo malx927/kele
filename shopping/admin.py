@@ -1,7 +1,7 @@
 from django.contrib import admin
 import datetime
 from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, MemberLimit, MailFee, \
-    MemberRechargeAmount, MemberDeposit, MemberRechargeRecord
+    MemberRechargeAmount, MemberDeposit, MemberRechargeRecord, MarketPlan, OrderMarketPlan
 # Register your models here.
 
 
@@ -45,6 +45,20 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('out_trade_no', 'user_id', 'username', 'telnumber', 'postalcode', 'detailinfo', 'total_fee','mail_cost', 'cash_fee','mailstyle','nationalcode', 'status', 'is_mail','confirm_at','confirm_user','confirm_openid')
         })
     ]
+
+
+@admin.register(MarketPlan)
+class MarketPlanAdmin(admin.ModelAdmin):
+    list_display = ( 'goods', 'sale_type', 'member_type','present','ticket','sale_one','discount_one','sale_two',  'discount_two','is_enabled')
+    list_per_page = 50
+    list_filter = ['goods', 'sale_type', 'member_type']
+
+
+@admin.register(OrderMarketPlan)
+class OrderMarketPlanAdmin(admin.ModelAdmin):
+    list_display = ( 'member_type', 'total_money', 'minus_money', 'is_enabled')
+    list_per_page = 50
+    list_filter = ['member_type']
 
 
 @admin.register(ShopCart)

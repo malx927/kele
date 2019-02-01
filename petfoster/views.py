@@ -428,7 +428,10 @@ class FosterPayView(View):
             order_id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get(pk=int(order_id))
             # 得到用户的储值数据，判断是否需要微信支付
-            openid = request.session.get("openid", None)   #-------------
+            openid = instance.openid
+            if openid is None:
+                openid = request.session.get("openid", None)   #-------------
+
             try:
                 deposit = MemberDeposit.objects.get(openid=openid)
                 balance = deposit.balance()
@@ -567,10 +570,24 @@ class FosterOrderDetailView(View):
         try:
             out_trade_no = kwargs.get("out_trade_no", None)
             instance = FosterStyleChoose.objects.get(out_trade_no=out_trade_no, status=1)
+            contract = instance.contractinfo_set.first()
             pet_ids = instance.pet_list
             petList = pet_ids.split(',')
             pets = PetFosterInfo.objects.filter(id__in=petList)
-            return render(request, template_name="petfoster/foster_checkout.html", context={"instance": instance, "pets": pets})
+            petowner = PetOwner.objects.get(openid=instance.openid)
+            if instance.transaction_id:
+                weixin_pay = True
+            else:
+                weixin_pay = False
+
+            context = {
+                "instance": instance,
+                "pets": pets,
+                "petowner": petowner,
+                "contract_id": contract.id,
+                "weixin_pay": weixin_pay,
+            }
+            return render(request, template_name="petfoster/foster_checkout.html", context=context)
         except FosterStyleChoose.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("foster-style-calc"))
         except:
@@ -855,8 +872,6 @@ class ContractList(View):
             contract_id = request.GET.get("contract_id", None)
             contract = ContractInfo.objects.get(pk=contract_id)
             contract_url = contract.picture.url
-        except:
+        except ContractInfo.DoesNotExist as ex:
             contract_url = ''
-
         return render(request, template_name="petfoster/foster_contract_detail.html", context={"contract_url": contract_url})
-

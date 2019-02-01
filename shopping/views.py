@@ -672,7 +672,6 @@ class ConsumeListView(View):
             "orders": orders,
             "fosterOrders": fosterOrders
         }
-
         return render(request, template_name="shopping/my_consume_list.html", context=context)
 
 

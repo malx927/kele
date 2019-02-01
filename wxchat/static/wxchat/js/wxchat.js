@@ -1,8 +1,9 @@
 
-//$(function() {
-//    //FastClick.attach(document.body);
-//
-//});
+$(function() {
+    //FastClick.attach(document.body);
+
+});
+
 
 //首页图片轮播
 function setImageUrl(){
