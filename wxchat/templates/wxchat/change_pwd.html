@@ -92,7 +92,9 @@
               data: params,
               timeout: 5000,
               success: function(data){
-                 alert(JSON.stringify(data));
+                  if(data.success="true"){
+                      weui.alert("密码重置成功,请在公众号窗口查看!")
+                  }
               },
               error: function(error){
                   weui.alert("密码重置失败!")
