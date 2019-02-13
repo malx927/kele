@@ -48,9 +48,15 @@
                              <div class="weui-flex__item"><span>性别：</span>{{ object.get_sex_display }}</div>
                             <div class="weui-flex__item"><span>绝育：</span>{{ object.get_sterilization_display }}</div>
                          </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>状态：</span>{% if object.is_end %}<em class="color-danger">正在寄养</em> {% else %}无{% endif %}</div>
+                         </div>
                     </div>
                     <div class="weui-cell__ft"></div>
                     </a>
+{#                    {% if object.is_end %}#}
+{#                    <a id="code_{{ object.id }}" date-item="{{ object.id }}"  class="weui-btn weui-btn_mini weui-btn_plain-primary btn_mini r" style="margin-top: -32px;margin-right: 4px;">提宠编码</a>#}
+{#                    {% endif %}#}
                     {% empty %}
                     <div style="height: 50vh;line-height: 50vh;text-align: center">
                         <a class="weui-btn weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-pet-info' %}">宠物录入</a>
@@ -87,6 +93,34 @@
 
             window.location.href = "{% url 'foster-style-calc' %}";
         })
+
+        $("a[id^='code']").on('click',function(){
+            var params ={
+              id: $(this).attr("data-item"),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+{#              url: '{% url "foster-pet-code" %}',#}
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.success !=true){
+                    weui.alert('提宠编码为:'+ data.code);
+                  }
+                  else{
+                      weui.alert('提宠编码生成失败');
+                  }
+              },
+              error: function(error){
+                     weui.alert('提宠编码生成失败');
+              }
+            });
+        });
+
+
     });
 
     </script>

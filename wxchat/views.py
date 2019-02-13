@@ -4,11 +4,12 @@ import random, string, time, os
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import model_to_dict
+from django.utils.decorators import method_decorator
 from django.utils.http import urlquote_plus, urlunquote_plus
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.generic import DetailView, View
+from django.views.generic import DetailView, View, DeleteView
 import requests
 import json
 from django.views.decorators.csrf import csrf_exempt
@@ -42,6 +43,8 @@ from django.db.models import Q
 from wechatpy.session.redisstorage import RedisStorage
 from redis import Redis
 
+from .decorators import weixin_decorator
+
 WECHAT_TOKEN = settings.WECHAT_TOKEN
 APP_URL = settings.APP_URL
 APPID = settings.WECHAT_APPID
@@ -60,6 +63,43 @@ wxPay = WeChatPay(appid=settings.WECHAT_APPID, api_key=settings.MCH_KEY,
 
 SEND_MSG = '恭喜您成为我们的会员，享有购买商品时，卡券自动抵消相应价钱的优惠服务。'
 SCENE_STR = 'dayankelelianmeng'
+
+
+#
+# def weixin_decorator(func):
+#     def wrapper(request, *args, **kwargs):
+#         code = request.GET.get('code', None)
+#         openid = request.session.get('openid', None)
+#         print('weixin_decorator', code, openid)
+#         if openid is None:
+#             if code is None:  # 获取授权码code
+#                 redirect_url = '%s://%s%s' % (request.scheme, request.get_host(), request.get_full_path())
+#                 print(redirect_url)
+#                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
+#                 authorize_url = webchatOAuth.authorize_url
+#                 return HttpResponseRedirect(authorize_url)
+#             else:  # 同意授权，通过授权码获取ticket,根据ticket拉取用户信息
+#                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
+#                 res = webchatOAuth.fetch_access_token(code)
+#                 if 'errcode' in res:
+#                     return HttpResponse(json.dumps(res))
+#                 else:
+#                     open_id = webchatOAuth.open_id
+#                     userinfo = webchatOAuth.get_user_info()
+#                     userinfo.pop('privilege')
+#
+#                     obj, created = WxUserinfo.objects.update_or_create(openid=open_id, defaults=userinfo)
+#
+#                     request.session['openid'] = open_id
+#                     userinf = get_object_or_404(WxUserinfo, openid=open_id)
+#                     request.session['nickname'] = userinf.nickname
+#                     request.session['is_member'] = userinf.is_member
+#                     request.session['headimgurl'] = userinf.headimgurl
+#                     return func(request, *args, **kwargs)
+#         else:
+#             return func(request, *args, **kwargs)
+#     return wrapper
+#
 
 @csrf_exempt
 def wechat(request):
@@ -102,7 +142,7 @@ def wechat(request):
             elif msg.event == 'unsubscribe':
                 reply = create_reply('取消关注公众号', msg)
                 unSubUserinfo(msg.source)
-                request.session.clear()
+                request.session.flush()
             elif msg.event == 'subscribe_scan':
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
                 saveUserinfo(msg.source, msg.scene_id)
@@ -221,12 +261,12 @@ def createMenu(request):
             {
                 "type": "view",
                 "name": "宠物社区",
-                "url": APP_URL + "/redirect/dogindex"
+                "url": APP_URL + "/dogindex/"
             },
              {
                 "type": "view",
                 "name": "个人中心",
-                "url": APP_URL + "/redirect/myinfo"
+                "url": APP_URL + "/myinfo/"
             },
 
             # {
@@ -280,7 +320,7 @@ def redirectUrl(request, item):
     """
     code = request.GET.get('code', None)
     openid = request.session.get('openid', None)
-
+    # print(item, request.path, request.get_full_path())
     if openid is None:
         if code is None:  # 获取授权码code
             redirect_url = '%s/redirect/%s' % (APP_URL, item)
@@ -322,8 +362,8 @@ def redirectUrl(request, item):
         return HttpResponseRedirect(redirect_url)
 
 
+@weixin_decorator
 def dogLoss(request):
-    openid = request.session.get('openid', None)
     return render(request, template_name='wxchat/dogloss.html', context={'nickname': '', 'imgurl': ''})
 
 
@@ -444,6 +484,7 @@ class DogFemaleDetailView(DetailView):
 
 
 # 寻宠物详细视图
+@method_decorator(weixin_decorator, name="get")
 class DogLossDetailView(DetailView):
     model = DogLoss
     template_name = 'wxchat/dogloss_detail.html'
@@ -687,8 +728,8 @@ def orderList(request):
         user_id = request.session.get('openid', None)
         out_trade_no = request.GET.get('out_trade_no',None)
         _result = request.GET.get('_result',None)
-        signPackage = getJsApiSign(request)
         #print(out_trade_no, user_id)
+        signPackage = getJsApiSign(request)
         if _result is None:
             try:
                 signPackage = getJsApiSign(request)
@@ -961,6 +1002,10 @@ class DogSaleDetailView(DetailView):
         self.object.save()
         return response
 
+class DogSaleDelView(DeleteView):
+    pass
+
+
 
 @csrf_exempt
 def getUserinfo(request):
@@ -1154,6 +1199,10 @@ def payNotify(request):
 
 
 def getJsApiSign(request):
+    global client
+    if client is None:
+        client = WeChatClient(settings.WECHAT_APPID, settings.WECHAT_SECRET, session=session_interface)
+
     ticket = client.jsapi.get_jsapi_ticket()
     noncestr = random_string(15)
     timestamp = int(time.time())
@@ -1390,7 +1439,7 @@ def sendPasswordTemplateMesToUser(instance, mode=0):
         }
         client.message.send_template(user_id=instance.openid, template_id = template_modify , url='', data=modify_data)
 
-
+@weixin_decorator
 def dogIndex(request):
     if 'HTTP_X_FORWARDED_FOR' in request.META:
         ip =  request.META['HTTP_X_FORWARDED_FOR']
@@ -1398,10 +1447,11 @@ def dogIndex(request):
     else:
         ip = request.META['REMOTE_ADDR']
         print("ip2=",ip)
+    signPackage = getJsApiSign(request)
 
-    return render(request, 'wxchat/dogindex.html')
+    return render(request, template_name='wxchat/dogindex.html', context={'sign': signPackage} )
 
-
+@weixin_decorator
 def myInfo(request):
     return render(request, 'wxchat/myinfo.html')
 
@@ -1440,13 +1490,22 @@ def myQRCode(user):
 
     myinfo = user
 
-    qrcode_data = {
-        'expire_seconds': 2592000,
-        'action_name': 'QR_SCENE',
-        'action_info': {
-            'scene': {'scene_id': myinfo.qr_scene},
+    if 'o0AHP0t3HTWzuhM8kfbUq1yegnWI' == myinfo.openid:
+        qrcode_data = {
+            'action_name': 'QR_LIMIT_STR_SCENE',
+            'action_info': {
+                'scene': {'scene_id': myinfo.qr_scene},
+            }
         }
-    }
+    else:
+        qrcode_data = {
+            'expire_seconds': 2592000,
+            'action_name': 'QR_SCENE',
+            'action_info': {
+                'scene': {'scene_id': myinfo.qr_scene},
+            }
+        }
+
     openid = user.openid
     res = client.qrcode.create(qrcode_data)
     ret = client.qrcode.show(res)

@@ -59,6 +59,10 @@ a{
     text-align: center;
     color: #cfcfcf;
 }
+.btn_mini{
+    line-height: 1.8em;
+    padding: 0 1.0em;
+}
 .r{
     float: right;
 }

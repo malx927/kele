@@ -15,7 +15,18 @@
               id: $("#id").text(),
               csrfmiddlewaretoken:'{{ csrf_token }}',
             }
-
+           var ts = sessionStorage.getItem('checkout');
+           if(ts==null) {
+               sessionStorage.setItem('checkout', new Date().getTime());
+           }else{
+               var cur_ts = new Date().getTime();
+               var diff = (cur_ts - Number(ts))/1000;
+               if(diff < 20 ){
+                   weui.alert('您刚才已经提交过，如果没有成功请30秒后再提交!');
+                    return false;
+               }
+               sessionStorage.setItem('checkout', cur_ts);
+           }
            $.ajax({
               type: 'POST',
               url: '{% url "foster-pay" %}',
@@ -108,14 +119,21 @@
                             </select>
                         </div>
                         <div class="weui-cell__ft">
-                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">分配房间</a>
+                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">寄养确认</a>
                         </div>
                     </div>
-                    <div class="weui-cell">
+                    <div class="weui-cell weui-cell_vcode">
                         <div class="weui-cell__hd"><label for="" class="weui-label">物品交接:</label></div>
                         <div class="weui-cell__bd"><a href="{% url 'hand-over-list' %}?orderid={{ instance.id }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">交接记录</a></div>
+                        <div class="weui-cell__ft">
+                               <a id="foster_stop" href="javascript:;" class="weui-vcode-btn">寄养结束</a>
+                        </div>
                     </div>
                     {% endif %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">提取宠物码:</label></div>
+                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">提宠码</a></div>
+                    </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
                         <div class="weui-cell__bd">{{ instance.out_trade_no|default:'' }}</div>
@@ -269,7 +287,63 @@
                   }
                 });
             });
+
+            $("#foster_stop").on("click", function(){
+
+                var params ={
+                  orderid: $("#id").text(),
+                  csrfmiddlewaretoken:'{{ csrf_token }}'
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "foster-pet-stop" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+
+                      if(data.success=="true"){
+                          weui.alert("设置成功！");
+                      }
+                      else{
+                          weui.alert("设置失败！");
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("设置失败!");
+                  }
+                });
+            });
+
         {% endif %}
+
+         $("#pet_code").on("click", function(){
+                var params ={
+                  orderid: $("#id").text(),
+                  csrfmiddlewaretoken:'{{ csrf_token }}'
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "foster-pet-code" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                      if(data.success=="true"){
+                          weui.alert("宠物提取码:" + data.code);
+                      }
+                      else{
+                          weui.alert("提取失败！");
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("提取失败!");
+                  }
+                });
+            });
+
     })
     </script>
 {% endblock bottomjs %}

@@ -1,5 +1,23 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% include 'shopping/include/jssdk.html' %}
+<script>
+ wx.ready(function () {
 
+    $("#dog_walk").on('click',function(){
+         wx.openLocation({
+          latitude: 40.7094,
+          longitude: 120.765,
+          name: '宠物乐园',
+          address: '东砬村(葫芦岛市龙港区双树乡东砬村)',
+          scale: 13,
+          infoUrl: ''
+        });
+    });
+
+});
+</script>
+{% endblock extra %}
 {% block tabpanel %}
         <div class="weui-tab__content" id="tab1">
             <div class="weui-panel weui-panel_access">
@@ -21,7 +39,7 @@
                     <p class="weui-grid__label">宠物相亲</p>
                   </a>
                   <a href="{% url 'foster-menu'  %}" class="weui-grid">
-                    <div class="weui-grid__icon">
+                    <div class="weui-grid__icon" >
                       <i class="icon iconfont icon-chongwujiyang"></i>
                     </div>
                     <p class="weui-grid__label">宠物寄养</p>
@@ -70,9 +88,15 @@
                   </a>
                   <a href="{% url 'recruit-index' %}" class="weui-grid">
                     <div class="weui-grid__icon">
-                      <i class="icon iconfont icon-gongxianggeiwo" aria-hidden="true"></i>
+                      <i class="icon iconfont icon-zhaopin" aria-hidden="true"></i>
                     </div>
                     <p class="weui-grid__label">招聘发布</p>
+                  </a>
+                  <a href="javascript:void(0);" id="dog_walk" class="weui-grid">
+                    <div class="weui-grid__icon">
+                      <i class="icon iconfont icon-weizhi" aria-hidden="true"></i>
+                    </div>
+                    <p class="weui-grid__label">乐园位置</p>
                   </a>
                 </div>
             </div>

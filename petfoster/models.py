@@ -26,6 +26,7 @@ TYPE_STERILIZATION_CHOICE = (
 TYPE_SHOPPING_STATUS = (
     (1,'已支付'),
     (0,'待支付'),
+    (2,'支付中'),
 
 )
 
@@ -164,10 +165,11 @@ class PetFosterInfo(models.Model):
     room = models.ForeignKey(FosterRoom, verbose_name='房间', blank=True, null=True, on_delete=models.SET_NULL)
     trainer = models.ForeignKey(WxUserinfo, verbose_name='驯养师',  blank=True, null=True, on_delete=models.SET_NULL )
     foster_type = models.ForeignKey(FosterType, verbose_name="寄养方式", blank=True, null=True, on_delete=models.SET_NULL)
-    begin_time = models.DateTimeField(verbose_name="开始时间", blank=True, null=True)
+    begin_time = models.DateField(verbose_name="开始时间", blank=True, null=True)
     end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
-    set_time = models.DateField(verbose_name=u'分配时间', null=True, blank=True )
-    is_end = models.BooleanField(verbose_name="寄养结束",default=False)
+    set_time = models.DateTimeField(verbose_name=u'分配时间', null=True, blank=True )
+    is_end = models.BooleanField(verbose_name="寄养结束",default=False)    # 寄养结束标志 1为正在寄养，0为寄养结束
+
 
     class Meta:
         verbose_name = u"06.寄养宠物信息"
@@ -180,6 +182,14 @@ class PetFosterInfo(models.Model):
 
     def __str__(self):
         return self.name
+
+    def is_foster(self):
+        if self.end_time is None:
+            return  False
+        else:
+            return self.end_time >= datetime.datetime.now().date()
+
+
 
 class FosterDemand(models.Model):
     pet = models.ForeignKey(PetFosterInfo, verbose_name='寄养宠物', on_delete=models.CASCADE )
@@ -372,6 +382,8 @@ class FosterStyleChoose(models.Model):
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
     pet_list = models.CharField(validators=[validate_comma_separated_integer_list],max_length=100, blank=True, null=True, default='')
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
+    code = models.CharField(verbose_name='提取宠物码', max_length=12, default='', blank=True)
+
 
     def __str__(self):
         if self.out_trade_no:

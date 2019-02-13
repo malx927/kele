@@ -203,6 +203,9 @@ def insuranceNotify(request):
                         instance = PetInsurance.objects.get(openid=openid, out_trade_no=out_trade_no)
                     elif out_trade_no.startswith('F'):  #寄养
                         instance = FosterStyleChoose.objects.get(openid=openid, out_trade_no=out_trade_no)
+                        pet_ids = instance.pet_list
+                        petList = pet_ids.split(',')
+                        PetFosterInfo.objects.filter(id__in=petList).update(begin_time=instance.begin_time, end_time=instance.end_time)
 
                     if instance.status==0:
                         #更新订单
@@ -273,6 +276,7 @@ class PetFosterInfoView(View):
 
         if form.is_valid():
             instance = form.save(commit=False)
+            print('openid===', user_id)
             instance.openid = user_id
             instance.save()
             if instance.picture:
@@ -614,7 +618,7 @@ class FosterRoomUpdateView(View):
                 pet_ids = order.pet_list
                 petList = pet_ids.split(',')
 
-                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room)
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now(), is_end=True)
 
                 if order.foster_mode == 3:
                     room.petcounts += nRows
@@ -712,6 +716,10 @@ class FosterBalancePayView(View):
             #生成订单号
             out_trade_no = '{0}{1}{2}'.format('F', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
             instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            pet_ids = instance.pet_list
+            pet_list = pet_ids.split(',')
+            PetFosterInfo.objects.filter(id__in=pet_list).update(begin_time=instance.begin_time, end_time=instance.end_time)
+
             deposit = MemberDeposit.objects.get(openid = openid)
 
             total_price = instance.total_price
@@ -875,3 +883,41 @@ class ContractList(View):
         except ContractInfo.DoesNotExist as ex:
             contract_url = ''
         return render(request, template_name="petfoster/foster_contract_detail.html", context={"contract_url": contract_url})
+
+
+# 寄养宠物列表
+class FosterPetsList(View):
+    def get(self, request, *args, **kwargs):
+        foster_pets = PetFosterInfo.objects.filter(end_time__gte=datetime.datetime.now().date())
+        return render(request, template_name="petfoster/foster_pets_list.html", context={"pets": foster_pets})
+
+
+# 宠物提取时生成的编码
+class FosterPetCode(View):
+    def post(self, request):
+        order_id = request.POST.get("orderid", None)
+        try:
+            styleChoose = FosterStyleChoose.objects.get(pk=order_id)
+            code = styleChoose.out_trade_no[-6:]
+            print(code)
+            styleChoose.code = code
+            styleChoose.save(update_fields=['code'])
+        except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponse(json.dumps({"success":"false"}))
+
+        return HttpResponse(json.dumps({"success":"true", "code":styleChoose.code}))
+
+
+# 宠物寄养结束
+class FosterPetStop(View):
+    def post(self, request):
+        order_id = request.POST.get("orderid", None)
+        try:
+            styleChoose = FosterStyleChoose.objects.get(pk=order_id)
+            pet_ids = styleChoose.pet_list
+            petList = pet_ids.split(',')
+            PetFosterInfo.objects.filter(id__in=petList).update(room=None, begin_time=None, end_time=None, is_end=0)
+        except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponse(json.dumps({"success":"false"}))
+
+        return HttpResponse(json.dumps({"success":"true"}))

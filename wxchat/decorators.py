@@ -16,7 +16,7 @@ def weixin_decorator(func):
         if openid is None:
             if code is None:  # 获取授权码code
                 redirect_url = '%s://%s%s' % (request.scheme, request.get_host(), request.get_full_path())
-                print(redirect_url)
+                print('redirect_url=', redirect_url)
                 webchatOAuth = WeChatOAuth(settings.WECHAT_APPID, settings.WECHAT_SECRET, redirect_url, 'snsapi_userinfo')
                 authorize_url = webchatOAuth.authorize_url
                 return HttpResponseRedirect(authorize_url)
@@ -37,7 +37,14 @@ def weixin_decorator(func):
                     request.session['nickname'] = userinf.nickname
                     request.session['is_member'] = userinf.is_member
                     request.session['headimgurl'] = userinf.headimgurl
+                    request.session['role'] = userinf.member_role.id if userinf.member_role else 0
                     return func(request, *args, **kwargs)
         else:
+            request.session['openid'] = openid
+            userinf = get_object_or_404(WxUserinfo, openid=openid)
+            request.session['nickname'] = userinf.nickname
+            request.session['is_member'] = userinf.is_member
+            request.session['headimgurl'] = userinf.headimgurl
+            request.session['role'] = userinf.member_role.id if userinf.member_role else 0
             return func(request, *args, **kwargs)
     return wrapper
