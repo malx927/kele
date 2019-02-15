@@ -18,7 +18,7 @@
 {#        <div class="weui-cells__title">带图标、说明、跳转的列表项</div>#}
         <div class="weui-cells height30">
             {% if request.session.role == 2 or request.session.role == 1 %}
-            <a id="pet_loss" class="weui-cell weui-cell_access" href="javascript:void(0);">
+            <a  class="weui-cell weui-cell_access" href="{% url 'foster-list' %}">
                 <div class="weui-cell__hd"><img src="{% static 'wxchat/images/foster_pet.png' %}" class="img_icon"></div>
                 <div class="weui-cell__bd"><p>寄养宠物</p></div>
                 <div class="weui-cell__ft"></div>
@@ -69,7 +69,7 @@
             <a href="{% url 'contact-us' %}"  class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
                 <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/contact_us.png' %}" class="img_icon"></div>
                 <div class="weui-cell__bd">
-                    <p>关于我们</p>
+                    <p>联系我们</p>
                 </div>
                 <div class="weui-cell__ft"></div>
             </a>

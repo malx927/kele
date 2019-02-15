@@ -1,16 +1,15 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}
 {% block extra %}
-    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
     <style>
-
+    .pet_img{
+        width:6.5em;height:6.5em;margin-right:5px;display:block;
+    }
     .weui-flex__item{
         font-size: 16px;
-        height:30px;
     }
     .weui-flex__item span{
-        color: #787a69;
-        font-size: 15px;
-        padding-right: 8px;
+        color:#c0c0c0;
+        font-size: 14px;
     }
     .pet_bgcolor{
        background-color:#f46253;
@@ -23,49 +22,33 @@
         <div class="weui-panel__hd">
             <div class="weui-flex">
                 <div class="weui-flex__item"><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-                <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >寄养订单</span></div>
+                <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >寄养宠物列表</span></div>
                 <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
              </div>
         </div>
         <div class="weui-panel__bd" id="pets">
-            <div class="weui-cells__title">寄养订单列表</div>
+            <div class="weui-cells__title">寄养宠物列表</div>
             <div class="weui-cells">
-                {% for order in fosterOrders %}
-                    <a class="weui-cell weui-cell_access" href="{% url 'foster-order-detail' order.id %}">
-                    <div class="weui-cell__hd">
-                         <div class="weui-flex">
-                            <div class="weui-flex__item"><b class="weui-badge badge badge-bgcolor">{{ forloop.counter }}</b></div>
-                         </div>
-                    </div>
+                {% for pet in pet_list %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-detail' pet.id %}">
+                    <div class="weui-cell__hd"><img src="{{ pet.picture.url }}" class="pet_img"></div>
                     <div class="weui-cell__bd">
-                        {% if order.status == 1 %}
-                         <div class="weui-flex">
-                            <div class="weui-flex__item"><span>订单号：</span>{{ order.out_trade_no|default:'' }} </div>
-                         </div>
-                        {% endif %}
                         <div class="weui-flex">
-                            <div class="weui-flex__item"><span>寄养数量：</span>{{ order.get_totals }} </div>
-                            <div class="weui-flex__item" style="color: red;"><span>状态：</span>{% if order.status == 1 %}已支付{% else %}待支付{% endif %} </div>
+                            <div class="weui-flex__item"><span>昵称：</span>{{ pet.name }} </div>
                          </div>
                          <div class="weui-flex">
-                            <div class="weui-flex__item"><span>寄养费用：</span>{{ order.total_price|default:'' }}元 </div>
-                         </div>
-                        <div class="weui-flex">
-                            <div class="weui-flex__item"><span>开始时间：</span>{{ order.begin_time }}</div>
+                            <div class="weui-flex__item"><span>品种：</span>{{ pet.type }}</div>
+                            <div class="weui-flex__item"><span>毛色：</span>{{ pet.color }}</div>
                          </div>
                          <div class="weui-flex">
-                            <div class="weui-flex__item"><span>结束时间：</span>{{ order.end_time }} </div>
+                            <div class="weui-flex__item"><span>生日：</span>{{ peet.birthdate }}</div>
                          </div>
                          <div class="weui-flex">
-                            <div class="weui-flex__item"><span>寄养类型：</span>{{ order.foster_type }}</div>
-                         </div>
-                         <div class="weui-flex">
-                            <div class="weui-flex__item"><span>寄养方式：</span>{{ order.foster_mode }}</div>
+                             <div class="weui-flex__item"><span>性别：</span>{{ pet.get_sex_display }}</div>
+                            <div class="weui-flex__item"><span>绝育：</span>{{ pet.get_sterilization_display }}</div>
                          </div>
                     </div>
-                    <div class="weui-cell__ft">
-
-                    </div>
+                    <div class="weui-cell__ft"></div>
                     </a>
                 {% endfor %}
             </div>
@@ -77,8 +60,7 @@
 {% block bottomjs %}
 
     {{ block.super }}
-    <script type="application/javascript">
-
+    <script>
 
     </script>
 {% endblock bottomjs %}

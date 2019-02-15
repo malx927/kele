@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
    FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView, ContractList, \
-   FosterPetStop
+   FosterPetStop, FosterPetListView, FosterPetDemandDetailView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView,\
    FosterPetsList, FosterPetCode
@@ -28,6 +28,7 @@ urlpatterns = [
    url(r'^petinfolist/$', PetFosterInfoListView.as_view(), name='foster-pet-list'),   #宠物信息列表
    url(r'^petdemand/(?P<petid>\d+)/$', FosterDemandView.as_view(), name='foster-pet-demand'),
    url(r'^petdemand/create/$', FosterDemandCreateUpdateView.as_view(), name='foster-pet-demand-create'),
+   url(r'^petdemand/(?P<pk>\d+)/detail/$', FosterPetDemandDetailView.as_view(), name='foster-pet-demand-detail'),
    url(r'^petagreement/$', FosterAgreementView.as_view(), name='foster-pet-agreement'),
    url(r'^fostercalcnav/$', TemplateView.as_view(template_name="petfoster/foster_calc_nav.html"), name='foster-style-calc-nav'),
    url(r'^fostercalc/$', FosterCalculateView.as_view(), name='foster-style-calc'),
@@ -42,4 +43,5 @@ urlpatterns = [
    url(r'^fosterpets/$', FosterPetsList.as_view(), name='foster-pets'),
    url(r'^fostercode/$', FosterPetCode.as_view(), name='foster-pet-code'),
    url(r'^fosterstop/$', FosterPetStop.as_view(), name='foster-pet-stop'),
+   url(r'^fosterpetlist/$', FosterPetListView.as_view(), name='foster-list'),
 ]

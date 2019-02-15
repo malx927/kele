@@ -8,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import  View, ListView, DetailView
-from django.db.models import Max
+from django.db.models import Max, Q
 # Create your views here.
 from io import BytesIO
 from wechatpy import WeChatPayException
@@ -898,7 +898,7 @@ class FosterPetCode(View):
         order_id = request.POST.get("orderid", None)
         try:
             styleChoose = FosterStyleChoose.objects.get(pk=order_id)
-            code = styleChoose.out_trade_no[-6:]
+            code = styleChoose.out_trade_no[-1:-7:-1]
             print(code)
             styleChoose.code = code
             styleChoose.save(update_fields=['code'])
@@ -921,3 +921,26 @@ class FosterPetStop(View):
             return HttpResponse(json.dumps({"success":"false"}))
 
         return HttpResponse(json.dumps({"success":"true"}))
+
+
+# 宠物寄养列表
+class FosterPetListView(ListView):
+    model = PetFosterInfo
+    template_name = 'petfoster/foster_pets_list.html'
+    context_object_name = 'pet_list'
+
+    def get_queryset(self):
+        return super(FosterPetListView, self).get_queryset().filter(Q(is_end=1)|Q(end_time__gte=datetime.datetime.now().date()))
+
+
+# 宠物要求明细
+class FosterPetDemandDetailView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            d_id = kwargs.get("pk", None)
+            demand = FosterDemand.objects.get(pk=d_id)
+
+        except FosterDemand.DoesNotExist as Ex:
+            demand = None
+
+        return render(request, template_name="petfoster/foster_demand_detail.html",context={"object": demand})

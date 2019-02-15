@@ -1,0 +1,49 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+  <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物寄养要求明细</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+
+    <div class="weui-panel__bd">
+        <div class="weui-cells weui-cells_form cells_top">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">宠物名称:</label></div>
+                <div class="weui-cell__bd">
+                   {{ object.pet.name }}
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">每天几餐:</label>
+                </div>
+                <div class="weui-cell__bd">{{ object.day_meals }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">每餐数量:</label></div>
+                <div class="weui-cell__bd">{{ object.meals_nums }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">加餐情况:</label></div>
+                <div class="weui-cell__bd">{{ object.extra_meal }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">排便情况:</label></div>
+                <div class="weui-cell__bd">{{ object.defecation }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">其他情况:</label></div>
+                <div class="weui-cell__bd">{{ object.others }}</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock container %}
