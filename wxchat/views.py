@@ -1492,7 +1492,7 @@ def myQRCode(user):
 
     if 'o0AHP0t3HTWzuhM8kfbUq1yegnWI' == myinfo.openid:
         qrcode_data = {
-            'action_name': 'QR_LIMIT_STR_SCENE',
+            'action_name': 'QR_LIMIT_SCENE',
             'action_info': {
                 'scene': {'scene_id': myinfo.qr_scene},
             }
