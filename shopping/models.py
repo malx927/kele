@@ -1,9 +1,11 @@
 #coding:utf-8
 from django.db import models
+from django.db.models import Q
 from django.urls import reverse
 from ckeditor_uploader.fields import RichTextUploadingField
 import  datetime
 # Create your models here.
+from wxchat.models import WxUserinfo
 
 TYPE_DOG_CHOICE=(
     (0,'大型犬'),
@@ -51,9 +53,9 @@ TYPE_MAIL_STYLE = (
 # )
 
 CHOICE_MEMBER_TYPE = (
-    (0,'全部'),
+    (0,'非会员'),
     (1,'会员'),
-    (2,'非会员'),
+    (2,'全部'),
 )
 
 CHOICE_SALE_TYPE = (
@@ -80,7 +82,7 @@ class GoodsType(models.Model):
     is_show = models.BooleanField(verbose_name=u'是否有效', default=True)
 
     class Meta:
-        verbose_name ='商品分类'
+        verbose_name ='01.食品分类'
         verbose_name_plural = verbose_name
         ordering = ['sort']
 
@@ -107,7 +109,7 @@ class Goods(models.Model):
     sort = models.IntegerField(verbose_name='顺序', blank=True, null=True,default=0)
 
     class Meta:
-        verbose_name = '宠物食品'
+        verbose_name = '02.宠物食品'
         verbose_name_plural = verbose_name
 
     def show_goodstype(self):
@@ -135,40 +137,45 @@ class Goods(models.Model):
         self.click_nums += 1
         self.save(update_fields=['click_nums'])
 
+    def get_market_plans(self):
+        return self.plans.filter(is_enabled=1)
 
-# 商品销售策略
+
+
+# 商品营销策略
 class MarketPlan(models.Model):
-    goods = models.ForeignKey(Goods, verbose_name='商品', on_delete=models.CASCADE, help_text='参加活动的商品')
+    goods = models.ForeignKey(Goods, verbose_name='商品', on_delete=models.CASCADE, help_text='参加活动的商品', related_name="plans")
     sale_type = models.IntegerField(verbose_name='销售类型', choices=CHOICE_SALE_TYPE)
     member_type = models.IntegerField(verbose_name='销售对象', choices=CHOICE_MEMBER_TYPE)
     present = models.ForeignKey(Goods, verbose_name='赠品', related_name="presents", on_delete=models.CASCADE, blank=True, null=True, help_text='选择买赠活动，需要填写')
+    present_num = models.IntegerField(verbose_name='赠品数量', default=0, blank=True)
     ticket = models.IntegerField(verbose_name='赠券数量', blank=True, null=True, help_text='选择赠券活动，需要填写')
-    sale_one = models.IntegerField(verbose_name='购买数量1', blank=True, null=True, help_text='打折活动，需要填写')
-    discount_one = models.DecimalField(verbose_name='折扣1', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
-    sale_two = models.IntegerField(verbose_name='购买数量2', blank=True, null=True, help_text='打折活动，需要填写')
-    discount_two = models.DecimalField(verbose_name='折扣2', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
+    sale_one = models.IntegerField(verbose_name='1-购买数量(件)', blank=True, null=True, help_text='打折活动，需要填写(如：满2件打八折)')
+    discount_one = models.DecimalField(verbose_name='1-折扣', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
+    sale_two = models.IntegerField(verbose_name='2-购买数量(件)', blank=True, null=True, help_text='打折活动，需要填写(数量要高于1-购买数量)')
+    discount_two = models.DecimalField(verbose_name='2-折扣', blank=True, null=True, max_digits=3, decimal_places=1, help_text='打折活动，需要填写')
     is_enabled = models.BooleanField(verbose_name='是否有效', default=True, help_text='设置有效才能参加活动')
 
     def __str__(self):
-        return self.sale_type
+        return self.get_sale_type_display()
 
     class Meta:
-        verbose_name = '销售策略'
+        verbose_name = '05.营销策略'
         verbose_name_plural = verbose_name
 
 
 # 满减销售活动
 class OrderMarketPlan(models.Model):
     member_type = models.IntegerField(verbose_name='销售对象', choices=CHOICE_MEMBER_TYPE)
-    total_money = models.DecimalField(verbose_name='消费金额', max_digits=7, decimal_places=2)
-    minus_money = models.DecimalField(verbose_name='减免金额', max_digits=7, decimal_places=2)
+    total_money = models.DecimalField(verbose_name='消费金额(满)', max_digits=7, decimal_places=2)
+    minus_money = models.DecimalField(verbose_name='减免金额(减)', max_digits=7, decimal_places=2)
     is_enabled = models.BooleanField(verbose_name='是否有效', default=True, help_text='设置有效才能参加活动')
 
     def __str__(self):
-        return self.sale_type
+        return self.get_member_type_display()
 
     class Meta:
-        verbose_name = '满减销售活动'
+        verbose_name = '06.订单满减活动'
         verbose_name_plural = verbose_name
 
 # 购物车
@@ -180,7 +187,7 @@ class ShopCart(models.Model):
     add_time = models.DateTimeField(verbose_name='添加时间', auto_now_add=True, auto_now=False)
 
     class Meta:
-        verbose_name ='购物车'
+        verbose_name ='04.购物车'
         verbose_name_plural = verbose_name
         ordering = ['-add_time']
 
@@ -216,6 +223,30 @@ class ShopCart(models.Model):
         self.quantity = quantity
         self.save()
 
+    def get_goods_market_plans(self):
+        try:
+            nums = self.quantity
+            userInfo = WxUserinfo.objects.get(openid = self.user_id)
+            if userInfo.is_member == 1:
+                plans = self.goods.plans.filter(~Q(sale_type=3) | Q(sale_type=3) & Q(sale_one__lte=nums), member_type__in=[1, 2], is_enabled=1 )
+                # print(plans.query)
+            else:
+                plans = self.goods.plans.filter(~Q(sale_type=3) | Q(sale_type=3) & Q(sale_one__lte=nums), member_type__in=[0, 2], is_enabled=1)
+        except WxUserinfo.DoesNotExist as ex:
+            plans = None
+        return plans
+
+    def get_discount(self):
+        discount = MarketPlan.objects.filter(sale_type = 3, is_enabled=1).first()  # 打折
+        if discount:
+            if  discount.sale_one <= self.quantity < discount.sale_two:
+                return discount.discount_one
+            elif self.quantity >= discount.sale_two:
+                return discount.discount_two
+        else:
+            return  None
+
+
 #订单
 class Order(models.Model):
     out_trade_no = models.CharField(verbose_name='商户订单号', max_length=32)
@@ -243,7 +274,7 @@ class Order(models.Model):
     confirm_at = models.DateTimeField(verbose_name='发货确认时间',blank=True, null=True)
 
     class Meta:
-        verbose_name ='订单'
+        verbose_name ='03.食品订单'
         verbose_name_plural = verbose_name
         ordering = ['-status' , '-add_time',]
 
@@ -364,7 +395,7 @@ class MailFee(models.Model):
     create_at = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     class Meta:
-        verbose_name ="快递费用"
+        verbose_name ="11.快递费用"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -383,7 +414,7 @@ class MemberRechargeAmount(models.Model):
     money = models.DecimalField(verbose_name="充值金额", max_digits=10, decimal_places=2)
 
     class Meta:
-        verbose_name = "会员充值金额"
+        verbose_name = "10.会员充值金额"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -402,7 +433,7 @@ class MemberDeposit(models.Model):
     add_time = models.DateTimeField(verbose_name="充值时间",)
 
     class Meta:
-        verbose_name="会员储值表"
+        verbose_name="07.会员储值表"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -428,7 +459,7 @@ class MemberRechargeRecord(models.Model):
     prepay_at = models.DateTimeField(verbose_name='预支付时间', null=True, blank=True)
 
     class Meta:
-        verbose_name="会员充值明细"
+        verbose_name="08.会员充值明细"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -441,7 +472,7 @@ class MemberLimit(models.Model):
     create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     class Meta:
-        verbose_name = '会员限额设置'
+        verbose_name = '09.会员限额设置'
         verbose_name_plural = verbose_name
 
     def __str__(self):

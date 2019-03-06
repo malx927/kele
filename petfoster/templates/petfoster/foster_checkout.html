@@ -122,9 +122,13 @@
                                <a id="room_set" href="javascript:;" class="weui-vcode-btn">寄养确认</a>
                         </div>
                     </div>
-                    <div class="weui-cell weui-cell_vcode">
+                    <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">物品交接:</label></div>
                         <div class="weui-cell__bd"><a href="{% url 'hand-over-list' %}?orderid={{ instance.id }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">交接记录</a></div>
+                    </div>
+                    <div class="weui-cell weui-cell_vcode">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">填写宠物码:</label></div>
+                        <div class="weui-cell__bd"><input class="weui-input" id="pet_vcode" type="number" placeholder="请输入宠物提取码"></div>
                         <div class="weui-cell__ft">
                                <a id="foster_stop" href="javascript:;" class="weui-vcode-btn">寄养结束</a>
                         </div>
@@ -289,9 +293,14 @@
             });
 
             $("#foster_stop").on("click", function(){
-
+                var vcode = $("#pet_vcode").val();
+                if(vcode.length == 0){
+                    weui.alert("请输入宠物提取码！");
+                    return false
+                }
                 var params ={
                   orderid: $("#id").text(),
+                  vcode: vcode,
                   csrfmiddlewaretoken:'{{ csrf_token }}'
                 }
 
@@ -305,6 +314,9 @@
 
                       if(data.success=="true"){
                           weui.alert("设置成功！");
+                      }
+                      else if(data.vcode == "false"){
+                          weui.alert("宠物提取码不正确!");
                       }
                       else{
                           weui.alert("设置失败！");
@@ -333,6 +345,9 @@
                   success: function(data){
                       if(data.success=="true"){
                           weui.alert("宠物提取码:" + data.code);
+                          if( $("#pet_vcode").length > 0 ){
+                              $("#pet_vcode").val(data.code);
+                          }
                       }
                       else{
                           weui.alert("提取失败！");

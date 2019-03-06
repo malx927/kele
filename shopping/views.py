@@ -1,4 +1,5 @@
 #coding:utf-8
+import decimal
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -14,7 +15,7 @@ from wechatpy.client.api import WeChatCustomService
 from doginfo.models import DogOrder
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
-    MemberRechargeAmount, MemberRechargeRecord, MemberDeposit
+    MemberRechargeAmount, MemberRechargeRecord, MemberDeposit, MarketPlan
 from petfoster.models import FosterStyleChoose
 from wxchat.utils import random_number
 from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser
@@ -23,7 +24,7 @@ from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 
-from django.db.models import Sum,F, FloatField,Count
+from django.db.models import Sum,F, FloatField,Count, Q
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
 
@@ -54,22 +55,66 @@ def getShopCartTotals(user_id, is_member):
     }
 
     if user_id:
-        totals = ShopCart.objects.filter(user_id = user_id, status=1)\
-            .aggregate(
-                price_totals = Sum(F('goods__price') * F('quantity'),output_field=FloatField()),    #媒体价格
-                member_price_totals = Sum(F('goods__benefits') * F('quantity'),output_field=FloatField()), #会员价格
-                goods_totals = Count('goods')
-                )
-        price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
-        member_price_totals = totals.get('member_price_totals') if totals.get('member_price_totals') is not None else 0.0
-        goods_totals = totals.get('goods_totals') if totals.get('goods_totals') is not None else 0
+        # totals = ShopCart.objects.filter(user_id = user_id, status=1)\
+        #     .aggregate(
+        #         price_totals = Sum(F('goods__price') * F('quantity'), output_field=FloatField()),    #媒体价格
+        #         goods_totals = Count('goods')
+        #         )
+        # member_price_totals = Sum(F('goods__benefits') * F('quantity'), output_field=FloatField()),
+        #
+        # price_totals = totals.get('price_totals') if totals.get('price_totals') is not None else 0.0
+        # goods_totals = totals.get('goods_totals') if totals.get('goods_totals') is not None else 0
+        #
+        goods_totals = 0
+        price_totals = decimal.Decimal(0.0)
+        benefit_totals = decimal.Decimal(0.0)
+        discount_val = {}
+        if is_member == 1:
+            for item in ShopCart.objects.filter(user_id = user_id, status=1):
+                goods_totals += item.quantity
+                discount =item.goods.plans.filter(sale_type=3, member_type__in=[1,2], is_enabled=1, sale_one__lte=item.quantity).first()   # 打折
+                if discount:
+                    if  discount.sale_one <= item.quantity  < discount.sale_two and discount.discount_one > 0.0:
+                        price_totals += item.price * discount.discount_one * decimal.Decimal(0.1) * item.quantity
+                        benefit_totals += item.price * ( decimal.Decimal(10.0) - discount.discount_one ) * decimal.Decimal(0.1) * item.quantity
+                        discount_val = { '{0}-{1}'.format(item.goods.id,discount.id): discount.discount_one}
+                    elif item.quantity >= discount.sale_two and discount.discount_two > 0.0:
+                        price_totals += item.price * discount.discount_two * decimal.Decimal(0.1) * item.quantity
+                        benefit_totals += item.price * ( decimal.Decimal(10.0) - discount.discount_two ) * decimal.Decimal(0.1) * item.quantity
+                        discount_val = { '{0}-{1}'.format(item.goods.id,discount.id): discount.discount_two }
+                else:
+                    price_totals += item.price * item.quantity
+
+                ticket = item.goods.plans.filter(sale_type=2, member_type__in=[1,2], is_enabled=1).first()    # 送券
+                if ticket:
+                    price_totals -= ticket.ticket
+                    benefit_totals += ticket.ticket
+        else:
+           for item in ShopCart.objects.filter(user_id = user_id, status=1):
+                goods_totals += item.quantity
+                discount =item.goods.plans.filter(sale_type=3, member_type__in=[0,2], is_enabled=1, sale_one__lte=item.quantity).first()   # 打折
+                if discount:
+                    if  discount.sale_one <= item.quantity  < discount.sale_two and discount.discount_one > 0.0:
+                        price_totals += item.price * discount.discount_one * item.quantity
+                        benefit_totals += item.price * ( 10.0 - discount.discount_one ) * decimal.Decimal(0.1) * item.quantity
+                        discount_val = { '{0}-{1}'.format(item.goods.id,discount.id): discount.discount_one}
+                    elif item.quantity >= discount.sale_two and discount.discount_two > 0.0:
+                        price_totals += item.price * discount.discount_two * decimal.Decimal(0.1) * item.quantity
+                        benefit_totals += item.price * ( 10.0 - discount.discount_two ) * decimal.Decimal(0.1) * item.quantity
+                        discount_val = { '{0}-{1}'.format(item.goods.id,discount.id): discount.discount_two }
+                else:
+                    price_totals += item.price * item.quantity
+
+                ticket = item.goods.plans.filter(sale_type=2, member_type__in=[0,2], is_enabled=1).first()    # 送券
+                if ticket:
+                    price_totals -= ticket.ticket
+                    benefit_totals += ticket.ticket
 
         count['goods_totals'] = goods_totals
-        if is_member == 1:
-            count['price_totals'] = member_price_totals if member_price_totals > 0 else price_totals
-            count['benefits_totals'] = price_totals - member_price_totals if member_price_totals > 0 else 0 #会员优惠
-        else:
-            count['price_totals'] = price_totals
+        count['price_totals'] = price_totals
+        count['discount'] = discount_val
+        count['benefits_totals'] = benefit_totals #优惠
+
     return count
 
 
@@ -87,7 +132,14 @@ class GoodsDetailView(DetailView):
     def get(self, request, *args, **kwargs):
         response = super(GoodsDetailView, self).get(request, *args, **kwargs)
         self.object.increase_click_nums()
+        # print( self.object.plans.all() )
         return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['plans'] = self.object.plans.filter(is_enabled=1)
+        return context
+
 
 #购物车商品列表
 class ShopCartListView(ListView):

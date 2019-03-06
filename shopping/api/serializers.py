@@ -7,22 +7,41 @@ from django.utils import timezone
 from rest_framework.fields import SerializerMethodField
 from rest_framework.relations import HyperlinkedIdentityField
 from rest_framework_jwt.settings import api_settings
-from doginfo.models import DogAdoption, DogDelivery,Freshman,Doginstitution
 from easy_thumbnails.files import get_thumbnailer
 
 
 from shopping.models import Goods,Order,OrderItem, GoodsType, ShopCart, MemberScore, MemberScoreDetail
-from shopping.models import MemberDeposit, MemberRechargeRecord
+from shopping.models import MemberDeposit, MemberRechargeRecord, MarketPlan
 from rest_framework import serializers
+
+
+
+class MarketPlanSerializer(serializers.ModelSerializer):
+    saletype = SerializerMethodField()
+    membertype = SerializerMethodField()
+    class Meta:
+        model = MarketPlan
+        fields = ('goods', 'saletype', 'membertype', 'present', 'present_num', 'ticket', 'sale_one', 'discount_one', 'sale_two', 'discount_two')
+
+    def get_saletype(self, obj):
+        return obj.get_sale_type_display()
+
+    def get_membertype(self, obj):
+        return obj.get_member_type_display()
 
 
 #宠物商品
 class GoodsListSerializer(serializers.ModelSerializer):
     benefits = SerializerMethodField()
-
+    plans = SerializerMethodField()
     class Meta:
         model = Goods
-        fields = ('id','name','goodstype','images', 'price', 'benefits', 'scores', 'content', 'get_absolute_url')
+        fields = ('id','name','goodstype','images', 'price', 'benefits', 'scores', 'content', 'get_absolute_url', 'plans')
+
+    def get_plans(self,obj):
+        market_plans = MarketPlan.objects.filter(goods=obj.id, is_enabled=1)
+        serializer = MarketPlanSerializer(market_plans, many=True)
+        return serializer.data
 
     def get_benefits(self,obj):
         if obj.benefits == 0:

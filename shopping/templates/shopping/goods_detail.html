@@ -19,12 +19,28 @@
            <div class="weui-form-preview">
             <div class="weui-form-preview__hd line_height">
                 <div class="weui-form-preview__item ">
-                   <p class="price_title weui-form-preview__value ">¥{{ object.price }}<span class="price-size r"><label style="color:#858282;">会员送: </label>¥{{ object.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i></span></p>
+                   <p class="price_title weui-form-preview__value ">¥{{ object.price }}</p>
                    <em class="weui-form-preview__value">{{ object.name }}</em>
-                   <p class="price_title weui-form-preview__value "><span class="price-size r"><label style="color:#858282;">会员返利: </label>{{ object.scores }}积分</span></p>
                 </div>
             </div>
-               <div class="weui-form-preview__hd line_height">
+            <div class="weui-cells cells_top">
+                {% for plan in plans %}
+                <div class="weui-cell cell-end">
+                    <div class="weui-cell__hd color_red"  ><B>{{plan.get_sale_type_display}}({{ plan.get_member_type_display }})</B>: </div>
+                    <div class="weui-cell__bd " style="color:#000000;padding-left:5px;" >
+                        {% if plan.sale_type == 1 %}
+                            <p><a href="{{plan.present.get_absolute_url}}">{{ plan.present.name }} x {{plan.present_num}}</a></p>
+                        {% elif plan.sale_type == 2 %}
+                            <p>送券 <i class="color_red">{{ plan.ticket }}元</i></p>
+                        {% elif plan.sale_type == 3 %}
+                            <p>买{{ plan.sale_one }}件, 打{{ plan.discount_one }}折, 买{{ plan.sale_two }}件, 打{{ plan.discount_two }}折</p>
+                            <p></p>
+                        {% endif %}
+                    </div>
+                </div>
+               {% endfor %}
+            </div>
+            <div class="weui-form-preview__hd line_height">
                 <div class="weui-form-preview__item ">
                    <em class="weui-form-preview__value">商品详情</em>
                </div>

@@ -568,8 +568,10 @@ a{
 }
 .weui-count_ex{
     position: absolute;
-    bottom:16px;
-    right:15px;
+    left:80%;
+    top:50%;
+    margin-top:-14px;
+    margin-left:-12px;
     z-index:100;
 }
 .cell-end{

@@ -49,7 +49,8 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(MarketPlan)
 class MarketPlanAdmin(admin.ModelAdmin):
-    list_display = ( 'goods', 'sale_type', 'member_type','present','ticket','sale_one','discount_one','sale_two',  'discount_two','is_enabled')
+    list_display = ( 'goods', 'sale_type', 'member_type','present','present_num', 'ticket','sale_one','discount_one','sale_two',  'discount_two','is_enabled')
+    fields = ['goods', ('sale_type', 'member_type'), 'present', 'present_num', 'ticket',('sale_one','discount_one'),('sale_two',  'discount_two'),'is_enabled']
     list_per_page = 50
     list_filter = ['goods', 'sale_type', 'member_type']
 

@@ -48,9 +48,7 @@
                                 <h4 class="weui-media-box__title">{{ cart.goods.name }}</h4>
                                 <ul class="weui-media-box__info ">
                                     <li class="weui-media-box__info__meta sub_title">¥ {{ cart.price }}</li>
-                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" >
-                                        {{ cart.goods.diff_price }}<i class="icon iconfont icon-youhuiquan1 benefits_card"></i>
-                                    </li>
+                                    <li class="weui-media-box__info__meta r" style="color: #977a7a;" ></li>
                                 </ul>
                                 <p class="weui-media-box__desc sub_title" style="padding-top:5px;font-size:16px;">
                                     <span >
@@ -62,6 +60,24 @@
                                 </p>
 							</div>
                     </div>
+                         <div class="weui-cells" id="plans-{{ cart.goods.id }}">
+                          {% for plan in cart.get_goods_market_plans %}
+                            <div class="weui-cell" id="plan-{{ cart.goods.id }}-{{ plan.id }}">
+                                <div class="weui-cell__hd color_red"  ><B>{{plan.get_sale_type_display}}({{ plan.get_member_type_display }})</B>: </div>
+                                <div class="weui-cell__bd " style="color:#000000;padding-left:5px;" >
+                                    {% if plan.sale_type == 1 %}
+                                        <p><a href="{{plan.present.get_absolute_url}}">{{ plan.present.name }} x {{plan.present_num}}</a></p>
+                                    {% elif plan.sale_type == 2 %}
+                                        <p>送券 <i class="color_red">{{ plan.ticket }}元</i></p>
+                                    {% elif plan.sale_type == 3 %}
+                                        {% if cart.get_discount %}
+                                        <p>打<span id="dicount-{{ cart.goods.id }}-{{ plan.id }}">{{ cart.get_discount }}</span>折</p>
+                                        {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                           {% endfor %}
+                        </div>
                     {% endfor %}
                 </div>
             </div>
@@ -156,6 +172,7 @@
             }
             shopcartAction( params );
             $('#item-'+goods_id).remove();
+            $('#plans-'+goods_id).remove();
         });
 
         $('.decrease').click(function (e) {
@@ -266,6 +283,7 @@
               $('#total_price').text('¥' + data.price_totals.toFixed(2));
               $('#total_price').attr('data-price',data.price_totals);
               $('#benefits_price').text('¥' + data.benefits_totals.toFixed(2));
+{#              alert(JSON.stringify(data.discount));#}
 
               if( data.price_totals == 0 ){
                   changeCss("bg_red","bg_gray");

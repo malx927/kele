@@ -912,8 +912,11 @@ class FosterPetCode(View):
 class FosterPetStop(View):
     def post(self, request):
         order_id = request.POST.get("orderid", None)
+        vcode = request.POST.get('vcode', None)
         try:
             styleChoose = FosterStyleChoose.objects.get(pk=order_id)
+            if vcode != styleChoose.code:
+                return HttpResponse(json.dumps({"success":"false", "vcode":"false"}))
             pet_ids = styleChoose.pet_list
             petList = pet_ids.split(',')
             PetFosterInfo.objects.filter(id__in=petList).update(room=None, begin_time=None, end_time=None, is_end=0)
