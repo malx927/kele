@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
    FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView, ContractList, \
-   FosterPetStop, FosterPetListView, FosterPetDemandDetailView
+   FosterPetStop, FosterPetListView, FosterPetDemandDetailView, FosterPetAllListView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView,\
    FosterPetsList, FosterPetCode
@@ -44,4 +44,5 @@ urlpatterns = [
    url(r'^fostercode/$', FosterPetCode.as_view(), name='foster-pet-code'),
    url(r'^fosterstop/$', FosterPetStop.as_view(), name='foster-pet-stop'),
    url(r'^fosterpetlist/$', FosterPetListView.as_view(), name='foster-list'),
+   url(r'^fosterpetall/$', FosterPetAllListView.as_view(), name='foster-list-all'),
 ]

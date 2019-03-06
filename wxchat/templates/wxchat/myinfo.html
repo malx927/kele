@@ -23,6 +23,11 @@
                 <div class="weui-cell__bd"><p>寄养宠物</p></div>
                 <div class="weui-cell__ft"></div>
             </a>
+             <a  class="weui-cell weui-cell_access" href="{% url 'foster-list-all' %}">
+                <div class="weui-cell__hd"><img src="{% static 'wxchat/images/foster_list.png' %}" class="img_icon"></div>
+                <div class="weui-cell__bd"><p>宠物列表</p></div>
+                <div class="weui-cell__ft"></div>
+            </a>
             {% endif %}
             <a class="weui-cell weui-cell_access" href="{% url 'foster-order' %}">
                 <div class="weui-cell__hd"><img src="{% static 'wxchat/images/document_32.png' %}" class="img_icon"></div>

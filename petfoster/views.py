@@ -936,6 +936,15 @@ class FosterPetListView(ListView):
         return super(FosterPetListView, self).get_queryset().filter(Q(is_end=1)|Q(end_time__gte=datetime.datetime.now().date()))
 
 
+class FosterPetAllListView(ListView):
+    """
+    所有宠物列表
+    """
+    model = PetFosterInfo
+    template_name = 'petfoster/foster_pets_list.html'
+    context_object_name = 'pet_list'
+
+
 # 宠物要求明细
 class FosterPetDemandDetailView(View):
     def get(self, request, *args, **kwargs):
