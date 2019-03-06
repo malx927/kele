@@ -1,0 +1,320 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+ <script type="text/javascript" src="{% static 'wxchat/js/slideout.min.js' %}"></script>
+ <link rel="stylesheet" href="{% static 'wxchat/style/slideout.css' %}">
+{% endblock %}
+{% block tabpanel %}
+    <nav id="menu" class="menu">
+      <a href="javascript:;" >
+        <header class="menu-header">
+          <span class="menu-header-title">商品分类</span>
+        </header>
+      </a>
+      <section class="menu-section" id="typelist">
+      </section>
+     </nav>
+     <main id="panel" class="panel">
+        <div class="weui-tab__content weui-tab__panel_active" >
+            <div class="weui-panel weui-panel_access">
+                <div class="weui-panel__hd">
+                    <div class="weui-flex">
+                            <div class="weui-flex__item slideout-toggle"><i class="icon iconfont icon-caidan" style="font-size:20px;" ></i></div>
+                            <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >宠物食品列表</span></div>
+                            <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+                     </div>
+                </div>
+                <div class="weui-panel__bd" id="goods"></div>
+                <div class="weui-panel__ft">
+                    <a href="javascript:void(0);" class="weui-cell weui-cell_access weui-cell_link" id="goodsmore" style="display: none">
+                        <div class="weui-cell__bd">查看更多</div>
+                        <span class="weui-cell__ft"></span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock tabpanel %}
+ {% block tabbar %}
+        <a href="{% url 'my-order-list' %}" class="weui-tabbar__item tabbar_item" id="my_order">
+             <p class="weui-tabbar__label" style="background-color: #3e3e3e"><i class="icon iconfont icon-orderlisto" ></i> 订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></p>
+        </a>
+        <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="my_cart">
+             <p class="weui-tabbar__label bg_black">
+                 <i class="icon iconfont icon-buy2" ></i>
+                 <span id="cart_nums" class="weui-badge" style="margin-top: -15px;">0</span>
+                 <span id="cart_money">¥0.00</span>
+             </p>
+        </a>
+         <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="gotocart">
+            <p class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jiaoyi3" ></i><span id="btn_text"> 请选择</p>
+        </a>
+{% endblock tabbar %}
+
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+     nextUrl = '{% url 'goods-list' %}';
+
+     ///缓存滚动条位置
+     $('.weui-tab__panel').scroll(function(){
+            if($(this).scrollTop() !=0 ){
+                sessionStorage.setItem('offsetTop',$(this).scrollTop());
+            }
+    });
+
+    $(function(){
+        //左侧导航
+        var slideout = new Slideout({
+		  'panel': document.getElementById('panel'),
+		  'menu': document.getElementById('menu'),
+		  'padding': 146,
+          'duration':1000,
+		});
+
+        document.querySelector('.slideout-toggle').addEventListener('click', function() {
+          slideout.toggle();
+        });
+
+        document.querySelector('.menu').addEventListener('click', function(eve) {
+          if(eve.target.classList.contains("menu-item")) { slideout.close();}
+        });
+
+        getGoodsTypeList();
+        getGoodsList( nextUrl,0 );
+        getCartAndOrderCount();
+        var count = 0;
+         var flag = setInterval(function(max){
+             if( count < max ){
+                 slideout.open();
+                 count++;
+             }
+             else{
+                 slideout.close();
+                 clearInterval( flag );
+             }
+
+        } , 2000, 1 );
+
+        $("#gotocart,#my_cart").on('click', function(e){
+            cart_nums = $('#cart_nums').text();
+            if( cart_nums == 0 ) return false;
+            window.location.href = '{% url 'shop-cart-list' %}';
+        });
+
+    });
+
+    function getGoodsList(url, typeid){
+        var loading = weui.loading('加载中...');
+        console.log(url,typeid);
+        $.ajax({
+          type: 'GET',
+          url: url,
+          dataType: 'json',
+          data:{
+              typeid:typeid,
+          },
+          timeout: 5000,
+          context: $('#goods'),
+          success: function(data){
+              $('#goods p').remove();
+              if( data.length == 0)
+              {
+                  $('#goods').append('<p class="empty-content">暂无商品,看看别的分类吧( ⊙ o ⊙ )</p>');
+              }
+              appendItem(data);
+              loading.hide();
+              setScollPos();
+              counter();
+              getShopCartList();
+          },
+          error: function(xhr, type,error){loading.hide();}
+        });
+    }
+
+    function appendItem(results){
+        var counter = '<div class="weui-count weui-count_ex" >' +
+                  '<span class="weui-count__btn weui-count__decrease"></span>' +
+                  '<input class="weui-count__number" type="number" value="0" readonly>' +
+                  '<span class="weui-count__btn weui-count__increase"></span>' +
+                  '</div>';
+        $('#goods div').remove();
+        $.each(results,function(index,item){
+            var img_url = item.images;
+
+            if(img_url == null){
+                img_url = '<i class="icon iconfont icon-pet6  weui-media-box__thumb" ></i>';
+            }
+            else {
+                img_url = '<img class="weui-media-box__thumb" src="' + img_url + '">'
+            }
+            newItem =  '<div class="weui-media-box media-box" data-item="'+ item.id +'">' +
+                        '<a href="' + item.get_absolute_url + '" class="weui-media-box weui-media-box_appmsg">' +
+                            '<div class="weui-media-box__hd">' + img_url + '</div>'+
+                            '<div class="weui-media-box__bd">' +
+                               '<h4 class="weui-media-box__title">'+ item.name   +'</h4>' +
+                                '<div class="weui-media-box__title">'+
+                                     '<span class="color_red price-size"> ¥'+ item.price   +'</span>'  +
+                                     '<span class="color_red price-size r "> <i style="color:#cccccc">会员送:</i> ¥'+ item.benefits +'<i class="icon iconfont icon-youhuiquan1"></i></span>' +
+                                '</div>' +
+                                '<div class="weui-media-box__title">'+
+                                     '<span class="price-size"> 会员返利: '+ item.scores   +' 积分</span>'  +
+                                '</div>' +
+                             '</div>'  +
+                        '</a>'  + counter +
+                        '</div>'
+            $('#goods').append( newItem );
+        }) ;
+    }
+
+    ////设置滚动条位置
+    function setScollPos(){
+        var _offset = sessionStorage.getItem("offsetTop");//获取滚动位置
+        $('.weui-tab__panel').scrollTop(_offset);
+    }
+
+    //提取为提交订单数量和购物车商品数量
+    function getCartAndOrderCount(){
+        $.ajax({
+          type: 'GET',
+          url: '{% url "order-cart-count" %}',
+          data:{ order:1,cart:1, _rand:Math.random() },
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              $('#order_nums').text(data.order_nums);
+              $('#cart_nums').text(data.cart_nums);
+              $('#cart_money').text('¥ ' + data.cart_money.toFixed(2));
+              if(data.cart_nums > 0){
+                  $('#btn_text').text("选好了");
+                  $("#gotocart p").hasClass("bg_gray") && $("#gotocart p").removeClass("bg_gray");
+                  $("#gotocart p").addClass("bg_red");
+              }
+              else{
+                  $('#btn_text').text("请选择");
+                  $("#gotocart p").hasClass("bg_red") && $("#gotocart p").removeClass("bg_red");
+                  $("#gotocart p").addClass("bg_gray");
+              }
+          },
+          error: function(xhr, type,error){}
+        });
+    }
+
+    function getGoodsTypeList(){
+        $.ajax({
+          type: 'GET',
+          url: '{% url "goods-type-list" %}',
+          dataType: 'json',
+          timeout: 5000,
+          context: $('#typelist'),
+          success: function(data){
+              $.each(data,function(index,item){
+                 if(item.link_url){
+                     var title = '<h3 class="menu-section-title menu-item" link-url="'+ item.link_url +'">'+ item.name +'</h3>';
+                     $("#typelist").append(title);
+                 }
+                 else if(item.counts > 0){
+                     var title = '<h3 class="menu-section-title">'+ item.name +'</h3>';
+                     var children = item.children;
+                     var listItem =  '<ul class="menu-section-list">';
+                      $.each(children, function(idx,child){
+                          listItem += '<li class="menu-item" data-typeid="'+ child.id +'">' + child.name + '</li>';
+                      });
+                      listItem +="</ul>"
+                      $("#typelist").append(title);
+                      $("#typelist").append(listItem);
+                 }
+                 else{
+                     var title = '<h3 class="menu-section-title menu-item" data-typeid="'+ item.id +'">'+ item.name +'</h3>';
+                      $("#typelist").append(title);
+                 }
+              });
+
+              $('.menu-item').on('click', function(event){
+
+                  if( $(this).attr("link-url") != undefined ){
+                        window.location.href = $(this).attr("link-url");
+                        return;
+                  }
+                  typeid = $(this).attr('data-typeid');
+                  getGoodsList('{% url 'goods-list' %}' ,typeid );
+                  $(".menu-item").removeClass('menu-active');
+                  $(this).addClass('menu-active');
+
+              });
+          },
+          error: function(xhr, type,error){}
+        });
+    }
+
+     function counter(){
+         var MAX = 99, MIN = 0;
+          $('.weui-count__decrease').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.weui-count__number');
+            var number = parseInt($input.val() || "0") - 1
+            if (number < MIN) number = MIN;
+            $input.val(number)
+            var itemid = $(e.currentTarget).parent().parent().attr('data-item');
+            addShopCartItem(itemid, number);
+          });
+
+          $('.weui-count__increase').click(function (e) {
+            var $input = $(e.currentTarget).parent().find('.weui-count__number');
+            var number = parseInt($input.val() || "0") + 1
+            if (number > MAX) number = MAX;
+            $input.val(number);
+            var itemid = $(e.currentTarget).parent().parent().attr('data-item');
+            addShopCartItem(itemid, number);
+          });
+
+    }
+ ///添加到购物车
+    function addShopCartItem( itemid, quantity ){
+        var params ={
+          itemid: itemid ,
+          csrfmiddlewaretoken:'{{ csrf_token }}',
+          quantity: quantity,
+        }
+       $.ajax({
+          type: 'POST',
+          url: '{% url "shop-cart-add" %}',
+          data:params,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              if(data.success == true){
+                  getCartAndOrderCount();
+              }
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+    ////同步购物车商品数量
+    function getShopCartList(){
+       params ={
+             action:'list',
+       }
+       $.ajax({
+          type: 'GET',
+          url: '{% url "shop-cart" %}',
+          data:params,
+          dataType: 'json',
+          timeout: 5000,
+          success: function(data){
+              $.each(data,function(index,item){
+                $input = $('div[data-item="' + item.goods + '"]').find('.weui-count__number');
+                $input.val(item.quantity);
+              });
+          },
+          error: function(xhr, type,error){
+              console.log(type);
+          }
+        });
+    }
+
+
+
+    </script>
+{% endblock bottomjs %}
