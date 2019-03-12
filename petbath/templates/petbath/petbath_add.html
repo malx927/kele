@@ -1,0 +1,205 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+     <script type="text/javascript" src="{% static 'wxchat/js/moment.js' %}"></script>
+    <style>
+    .height{
+        height: 1.47058824em;
+        line-height: 1.47058824;
+    }
+
+    </style>
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物洗浴预定</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form id="actionForm" action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells weui-cells_form cells_top">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.bath_room.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.bath_room }}</div>
+            </div>
+            <div class="weui-cell weui-cell_vcode">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.pet_weight.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.pet_weight }}</div>
+                <div class="weui-cell__ft">
+                    <a href="javascript:;" class="weui-vcode-btn">斤</a>
+                </div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.start_time.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.start_time }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.end_time.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.end_time }}</div>
+            </div>
+            <div class="weui-cell weui-cell_vcode">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.total_fee.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.total_fee }}</div>
+                <div class="weui-cell__ft">
+                    <a href="javascript:;" class="weui-vcode-btn">元</a>
+                </div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <button type="button" id="action" class="weui-btn weui-btn_primary" >洗浴预定</button>
+        </div>
+        </form>
+        <div class="weui-cells__title">洗浴预定情况</div>
+        <div class="weui-cells" id="orders"></div>
+    </div>
+</div>
+
+{% endblock container %}
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+        var interval = {{ interval }};
+        laydate.render({
+            elem: '#id_start_time' ,    //指定元素
+            type: 'datetime',
+            format: 'yyyy-MM-dd HH:mm',
+            done: function(value, date){
+               var new_date =  moment(value).add(interval,"hour").format('YYYY-MM-DD HH:mm');
+                $('#id_end_time').val(new_date);
+{#                判断是否可以预定#}
+                params = {
+                    start_time: value,
+                    end_time: new_date,
+                    room_id: $('#id_bath_room').val(),
+                }
+                is_reserved(params);
+            }
+        });
+
+        $("#action").on("click", function(event){
+
+            $.ajax({
+                  type: 'GET',
+                  url: '{% url 'bath-time-search' %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  context: $('#id_start_time'),
+                  success: function(data){
+                      if(data.rows > 0){
+                          weui.alert('您选择的时间段已经被预定，请重新选择时间')
+                      }
+                      else{
+                          $("#actionForm").submit();
+                      }
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+            });
+
+
+        });
+
+        let room_id = $("#id_bath_room").val();
+        params = {
+            room_id: room_id,
+        }
+        getBathOrderList( params );
+    })
+
+
+        $("#id_pet_weight").on("input", function(event){
+            console.log(event.target.value);
+            var params = {
+                    pet_weight: event.target.value,
+                }
+            $.ajax({
+                  type: 'GET',
+                  url: '{% url 'bath-order-price' %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  context: $('#id_pet_weight'),
+                  success: function(data){
+                      console.log(JSON.stringify(data));
+                      $("#id_total_fee").val(data.price);
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+
+                  }
+            });
+
+        });
+
+        $("#id_bath_room").on("change", function(event){
+            console.log(event.target.value);
+            var params = {
+                    room_id: event.target.value,
+                }
+            $("#id_pet_weight").val('');
+            $("#id_start_time").val('');
+            $("#id_end_time").val('');
+            $("#id_price").val('0.0');
+            getBathOrderList(params);
+
+        });
+
+        function getBathOrderList(params){
+            $.ajax({
+                  type: 'GET',
+                  url: '{% url 'bath-order-list' %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  context: $('#id_bath_room'),
+                  success: function(data){
+                      $("#orders").children().remove();
+                      $.each(data, function(index, item){
+                          let indx = index + 1;
+                          let new_item ='<div class="weui-cell">' +
+                                        '<div class="weui-cell__hd"><span class="weui-badge badge badge-bgcolor" >' + indx + '</span></div>' +
+                                        '<div class="weui-cell__bd"><p class="center">' + item.starttime + '</p></div>' +
+                                        '<div class="weui-cell__ft"><p class="center" style="color: #000">' + item.endtime +'</p></div>' +
+                                        '</div>'
+                          $("#orders").append(new_item)
+                      });
+
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+            });
+        }
+
+        function is_reserved(params){
+             $.ajax({
+                  type: 'GET',
+                  url: '{% url 'bath-time-search' %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  context: $('#id_start_time'),
+                  success: function(data){
+                      console.log(JSON.stringify(data));
+                      if(data.rows > 0){
+                          $("#id_start_time").val('');
+                          $("#id_end_time").val('');
+                          weui.alert('您选择的时间段已经被预定，请重新选择时间')
+                      }
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type);
+                  }
+            });
+        }
+
+    </script>
+{% endblock bottomjs %}

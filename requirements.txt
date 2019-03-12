@@ -9,6 +9,6 @@ PyMySQL==0.9.3
 python-dateutil==*.*
 redis==*.*
 django-redis==4.7
-
+qrcode==6.0
 
 

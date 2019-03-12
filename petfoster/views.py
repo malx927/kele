@@ -15,6 +15,7 @@ from wechatpy import WeChatPayException
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.pay import dict_to_xml
 from kele import settings
+from petbath.models import BathOrder
 from shopping.models import MemberDeposit
 from shopping.views import wxPay, queryOrder
 from wxchat.models import WxUnifiedOrdeResult, WxPayResult, CompanyInfo
@@ -199,13 +200,15 @@ def insuranceNotify(request):
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
                 try:
                     instance = None
-                    if out_trade_no.startswith('S'):    #保险
+                    if out_trade_no.startswith('S'):    # 保险
                         instance = PetInsurance.objects.get(openid=openid, out_trade_no=out_trade_no)
-                    elif out_trade_no.startswith('F'):  #寄养
+                    elif out_trade_no.startswith('F'):  # 寄养
                         instance = FosterStyleChoose.objects.get(openid=openid, out_trade_no=out_trade_no)
                         pet_ids = instance.pet_list
                         petList = pet_ids.split(',')
                         PetFosterInfo.objects.filter(id__in=petList).update(begin_time=instance.begin_time, end_time=instance.end_time)
+                    elif out_trade_no.startswith('B'):    # 洗浴缴费
+                        instance = BathOrder.objects.get(openid=openid, out_trade_no=out_trade_no)
 
                     if instance.status==0:
                         #更新订单
@@ -214,10 +217,16 @@ def insuranceNotify(request):
                         time_end = res_data['time_end']
                         pay_time = datetime.datetime.strptime(time_end, "%Y%m%d%H%M%S")
                         instance.update_status_transaction_id(status, transaction_id, cash_fee, pay_time)
-                        sendTemplateMesToKf(instance)
+                        if out_trade_no.startswith('B'):
+                            sendTemplateMesToKf(instance, 1)
+                        else:
+                            sendTemplateMesToKf(instance)
+
                 except PetInsurance.DoesNotExist as ex:
                     print(ex)
                 except FosterStyleChoose.DoesNotExist as ex:
+                    print(ex)
+                except BathOrder.DoesNotExist as ex:
                     print(ex)
 
         return  HttpResponse(xml)
@@ -289,6 +298,7 @@ class PetFosterInfoView(View):
             return HttpResponseRedirect(reverse("foster-pet-demand", args=(instance.id,)))
         else:
             return HttpResponseRedirect(reverse("foster-pet-info"))
+
 
     def savePetOwnerInfo(self, instance):
         defaults ={

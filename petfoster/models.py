@@ -174,6 +174,7 @@ class PetFosterInfo(models.Model):
     class Meta:
         verbose_name = u"06.寄养宠物信息"
         verbose_name_plural = verbose_name
+        ordering =['-create_time']
 
     def get_age(self):
         today_year = datetime.datetime.today().year

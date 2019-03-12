@@ -48,5 +48,7 @@ urlpatterns = [
     url(r'^shopping/api/', include('shopping.api.urls')),
     url(r'^foster/', include('petfoster.urls')),
     url(r'^recruit/', include('recruitment.urls')),
+    url(r'^bath/', include('petbath.urls')),
+    url(r'^bath/api/', include('petbath.api.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

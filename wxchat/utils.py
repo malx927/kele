@@ -1,4 +1,6 @@
 #-*-coding:utf-8-*-
+import qrcode
+
 __author__ = 'malxin'
 import string
 import random
@@ -64,3 +66,17 @@ def random_number(length=6):
     rule =  string.digits
     rand_list = random.sample(rule, length)
     return ''.join(rand_list)
+
+
+# 创建二维码
+def create_qrcode(content):
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=12,
+        border=4,
+    )
+    qr.add_data(content)
+    qr.make(fit=True)
+    img = qr.make_image()
+    return img

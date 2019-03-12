@@ -1,0 +1,96 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+    <script type="text/javascript">
+    </script>
+{% endblock extra %}
+
+{% block container %}
+<div class="weui-tab" id="tab">
+    <div class="weui-tab__panel">
+      <div class="weui-panel weui-panel_access">
+       <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title"> 洗浴订单详情</span></div>
+                <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
+            </div>
+       </div>
+        <div class="weui-panel__bd">
+            {% if object %}
+            <div class="weui-form-preview">
+                <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
+                    <div class="weui-form-preview__item">
+                        <label class="weui-form-preview__label">付款金额</label>
+                        <em class="weui-form-preview__value  color-danger" id="total_cost_top" > {{ object.total_fee|floatformat:"2" }} 元</em>
+                    </div>
+                </div>
+                <div class="weui-cells  cells_top">
+                    {% if not code %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">确认码:</label></div>
+                        <div class="weui-cell__bd"><a href="{% url 'bath-qrcode-show' %}?orderid={{ object.id }}"  class="weui-btn weui-btn_mini weui-btn_plain-primary">洗浴确认码</a></div>
+                    </div>
+                    {% endif %}
+                    {% if object.qr_status == 1 %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">订单确认:</label></div>
+                        <div class="weui-cell__bd">已确认</div>
+                    </div>
+                    {% endif %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
+                        <div class="weui-cell__bd">{{ object.out_trade_no|default:'' }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">支付时间:</label></div>
+                        <div class="weui-cell__bd">{{ object.pay_time|default:'' }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">支付方式:</label></div>
+                        <div class="weui-cell__bd">{{ object.get_pay_style_display }}</div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">洗浴台:</label></div>
+                        <div class="weui-cell__bd">{{ object.bath_room }}</div>
+                    </div>
+                    <div class="weui-cell weui-cell_vcode">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">宠物体重:</label></div>
+                        <div class="weui-cell__bd">{{ object.pet_weight }}</div>
+                        <div class="weui-cell__ft">
+                            <a href="javascript:;" class="weui-vcode-btn">斤</a>
+                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">开始时间:</label></div>
+                        <div class="weui-cell__bd">
+                            <p>{{ object.start_time }}</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">结束时间:</label></div>
+                        <div class="weui-cell__bd">
+                            <p>{{ object.end_time }}</p>
+                        </div>
+                        <div class="weui-cell__ft"></div>
+                    </div>
+
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    </div>
+</div>
+
+{% endblock container %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script>
+    $(function(){
+
+    })
+    </script>
+{% endblock bottomjs %}

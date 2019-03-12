@@ -1,0 +1,61 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+
+<style>
+    .btn_size{
+        height:60px;
+        line-height: 60px;
+        font-size:2em;
+        margin-left: 30px;
+        margin-right: 30px;
+    }
+    .btn_size i{
+        font-size:1.1em;
+        padding-right:1.0em;
+    }
+
+    #op_list{
+        margin-top: 20px;
+        display: none;
+    }
+
+</style>
+{% endblock extra%}
+{% block tabpanel %}
+<div class="weui-tab__content" style="display: block">
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><span class="title">宠物洗浴</span></div>
+                <div class="weui-flex__item"></div>
+                <div class="weui-flex__item"><a href="{% url 'dog-index' %}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+            </div>
+        </div>
+        <div class="weui-panel__bd">
+            <div style="margin-top: 30px;">
+                {% for room in rooms %}
+                <a class="weui-btn weui-btn_primary btn_size" href="{% url 'bath-order-add' %}?room_id={{ room.id }}&interval={{ room.interval }}">
+                    <i class="icon iconfont icon-xizaomuyu"></i>{{ room.name }}({{ room.get_count }})
+                </a>
+                {% endfor %}
+                <a class="weui-btn weui-btn_plain-primary btn_size" href="{% url 'my-bath-order-list' %}">
+                    <i class="icon iconfont icon-icon5"></i>我的订单
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tabpanel %}
+{% block tabbar %}
+    {% include 'wxchat/include/bottom_nav.html' %}
+{% endblock tabbar %}
+
+{% block bottomjs %}
+    {{ block.super }}
+    <script type="application/javascript">
+    $(function(){
+
+    });
+
+    </script>
+{% endblock bottomjs %}

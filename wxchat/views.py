@@ -1303,7 +1303,7 @@ def sendTempMessageToUser( order, type=0 ):
         print("customer", ret)
 
 
-# 购买成功通知【保险和寄养通知】
+# 购买成功通知【保险、寄养和洗浴订单通知】
 # w96wgd0pnt_HSXDuGeNhA3bGbezteVbs6r0XsSuMays
 #{{first.DATA}} 商品名称：{{product.DATA}} 商品价格：{{price.DATA}} 购买时间：{{time.DATA}}{{remark.DATA}}
 def sendTemplateMesToKf(instance, toUser=0):
@@ -1317,6 +1317,9 @@ def sendTemplateMesToKf(instance, toUser=0):
     elif out_trade_no.startswith("F"):
         url ="{0}{1}".format(settings.ROOT_URL, reverse("foster-order-detail-over", args=(instance.out_trade_no,)) )
         name = "宠物寄养订单"
+    elif out_trade_no.startswith("B"):
+        url ="{0}{1}".format(settings.ROOT_URL, reverse("bath-order-detail", args=(instance.id,)) )
+        name = "宠物洗浴订单"
 
     color = "#173177"
     kf_data ={

@@ -1,4 +1,5 @@
 #-*-coding:utf-8-*-
+from petbath.views import BathPayView, BathBalancePayView
 
 __author__ = 'malxin'
 
@@ -27,6 +28,8 @@ urlpatterns = [
     url(r'^pay/insurnotify/$', insuranceNotify, name='insurance-notify'),
     url(r'^pay/fosterpay$', FosterPayView.as_view(), name='foster-pay'),
     url(r'^pay/fosterbalancepay$', FosterBalancePayView.as_view(), name='foster-pay-balance'),
+    url(r'^pay/bathpay$', BathPayView.as_view(), name='bath-pay'),
+    url(r'^pay/bathbalancepay$', BathBalancePayView.as_view(), name='bath-pay-balance'),
     url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),
     url(r'^pay/rechargeconsumelist/$', MemberRechargeListView.as_view(), name='my-recharge-consume-list'),
     url(r'^pay/consumelist/$', ConsumeListView.as_view(), name='my-consume-list'),
