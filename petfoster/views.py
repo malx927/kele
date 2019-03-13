@@ -551,7 +551,7 @@ class FosterOrderView(View):
             role = request.session.get("role", None)
             if user_id:
                 if role == 1 or role == 2:   # 老板or驯养师
-                    fosterOrders = FosterStyleChoose.objects.filter(status=1)
+                    fosterOrders = FosterStyleChoose.objects.filter(Q(status=1) | Q(openid=user_id))
                 else:
                     fosterOrders = FosterStyleChoose.objects.filter(openid=user_id)
 
@@ -704,7 +704,7 @@ class FosterBalancePayView(View):
             id = request.GET.get("id", None)
             instance = FosterStyleChoose.objects.get( pk=id, status=0 )
             return render(request, template_name="wxchat/pay_confirm.html", context={"instance": instance})
-        except:
+        except FosterStyleChoose.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("foster-pet-list"))
 
     def post(self, request, *args, **kwargs):

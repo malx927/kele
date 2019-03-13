@@ -4,12 +4,12 @@
     <link rel="stylesheet" href="{% static 'css/foster.css' %}">
     <script type="text/javascript">
     wx.ready(function () {
-
+        {% if not weixin_pay %}
         $('#pay_now_balance').on('click',function(){
             window.location.href = "{% url 'bath-pay-balance' %}?id=" + $("#id").text();
         });
-
-
+        {% endif %}
+        {% if weixin_pay %}
         $('#pay_now').on('click',function(){
             var params ={
               id: $("#id").text(),
@@ -66,7 +66,7 @@
                    }
             });
         }
-
+        {% endif %}
 });
 
 </script>

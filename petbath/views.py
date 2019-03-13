@@ -19,7 +19,7 @@ from petbath.models import BathRoom, BathOrder, BathPrice
 from shopping.models import MemberDeposit
 from wxchat.models import WxUnifiedOrdeResult
 from wxchat.utils import create_qrcode
-from wxchat.views import getJsApiSign, wxPay
+from wxchat.views import getJsApiSign, wxPay, sendTemplateMesToKf
 
 
 class BathRoomListView(ListView):
@@ -159,54 +159,47 @@ class BathBalancePayView(View):
     def get(self, request, *args, **kwargs):
         # 支付前出现密码输入窗口
         try:
-            id = request.GET.get("id", None)
-            instance = BathOrder.objects.get( pk=id, status=0 )
+            order_id = request.GET.get("id", None)
+            instance = BathOrder.objects.get( pk=order_id, status=0 )
             return render(request, template_name="wxchat/pay_confirm.html", context={"instance": instance})
-        except:
+        except BathOrder.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("bath-index"))
 
     def post(self, request, *args, **kwargs):
-        # try:
-        #     id = request.POST.get("id", None)
-        #     password = request.POST.get("password", None)
-        #     instance = BathOrder.objects.get( pk=id, status=0 )
-        #     openid = request.session.get('openid', None)
-        #     if not password:
-        #         error_msg = u'支付密码不能为空'
-        #         return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
-        #     else:
-        #         user = MemberDeposit.objects.get(openid=openid)
-        #         bFlag = check_password(password, user.password)
-        #         if not bFlag:
-        #             error_msg = u'支付密码错误'
-        #             return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
-        #
-        #     #生成订单号
-        #     out_trade_no = '{0}{1}{2}'.format('F', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
-        #     instance = FosterStyleChoose.objects.get( pk=id, status=0 )
-        #     pet_ids = instance.pet_list
-        #     pet_list = pet_ids.split(',')
-        #     PetFosterInfo.objects.filter(id__in=pet_list).update(begin_time=instance.begin_time, end_time=instance.end_time)
-        #
-        #     deposit = MemberDeposit.objects.get(openid = openid)
-        #
-        #     total_price = instance.total_price
-        #     instance.out_trade_no = out_trade_no
-        #     instance.cash_fee = total_price             #实际付款金额
-        #     instance.pay_time = datetime.datetime.now()
-        #     instance.pay_style = 1      # 支付类型( 储值卡消费--1 )
-        #     instance.status = 1
-        #
-        #     deposit.consume_money = deposit.consume_money + total_price     #消费累加
-        #     instance.save()
-        #     deposit.save()
-        #     sendTemplateMesToKf(instance, 1)
-        #     return render(request, template_name="petfoster/message.html")
-        # except FosterStyleChoose.DoesNotExist as ex:
-        #     return HttpResponseRedirect(reverse("foster-pet-list"))
-        # except MemberDeposit.DoesNotExist as ex:
+        try:
+            ordre_id = request.POST.get("id", None)
+            password = request.POST.get("password", None)
+            instance = BathOrder.objects.get( pk=ordre_id, status=0 )
+            openid = request.session.get('openid', None)
+            if not password:
+                error_msg = u'支付密码不能为空'
+                return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
+            else:
+                deposit = MemberDeposit.objects.get(openid=openid)
+                bFlag = check_password(password, deposit.password)
+                if not bFlag:
+                    error_msg = u'支付密码错误'
+                    return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
+                else:
+                    #生成订单号
+                    out_trade_no = '{0}{1}{2}'.format('B', datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+                    total_fee = instance.total_fee
+                    instance.out_trade_no = out_trade_no
+                    instance.cash_fee = total_fee             #实际付款金额
+                    instance.pay_time = datetime.now()
+                    instance.pay_style = 1      # 支付类型( 储值卡消费--1 )
+                    instance.status = 1
+                    instance.save()
+                    if total_fee > 0:
+                        deposit.consume_money = deposit.consume_money + total_fee     #消费累加
+                        deposit.save()
 
-            return HttpResponseRedirect(reverse("foster-pet-list"))
+                    sendTemplateMesToKf(instance, 1)
+                    return render(request, template_name="petfoster/message.html")
+        except BathOrder.DoesNotExist as ex:
+            return HttpResponseRedirect(reverse("bath-index"))
+        except MemberDeposit.DoesNotExist as ex:
+            return HttpResponseRedirect(reverse("bath-index"))
 
 
 class BathOrderListView(ListView):

@@ -38,7 +38,7 @@ def resetPassword(deposit):
     # 发送密码给用户
     deposit.new_password = newpasswd
     print(newpasswd, new_password)
-    # sendPasswordTemplateMesToUser(deposit, mode=0)
+    sendPasswordTemplateMesToUser(deposit, mode=0)
 
 #获得购物车统计数据
 def getShopCartTotals(user_id, is_member):
