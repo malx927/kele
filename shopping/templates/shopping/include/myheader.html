@@ -6,8 +6,10 @@
 </div>
 <div class="nav_header">
     <div class="weui-flex">
+     {% if request.session.role == 2 or request.session.role == 1 %}
       <a href="{% url 'my-order-list' %}" class="weui-flex__item placeholder"><i class="icon iconfont icon-orderlisto" ></i>我的订单<span id="order_nums" class="weui-badge" style="margin-top: -15px;">0</span></a>
       <a class="weui-flex__item placeholder" href="javascript:;"><i class="icon iconfont icon-jiaoyi1" ></i>余额<span id="mybalance">0.00</span>元</a>
+     {% endif %}
     </div>
 </div>
 <script>

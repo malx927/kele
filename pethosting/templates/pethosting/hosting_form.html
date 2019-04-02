@@ -1,0 +1,185 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .weui-select{
+        height: 1.47058824em;
+        line-height: 1.47058824;
+    }
+    </style>
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物托管</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form  action="" method="post" enctype="multipart/form-data" id="hostingForm">{% csrf_token %}
+        <div class="weui-cells weui-cells_form weui-cells_checkbox cells_top" >
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.name }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.telephone.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.telephone }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.begin_time.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.begin_time }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.months.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.months }}</div>
+            </div>
+            <div class="weui-cell  weui-cell_vcode">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.total_fee.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.total_fee }}</div>
+                 <div class="weui-cell__ft">
+                    <a href="javascript:;" class="weui-vcode-btn">元</a>
+                </div>
+            </div>
+          </div>
+
+        <div class="weui-cells__title">选中托管宠物</div>
+        <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
+            {% for pet in pets %}
+            <label class="weui-cell weui-check__label" for="checkbox_{{ pet.id }}"style="width: 38%;min-width: 38%;max-width: 38%">
+                <div class="weui-cell__hd">
+                    <input type="checkbox" class="weui-check" name="pet_list" value="{{ pet.id }}" id="checkbox_{{ pet.id }}" checked>
+                    <i class="weui-icon-checked"></i>
+                </div>
+                <div class="weui-cell__bd"><p>{{ pet.name }}</p></div>
+                <div class="weui-cell__ft"></div>
+            </label>
+            {% endfor %}
+        </div>
+        <div class="weui-btn-area">
+            <button type="button"  id="btn_submit" class="weui-btn weui-btn_primary" >提交</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    $(function(){
+        $("#id_begin_time").on("change", function(event){
+            var beginDate = event.target.value;
+            if ( beginDate.length == 0 ) return;
+            params = {
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+                beginDate: beginDate,
+                months: $("#id_months").val(),
+                pet_counts: $("input[name='pet_list']:checked").size()
+            }
+
+            calc_price(params);
+        });
+
+        $("#id_months").on("change", function(event){
+            var months = event.target.value;
+            if ( months.length == 0 ) return;
+            params = {
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+                beginDate: $("#id_begin_time").val(),
+                months: months,
+                pet_counts: $("input[name='pet_list']:checked").size()
+            }
+
+            calc_price(params);
+        });
+
+
+         $("input[name='pet_list']").on("click", function(event){
+            params = {
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+                beginDate: $("#id_begin_time").val(),
+                months: $("#id_months").val(),
+                pet_counts: $("input[name='pet_list']:checked").size()
+            }
+
+            calc_price(params);
+        });
+
+        $("#btn_submit").on("click", function(event){
+            var total_fee = $("#id_total_fee").val();
+            if( total_fee <= 0 ){
+               weui.alert("消费金额不能为空");
+               return false
+            }
+            params = {
+                csrfmiddlewaretoken:'{{ csrf_token }}',
+                total_fee: total_fee,
+            }
+            $.ajax({
+                  type: 'POST',
+                  url: '{% url "hosting-deposit-search" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                    if(data.success=="true"){
+                        var begin_time = $("#id_begin_time").val();
+                        var curDate = getCurrDate();
+
+                        if( begin_time < curDate ){
+                           weui.alert("开始时间不能小于当前时间");
+                           $("#id_begin_time").focus();
+                           return false
+                        }
+
+                        if($("input[name='pet_list']:checked").size()==0){
+                           weui.alert("请选择要托管宠物");
+                           return false
+                        }
+                        showing();
+                        $("#hostingForm").submit();
+                    }
+                    else{
+                        weui.alert(data.error, function(){
+                            if(data.flag==1)
+                            {
+                                 window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
+                            }
+                        });
+                    }
+
+                  },
+                  error: function(xhr, type,error){
+                      console.log(type, error);
+                      weui.alert("托管提交失败");
+                      return false;
+                  }
+            });
+        });
+
+    });
+
+
+    function calc_price(params){
+
+           $.ajax({
+              type: 'POST',
+              url: '{% url "hosting-calc-price" %}',
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                $("#id_total_fee").val(data.total_fee)
+              },
+              error: function(xhr, type,error){
+                  console.log(type, error);
+              }
+            });
+
+    }
+    </script>
+{% endblock bottomjs %}

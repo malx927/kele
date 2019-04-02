@@ -13,7 +13,7 @@ class MemberRoleAdmin(admin.ModelAdmin):
 @admin.register(WxUserinfo)
 class WxUserinfoAdmin(admin.ModelAdmin):
     list_display = ['openid', 'nickname', 'sex', 'province', 'city', 'country', 'subscribe', 'subscribe_time','company_member', 'is_member','member_role']
-
+    search_fields = ['nickname']
 
 @admin.register(Menu)
 class MenuAdmin(admin.ModelAdmin):

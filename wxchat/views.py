@@ -76,7 +76,7 @@ SCENE_STR = 'dayankelelianmeng'
 #                 redirect_url = '%s://%s%s' % (request.scheme, request.get_host(), request.get_full_path())
 #                 print(redirect_url)
 #                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
-#                 authorize_url = webchatOAuth.authorize_url
+#                 authorize_url = wpyebchatOAuth.authorize_url
 #                 return HttpResponseRedirect(authorize_url)
 #             else:  # 同意授权，通过授权码获取ticket,根据ticket拉取用户信息
 #                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')

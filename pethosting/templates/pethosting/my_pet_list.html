@@ -1,0 +1,147 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <style>
+    .pet_img{
+        width:6.5em;height:6.5em;margin-right:5px;display:block;
+    }
+    .weui-flex__item{
+        font-size: 16px;
+    }
+    .weui-flex__item span{
+        color:#c0c0c0;
+        font-size: 14px;
+    }
+    .pet_bgcolor{
+       background-color:#f46253;
+    }
+    </style>
+{% endblock %}
+{% block tabpanel %}
+<div class="weui-tab__content weui-tab__panel_active" >
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >我的宠物</span></div>
+                <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+             </div>
+        </div>
+        <div class="weui-panel__bd" id="pets">
+            <div class="weui-cells__title">宠物列表</div>
+            <div class="weui-cells">
+
+                {% for object in object_list %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-update' object.id %}">
+                    <div class="weui-cell__hd"><img src="{{ object.picture.url }}" class="pet_img"></div>
+                    <div class="weui-cell__bd">
+                        <div class="weui-flex">
+                            <div class="weui-flex__item"><span>昵称：</span>{{ object.name }} </div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>品种：</span>{{ object.type }}</div>
+                            <div class="weui-flex__item"><span>毛色：</span>{{ object.color }}</div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>生日：</span>{{ object.birthdate }}</div>
+                         </div>
+                         <div class="weui-flex">
+                             <div class="weui-flex__item"><span>性别：</span>{{ object.get_sex_display }}</div>
+                            <div class="weui-flex__item"><span>绝育：</span>{{ object.get_sterilization_display }}</div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>状态：</span>{% if object.is_end %}<em class="color-danger">正在寄养</em> {% else %}无{% endif %}</div>
+                         </div>
+                    </div>
+                    <div class="weui-cell__ft"></div>
+                    </a>
+{#                    {% if object.is_end %}#}
+{#                    <a id="code_{{ object.id }}" date-item="{{ object.id }}"  class="weui-btn weui-btn_mini weui-btn_plain-primary btn_mini r" style="margin-top: -32px;margin-right: 4px;">提宠编码</a>#}
+{#                    {% endif %}#}
+                    {% empty %}
+                    <div style="height: 50vh;line-height: 50vh;text-align: center">
+                        <a class="weui-btn weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-pet-info' %}">宠物录入</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tabpanel %}
+ {% block tabbar %}
+        <a href="{% url 'foster-pet-info' %}" class="weui-tabbar__item tabbar_item">
+             <p class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jian" ></i> 增加宠物</p>
+        </a>
+        <a href="{% url 'hosting-order-list' %}" class="weui-tabbar__item tabbar_item" id="gotoorder">
+            <p class="weui-tabbar__label bg_black"><i class="icon iconfont icon-orderlisto" ></i><span> 订单</span></p>
+        </a>
+         <a href="javascript:void(0);" class="weui-tabbar__item tabbar_item" id="gotopay">
+            <p class="weui-tabbar__label pet_bgcolor"><span id="btn_text"> 托管缴费</span><i class="icon iconfont icon-jiantou" ></i></p>
+        </a>
+{% endblock tabbar %}
+
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+    $(function(){
+        var obj_counts = {{ object_list|length }}
+        $("#gotopay").on("click", function(){
+{#            if(obj_counts == 0){#}
+{#                weui.alert('请先录入寄养宠物信息!<div style="color:green">点击左下方增加宠物按钮</div>');#}
+{#                return false;#}
+{#            }#}
+
+            $.ajax({
+              type: 'GET',
+              url: '{% url "member-hosting-condition" %}',
+              dataType: 'json',
+              timeout: 5000,
+              success: function(data){
+                  if(data.success == "true"){
+                     window.location.href = "{% url 'hosting-order' %}";
+                  }
+                  else{
+                      weui.alert('您的储值卡金额不够，请先充值', function(){
+                          window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
+                      });
+                  }
+              },
+              error: function(error){
+                     console.log(error);
+              }
+            });
+
+
+        })
+
+        $("a[id^='code']").on('click',function(){
+            var params ={
+              id: $(this).attr("data-item"),
+              csrfmiddlewaretoken:'{{ csrf_token }}',
+            }
+
+           $.ajax({
+              type: 'POST',
+{#              url: '{% url "foster-pet-code" %}',#}
+              dataType: 'json',
+              data: params,
+              timeout: 5000,
+              success: function(data){
+                  if(data.success !=true){
+                    weui.alert('提宠编码为:'+ data.code);
+                  }
+                  else{
+                      weui.alert('提宠编码生成失败');
+                  }
+              },
+              error: function(error){
+                     weui.alert('提宠编码生成失败');
+              }
+            });
+        });
+
+
+    });
+
+    </script>
+{% endblock bottomjs %}

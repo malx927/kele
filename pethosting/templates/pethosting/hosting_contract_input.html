@@ -1,0 +1,65 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+{% endblock extra%}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">托管合同信息录入</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd">
+        <form action="{% url 'hosting-contract' %}" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
+        <div class="weui-cells__title">甲方信息</div>
+        <div class="weui-cells weui-cells_form"><input type="hidden" name="id" value="{{ form.instance.id|default:'' }}">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.first_party.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.first_party }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.first_telephone.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.first_telephone }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.first_address.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.first_address }}</div>
+            </div>
+        </div>
+         <div class="weui-cells__title">乙方信息</div>
+         <div class="weui-cells weui-cells_form">
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label class="weui-label">{{ form.second_party.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.second_party }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd">
+                    <label for="" class="weui-label">{{ form.second_telephone.label }}:</label>
+                </div>
+                <div class="weui-cell__bd">{{ form.second_telephone }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.second_address.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.second_address }}</div>
+            </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.second_idcard.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.second_idcard }}</div>
+            </div>
+
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.total_fee.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.total_fee }}</div>
+                <div class="weui-cell__ft" style="font-size:16px;">元</div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <input type="hidden" name="order" value="{{ form.order.value }}">
+            <button type="submit" name="submit" class="weui-btn weui-btn_primary" >生成合同</button>
+        </div>
+        </form>
+    </div>
+</div>
+
+{% endblock container %}

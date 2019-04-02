@@ -7,13 +7,13 @@
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">合同信息</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">托管合同信息</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
     <div class="weui-panel__bd" >
         <div id="contract_content">
-        <div class="weui-cells__title" style="text-align: center; color: #000000"><h1>寄养协议</h1></div>
+        <div class="weui-cells__title" style="text-align: center; color: #000000"><h1>托管协议</h1></div>
         <div class="weui-cells">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">日期：</label></div>
@@ -50,13 +50,7 @@
                         {% endfor %}
                     </div>
                 </div>
-                {% elif item.number == 3 %}
-                <div class="weui-cell">
-                    <div class="weui-cell__bd">
-                        <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.foster_type}}</span></p>
-                    </div>
-                </div>
-                {% elif item.number == 13 %}
+                {% elif item.number == 12 %}
                  <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.total_fee}}元</span></p>
@@ -65,7 +59,7 @@
                  {% elif item.number == 99 %}
                  <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <p><b>{{ item.content }}</b></p>
+                        <p style="color:red;"><b>{{ item.content }}</b></p>
                     </div>
                  </div>
                 <div class="weui-cell">
@@ -101,12 +95,6 @@
                     <div class="weui-cell__bd"><input class="weui-input" type="date" name="sign_date" id="id_sign_date" value="{{ contract.sign_date|date:'Y-m-d' }}"> </div>
                  </div>
                  {% elif item.number == 100 %}
-{#                     <label for="weuiAgree" class="weui-agree">#}
-{#                        <input type="checkbox" class="weui-agree__checkbox" name="confirm" id="id_confirm" {% if contract.confirm %}checked{% endif %}>#}
-{#                        <span class="weui-agree__text">#}
-{#                            {{ item.content }}#}
-{#                        </span>#}
-{#                    </label>#}
                     <label class="weui-cell weui-check__label" for="id_confirm">
                         <div class="weui-cell__hd">
                             <input type="checkbox" class="weui-check" name="confirm" id="id_confirm" {% if contract.confirm %}checked{% endif %}>
@@ -118,7 +106,7 @@
                 {% else %}
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
-                            <p {% if item.number == 14 %}style="color:red"{% endif %}>{{ item.number }}、{{ item.content|safe }}</p>
+                            <p>{{ item.number }}、{{ item.content|safe }}</p>
                         </div>
                     </div>
                 {% endif %}
@@ -131,7 +119,7 @@
         </div>
     </div>
 </div>
- <div id="imgShot" style="display: none"></div>
+ <div id="imgShot" ></div>
 
 {% endblock container %}
 {% block bottomjs %}
@@ -170,14 +158,15 @@
                           loading.hide();
                           if(data.success == "true"){
                               orderid = data.orderid;
-                              window.location.href = "{% url 'foster-pay' %}?id=" + orderid
+                              window.location.href = "{% url 'hosting-pay' %}?id=" + orderid
                           }else{
                               weui.alert('合同签订失败!');
                           }
                       },
                       error: function(error){
+                          console.log(error);
                           loading.hide();
-                          weui.alert('合同签订失败');
+                          weui.alert('合同签订失败1111');
                       }
                     });
                 });

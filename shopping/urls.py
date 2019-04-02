@@ -8,9 +8,10 @@ from django.conf.urls import url
 from django.views.generic import TemplateView
 
 from .views import index, GoodsDetailView, GoodsBuyListView, CreateOrderView, PayOrderView, payNotify, ShopCartListView, \
-    PasswordReset, ConsumeListView
+    PasswordReset, ConsumeListView, MemberHostingCondition
 from .views import  ShopCartBuyListView, OrderView, RechargeAmountView, MemberRechargeListView
 from petfoster.views import PetInsuranceView, PayInsuranceView, insuranceNotify, FosterPayView, FosterBalancePayView
+from pethosting.views import HostingPayView, HostingBalancePayView
 
 urlpatterns = [
 
@@ -30,10 +31,14 @@ urlpatterns = [
     url(r'^pay/fosterbalancepay$', FosterBalancePayView.as_view(), name='foster-pay-balance'),
     url(r'^pay/bathpay$', BathPayView.as_view(), name='bath-pay'),
     url(r'^pay/bathbalancepay$', BathBalancePayView.as_view(), name='bath-pay-balance'),
-    url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),
+    url(r'^pay/hostingpay$', HostingPayView.as_view(), name='hosting-pay'),
+    url(r'^pay/hostingbalancepay$', HostingBalancePayView.as_view(), name='hosting-pay-balance'),
+    url(r'^pay/amountlist$', RechargeAmountView.as_view(), name='member-recharge-amount'),          # 会员充值
     url(r'^pay/rechargeconsumelist/$', MemberRechargeListView.as_view(), name='my-recharge-consume-list'),
     url(r'^pay/consumelist/$', ConsumeListView.as_view(), name='my-consume-list'),
     url(r'^passwordreset/$', PasswordReset.as_view(), name='password-reset'),
+    # 托管条件判断
+    url(r'^hostingcondition/$', MemberHostingCondition.as_view(), name='member-hosting-condition'),
     #url(r'^sendmsg/$', sendTemplateMessage, name='send-mesage'), #发送模板消息
 
     # url(r'^redirect/(?P<item>[\w-]+)$', redirectUrl),

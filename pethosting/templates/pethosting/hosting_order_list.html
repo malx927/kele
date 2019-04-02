@@ -1,0 +1,86 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block extra %}
+    <link rel="stylesheet" href="{% static 'css/foster.css' %}">
+    <style>
+
+    .weui-flex__item{
+        font-size: 16px;
+        height:30px;
+    }
+    .weui-flex__item span{
+        color: #787a69;
+        font-size: 15px;
+        padding-right: 8px;
+    }
+    .pet_bgcolor{
+       background-color:#f46253;
+    }
+    </style>
+{% endblock %}
+{% block tabpanel %}
+<div class="weui-tab__content weui-tab__panel_active" >
+    <div class="weui-panel weui-panel_access">
+        <div class="weui-panel__hd">
+            <div class="weui-flex">
+                <div class="weui-flex__item"><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+                <div class="weui-flex__item" style="margin-top:5px;"><span class="title"  >托管订单</span></div>
+                <div class="weui-flex__item"><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+             </div>
+        </div>
+        <div class="weui-panel__bd" id="pets">
+            <div class="weui-cells__title">托管订单列表</div>
+            <div class="weui-cells">
+                {% for order in hostingOrders %}
+                    <a class="weui-cell weui-cell_access" href="{% url 'hosting-order-detail' order.id %}">
+                    <div class="weui-cell__hd">
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><b class="weui-badge badge badge-bgcolor">{{ forloop.counter }}</b></div>
+                         </div>
+                    </div>
+                    <div class="weui-cell__bd">
+                        {% if order.status == 1 %}
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>订单号：</span>{{ order.out_trade_no|default:'' }} </div>
+                         </div>
+                        {% endif %}
+                        <div class="weui-flex">
+                            <div class="weui-flex__item"><span>姓名：</span>{{ order.name }}</div>
+                            <div class="weui-flex__item" style="color: red;"><span>状态：</span>{% if order.status == 1 %}已支付{% else %}待支付{% endif %} </div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>电话：</span>{{ order.telephone }}</div>
+                         </div>
+                        <div class="weui-flex">
+                            <div class="weui-flex__item"><span>托管数量：</span>{{ order.get_pet_totals }} </div>
+                             <div class="weui-flex__item"><span>托管月数：</span>{{ order.get_months_display }} </div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>托管费用：</span>{{ order.total_fee|default:0 }}元 </div>
+
+                         </div>
+                        <div class="weui-flex">
+                            <div class="weui-flex__item"><span>开始时间：</span>{{ order.begin_time }}</div>
+                         </div>
+                         <div class="weui-flex">
+                            <div class="weui-flex__item"><span>结束时间：</span>{{ order.end_time }} </div>
+                         </div>
+                    </div>
+                    <div class="weui-cell__ft">
+
+                    </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock tabpanel %}
+
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+
+
+    </script>
+{% endblock bottomjs %}

@@ -19,7 +19,7 @@ class BathRoom(models.Model):
         return  self.name
 
     class Meta:
-        verbose_name = u"洗浴房间"
+        verbose_name = u"1.洗浴房间"
         verbose_name_plural = verbose_name
 
     def get_count(self):
@@ -36,7 +36,7 @@ class BathPrice(models.Model):
     price = models.DecimalField(verbose_name='价格(元)', max_digits=6, decimal_places=2)
 
     class Meta:
-        verbose_name = "洗浴价格"
+        verbose_name = "2.洗浴价格"
         verbose_name_plural = verbose_name
 
     def __str__(self):
@@ -64,7 +64,7 @@ class BathOrder(models.Model):
     qr_status = models.BooleanField(verbose_name="扫码确认", default=False)
 
     class Meta:
-        verbose_name = "洗浴订单"
+        verbose_name = "3.洗浴订单"
         verbose_name_plural = verbose_name
         ordering = ['-start_time']
 

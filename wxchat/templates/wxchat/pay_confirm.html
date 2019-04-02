@@ -30,7 +30,12 @@
             </div>
              <div class="weui-cell">
                 <div class="weui-cell__bd" style="text-align: center;">
+                    {% if instance.total_price %}
                     <p>¥ {{ instance.total_price|floatformat:"2" }}</p>
+                    {% endif %}
+                    {% if instance.total_fee %}
+                    <p>¥ {{ instance.total_fee|floatformat:"2" }}</p>
+                    {% endif %}
                 </div>
             </div>
 

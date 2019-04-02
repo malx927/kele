@@ -19,11 +19,11 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic import TemplateView,RedirectView
+from django.views.static import serve
 from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework_jwt.views import refresh_jwt_token
 from rest_framework_jwt.views import verify_jwt_token
 
-from doginfo.views import register
 
 admin.site.site_title = u'大眼可乐后台'
 
@@ -50,5 +50,12 @@ urlpatterns = [
     url(r'^recruit/', include('recruitment.urls')),
     url(r'^bath/', include('petbath.urls')),
     url(r'^bath/api/', include('petbath.api.urls')),
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    url(r'^hosting/', include('pethosting.urls')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+
+if settings.DEBUG == False:
+    urlpatterns += [
+        url(r'^static/(?P<path>.*)$', serve, { 'document_root': settings.STATIC_ROOT}, "static" ),
+        url(r'^uploads/(?P<path>.*)$', serve, { 'document_root': settings.MEDIA_ROOT}),
+    ]

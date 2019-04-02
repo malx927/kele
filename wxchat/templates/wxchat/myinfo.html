@@ -36,6 +36,7 @@
                 </div>
                 <div class="weui-cell__ft"></div>
             </a>
+            {% if request.session.role == 0 %}
             <a  href="{% url 'member-recharge-amount' %}" class="weui-cell weui-cell_access">
                 <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/currency _new.png' %}" class="img_icon"></div>
                 <div class="weui-cell__bd">
@@ -64,6 +65,7 @@
                 </div>
                 <div class="weui-cell__ft"></div>
             </a>
+            {% endif %}
             <a href="{% url 'my-qrcode' %}"  class="weui-cell weui-cell_access">
                 <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/spread.png' %}" class="img_icon"></div>
                 <div class="weui-cell__bd">
@@ -71,6 +73,7 @@
                 </div>
                 <div class="weui-cell__ft"></div>
             </a>
+            {% if request.session.role == 0 %}
             <a href="{% url 'contact-us' %}"  class="weui-cell weui-cell_access">
                 <div class="weui-cell__hd"> <img src="{% static 'wxchat/images/contact_us.png' %}" class="img_icon"></div>
                 <div class="weui-cell__bd">
@@ -78,6 +81,7 @@
                 </div>
                 <div class="weui-cell__ft"></div>
             </a>
+           {% endif %}
         </div>
     </div>
 </div>

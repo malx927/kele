@@ -165,10 +165,11 @@ class PetFosterInfo(models.Model):
     room = models.ForeignKey(FosterRoom, verbose_name='房间', blank=True, null=True, on_delete=models.SET_NULL)
     trainer = models.ForeignKey(WxUserinfo, verbose_name='驯养师',  blank=True, null=True, on_delete=models.SET_NULL )
     foster_type = models.ForeignKey(FosterType, verbose_name="寄养方式", blank=True, null=True, on_delete=models.SET_NULL)
+    is_hosting = models.BooleanField(verbose_name="托管标志", default=False)
     begin_time = models.DateField(verbose_name="开始时间", blank=True, null=True)
     end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
     set_time = models.DateTimeField(verbose_name=u'分配时间', null=True, blank=True )
-    is_end = models.BooleanField(verbose_name="寄养结束",default=False)    # 寄养结束标志 1为正在寄养，0为寄养结束
+    is_end = models.BooleanField(verbose_name="寄养(托管)结束",default=False)    # 寄养结束标志 1为正在寄养，0为寄养结束
 
 
     class Meta:

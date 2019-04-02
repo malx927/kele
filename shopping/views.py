@@ -650,7 +650,17 @@ class OrderView(View):
 class RechargeAmountView(View):
 
     def get(self, request, *args, **kwargs):
-        amounts = MemberRechargeAmount.objects.all()
+        hosting = request.GET.get("hosting", None)
+        openid = request.session.get("openid", None)
+        #托管充值
+        if hosting == "1":
+            counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=2000).count()
+            if counts > 0:
+                amounts = MemberRechargeAmount.objects.filter(money__gte=1000)
+            else:
+                amounts = MemberRechargeAmount.objects.filter(money__gte=2000)
+        else:
+            amounts = MemberRechargeAmount.objects.all()
         signPackage = getJsApiSign(self.request)
         context={
             'amounts': amounts,
@@ -711,6 +721,23 @@ class MemberRechargeListView(View):
         }
 
         return render(request, template_name="shopping/my_recharge_list.html", context=context)
+
+
+class MemberHostingCondition(View):
+    def get(self, request, *args, **kwargs):
+
+        openid = request.session.get("openid", None)
+        counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=2000).count()
+        context = {
+                "success": "false",
+                "counts": 0 ,
+            }
+        if counts > 0:
+            context["success"] = "true"
+            context["counts"] = counts
+
+        return JsonResponse(context)
+
 
 
 # 消费明细

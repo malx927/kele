@@ -50,7 +50,7 @@ class FosterDemandInline(admin.TabularInline):
 
 @admin.register(PetFosterInfo)
 class PetFosterInfoAdmin(admin.ModelAdmin):
-    list_display = ('name', 'birthdate','type','color','sex','sterilization','owner','telephone','room','foster_type','begin_time','begin_time','is_end' )
+    list_display = ('name', 'birthdate','type','color','sex','sterilization','owner','telephone','room','foster_type','is_hosting','begin_time','begin_time','is_end' )
     list_display_links = ('name','birthdate','type')
     list_per_page = 50
     inlines = [FosterDemandInline]

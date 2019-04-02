@@ -6,7 +6,7 @@
     wx.ready(function () {
 
         $('#pay_now_balance').on('click',function(){
-            window.location.href = "{% url 'foster-pay-balance' %}?id=" + $("#id").text();
+            window.location.href = "{% url 'hosting-pay-balance' %}?id=" + $("#id").text();
         });
 
 
@@ -15,9 +15,9 @@
               id: $("#id").text(),
               csrfmiddlewaretoken:'{{ csrf_token }}',
             }
-           var ts = sessionStorage.getItem('checkout');
+           var ts = sessionStorage.getItem('host_checkout');
            if(ts==null) {
-               sessionStorage.setItem('checkout', new Date().getTime());
+               sessionStorage.setItem('host_checkout', new Date().getTime());
            }else{
                var cur_ts = new Date().getTime();
                var diff = (cur_ts - Number(ts))/1000;
@@ -25,11 +25,11 @@
                    weui.alert('您刚才已经提交过，如果没有成功请30秒后再提交!');
                     return false;
                }
-               sessionStorage.setItem('checkout', cur_ts);
+               sessionStorage.setItem('host_checkout', cur_ts);
            }
            $.ajax({
               type: 'POST',
-              url: '{% url "foster-pay" %}',
+              url: '{% url "hosting-pay" %}',
               dataType: 'json',
               data: params,
               timeout: 5000,
@@ -55,7 +55,7 @@
                     if (res.errMsg == "chooseWXPay:ok") {
                         window.location.replace('{% url "foster-success" %}');
                     } else {
-                       weui.alert('宠物寄养订单支付失败!');
+                       weui.alert('宠物托管订单支付失败!');
                     }
                   },
                    cancel: function(res) {
@@ -79,7 +79,7 @@
        <div class="weui-panel__hd">
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 寄养订单详情 {% endif %}</span></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 寄养托管详情 {% endif %}</span></div>
                 <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
@@ -88,7 +88,7 @@
                 <div class="weui-form-preview__hd" style="text-align: right;line-height: 1.5em">
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">付款金额</label><span id="id" style="display: none" >{{ instance.id }}</span>
-                        <em class="weui-form-preview__value  color-danger" id="total_cost_top" > {{ instance.total_price|floatformat:"2" }} 元</em>
+                        <em class="weui-form-preview__value  color-danger" id="total_cost_top" > {{ instance.total_fee|floatformat:"2" }} 元</em>
                     </div>
                 </div>
                 {% if request.session.role != 2 %}
@@ -96,12 +96,12 @@
                      {% if not weixin_pay %}
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">储值卡</label>
-                        <em class="weui-form-preview__value "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                        <em class="weui-form-preview__value "> -{{ instance.total_fee|floatformat:"2" }} 元</em>
                     </div>
                      {% elif weixin_pay %}
                     <div class="weui-form-preview__item">
                         <label class="weui-form-preview__label">微信支付</label>
-                        <em class="weui-form-preview__value  "> -{{ instance.total_price|floatformat:"2" }} 元</em>
+                        <em class="weui-form-preview__value  "> -{{ instance.total_fee|floatformat:"2" }} 元</em>
                     </div>
                      {% endif %}
                 </div>
@@ -121,18 +121,7 @@
                             </select>
                         </div>
                         <div class="weui-cell__ft">
-                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">寄养确认</a>
-                        </div>
-                    </div>
-{#                    <div class="weui-cell">#}
-{#                        <div class="weui-cell__hd"><label for="" class="weui-label">物品交接:</label></div>#}
-{#                        <div class="weui-cell__bd"><a href="{% url 'hand-over-list' %}?orderid={{ instance.id }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">交接记录</a></div>#}
-{#                    </div>#}
-                    <div class="weui-cell weui-cell_vcode">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">填写宠物码:</label></div>
-                        <div class="weui-cell__bd"><input class="weui-input" id="pet_vcode" type="number" placeholder="请输入宠物提取码"></div>
-                        <div class="weui-cell__ft">
-                               <a id="foster_stop" href="javascript:;" class="weui-vcode-btn">寄养结束</a>
+                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">托管确认</a>
                         </div>
                     </div>
                     {% else %}
@@ -151,80 +140,29 @@
                     </div>
                     {% endif %}
                     <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养类型:</label></div>
-                        <div class="weui-cell__bd">{{ instance.foster_type }}</div>
-                    </div>
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养方式:</label></div>
-                        <div class="weui-cell__bd">{{ instance.foster_mode }}</div>
-                    </div>
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">寄养时间:</label></div>
+                        <div class="weui-cell__hd"><label for="" class="weui-label">托管时间:</label></div>
                         <div class="weui-cell__bd">
                             <p>开始: {{ instance.begin_time }}</p>
                             <p>结束: {{ instance.end_time }}</p>
                         </div>
-                        <div class="weui-cell__ft">
-                           共{{ instance.get_days }}天
-                        </div>
+                    </div>
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"><label for="" class="weui-label">托管月数:</label></div>
+                        <div class="weui-cell__bd">{{ instance.get_months_display }}</div>
                     </div>
                 </div>
-                 {% if instance.big_dog %}
-                <div class="weui-cells weui-cells_form cells_top flex" >
-                    <div class="weui-cell" style="width:35%">
-                        <div class="weui-cell__hd"><label class="weui-label">大型犬数量:</label></div>
-                        <div class="weui-cell__bd">{{ instance.big_dog|default:0 }}</div>
-                    </div>
-                    <div class="weui-cell" style="width:55%">
-                        <div class="weui-cell__hd"><label class="weui-label">每日费用(元):</label></div>
-                        <div class="weui-cell__bd color-danger">{{ instance.big_price|floatformat:2 }}</div>
-                    </div>
-                 </div>
-                {% endif %}
-                {% if instance.middle_dog %}
-                 <div class="weui-cells weui-cells_form cells_top flex" >
-                    <div class="weui-cell" style="width:35%">
-                        <div class="weui-cell__hd">
-                            <label for="" class="weui-label">中型犬数量:</label>
-                        </div>
-                        <div class="weui-cell__bd">{{ instance.middle_dog|default:0 }}</div>
-                    </div>
-                     <div class="weui-cell" style="width:55%">
-                        <div class="weui-cell__hd">
-                            <label for="" class="weui-label">每日费用(元):</label>
-                        </div>
-                        <div class="weui-cell__bd color-danger">{{ instance.middle_price|floatformat:2 }}</div>
-                    </div>
-                 </div>
-               {% endif %}
-                {% if instance.small_dog %}
-                 <div class="weui-cells weui-cells_form cells_top flex">
-                    <div class="weui-cell" style="width:35%">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">小型犬数量:</label></div>
-                        <div class="weui-cell__bd">{{ instance.small_dog|default:0 }}</div>
-                    </div>
-                     <div class="weui-cell" style="width:55%">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">每日费用(元):</label></div>
-                        <div class="weui-cell__bd color-danger">{{ instance.small_price|floatformat:2 }}</div>
-                    </div>
-                </div>
-              {% endif %}
                 <div class="weui-cells__title">客户信息</div>
                 <div class="weui-cells" >
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">姓名：</label></div>
-                        <div class="weui-cell__bd">{{ petowner.name }}</div>
+                        <div class="weui-cell__bd">{{ instance.name }}</div>
                     </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label class="weui-label">电话:</label></div>
-                        <div class="weui-cell__bd">{{ petowner.telephone }}</div>
-                    </div>
-                     <div class="weui-cell">
-                        <div class="weui-cell__hd"><label class="weui-label">地址:</label></div>
-                        <div class="weui-cell__bd">{{ petowner.address }}</div>
+                        <div class="weui-cell__bd">{{ instance.telephone }}</div>
                     </div>
                 </div>
-                <div class="weui-cells__title">寄养宠物</div>
+                <div class="weui-cells__title">托管宠物</div>
                 <div class="weui-cells flex_wrap" >
                     {% for pet in pets %}
                     <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-detail' pet.id %}" style="width: 38%;min-width: 38%;max-width: 38%">
@@ -237,7 +175,7 @@
                     <div class="weui-cell">
                         <div class="weui-cell__hd">查看协议：</div>
                         <div class="weui-cell__bd" >
-                            <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-contract-detail' %}?contract_id={{ contract_id }}">寄养协议</a></p>
+                            <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'hosting-contract-detail' %}?contract_id={{ contract_id }}">托管协议</a></p>
                         </div>
                     </div>
                 </div>
@@ -247,13 +185,13 @@
     </div>
     {% if instance.status == 0 %}
     <div class="weui-tabbar">
-        {% if weixin_pay %}
+        {% if weixin_pay %}fee
          <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
-            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_fee }}</span></p>
         </a>
         {% elif not weixin_pay%}
         <a href="#" id="pay_now_balance" class="weui-tabbar__item tabbar_item bg-warning" >
-            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_price }}</span></p>
+            <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_fee }}</span></p>
         </a>
         {% endif %}
     </div>
