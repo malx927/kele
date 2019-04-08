@@ -79,7 +79,7 @@
        <div class="weui-panel__hd">
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 寄养托管详情 {% endif %}</span></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 宠物托管详情 {% endif %}</span></div>
                 <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
@@ -126,8 +126,11 @@
                     </div>
                     {% else %}
                     <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">提取宠物码:</label></div>
-                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">提宠码</a></div>
+                        <div class="weui-cell__hd"><label for="" class="weui-label">宠物码:</label></div>
+                        <div class="weui-cell__bd">
+                            <a href="javascript:;" id="pet_recv" class="weui-btn weui-btn_mini weui-btn_plain-primary">接宠码</a>
+                            <a href="javascript:;" id="pet_send" class="weui-btn weui-btn_mini weui-btn_plain-primary">送宠码</a>
+                        </div>
                     </div>
                     {% endif %}
                     <div class="weui-cell">
@@ -238,71 +241,15 @@
                   }
                 });
             });
-
-            $("#foster_stop").on("click", function(){
-                var vcode = $("#pet_vcode").val();
-                if(vcode.length == 0){
-                    weui.alert("请输入宠物提取码！");
-                    return false
-                }
-                var params ={
-                  orderid: $("#id").text(),
-                  vcode: vcode,
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
-
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-pet-stop" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-
-                      if(data.success=="true"){
-                          weui.alert("设置成功！");
-                      }
-                      else if(data.vcode == "false"){
-                          weui.alert("宠物提取码不正确!");
-                      }
-                      else{
-                          weui.alert("设置失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("设置失败!");
-                  }
-                });
-            });
-
         {% endif %}
 
-         $("#pet_code").on("click", function(){
-                var params ={
-                  orderid: $("#id").text(),
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
+         $("#pet_recv").on("click", function(){
+                window.location.href = "{% url 'hosting-qrcode-show' %}?orderid={{ instance.id }}&flag=recv"
+         });
 
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-pet-code" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-                      if(data.success=="true"){
-                          weui.alert("宠物提取码:" + data.code);
-
-                      }
-                      else{
-                          weui.alert("提取失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("提取失败!");
-                  }
-                });
-            });
+        $("#pet_send").on("click", function(){
+                window.location.href = "{% url 'hosting-qrcode-show' %}?orderid={{ instance.id }}&flag=send"
+         });
 
     })
     </script>

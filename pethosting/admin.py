@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import HostingOrder, HostingPrice, HostContractFixInfo, HostContractInfo
+from .models import HostingOrder, HostingPrice, HostContractFixInfo, HostContractInfo, HostShuttleRecord
 
 
 @admin.register(HostingOrder)
@@ -41,3 +41,11 @@ class HostContractInfoAdmin(admin.ModelAdmin):
     list_filter = ['confirm']
     date_hierarchy = 'sign_date'
     readonly_fields = ['picture']
+
+
+@admin.register(HostShuttleRecord)
+class HostShuttleRecordAdmin(admin.ModelAdmin):
+    list_display = ('name', 'order', 'shuttle_time', 'shuttle_type', 'code')
+    list_per_page = 50
+    search_fields = ['name', 'order__out_trade_no', 'code']
+    list_filter = ['order']

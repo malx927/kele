@@ -65,41 +65,6 @@ SEND_MSG = '恭喜您成为我们的会员，享有购买商品时，卡券自�
 SCENE_STR = 'dayankelelianmeng'
 
 
-#
-# def weixin_decorator(func):
-#     def wrapper(request, *args, **kwargs):
-#         code = request.GET.get('code', None)
-#         openid = request.session.get('openid', None)
-#         print('weixin_decorator', code, openid)
-#         if openid is None:
-#             if code is None:  # 获取授权码code
-#                 redirect_url = '%s://%s%s' % (request.scheme, request.get_host(), request.get_full_path())
-#                 print(redirect_url)
-#                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, redirect_url, 'snsapi_userinfo')
-#                 authorize_url = wpyebchatOAuth.authorize_url
-#                 return HttpResponseRedirect(authorize_url)
-#             else:  # 同意授权，通过授权码获取ticket,根据ticket拉取用户信息
-#                 webchatOAuth = WeChatOAuth(APPID, APPSECRET, '', 'snsapi_userinfo')
-#                 res = webchatOAuth.fetch_access_token(code)
-#                 if 'errcode' in res:
-#                     return HttpResponse(json.dumps(res))
-#                 else:
-#                     open_id = webchatOAuth.open_id
-#                     userinfo = webchatOAuth.get_user_info()
-#                     userinfo.pop('privilege')
-#
-#                     obj, created = WxUserinfo.objects.update_or_create(openid=open_id, defaults=userinfo)
-#
-#                     request.session['openid'] = open_id
-#                     userinf = get_object_or_404(WxUserinfo, openid=open_id)
-#                     request.session['nickname'] = userinf.nickname
-#                     request.session['is_member'] = userinf.is_member
-#                     request.session['headimgurl'] = userinf.headimgurl
-#                     return func(request, *args, **kwargs)
-#         else:
-#             return func(request, *args, **kwargs)
-#     return wrapper
-#
 
 @csrf_exempt
 def wechat(request):
@@ -146,8 +111,6 @@ def wechat(request):
             elif msg.event == 'subscribe_scan':
                 reply = create_reply('感谢您关注【大眼可乐宠物联盟】', msg)
                 saveUserinfo(msg.source, msg.scene_id)
-
-                print('scene_id=', msg.scene_id)
             elif msg.event == 'scan':
                 setUserToMember(msg.source, msg.scene_id)
                 reply = create_reply('', msg)

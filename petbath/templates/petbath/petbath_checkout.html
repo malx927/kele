@@ -108,7 +108,7 @@
                     {% if instance.status == 1 %}
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">确认码:</label></div>
-                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">提宠码</a></div>
+                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">洗浴确认码</a></div>
                     </div>
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
@@ -171,78 +171,7 @@
     {{ block.super }}
     <script>
     $(function(){
-        {% if request.session.role == 2 or request.session.role == 1 %}
-            $("#room_set").on("click", function(){
-                var room_id = $('#id_room option:selected').val();
-                if(room_id=="" || room_id.length==0){
-                    weui.alert("请选择房间");
-                    $("#room_id").focus();
-                    return false;
-                }
-                var params ={
-                  id: $("#id").text(),
-                  room_id: room_id,
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
 
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-room-update" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-
-                      if(data.success=="true"){
-                          weui.alert("设置成功！");
-                      }
-                      else{
-                          weui.alert("设置失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("设置失败!");
-                  }
-                });
-            });
-
-            $("#foster_stop").on("click", function(){
-                var vcode = $("#pet_vcode").val();
-                if(vcode.length == 0){
-                    weui.alert("请输入宠物提取码！");
-                    return false
-                }
-                var params ={
-                  orderid: $("#id").text(),
-                  vcode: vcode,
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
-
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-pet-stop" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-
-                      if(data.success=="true"){
-                          weui.alert("设置成功！");
-                      }
-                      else if(data.vcode == "false"){
-                          weui.alert("宠物提取码不正确!");
-                      }
-                      else{
-                          weui.alert("设置失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("设置失败!");
-                  }
-                });
-            });
-
-        {% endif %}
 
          $("#pet_code").on("click", function(){
                 var params ={
@@ -258,7 +187,7 @@
                   timeout: 5000,
                   success: function(data){
                       if(data.success=="true"){
-                          weui.alert("宠物提取码:" + data.code);
+                          weui.alert("洗浴确认码:" + data.code);
                           if( $("#pet_vcode").length > 0 ){
                               $("#pet_vcode").val(data.code);
                           }

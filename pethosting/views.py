@@ -22,9 +22,10 @@ from dateutil.relativedelta import *
 from kele import settings
 from petfoster.models import PetFosterInfo, PetOwner, FosterRoom
 from pethosting.forms import HostingOrderForm, HostContractInfoForm
-from pethosting.models import HostingPrice, HostingOrder, HostContractInfo, HostContractFixInfo
+from pethosting.models import HostingPrice, HostingOrder, HostContractInfo, HostContractFixInfo, HostShuttleRecord
 from shopping.models import MemberDeposit
 from wxchat.models import WxUnifiedOrdeResult, CompanyInfo
+from wxchat.utils import create_qrcode
 from wxchat.views import getJsApiSign, wxPay, sendTemplateMesToKf
 
 
@@ -441,7 +442,7 @@ class HostingOrderListView(View):
 
             return render(request, template_name="pethosting/hosting_order_list.html", context={"hostingOrders": hostingOrders})
         else:
-            return  HttpResponseRedirect(reverse("hosting_pet_list"))
+            return  HttpResponseRedirect(reverse("hosting-pet-list"))
 
 class HostingOrderDetailView(View):
     """
@@ -478,3 +479,70 @@ class HostContractDetailView(View):
         except HostContractInfo.DoesNotExist as ex:
             contract_url = ''
         return render(request, template_name="pethosting/hosting_contract_detail.html", context={"contract_url": contract_url})
+
+
+class HostQrCodeShowView(View):
+    def get(self, request, *args, **kwargs):
+        orderid = request.GET.get("orderid", None)
+        flag = request.GET.get("flag", None)
+        return render(request, template_name="pethosting/hosting_qrcode_image.html", context={"orderid": orderid, "flag": flag})
+
+
+class HostQrCodeAckView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            code = request.GET.get("code", None)
+            flag = request.GET.get("flag", None)
+            print("HostQrCodeAckView", code, flag)
+            order = HostingOrder.objects.get(code=code)
+            role = request.session.get("role", None)
+            if role == 1 or role ==2 :
+                data = {
+                    "name": order.name,
+                    "openid": order.openid,
+                    "order": order,
+                    "code": code,
+                    "shuttle_type": 0 if flag == "recv" else 1
+                }
+                if flag == "recv":
+                    recv_count = HostShuttleRecord.objects.filter(code=code, shuttle_type=0).count()
+                    if recv_count ==0:
+                        HostShuttleRecord.objects.create(**data)
+                elif flag == "send":
+                    send_count = HostShuttleRecord.objects.filter(code=code, shuttle_type=1).count()
+                    if send_count==0:
+                        HostShuttleRecord.objects.create(**data)
+
+        except HostingOrder.DoesNotExist as ex :
+            print(ex)
+            order = None
+        url = "{0}?id={1}".format(reverse("hosting-pay"), order.id)
+        return HttpResponseRedirect(url)
+
+class HostQrCodeView(View):
+    def get(self, request, *args, **kwargs):
+        orderid = request.GET.get("orderid", None)
+        flag = request.GET.get("flag", None)
+        try:
+            order = HostingOrder.objects.get(pk=orderid)
+            if len(order.code) == 0:
+                code = '{0}{1}'.format(datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
+                order.code = code
+                order.save(update_fields=['code'])
+            else:
+                code = order.code
+
+            host = request.get_host()
+            path = reverse('hosting-qrcode-ack')
+            url = "http://{0}{1}?code={2}&flag={3}".format(host, path, code, flag)
+
+            image = create_qrcode( url )
+            f = BytesIO()
+            image.save(f, "PNG")
+        except HostingOrder.DoesNotExist as ex:
+            return HttpResponse(json.dumps({"success":"false"}))
+
+        return HttpResponse(f.getvalue())
+
+    def post(self, request, *args, **kwargs):
+       pass

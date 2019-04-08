@@ -71,8 +71,8 @@ class BathOrder(models.Model):
     def __str__(self):
         return self.out_trade_no
 
-    def total_price(self):
-        return self.total_fee
+    # def total_price(self):
+    #     return self.total_fee
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
         self.status = status

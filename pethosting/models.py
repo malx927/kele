@@ -44,7 +44,7 @@ class HostingOrder(models.Model):
     transaction_id = models.CharField(verbose_name='微信支付订单号', max_length=32,null=True,blank=True)
 
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
-    code = models.CharField(verbose_name='提取宠物码', max_length=12, default='', blank=True)
+    code = models.CharField(verbose_name='接送宠物码', max_length=12, default='', blank=True)
 
 
     def __str__(self):
@@ -123,4 +123,17 @@ class HostContractInfo(models.Model):
         verbose_name_plural = verbose_name
 
 
+class HostShuttleRecord(models.Model):
+    name = models.CharField(verbose_name="姓名", max_length=20)
+    openid  = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
+    order = models.ForeignKey(HostingOrder, verbose_name='订单')
+    code = models.CharField(verbose_name='扫描码', max_length=16, blank=True, null=True)
+    shuttle_time = models.DateTimeField(verbose_name='接送时间', auto_now=True)
+    shuttle_type = models.IntegerField(verbose_name='接送类型', null=True, blank=True, choices=((0,'接走'),(1,'送回')))
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '5.托管接送记录'
+        verbose_name_plural = verbose_name
