@@ -549,3 +549,40 @@ class HostQrCodeView(View):
 
     def post(self, request, *args, **kwargs):
        pass
+
+
+class HostingRoomUpdateView(View):
+    """
+    设置托管宠物房间
+    """
+    def post(self, request, *args, **kwargs):
+        order_id = request.POST.get("id", None)
+        room_id = request.POST.get("room_id", None)
+        context = {
+            "success": "false",
+        }
+        if order_id is None or room_id is None:
+            context["errors"] = "Invalid Order ID or Invalid Room ID"
+            return HttpResponse(json.dumps(context))
+        else:
+            try:
+                room = FosterRoom.objects.get(pk=room_id)
+                order = HostingOrder.objects.get(pk=order_id)
+                order.room = room
+                order.save(update_fields=["room"])
+                pet_ids = order.pet_list
+                petList = pet_ids.split(',')
+
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now())
+                room.petcounts = nRows
+                room.save(update_fields=["petcounts"])
+
+                # 修改宠物的房间
+                context["success"] = "true"
+                return HttpResponse(json.dumps(context))
+            except HostingOrder.DoesNotExist as ex:
+                context["errors"] = "Order Not Exists"
+                return HttpResponse(json.dumps(context))
+            except Exception as ex:
+                context["errors"] = "Order Save Failure"
+                return HttpResponse(json.dumps(context))

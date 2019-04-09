@@ -101,7 +101,7 @@
                      window.location.href = "{% url 'hosting-order' %}";
                   }
                   else{
-                      weui.alert('您的储值卡金额不够，请先充值', function(){
+                      weui.alert('首次充值金额超过2000元,才可以托管或者您的储值卡金额不够，请先充值', function(){
                           window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
                       });
                   }

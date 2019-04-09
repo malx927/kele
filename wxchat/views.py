@@ -1283,6 +1283,9 @@ def sendTemplateMesToKf(instance, toUser=0):
     elif out_trade_no.startswith("B"):
         url ="{0}{1}".format(settings.ROOT_URL, reverse("bath-order-detail", args=(instance.id,)) )
         name = "宠物洗浴订单"
+    elif out_trade_no.startswith("H"):
+        url ="{0}{1}".format(settings.ROOT_URL, reverse("hosting-order-detail", args=(instance.id,)) )
+        name = "宠物托管订单"
 
     color = "#173177"
     kf_data ={

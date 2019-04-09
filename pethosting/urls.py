@@ -4,9 +4,10 @@ __author__ = 'malxin'
 
 from django.conf.urls import url
 from django.views.generic import TemplateView
-from pethosting.views import PetInfoListView, HostingOrderView, HostingCalcPrice, HostingDepositSearchView, HostingOrderListView, \
+from pethosting.views import PetInfoListView, HostingOrderView, HostingCalcPrice, HostingDepositSearchView, \
+   HostingOrderListView, \
    HostingContractView, HostContractPageView, HostingOrderDetailView, HostContractDetailView, HostQrCodeView, \
-   HostQrCodeShowView, HostQrCodeAckView
+   HostQrCodeShowView, HostQrCodeAckView, HostingRoomUpdateView
 
 urlpatterns = [
 
@@ -22,4 +23,5 @@ urlpatterns = [
    url(r'^qrcode/$', HostQrCodeView.as_view(), name='hosting-qrcode'), # 确认二维码
    url(r'^qrcodeshow/$', HostQrCodeShowView.as_view(), name='hosting-qrcode-show'), # 确认二维码
    url(r'^qrcodeack/$', HostQrCodeAckView.as_view(), name='hosting-qrcode-ack'), # 确认二维码
+   url(r'^hostrupdateroom/$', HostingRoomUpdateView.as_view(), name='hosting-room-update'),
 ]
