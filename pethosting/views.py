@@ -504,15 +504,18 @@ class HostQrCodeAckView(View):
                     "code": code,
                     "shuttle_type": 0 if flag == "recv" else 1
                 }
+                pet_list = order.pet_list
+                petList = pet_list.split('.')
                 if flag == "recv":
                     recv_count = HostShuttleRecord.objects.filter(code=code, shuttle_type=0).count()
                     if recv_count ==0:
                         HostShuttleRecord.objects.create(**data)
+                        PetFosterInfo.objects.filter(id__in=petList).update(is_hosting=False)
                 elif flag == "send":
                     send_count = HostShuttleRecord.objects.filter(code=code, shuttle_type=1).count()
                     if send_count==0:
                         HostShuttleRecord.objects.create(**data)
-
+                        PetFosterInfo.objects.filter(id__in=petList).update(is_hosting=True)
         except HostingOrder.DoesNotExist as ex :
             print(ex)
             order = None
