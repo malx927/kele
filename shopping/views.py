@@ -21,7 +21,7 @@ from wxchat.utils import random_number
 from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
-from wxchat.models import WxUserinfo,WxUnifiedOrdeResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
+from wxchat.models import WxUserinfo,WxUnifiedOrderResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 
 from django.db.models import Sum,F, FloatField,Count, Q
@@ -391,7 +391,7 @@ class PayOrderView(View):
 
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 order.prepay_id = prepay_id
                 order.prepay_at = datetime.now()

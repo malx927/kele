@@ -128,8 +128,8 @@
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">宠物码:</label></div>
                         <div class="weui-cell__bd">
-                            <a href="javascript:;" id="pet_recv" class="weui-btn weui-btn_mini weui-btn_plain-primary">接宠码</a>
-                            <a href="javascript:;" id="pet_send" class="weui-btn weui-btn_mini weui-btn_plain-primary">送宠码</a>
+                            <a href="javascript:;" id="pet_send" class="weui-btn weui-btn_mini weui-btn_plain-primary">送宠确认</a>
+                            <a href="javascript:;" id="pet_recv" class="weui-btn weui-btn_mini weui-btn_plain-primary">接宠确认</a>
                         </div>
                     </div>
                     {% endif %}
@@ -223,7 +223,7 @@
 
                $.ajax({
                   type: 'POST',
-                  url: '{% url "foster-hosting-room-update" %}',
+                  url: '{% url "hosting-room-update" %}',
                   dataType: 'json',
                   data: params,
                   timeout: 5000,

@@ -17,7 +17,7 @@ from petbath.models import BathRoom, BathOrder, BathPrice
 
 # 洗浴间列表
 from shopping.models import MemberDeposit
-from wxchat.models import WxUnifiedOrdeResult
+from wxchat.models import WxUnifiedOrderResult
 from wxchat.utils import create_qrcode
 from wxchat.views import getJsApiSign, wxPay, sendTemplateMesToKf
 
@@ -137,7 +137,7 @@ class BathPayView(View):
             prepay_id = data.get('prepay_id', None)
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))

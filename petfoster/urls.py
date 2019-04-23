@@ -7,7 +7,8 @@ from django.views.generic import TemplateView
 
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
    FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView, ContractList, \
-   FosterPetStop, FosterPetListView, FosterPetDemandDetailView, FosterPetAllListView
+   FosterPetStop, FosterPetListView, FosterPetDemandDetailView, FosterPetAllListView, FosterQrCodeView, \
+   FosterQrCodeShowView, FosterQrCodeAckView, FosterRenewView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView,\
    FosterPetsList, FosterPetCode
@@ -45,4 +46,8 @@ urlpatterns = [
    url(r'^fosterstop/$', FosterPetStop.as_view(), name='foster-pet-stop'),
    url(r'^fosterpetlist/$', FosterPetListView.as_view(), name='foster-list'),
    url(r'^fosterpetall/$', FosterPetAllListView.as_view(), name='foster-list-all'),
+   url(r'^qrcode/$', FosterQrCodeView.as_view(), name='foster-qrcode'),  # 确认二维码
+   url(r'^qrcodeshow/$', FosterQrCodeShowView.as_view(), name='foster-qrcode-show'),  # 确认二维码
+   url(r'^qrcodeack/$', FosterQrCodeAckView.as_view(), name='foster-qrcode-ack'),  # 确认二维码
+   url(r'^fosterrenew/$', FosterRenewView.as_view(), name='foster-renew'),  # 寄养续费
 ]

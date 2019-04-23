@@ -24,7 +24,7 @@ from petfoster.models import PetFosterInfo, PetOwner, FosterRoom
 from pethosting.forms import HostingOrderForm, HostContractInfoForm
 from pethosting.models import HostingPrice, HostingOrder, HostContractInfo, HostContractFixInfo, HostShuttleRecord
 from shopping.models import MemberDeposit
-from wxchat.models import WxUnifiedOrdeResult, CompanyInfo
+from wxchat.models import WxUnifiedOrderResult, CompanyInfo
 from wxchat.utils import create_qrcode
 from wxchat.views import getJsApiSign, wxPay, sendTemplateMesToKf
 
@@ -220,7 +220,7 @@ class HostingPayView(View):
             prepay_id = data.get('prepay_id',None)
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
@@ -573,7 +573,7 @@ class HostingRoomUpdateView(View):
                 pet_ids = order.pet_list
                 petList = pet_ids.split(',')
 
-                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now())
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.now())
                 room.petcounts = nRows
                 room.save(update_fields=["petcounts"])
 

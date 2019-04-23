@@ -32,7 +32,7 @@ from wechatpy.utils import random_string
 from doginfo.models import DogBreed, DogBuy, DogSale
 from .forms import DogBreedForm, DogSaleForm
 from doginfo.models import DogLoss, DogOwner, Doginstitution
-from .models import WxUserinfo, WxUnifiedOrdeResult, WxPayResult, WxIntroduce, WxTemplateMsgUser
+from .models import WxUserinfo, WxUnifiedOrderResult, WxPayResult, WxIntroduce, WxTemplateMsgUser
 from .forms import DogLossForm, DogOwnerForm, DogBuyForm
 from shopping.models import Order, MemberScore, MemberScoreDetail, MemberDeposit
 from .utils import changeImage, mergeImage
@@ -603,7 +603,7 @@ class DogPayOrderView(View):
             print('DogPayOrderView',prepay_id)
             save_data = dict(data)
             # 保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))

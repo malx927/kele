@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from .models import FosterType, PetType, FosterStandard, FosterNotice, PetFosterInfo, FosterDemand, FosterRoom, \
-    ContractFixInfo, ContractInfo
+    ContractFixInfo, ContractInfo, FosterShuttleRecord
 from .models import FosterAgreement, HandOverList, PetFeedNote, PetGameNote, FosterMode
 from .models import PetInsurance, InsurancePlan, ClaimProcess, FosterPrice, FosterStyleChoose
 # Register your models here.
@@ -137,3 +137,10 @@ class ContractInfoAdmin(admin.ModelAdmin):
     list_filter = ['confirm']
     date_hierarchy = 'sign_date'
     readonly_fields = ['picture']
+
+@admin.register(FosterShuttleRecord)
+class FosterShuttleRecordAdmin(admin.ModelAdmin):
+    list_display = ('name', 'order', 'shuttle_time', 'shuttle_type', 'code')
+    list_per_page = 50
+    search_fields = ['name', 'order__out_trade_no', 'code']
+    list_filter = ['order']

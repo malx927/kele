@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import WxUserinfo,Menu,SwiperImage,WxPayResult,WxUnifiedOrdeResult,OrderAddress, WxIntroduce
+from .models import WxUserinfo,Menu,SwiperImage,WxPayResult,WxUnifiedOrderResult,OrderAddress, WxIntroduce
 from .models import WxTemplateMsgUser, MemberRole, CompanyInfo
 
 
@@ -28,7 +28,7 @@ class SwiperImageAdmin(admin.ModelAdmin):
 
 
 
-@admin.register(WxUnifiedOrdeResult)
+@admin.register(WxUnifiedOrderResult)
 class WxUnifiedOrderResultAdmin(admin.ModelAdmin):
     list_display = ('return_code','appid','mch_id','device_info','result_code','err_code','trade_type','prepay_id','code_url')
     list_per_page = 50

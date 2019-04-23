@@ -368,7 +368,7 @@ class FosterStyleChoose(models.Model):
     foster_type = models.ForeignKey(FosterType, verbose_name="寄养类型")
     foster_mode = models.ForeignKey(FosterMode, verbose_name='寄养方式')
     begin_time = models.DateField(verbose_name="开始时间")
-    end_time = models.DateField(verbose_name="结束时间")
+    end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
     big_price = models.IntegerField(verbose_name="大型价格", default=0, blank=True, null=True)
     middle_price = models.IntegerField(verbose_name="中型价格", default=0, blank=True, null=True)
     small_price = models.IntegerField(verbose_name="小型价格", default=0, blank=True, null=True)
@@ -397,6 +397,14 @@ class FosterStyleChoose(models.Model):
         verbose_name = "14.寄养订单"
         verbose_name_plural = verbose_name
         ordering = ("-status", '-create_time')
+
+    def is_end(self):
+        if self.pet_list:
+            petList = self.pet_list.split(',')
+            pet = PetFosterInfo.objects.filter(id__in=petList).first()
+            return pet.is_end
+        else:
+            return  None
 
     def get_totals(self):
         big_dog = self.big_dog if self.big_dog else 0
@@ -491,4 +499,17 @@ class ContractInfo(models.Model):
         verbose_name_plural = verbose_name
 
 
+class FosterShuttleRecord(models.Model):
+    name = models.CharField(verbose_name="姓名", max_length=20)
+    openid  = models.CharField(verbose_name="微信标识", max_length=64, blank=True, null=True)
+    order = models.ForeignKey(FosterStyleChoose, verbose_name='订单')
+    code = models.CharField(verbose_name='扫描码', max_length=16, blank=True, null=True)
+    shuttle_time = models.DateTimeField(verbose_name='接送时间', auto_now=True)
+    shuttle_type = models.IntegerField(verbose_name='接送类型', null=True, blank=True, choices=((0,'结束寄养'),(1, '开始寄养')))
 
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = '17.寄养接送记录'
+        verbose_name_plural = verbose_name

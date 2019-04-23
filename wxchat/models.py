@@ -104,7 +104,7 @@ class SwiperImage(models.Model):
 
 
 #微信统一下单结果
-class WxUnifiedOrdeResult(models.Model):
+class WxUnifiedOrderResult(models.Model):
     return_code = models.CharField(verbose_name='返回状态码',max_length=16,null=True,blank=True)
     return_msg = models.CharField(verbose_name='返回信息',max_length=128,null=True,blank=True)
 
