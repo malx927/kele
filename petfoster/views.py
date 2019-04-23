@@ -18,11 +18,11 @@ from kele import settings
 from petbath.models import BathOrder
 from shopping.models import MemberDeposit
 from shopping.views import wxPay, queryOrder
-from wxchat.models import WxUnifiedOrdeResult, WxPayResult, CompanyInfo
-from wxchat.utils import changeImage
+from wxchat.models import WxUnifiedOrderResult, WxPayResult, CompanyInfo
+from wxchat.utils import changeImage, create_qrcode
 from .models import InsurancePlan, ClaimProcess, PetInsurance, FosterStandard, FosterType, PetFosterInfo, FosterDemand, \
     FosterNotice, FosterAgreement, FosterStyleChoose, PetOwner, FosterRoom, HandOverList, ContractFixInfo, \
-    ContractInfo
+    ContractInfo, FosterShuttleRecord
 
 from .forms import PetInsuranceForm, PetFosterInfoForm, FosterDemandForm, FosterStyleChooseForm, HandOverListForm, \
     ContractInfoForm
@@ -156,7 +156,7 @@ class PayInsuranceView(View):
             print('aaaa:',prepay_id)
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
@@ -382,7 +382,12 @@ class FosterCalculateView(View):
 
     def post(self,request):
         flag = request.POST.get("flag", None)
-        form = FosterStyleChooseForm(request.POST or None)
+        order_id = request.POST.get("id", None)
+        if order_id:
+            order = FosterStyleChoose.objects.get(pk=int(order_id))
+            form = FosterStyleChooseForm(request.POST, instance=order)
+        else:
+            form = FosterStyleChooseForm(request.POST or None)
         if form.is_valid():
             if flag == "test":      #测试计算
                 member = request.POST.get("member", None)
@@ -391,20 +396,25 @@ class FosterCalculateView(View):
             else:               #寄养缴费
                 user_id = request.session.get("openid", None)
                 is_member = request.session.get("is_member", None)
-                pet_list = request.POST.getlist("pet_list")
-                pet_list_str = ''
+                pet_list = request.POST.getlist("pet_list", None)
+
                 if pet_list:
                     pet_list_str = ','.join(pet_list)
+                    form.instance.pet_list = pet_list_str
+                else:
+                    petlist = request.POST.get("petlist")
+                    form.instance.pet_list = petlist
+
                 form = self.calculate_price( form, is_member)
 
                 form.instance.openid = user_id
-                form.instance.pet_list = pet_list_str
                 instance = form.save()
                 # url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
                 # return HttpResponseRedirect(url)        # 跳转到签订合同
                 url = "{0}?orderid={1}".format(reverse("foster-contract"), instance.id)
                 return HttpResponseRedirect(url)        # 跳转到签订合同
         else:
+            print(form.errors)
             return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
 
 
@@ -488,8 +498,10 @@ class FosterPayView(View):
 
             return render(request, template_name="petfoster/foster_checkout.html", context=context)
         except FosterStyleChoose.DoesNotExist as ex:
+            print(ex)
             return HttpResponseRedirect(reverse("foster-style-calc"))
         except Exception as ex:
+            print(ex)
             return HttpResponseRedirect(reverse("foster-style-calc"))
 
 
@@ -515,7 +527,7 @@ class FosterPayView(View):
             prepay_id = data.get('prepay_id',None)
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
@@ -559,7 +571,6 @@ class FosterOrderView(View):
             else:
                 return  HttpResponseRedirect(reverse("foster-menu"))
         else:
-
             try:
                 fosterOrder = FosterStyleChoose.objects.get(pk=id)
                 if fosterOrder.status == 1:
@@ -628,7 +639,7 @@ class FosterRoomUpdateView(View):
                 pet_ids = order.pet_list
                 petList = pet_ids.split(',')
 
-                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now(), is_end=True)
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now())
 
                 if order.foster_mode == 3:
                     room.petcounts += nRows
@@ -966,3 +977,102 @@ class FosterPetDemandDetailView(View):
             demand = None
 
         return render(request, template_name="petfoster/foster_demand_detail.html",context={"object": demand})
+
+
+class FosterQrCodeShowView(View):
+    def get(self, request, *args, **kwargs):
+        orderid = request.GET.get("orderid", None)
+        flag = request.GET.get("flag", None)
+        return render(request, template_name="petfoster/foster_qrcode_image.html", context={"orderid": orderid, "flag": flag})
+
+class FosterQrCodeView(View):
+    def get(self, request, *args, **kwargs):
+        orderid = request.GET.get("orderid", None)
+        flag = request.GET.get("flag", None)
+        try:
+            order = FosterStyleChoose.objects.get(pk=orderid)
+            if len(order.code) == 0:
+                code = '{0}{1}'.format(datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
+                order.code = code
+                order.save(update_fields=['code'])
+            else:
+                code = order.code
+
+            host = request.get_host()
+            path = reverse('foster-qrcode-ack')
+            url = "http://{0}{1}?code={2}&flag={3}".format(host, path, code, flag)
+
+            image = create_qrcode( url )
+            f = BytesIO()
+            image.save(f, "PNG")
+        except FosterStyleChoose.DoesNotExist as ex:
+            return HttpResponse(json.dumps({"success":"false"}))
+
+        return HttpResponse(f.getvalue())
+
+    def post(self, request, *args, **kwargs):
+       pass
+
+
+class FosterQrCodeAckView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            name = request.session.get("nickname", "")
+            code = request.GET.get("code", None)
+            flag = request.GET.get("flag", None)
+            order = FosterStyleChoose.objects.get(code=code)
+            role = request.session.get("role", None)
+            shuttle_type = 1 if flag == "start" else 0
+            if role == 1 or role == 2:
+                data = {
+                    "name": name,
+                    "openid": order.openid,
+                    "order": order,
+                    "code": code,
+                    "shuttle_type": shuttle_type
+                }
+                pet_list = order.pet_list
+                petList = pet_list.split(',')
+                print(petList)
+
+                count = FosterShuttleRecord.objects.filter(code=code, shuttle_type=shuttle_type).count()
+                if count == 0:
+                    FosterShuttleRecord.objects.create(**data)
+                    PetFosterInfo.objects.filter(id__in=petList).update(is_end=shuttle_type)
+
+        except FosterStyleChoose.DoesNotExist as ex :
+            print(ex)
+            order = None
+        url = "{0}?id={1}".format(reverse("foster-pay"), order.id)
+        return HttpResponseRedirect(url)
+
+
+class FosterRenewView(View):
+    """寄养续费"""
+    def get(self, request, *args, **kwargs):
+        out_trade_no = request.GET.get("out_trade_no", None)
+        openid = request.session.get("openid", None)
+        try:
+            # order = FosterStyleChoose.objects.get(openid=openid, out_trade_no=out_trade_no)
+            order = FosterStyleChoose.objects.get(out_trade_no=out_trade_no)
+        except FosterStyleChoose.DoesNotExist as ex:
+            pass
+
+        order.pk = None
+        order.begin_time = order.end_time + datetime.timedelta(days=1)
+        order.end_time = None
+        order.cash_fee = None
+        order.out_trade_no = None
+        order.pay_time = None
+        order.status = 0
+        order.total_price = 0
+        order.transaction_id = None
+        order.balance_fee = None
+        order.pay_style = 0
+        order.code = ''
+        order.save()
+        form = FosterStyleChooseForm(instance=order)
+        return render(request, template_name="petfoster/foster_renew.html", context={"form": form})
+
+    def post(self, request, *args, **kwargs):
+        pass

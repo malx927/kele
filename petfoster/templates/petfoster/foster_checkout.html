@@ -121,19 +121,20 @@
                             </select>
                         </div>
                         <div class="weui-cell__ft">
-                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">寄养确认</a>
+                               <a id="room_set" href="javascript:;" class="weui-vcode-btn">分配房间</a>
                         </div>
                     </div>
-{#                    <div class="weui-cell">#}
-{#                        <div class="weui-cell__hd"><label for="" class="weui-label">物品交接:</label></div>#}
-{#                        <div class="weui-cell__bd"><a href="{% url 'hand-over-list' %}?orderid={{ instance.id }}" class="weui-btn weui-btn_mini weui-btn_plain-primary">交接记录</a></div>#}
-{#                    </div>#}
+
                     <div class="weui-cell weui-cell_vcode">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">填写宠物码:</label></div>
-                        <div class="weui-cell__bd"><input class="weui-input" id="pet_vcode" type="number" placeholder="请输入宠物提取码"></div>
-                        <div class="weui-cell__ft">
-                               <a id="foster_stop" href="javascript:;" class="weui-vcode-btn">寄养结束</a>
+                        <div class="weui-cell__hd"><label for="" class="weui-label">宠物码:</label></div>
+                        <div class="weui-cell__bd">
+                            {% if instance.is_end == 0 %}
+                            <a href="javascript:;" id="foster_start" class="weui-btn weui-btn_mini weui-btn_plain-primary">开始寄养</a>
+                            {% elif instance.is_end == 1%}
+                            <a href="javascript:;" id="foster_stop" class="weui-btn weui-btn_mini weui-btn_plain-primary">结束寄养</a>
+                            {% endif %}
                         </div>
+
                     </div>
                     {% else %}
                     <div class="weui-cell">
@@ -257,6 +258,12 @@
         </a>
         {% endif %}
     </div>
+    {% else %}
+     <div class="weui-tabbar">
+        <a href="{% url 'foster-renew' %}?out_trade_no={{ instance.out_trade_no }}" id="foster_renew" class="weui-tabbar__item tabbar_item bg-warning" >
+            <p class="weui-tabbar__label " style="font-size:18px;"> 寄养续费</p>
+        </a>
+     </div>
     {% endif %}
 </div>
 
@@ -287,45 +294,8 @@
                   data: params,
                   timeout: 5000,
                   success: function(data){
-
                       if(data.success=="true"){
                           weui.alert("设置成功！");
-                      }
-                      else{
-                          weui.alert("设置失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("设置失败!");
-                  }
-                });
-            });
-
-            $("#foster_stop").on("click", function(){
-                var vcode = $("#pet_vcode").val();
-                if(vcode.length == 0){
-                    weui.alert("请输入宠物提取码！");
-                    return false
-                }
-                var params ={
-                  orderid: $("#id").text(),
-                  vcode: vcode,
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
-
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-pet-stop" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-
-                      if(data.success=="true"){
-                          weui.alert("设置成功！");
-                      }
-                      else if(data.vcode == "false"){
-                          weui.alert("宠物提取码不正确!");
                       }
                       else{
                           weui.alert("设置失败！");
@@ -338,6 +308,14 @@
             });
 
         {% endif %}
+
+         $("#foster_start").on("click", function(){
+                window.location.href = "{% url 'foster-qrcode-show' %}?orderid={{ instance.id }}&flag=start"
+         });
+
+        $("#foster_stop").on("click", function(){
+                window.location.href = "{% url 'foster-qrcode-show' %}?orderid={{ instance.id }}&flag=stop"
+         });
 
          $("#pet_code").on("click", function(){
                 var params ={

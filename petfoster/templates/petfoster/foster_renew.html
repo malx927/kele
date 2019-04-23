@@ -12,33 +12,23 @@
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if member == "1" %}会员{% elif member == "0" %}非会员{% endif %}寄养费用计算</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">寄养续费</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
     <div class="weui-panel__bd">
-        <form  action="" method="post" enctype="multipart/form-data" onsubmit="return checkValue();">{% csrf_token %}
+        <form  action="{% url 'foster-style-calc' %}" method="post" enctype="multipart/form-data" onsubmit="return checkValue();">{% csrf_token %}
         <div class="weui-cells weui-cells_form weui-cells_checkbox cells_top" >
-            {% if flag %}
-                <input type="hidden" name="flag" id="flag" value="{{ flag }}">
-            {% endif %}
-            {% if member %}
-                <input type="hidden" name="member" id="member" value="{{ member }}">
-            {% endif %}
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label class="weui-label">{{ form.big_dog.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.big_dog }}</div>
+            <div style="display:none">
+                <input type="number" name="id" value="{{ form.instance.id|default:""}}" >
+                <input type="number" name="big_dog" value="{{ form.big_dog.value|default:0}}" >
+                <input type="number" name="middle_dog" value="{{ form.middle_dog.value|default:0}}" >
+                <input type="number" name="small_dog" value="{{ form.small_dog.value|default:0}}">
+                <input type="number" name="foster_type" value="{{ form.foster_type.value }}">
+                <input type="number" name="foster_mode" value="{{ form.foster_mode.value }}">
+                <input type="text" name="petlist" value="{{ form.pet_list.value }}">
             </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd">
-                    <label for="" class="weui-label">{{ form.middle_dog.label }}:</label>
-                </div>
-                <div class="weui-cell__bd">{{ form.middle_dog }}</div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.small_dog.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.small_dog }}</div>
-            </div>
+
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.begin_time.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.begin_time }}</div>
@@ -47,45 +37,9 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.end_time.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.end_time }}</div>
             </div>
-             <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.foster_type.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.foster_type }}</div>
-            </div>
           </div>
-          <div class="weui-cells__title black" style="font-size:17px;">{{ form.foster_mode.label }}</div>
-          <div class="weui-cells weui-cells_checkbox">
-            {% for chioce in form.fields.foster_mode.choices %}
-                {% if chioce.0 != "" %}
-                <label class="weui-cell weui-check__label" for="id_foster_mode_{{ chioce.0 }}">
-                    <div class="weui-cell__hd">
-                        <input type="radio" class="weui-check" name="foster_mode" value="{{ chioce.0 }}" id="id_foster_mode_{{ chioce.0 }}" >
-                        <i class="weui-icon-checked"></i>
-                    </div>
-                    <div class="weui-cell__bd"><p>{{ chioce.1 }}</p></div>
-                </label>
-                {% endif %}
-            {% endfor %}
-          </div>
-
-         {% if flag is None %}
-        <div class="weui-cells__title">选中寄养宠物</div>
-        <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
-            {% for pet in pets %}
-            <label class="weui-cell weui-check__label" for="id_{{ pet.id }}"style="width: 38%;min-width: 38%;max-width: 38%">
-                <div class="weui-cell__hd">
-                    <input type="checkbox" class="weui-check" name="pet_list" value="{{ pet.id }}" id="id_{{ pet.id }}" checked>
-                    <i class="weui-icon-checked"></i>
-                </div>
-                <div class="weui-cell__bd"><p>{{ pet.name }}</p></div>
-                <div class="weui-cell__ft"></div>
-            </label>
-            {% endfor %}
-        </div>
-         {% endif %}
         <div class="weui-btn-area">
-            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >
-                {% if flag == "test" %}{% if member == "1" %}会员{% elif member == "0" %}非会员{% endif %}计算{% else %}提交{% endif %}
-            </button>
+            <button type="submit" name="submit" id="btn_submit" class="weui-btn weui-btn_primary" >提交</button>
         </div>
         </form>
     </div>
@@ -95,117 +49,32 @@
 {% block bottomjs %}
      {{ block.super }}
     <script>
-    $(function(){
-        $("#id_begin_time").on("change", function(event){
-            var beginDate = event.target.value;
-            var endDate = $("#id_end_time").val();
-            if (beginDate.length == 0 || endDate.length == 0) return;
-            if(endDate.length > 0 && endDate < beginDate ){
-                 weui.alert("开始时间不能大于结束时间");
-                 $("#id_begin_time").focus();
-            }
-            var days = dateDiff(beginDate, endDate);
-            setFosterType(days);
-        });
-        $("#id_end_time").on("change", function(event){
+    $(function() {
+
+        $("#id_end_time").on("change", function (event) {
             var endDate = event.target.value;
             var beginDate = $("#id_begin_time").val();
+
             if (beginDate.length == 0 || endDate.length == 0) return;
-            if(beginDate.length > 0 && endDate < beginDate){
+            if (beginDate.length > 0 && endDate < beginDate) {
                 weui.alert("结束时间不能小于开始时间");
                 $("#id_end_time").focus();
             }
-            var days = dateDiff(beginDate, endDate);
-            setFosterType(days);
-         });
 
-        $("#id_big_dog, #id_middle_dog, #id_small_dog").on("input", function( event ){
-            var bigCount =  $("#id_big_dog").val() || 0;
-            var midCount =  $("#id_middle_dog").val() || 0;
-            var smlCount =  $("#id_small_dog").val() || 0;
-            var nCount = parseInt(midCount) + parseInt(bigCount) + parseInt(smlCount);
-            console.log(nCount, parseInt(bigCount), parseInt(midCount), parseInt(smlCount));
-            if( nCount > 1){
-                $("Label[for='id_foster_mode_1']").hide();
-                $("Label[for='id_foster_mode_2']").show();
-                $("Label[for='id_foster_mode_3']").hide();
-                $("#id_foster_mode_2").click();
-            }
-            else if( parseInt(bigCount) == 1 ){
-                $("Label[for='id_foster_mode_2']").hide();
-                $("Label[for='id_foster_mode_3']").hide();
-                $("Label[for='id_foster_mode_1']").show();
-                $("#id_foster_mode_1").click();
-            }
-            else if( parseInt(midCount) ==1 || parseInt(smlCount) ==1 ){
-                $("Label[for='id_foster_mode_1']").show();
-                $("Label[for='id_foster_mode_2']").hide();
-                $("Label[for='id_foster_mode_3']").show();
-                $("#id_foster_mode_3").click();
-            }
-            else{
-                $("Label[for='id_foster_mode_1']").show();
-                $("Label[for='id_foster_mode_2']").show();
-                $("Label[for='id_foster_mode_3']").show();
-            }
-        })
-
-    });
-
-    function setFosterType(days){
-        if(days <=30){
-            $("#id_foster_type").val(1);   ///短期寄养
-        }
-        else{
-            $("#id_foster_type").val(2);   ////长期寄养
-        }
-    }
-
-    function dateDiff(beginDate, endDate){
-        var bDate = new Date(beginDate);
-        var eDate = new Date(endDate);
-        var days  =  parseInt(Math.abs(eDate - bDate)/1000/60/60/24) + 1 ;
-        return days;
-    }
+        });
+    })
 
     function checkValue(){
 
-       var bigCount =  $("#id_big_dog").val()||0;
-       var midCount =  $("#id_middle_dog").val()||0;
-       var smlCount =  $("#id_small_dog").val()||0;
-
-       var nCount = parseInt(bigCount) + parseInt(midCount) + parseInt(smlCount);
-
-        if( nCount == 0 || isNaN(nCount) ){
-             weui.alert("请填写寄养宠物数量");
-             $("#id_big_dog").focus();
-            return false
-        }
-       var begin_time = $("#id_begin_time").val();
        var end_time = $("#id_end_time").val();
-       var curDate = getCurrDate();
-
-       if( begin_time < curDate ){
-           weui.alert("开始时间不能小于当前时间");
-           $("#id_begin_time").focus();
-           return false
-       }
+       var begin_time = $("#id_begin_time").val();
         if( end_time < begin_time ){
            weui.alert("结束时间不能小于开始时间");
            $("#id_end_time").focus();
            return false
        }
-      {% if flag is None and request.session.is_member%}
-       if($("input[name='pet_list']:checked").size()==0){
-           weui.alert("请选择要寄养宠物");
-           return false
-       }
-      {% endif %}
-      $("#id_foster_type").removeAttr("disabled")
        showing();
     }
-
-
 
     </script>
 {% endblock bottomjs %}
