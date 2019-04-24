@@ -992,7 +992,7 @@ class FosterQrCodeView(View):
         try:
             order = FosterStyleChoose.objects.get(pk=orderid)
             if len(order.code) == 0:
-                code = '{0}{1}'.format(datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
+                code = '{0}{1}'.format(datetime.datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
                 order.code = code
                 order.save(update_fields=['code'])
             else:
