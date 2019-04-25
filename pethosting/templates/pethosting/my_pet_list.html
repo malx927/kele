@@ -31,7 +31,7 @@
             <div class="weui-cells">
 
                 {% for object in object_list %}
-                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-update' object.id %}">
+                    <a class="weui-cell weui-cell_access" href="{% url 'foster-pet-update' object.id %}?input_type=hosting">
                     <div class="weui-cell__hd"><img src="{{ object.picture.url }}" class="pet_img"></div>
                     <div class="weui-cell__bd">
                         <div class="weui-flex">

@@ -316,8 +316,9 @@ class PetFosterInfoView(View):
 class FosterPetDetailView(View):
     def get(self, request, *args, **kwargs):
         petId = kwargs.get("pk", None)
+        input_type = request.GET.get("input_type", "")
         pet = PetFosterInfo.objects.get(pk=petId)
-        return render(request, template_name="petfoster/foster_petinfo_detail.html",context={"pet": pet})
+        return render(request, template_name="petfoster/foster_petinfo_detail.html",context={"pet": pet, "input_type": input_type})
 
 
 # 宠物寄养要求
