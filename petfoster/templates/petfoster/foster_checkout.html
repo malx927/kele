@@ -124,8 +124,8 @@
                                <a id="room_set" href="javascript:;" class="weui-vcode-btn">分配房间</a>
                         </div>
                     </div>
-                    {% else %}
-                    <div class="weui-cell weui-cell_vcode">
+                    {% endif %}
+                     <div class="weui-cell weui-cell_vcode">
                         <div class="weui-cell__hd"><label for="" class="weui-label">宠物码:</label></div>
                         <div class="weui-cell__bd" style="padding-top:5px;">
                             {% if instance.is_end == 0 %}
@@ -136,7 +136,6 @@
                         </div>
 
                     </div>
-                    {% endif %}
 {#                    <div class="weui-cell">#}
 {#                        <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>#}
 {#                        <div class="weui-cell__bd">{{ instance.out_trade_no|default:'' }}</div>#}
