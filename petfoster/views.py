@@ -257,7 +257,7 @@ class PetFosterInfoView(View):
 
     def get(self, request, *args, **kwargs):
         id = kwargs.get("pk",None)
-        type = request.GET.get("type", None)
+        input_type = request.GET.get("input_type", None)
         if id:
             petInfo = PetFosterInfo.objects.get(id=id)
             form = PetFosterInfoForm(instance=petInfo)
@@ -272,11 +272,11 @@ class PetFosterInfoView(View):
                 form["id_card"].field.initial = owner.id_card
             except PetOwner.DoesNotExist as ex:
                 pass
-        return render(request, template_name="petfoster/foster_petinfo.html", context={"form": form, "type": type})
+        return render(request, template_name="petfoster/foster_petinfo.html", context={"form": form, "input_type": input_type})
 
     def post(self, request, *args, **kwargs):
         id = kwargs.get("pk",None)
-        type = request.POST.get("type", '')
+        input_type = request.POST.get("input_type", '')
         if id:
             petInfo = PetFosterInfo.objects.get(id=id)
             form = PetFosterInfoForm(request.POST, request.FILES, instance=petInfo)
@@ -296,7 +296,7 @@ class PetFosterInfoView(View):
                 image.save(path)
 
             self.savePetOwnerInfo(instance)
-            url = "{0}?type={1}".format(reverse("foster-pet-demand", args=(instance.id,)), type)
+            url = "{0}?input_type={1}".format(reverse("foster-pet-demand", args=(instance.id,)), input_type)
             return HttpResponseRedirect(url)
         else:
             return HttpResponseRedirect(reverse("foster-pet-info"))
@@ -324,36 +324,36 @@ class FosterPetDetailView(View):
 class FosterDemandView(View):
 
     def get(self, request, petid):
-        type = request.GET.get("type", "")
+        input_type = request.GET.get("input_type", "")
         try:
             pet_id = petid
             petInfo = PetFosterInfo.objects.get(id=pet_id)
             instance = FosterDemand.objects.get(pet=pet_id)
             form = FosterDemandForm(instance=instance)
         except PetFosterInfo.DoesNotExist as ex:
-            if type == "hosting":
+            if input_type == "hosting":
                 return HttpResponseRedirect(reverse("hosting-pet-list"))
             else:
                 return HttpResponseRedirect(reverse("foster-pet-list"))
         except FosterDemand.DoesNotExist as ex:
             form = FosterDemandForm()
-            return render(request, template_name="petfoster/foster_demand.html", context={"form": form, "petinfo":petInfo, "type": type})
+            return render(request, template_name="petfoster/foster_demand.html", context={"form": form, "petinfo":petInfo, "input_type": input_type})
         else:
-            return render(request, template_name="petfoster/foster_demand.html", context={"form": form, "id": instance.id, "type": type})
+            return render(request, template_name="petfoster/foster_demand.html", context={"form": form, "id": instance.id, "input_type": input_type})
 
 
 class FosterDemandCreateUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         id = request.POST.get("id", None)
-        type = request.POST.get("type", "")
+        input_type = request.POST.get("input_type", "")
         if id:
             fosterDemand = FosterDemand.objects.get(id=id)
             form = FosterDemandForm(request.POST,instance=fosterDemand)
         else:
             form = FosterDemandForm(request.POST)
 
-        if type == "hosting":
+        if input_type == "hosting":
             url = reverse("hosting-pet-list")
         else:
             url = reverse("foster-pet-list")

@@ -68,7 +68,7 @@
 </div>
 {% endblock tabpanel %}
  {% block tabbar %}
-        <a href="{% url 'foster-pet-info' %}type=hosting" class="weui-tabbar__item tabbar_item">
+        <a href="{% url 'foster-pet-info' %}?input_type=hosting" class="weui-tabbar__item tabbar_item">
              <p class="weui-tabbar__label bg_gray"><i class="icon iconfont icon-jian" ></i> 增加宠物</p>
         </a>
         <a href="{% url 'hosting-order-list' %}" class="weui-tabbar__item tabbar_item" id="gotoorder">
