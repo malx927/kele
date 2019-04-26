@@ -50,4 +50,5 @@ urlpatterns = [
    url(r'^qrcodeshow/$', FosterQrCodeShowView.as_view(), name='foster-qrcode-show'),  # 确认二维码
    url(r'^qrcodeack/$', FosterQrCodeAckView.as_view(), name='foster-qrcode-ack'),  # 确认二维码
    url(r'^fosterrenew/$', FosterRenewView.as_view(), name='foster-renew'),  # 寄养续费
+
 ]

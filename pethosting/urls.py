@@ -24,4 +24,5 @@ urlpatterns = [
    url(r'^qrcodeshow/$', HostQrCodeShowView.as_view(), name='hosting-qrcode-show'), # 确认二维码
    url(r'^qrcodeack/$', HostQrCodeAckView.as_view(), name='hosting-qrcode-ack'), # 确认二维码
    url(r'^hostrupdateroom/$', HostingRoomUpdateView.as_view(), name='hosting-room-update'),
+   url(r'^hostingknow/$', TemplateView.as_view(template_name="pethosting/hosting_know.html"), name='hosting-know'),  # 托管须知
 ]

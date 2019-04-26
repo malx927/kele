@@ -413,7 +413,10 @@ class FosterStyleChoose(models.Model):
         return  big_dog + middle_dog  + small_dog
 
     def get_days(self):
-        return (self.end_time - self.begin_time).days + 1
+        days = (self.end_time - self.begin_time).days
+        if days == 0:
+            days += 1
+        return days
 
     def get_total_price(self):
         days = self.get_days()
