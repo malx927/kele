@@ -22,6 +22,8 @@ class HostingOrderForm(forms.ModelForm):
 
         self.fields["begin_time"].initial = datetime.date.today()
 
+        # self.fields["end_time"].widget.attrs['readonly'] = 'true'
+
         self.fields['months'].widget.attrs['class'] = 'weui-select'
         self.fields['months'].empty_label='托管月数'
 
@@ -31,10 +33,11 @@ class HostingOrderForm(forms.ModelForm):
 
     class Meta:
         model = HostingOrder
-        fields = ['name', 'telephone', 'begin_time', 'months', 'total_fee']
+        fields = ['name', 'telephone', 'begin_time', 'end_time', 'months', 'total_fee']
 
         widgets = {
              'begin_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
+             'end_time': forms.TextInput({'class': 'weui-input', 'type': 'date'}),
         }
 
 #托管合同
@@ -64,12 +67,18 @@ class HostContractInfoForm(forms.ModelForm):
         self.fields['second_idcard'].widget.attrs['class'] = 'weui-input'
         self.fields['second_idcard'].widget.attrs['placeholder'] = '请输入乙方身份证号'
 
+        self.fields['begin_date'].widget.attrs['class'] = 'weui-input'
+        self.fields['begin_date'].widget.attrs['readonly'] = 'true'
+
+        self.fields['end_date'].widget.attrs['class'] = 'weui-input'
+        self.fields['end_date'].widget.attrs['readonly'] = 'true'
+
         self.fields['total_fee'].widget.attrs['class'] = 'weui-input'
         self.fields['total_fee'].widget.attrs['readonly'] = 'true'
 
     class Meta:
         model = HostContractInfo
-        fields = ['first_party','first_telephone','first_address','second_party','second_telephone','second_address','second_idcard', 'total_fee', 'order']
+        fields = ['first_party','first_telephone','first_address','second_party','second_telephone','second_address','second_idcard', 'begin_date', 'end_date', 'total_fee', 'order']
 
 # #寄养宠物信息登记表
 # class PetFosterInfoForm(forms.ModelForm):

@@ -35,7 +35,7 @@ class HostContractFixInfoAdmin(admin.ModelAdmin):
 
 @admin.register(HostContractInfo)
 class HostContractInfoAdmin(admin.ModelAdmin):
-    list_display = ('sn', 'second_party', 'second_telephone', 'second_address', 'second_idcard', 'total_fee', 'sign_date','confirm')
+    list_display = ('sn', 'second_party', 'second_telephone', 'second_address', 'second_idcard', 'begin_date', 'end_date', 'total_fee', 'sign_date','confirm')
     list_per_page = 50
     search_fields = ['second_party', 'second_telephone', 'sn', 'second_idcard']
     list_filter = ['confirm']

@@ -106,6 +106,8 @@ class HostContractInfo(models.Model):
     second_telephone = models.CharField(verbose_name='乙方电话', max_length=32)
     second_address = models.CharField(verbose_name='乙方地址', max_length=64)
     second_idcard = models.CharField(verbose_name='身份证号', max_length=20)
+    begin_date = models.DateField(verbose_name="开始时间", blank=True, null=True)
+    end_date = models.DateField(verbose_name="结束时间", blank=True, null=True)
     add_time = models.DateTimeField(verbose_name='日期', default=timezone.now)
     other_fee = models.DecimalField(verbose_name='其他费用', max_digits=9 ,decimal_places=2, blank=True, null=True)
     total_fee = models.DecimalField(verbose_name='费用总计', max_digits=9, decimal_places=2, default=0)

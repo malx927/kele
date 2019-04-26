@@ -56,7 +56,13 @@
                         <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.foster_type}}</span></p>
                     </div>
                 </div>
-                {% elif item.number == 13 %}
+                 {% elif item.number == 13 %}
+                 <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{ contract.begin_date }}至{{ contract.end_date }}</span></p>
+                    </div>
+                 </div>
+                {% elif item.number == 14 %}
                  <div class="weui-cell">
                     <div class="weui-cell__bd">
                         <p>{{ item.number }}、{{ item.content }}<span class="text-underline">{{contract.total_fee}}元</span></p>
@@ -65,7 +71,7 @@
                  {% elif item.number == 99 %}
                  <div class="weui-cell">
                     <div class="weui-cell__bd">
-                        <p><b>{{ item.content }}</b></p>
+                        <p style="color:red;"><b>{{ item.content }}</b></p>
                     </div>
                  </div>
                 <div class="weui-cell">
@@ -118,7 +124,7 @@
                 {% else %}
                     <div class="weui-cell">
                         <div class="weui-cell__bd">
-                            <p {% if item.number == 14 %}style="color:red"{% endif %}>{{ item.number }}、{{ item.content|safe }}</p>
+                            <p {% if item.number == 15 %}style="color:red"{% endif %}>{{ item.number }}、{{ item.content|safe }}</p>
                         </div>
                     </div>
                 {% endif %}

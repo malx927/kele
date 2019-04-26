@@ -1,0 +1,82 @@
+{% extends 'wxchat/wxbase.html' %}{% load static %}
+{% block container %}
+<div class="weui-panel">
+    <div class="weui-panel__hd header_bottom">
+         <div class="weui-flex">
+            <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">托管须知</span></div>
+            <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
+        </div>
+    </div>
+    <div class="weui-panel__bd" >
+        <div id="contract_content">
+        <div class="weui-cells__title" style="text-align: center; color: #000000"><h1>托管须知</h1></div>
+            <div class="weui-cells weui-cells_checkbox cells_top">
+                <div class="weui-cell">
+                    <div class="weui-cell__bd">
+                        <p></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="weui-btn-area">
+            <a type="button" class="weui-btn weui-btn_primary" href="{% url 'hosting-pet-list' %}"  >下一步</a>
+        </div>
+    </div>
+</div>
+ <div id="imgShot" style="display: none"></div>
+
+{% endblock container %}
+{% block bottomjs %}
+     {{ block.super }}
+    <script>
+    $(function(){
+        $("#signBtn").on("click", function(event){
+             var confirm = $("#id_confirm").get(0).checked;
+            if(!confirm){
+                weui.alert('请阅读并同意合同条款')
+                $("#id_confirm").focus()
+                return false;
+            }
+            var loading = weui.loading('正在处理数据...');
+            html2canvas(document.getElementById('contract_content')).then(function(canvas){
+                var pic = canvas.toDataURL("image/png");
+                pic = pic.replace(/^data:image\/(png|jpg);base64,/, "")
+                var sign_date = $("#id_sign_date").val();
+                var contractId = $("#contractId").val();
+
+                var params ={
+                     sign_date: sign_date,
+                     confirm: confirm,
+                     contractId: contractId,
+                     content:pic,
+                     csrfmiddlewaretoken:'{{ csrf_token }}',
+                  }
+
+                   $.ajax({
+                      type: 'POST',
+                      url: '{{ request.get_full_path }}',
+                      dataType: 'json',
+                      data: params,
+                      timeout: 20000,
+                      success: function(data){
+                          loading.hide();
+                          if(data.success == "true"){
+                              orderid = data.orderid;
+                              window.location.href = "{% url 'foster-pay' %}?id=" + orderid
+                          }else{
+                              weui.alert('合同签订失败!');
+                          }
+                      },
+                      error: function(error){
+                          loading.hide();
+                          weui.alert('合同签订失败');
+                      }
+                    });
+                });
+
+            });
+    });
+
+    </script>
+{% endblock bottomjs %}

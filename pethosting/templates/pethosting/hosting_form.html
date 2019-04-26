@@ -37,6 +37,10 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.months.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.months }}</div>
             </div>
+            <div class="weui-cell">
+                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.end_time.label }}:</label></div>
+                <div class="weui-cell__bd">{{ form.end_time }}</div>
+            </div>
             <div class="weui-cell  weui-cell_vcode">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.total_fee.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.total_fee }}</div>
@@ -74,6 +78,7 @@
         $("#id_begin_time").on("change", function(event){
             var beginDate = event.target.value;
             if ( beginDate.length == 0 ) return;
+            var months = $("#id_months").val()
             params = {
                 csrfmiddlewaretoken:'{{ csrf_token }}',
                 beginDate: beginDate,
@@ -81,19 +86,25 @@
                 pet_counts: $("input[name='pet_list']:checked").size()
             }
 
+           var date = moment(beginDate).date()
+           var end_time =  moment(beginDate).subtract(date, "days").add(months, "months").format("YYYY-MM-DD");
+            $("#id_end_time").val(end_time)
             calc_price(params);
         });
 
         $("#id_months").on("change", function(event){
             var months = event.target.value;
             if ( months.length == 0 ) return;
+            var beginDate = $("#id_begin_time").val();
             params = {
                 csrfmiddlewaretoken:'{{ csrf_token }}',
-                beginDate: $("#id_begin_time").val(),
+                beginDate: beginDate,
                 months: months,
                 pet_counts: $("input[name='pet_list']:checked").size()
             }
-
+            var date = moment(beginDate).date()
+           var end_time =  moment(beginDate).subtract(date, "days").add(months, "months").format("YYYY-MM-DD");
+            $("#id_end_time").val(end_time)
             calc_price(params);
         });
 

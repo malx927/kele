@@ -131,7 +131,7 @@ class ContractFixInfoAdmin(admin.ModelAdmin):
 
 @admin.register(ContractInfo)
 class ContractInfoAdmin(admin.ModelAdmin):
-    list_display = ('sn', 'second_party', 'second_telephone', 'second_address', 'second_idcard', 'foster_type', 'total_fee', 'sign_date','confirm')
+    list_display = ('sn', 'second_party', 'second_telephone', 'second_address', 'second_idcard', 'begin_date', 'end_date', 'foster_type', 'total_fee', 'sign_date','confirm')
     list_per_page = 50
     search_fields = ['second_party', 'second_telephone', 'sn', 'second_idcard']
     list_filter = ['confirm']

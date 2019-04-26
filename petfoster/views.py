@@ -432,7 +432,10 @@ class FosterCalculateView(View):
     def calculate_price(self, obj, is_member):
         begin_time = obj.cleaned_data["begin_time"]
         end_time = obj.cleaned_data["end_time"]
-        days = (end_time - begin_time).days + 1
+        days = (end_time - begin_time).days
+        if days == 0:
+            days += 1
+        print("days=",days)
         data = {
             "is_member": is_member,
             "big_dog": obj.cleaned_data["big_dog"] or 0,
@@ -787,6 +790,8 @@ class ContractView(View):
             total_fee = order.total_price
             orderid = order.id
             initial = {
+                "begin_date": order.begin_time,
+                "end_date": order.end_time,
                 "foster_type": foster_type,
                 "total_fee": total_fee,
                 "order": orderid,

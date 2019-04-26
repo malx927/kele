@@ -246,6 +246,12 @@ class ContractInfoForm(forms.ModelForm):
         self.fields['second_idcard'].widget.attrs['class'] = 'weui-input'
         self.fields['second_idcard'].widget.attrs['placeholder'] = '请输入乙方身份证号'
 
+        self.fields['begin_date'].widget.attrs['class'] = 'weui-input'
+        self.fields['begin_date'].widget.attrs['readonly'] = 'true'
+
+        self.fields['end_date'].widget.attrs['class'] = 'weui-input'
+        self.fields['end_date'].widget.attrs['readonly'] = 'true'
+
         self.fields['foster_type'].widget.attrs['class'] = 'weui-input'
         self.fields['foster_type'].widget.attrs['readonly'] = 'true'
 
@@ -254,5 +260,5 @@ class ContractInfoForm(forms.ModelForm):
 
     class Meta:
         model = ContractInfo
-        fields = ['first_party','first_telephone','first_address','second_party','second_telephone','second_address','second_idcard','foster_type', 'total_fee', 'order']
+        fields = ['first_party','first_telephone','first_address','second_party','second_telephone','second_address','second_idcard', 'begin_date', 'end_date', 'foster_type', 'total_fee', 'order']
 

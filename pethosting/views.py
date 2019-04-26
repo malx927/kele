@@ -53,6 +53,9 @@ class HostingOrderView(View):
             form["name"].field.initial = owner.name
             form["telephone"].field.initial = owner.telephone
             months = form["months"].field.initial
+            begin_time = form["begin_time"].field.initial
+            day = begin_time.day
+            form["end_time"].field.initial = begin_time + relativedelta(months=+months, days=-day)
         except PetOwner.DoesNotExist as ex:
             pass
 
@@ -90,8 +93,6 @@ class HostingOrderView(View):
             form.instance.openid = user_id
             form.instance.pet_list = pet_list_str
             instance = form.save()
-            # url = "{0}?id={1}".format(reverse("hosting-pay"), instance.id)
-            # return HttpResponseRedirect(url)        # 跳转到支付界面
             url = "{0}?orderid={1}".format(reverse("hosting-contract"), instance.id)
             return HttpResponseRedirect(url)        # 跳转到签订合同
         else:
@@ -308,6 +309,8 @@ class HostingContractView(View):
             total_fee = order.total_fee
             orderid = order.id
             initial = {
+                "begin_date": order.begin_time,
+                "end_date": order.end_time,
                 "total_fee": total_fee,
                 "order": orderid,
             }
