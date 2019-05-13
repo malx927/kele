@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="weui-cells  cells_top">
-                    {% if not code %}
+                    {% if object.qr_status == 0 %}
                     <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">确认码:</label></div>
                         <div class="weui-cell__bd"><a href="{% url 'bath-qrcode-show' %}?orderid={{ object.id }}"  class="weui-btn weui-btn_mini weui-btn_plain-primary">洗浴确认码</a></div>

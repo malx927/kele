@@ -251,26 +251,20 @@ class HostingBalancePayView(View):
             return HttpResponseRedirect(reverse("hosting-pet-list"))
 
     def post(self, request, *args, **kwargs):
+        result = {
+            "success": "false",
+        }
         try:
             id = request.POST.get("id", None)
-            password = request.POST.get("password", None)
             instance = HostingOrder.objects.get( pk=id, status=0 )
             openid = request.session.get('openid', None)
-            if not password:
-                error_msg = u'支付密码不能为空'
-                return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
-            else:
-                user = MemberDeposit.objects.get(openid=openid)
-                bFlag = check_password(password, user.password)
-                if not bFlag:
-                    error_msg = u'支付密码错误'
-                    return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
 
             #生成订单号
             out_trade_no = '{0}{1}{2}'.format('H', datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
 
             pet_ids = instance.pet_list
             pet_list = pet_ids.split(',')
+
             PetFosterInfo.objects.filter(id__in=pet_list).update(begin_time=instance.begin_time, end_time=instance.end_time, is_hosting=True)
 
             deposit = MemberDeposit.objects.get(openid = openid)
@@ -282,16 +276,20 @@ class HostingBalancePayView(View):
             instance.pay_style = 1      # 支付类型( 储值卡消费--1 )
             instance.status = 1
 
-            deposit.consume_money = deposit.consume_money + total_fee     #消费累加
+            deposit.consume_money = deposit.consume_money + total_fee     # 消费累加
             instance.save()
             deposit.save()
             sendTemplateMesToKf(instance, 1)
-            return render(request, template_name="petfoster/message.html")
+            result["success"] = "true"
+            return JsonResponse(result)
         except HostingOrder.DoesNotExist as ex:
-            return HttpResponseRedirect(reverse("hosting-pet-list"))
+            return JsonResponse(result)
+            # return HttpResponseRedirect(reverse("hosting-pet-list"))
         except MemberDeposit.DoesNotExist as ex:
-
-            return HttpResponseRedirect(reverse("hosting-pet-list"))
+            return JsonResponse(result)
+            # return HttpResponseRedirect(reverse("hosting-pet-list"))
+        except Exception as ex:
+            return JsonResponse(result)
 
 
 class HostingContractView(View):

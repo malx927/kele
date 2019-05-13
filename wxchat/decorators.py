@@ -43,7 +43,8 @@ def weixin_decorator(func):
             request.session['openid'] = openid
             userinf = get_object_or_404(WxUserinfo, openid=openid)
             request.session['nickname'] = userinf.nickname
-            request.session['is_member'] = userinf.is_member
+            # request.session['is_member'] = userinf.is_member
+            request.session['is_member'] = 1
             request.session['headimgurl'] = userinf.headimgurl
             request.session['role'] = userinf.member_role.id if userinf.member_role else 0
             return func(request, *args, **kwargs)

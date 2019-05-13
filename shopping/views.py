@@ -18,7 +18,7 @@ from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreD
     MemberRechargeAmount, MemberRechargeRecord, MemberDeposit, MarketPlan
 from petfoster.models import FosterStyleChoose
 from wxchat.utils import random_number
-from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser
+from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser, sendChargeSuccessToUser
 from wechatpy.pay import WeChatPay
 from wechatpy.pay.utils import  dict_to_xml
 from wxchat.models import WxUserinfo,WxUnifiedOrderResult,WxPayResult, WxIntroduce, WxTemplateMsgUser
@@ -455,7 +455,7 @@ def payNotify(request):
                         "pay_time": pay_time
                     }
 
-                    MemberRechargeRecord.objects.update_or_create( defaults=data, out_trade_no=out_trade_no )
+                    obj,created =  MemberRechargeRecord.objects.update_or_create( defaults=data, out_trade_no=out_trade_no )
 
                     try:
                         deposit = MemberDeposit.objects.get(openid=openid)
@@ -482,6 +482,7 @@ def payNotify(request):
                         user.save()
                         # 发送密码给用户
                         resetPassword(deposit)
+                    sendChargeSuccessToUser(obj) # 发送通知
                 else:
                     order =getShoppingOrder(openid, res_data['out_trade_no'])
                     if order and order.status==0 :
@@ -654,11 +655,11 @@ class RechargeAmountView(View):
         openid = request.session.get("openid", None)
         #托管充值
         if hosting == "1":
-            counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=2000).count()
+            counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=1000).count()
             if counts > 0:
-                amounts = MemberRechargeAmount.objects.filter(money__gte=1000)
+                amounts = MemberRechargeAmount.objects.filter(money__gte=500)
             else:
-                amounts = MemberRechargeAmount.objects.filter(money__gte=2000)
+                amounts = MemberRechargeAmount.objects.filter(money__gte=1000)
         else:
             amounts = MemberRechargeAmount.objects.all()
         signPackage = getJsApiSign(self.request)
@@ -691,7 +692,7 @@ class RechargeAmountView(View):
             prepay_id = data.get('prepay_id',None)
             save_data = dict(data)
             #保存统一订单数据
-            WxUnifiedOrdeResult.objects.create(**save_data)
+            WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
                 return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
                 return HttpResponse(json.dumps(return_data))
@@ -727,7 +728,7 @@ class MemberHostingCondition(View):
     def get(self, request, *args, **kwargs):
 
         openid = request.session.get("openid", None)
-        counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=2000).count()
+        counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=1000).count()
         context = {
                 "success": "false",
                 "counts": 0 ,

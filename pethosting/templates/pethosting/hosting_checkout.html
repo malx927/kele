@@ -6,7 +6,41 @@
     wx.ready(function () {
 
         $('#pay_now_balance').on('click',function(){
-            window.location.href = "{% url 'hosting-pay-balance' %}?id=" + $("#id").text();
+                var params ={
+                      id: $("#id").text(),
+                      csrfmiddlewaretoken:'{{ csrf_token }}',
+                }
+               var ts = sessionStorage.getItem('host_checkout');
+               if(ts==null) {
+                   sessionStorage.setItem('host_checkout', new Date().getTime());
+               }
+               else{
+                   var cur_ts = new Date().getTime();
+                   var diff = (cur_ts - Number(ts))/1000;
+                   if(diff < 20 ){
+                       weui.alert('您刚才已经提交过，如果没有成功请30秒后再提交!');
+                        return false;
+                   }
+                   sessionStorage.setItem('host_checkout', cur_ts);
+               }
+               $.ajax({
+                      type: 'POST',
+                      url: '{% url "hosting-pay-balance" %}',
+                      dataType: 'json',
+                      data: params,
+                      timeout: 5000,
+                      success: function(data){
+                          if(data.success == "true"){
+                               window.location.href = "{% url 'foster-message' %}";
+                          }
+                          else{
+                               window.location.href = "{% url 'hosting-pet-list' %}";
+                          }
+                      },
+                      error: function(error){
+                          window.location.href = "{% url 'hosting-pet-list' %}";
+                      }
+               });
         });
 
 

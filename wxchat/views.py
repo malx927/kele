@@ -190,16 +190,6 @@ def saveUserinfo(openid, scene_id=None):
                 obj.is_member = 1
                 obj.save()
                 ret = client.message.send_text(openid, SEND_MSG)
-                if scene_id != SCENE_STR:
-                    intro_user = WxUserinfo.objects.get(qr_scene=scene_id)
-                    # 创建推荐表数据
-                    defaults = {
-                        'nickname': obj.nickname,
-                        'introduce_name': intro_user.nickname,
-                        'introduce_id': intro_user.openid,
-                    }
-                    WxIntroduce.objects.get_or_create(openid=obj.openid, defaults=defaults)
-
         except WxUserinfo.DoesNotExist:
             pass
     else:
@@ -1121,7 +1111,7 @@ def getPayInfo(request):
         # print(prepay_id,data,888888888)
         save_data = dict(data)
         # 保存统一订单数据
-        WxUnifiedOrdeResult.objects.create(**save_data)
+        WxUnifiedOrderResult.objects.create(**save_data)
 
         if prepay_id:
             return_data = wxPay.jsapi.get_jsapi_params(prepay_id=prepay_id, jssdk=True)
@@ -1407,6 +1397,44 @@ def sendPasswordTemplateMesToUser(instance, mode=0):
            }
         }
         client.message.send_template(user_id=instance.openid, template_id = template_modify , url='', data=modify_data)
+
+
+# {{first.DATA}}用户：{{keyword1.DATA}}帐号：{{keyword2.DATA}}充值金额：{{keyword3.DATA}}{{remark.DATA}}
+def sendChargeSuccessToUser(instance):
+    """充值成功提醒"""
+    template = 'o4BmIroTfp2XHlTQSzTeO7LQ_JeZnUgfEN3HSjOX2uk' # 充值成功提醒
+
+    color = "#173177"
+    data ={
+        'first':{
+            "value": u'账户充值成功!',
+            "color":color
+        },
+        "keyword1":{
+           "value":instance.nickname,
+           "color":color
+        },
+        "keyword2":{
+           "value":instance.openid,
+           "color":color
+        },
+        "keyword3": {
+            "value": "{}元".format(instance.cash_fee),
+            "color": color
+        },
+        "remark":{
+           "value":"{}充值{}成功".format(instance.pay_time, instance.cash_fee),
+           "color":color
+       }
+    }
+
+    client.message.send_template(user_id=instance.openid, template_id = template, url='', data=data)
+
+    msgUsers = WxTemplateMsgUser.objects.filter(is_check=1)
+    for user in msgUsers:
+        ret = client.message.send_template(user_id=user.user.openid, template_id = template, url='', data=data)
+        print(ret)
+
 
 @weixin_decorator
 def dogIndex(request):

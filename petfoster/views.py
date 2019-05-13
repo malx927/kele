@@ -432,10 +432,7 @@ class FosterCalculateView(View):
     def calculate_price(self, obj, is_member):
         begin_time = obj.cleaned_data["begin_time"]
         end_time = obj.cleaned_data["end_time"]
-        days = (end_time - begin_time).days
-        if days == 0:
-            days += 1
-        print("days=",days)
+        days = (end_time - begin_time).days + 1
         data = {
             "is_member": is_member,
             "big_dog": obj.cleaned_data["big_dog"] or 0,

@@ -185,11 +185,11 @@
        var end_time = $("#id_end_time").val();
        var curDate = getCurrDate();
 
-       if( begin_time < curDate ){
-           weui.alert("开始时间不能小于当前时间");
-           $("#id_begin_time").focus();
-           return false
-       }
+       {#if( begin_time < curDate ){#}
+       {#    weui.alert("开始时间不能小于当前时间");#}
+       {#    $("#id_begin_time").focus();#}
+       {#    return false#}
+       {#}#}
         if( end_time < begin_time ){
            weui.alert("结束时间不能小于开始时间");
            $("#id_end_time").focus();

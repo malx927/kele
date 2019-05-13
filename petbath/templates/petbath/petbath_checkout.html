@@ -107,10 +107,6 @@
                 <div class="weui-cells  cells_top">
                     {% if instance.status == 1 %}
                     <div class="weui-cell">
-                        <div class="weui-cell__hd"><label for="" class="weui-label">确认码:</label></div>
-                        <div class="weui-cell__bd"><a href="javascript:;" id="pet_code" class="weui-btn weui-btn_mini weui-btn_plain-primary">洗浴确认码</a></div>
-                    </div>
-                    <div class="weui-cell">
                         <div class="weui-cell__hd"><label for="" class="weui-label">订单号:</label></div>
                         <div class="weui-cell__bd">{{ instance.out_trade_no|default:'' }}</div>
                     </div>
@@ -171,37 +167,7 @@
     {{ block.super }}
     <script>
     $(function(){
-
-
-         $("#pet_code").on("click", function(){
-                var params ={
-                  orderid: $("#id").text(),
-                  csrfmiddlewaretoken:'{{ csrf_token }}'
-                }
-
-               $.ajax({
-                  type: 'POST',
-                  url: '{% url "foster-pet-code" %}',
-                  dataType: 'json',
-                  data: params,
-                  timeout: 5000,
-                  success: function(data){
-                      if(data.success=="true"){
-                          weui.alert("洗浴确认码:" + data.code);
-                          if( $("#pet_vcode").length > 0 ){
-                              $("#pet_vcode").val(data.code);
-                          }
-                      }
-                      else{
-                          weui.alert("提取失败！");
-                      }
-                  },
-                  error: function(error){
-                      weui.alert("提取失败!");
-                  }
-                });
-            });
-
+        
     })
     </script>
 {% endblock bottomjs %}

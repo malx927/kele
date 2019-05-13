@@ -1,4 +1,11 @@
 {% extends 'wxchat/wxbase.html' %}{% load static %}{% load thumbnail %}
+{% block extra %}
+    <style>
+    .claim_content{
+        padding-left:10px;
+    }
+    </style>
+{% endblock extra %}
 {% block container %}
 <div class="weui-tab" id="tab">
     <div class="weui-tab__panel">
@@ -18,27 +25,27 @@
                     <div class="weui-cell__ft"></div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（1）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content">要求入园时必须携带犬证。</p>
+                        <p class="claim_content">(1)要求入园时必须携带犬只免疫证。</p>
                     </div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（2）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content">要求6月以上10岁以下犬只。</p>
+                        <p class="claim_content">(2)要求6月以上10岁以下犬只。</p>
                     </div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（3）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content">要求身体健康无病无残疾。</p>
+                        <p class="claim_content">(3)要求身体健康无病无残疾。</p>
                     </div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（4）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content">只接收大中型犬只入住,小型犬不予托管。</p>
+                        <p class="claim_content">(4)只接收大中型犬只入住,小型犬不予托管。</p>
                     </div>
                 </div>
                <div class="weui-cell">
@@ -47,15 +54,15 @@
                     <div class="weui-cell__ft"></div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（1）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content" style="color: red">托管服务时间按月计算，每月1日到15日入园的按整月计算，15日以后入园的按半月计算。</p>
+                        <p class="claim_content" style="color: red">(1)托管服务时间按月计算，每月1日到15日入园的按整月计算，15日以后入园的按半月计算。</p>
                     </div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（2）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
-                        <p class="claim_content">（2）托管日期为除法定节假日和休息日之外的日期，法定节假 日宠物主人应将宠物接回，不接走的需要提前购买寄养服务。</p>
+                        <p class="claim_content">(2)托管日期为除法定节假日和休息日之外的日期，法定节假 日宠物主人应将宠物接回，不接走的需要提前购买寄养服务。</p>
                     </div>
                 </div>
                <div class="weui-cell">
@@ -64,7 +71,7 @@
                     <div class="weui-cell__ft"></div>
                 </div>
                 <div class="weui-cell">
-                    <div class="weui-cell__hd">（1）</div>
+                    <div class="weui-cell__hd"></div>
                     <div class="weui-cell__bd">
                         <p class="claim_content">托管宠物需要缴纳500元/只弃养保证金，弃养保证金用于宠物主人弃养宠物后处置宠物所需费用。</p>
                     </div>

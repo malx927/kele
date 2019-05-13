@@ -29,7 +29,7 @@ def foster_calc_price(data):
     bigPrice = big_prices.vipprice if is_member ==1 else big_prices.price
     midPrice = mid_prices.vipprice if is_member ==1 else mid_prices.price
     smlPrice = sml_prices.vipprice if is_member ==1 else sml_prices.price
-
+    print("midPrice=",midPrice)
     bPrice = mPrice = sPrice = 0
     #单舍寄养(每只犬价格，使用短期大型犬价格)
     if mode == 1:
