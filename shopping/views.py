@@ -729,13 +729,35 @@ class MemberHostingCondition(View):
 
         openid = request.session.get("openid", None)
         counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=1000).count()
-        context = {
+        if counts == 0:
+            context = {
                 "success": "false",
                 "counts": 0 ,
             }
-        if counts > 0:
-            context["success"] = "true"
-            context["counts"] = counts
+            return JsonResponse(context)
+
+        try:
+            deposit = MemberDeposit.objects.get(openid=openid)
+        except MemberDeposit.DoesNotExist as ex:
+            context = {
+                "success": "false",
+                "counts": counts,
+                "msg": "用户不存在"
+            }
+            return JsonResponse(context)
+
+        if deposit.balance() <= settings.HOSTING_LOW_DEPOSIT:
+            context = {
+                "success": "false",
+                "counts": counts,
+                "msg": "托管过程中储值卡余额不能低于500元"
+            }
+            return JsonResponse(context)
+
+        context = {
+            "success": "true",
+            "counts": counts,
+        }
 
         return JsonResponse(context)
 

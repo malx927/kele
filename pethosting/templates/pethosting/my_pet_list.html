@@ -101,9 +101,16 @@
                      window.location.href = "{% url 'hosting-order' %}";
                   }
                   else{
-                      weui.alert('首次充值金额超过1000元,才可以托管或者您的储值卡金额不够，请先充值', function(){
-                          window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
-                      });
+                      if(data.counts == 0){
+                           weui.alert('首次充值金额超过1000元,才可以托管或者您的储值卡金额不够，请先充值', function(){
+                              window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
+                          });
+                      }else {
+                            weui.alert(data.msg, function(){
+                                window.location.href = "{% url 'member-recharge-amount' %}?hosting=1";
+                            });
+                      }
+
                   }
               },
               error: function(error){

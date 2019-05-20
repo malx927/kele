@@ -479,10 +479,18 @@ class FosterPayView(View):
                 deposit = MemberDeposit.objects.get(openid=openid)
                 balance = deposit.balance()
                 total_fee = instance.total_price
-                if balance >= total_fee:
-                    weixin_pay = False
+                cur_date = datetime.datetime.now().date()
+                counts = HostingOrder.objects.filter(openid=openid, end_time__gte=cur_date).count()
+                if counts > 0:
+                    if balance >= total_fee + settings.HOSTING_LOW_DEPOSIT:
+                        weixin_pay = False
+                    else:
+                        weixin_pay = True
                 else:
-                    weixin_pay = True
+                    if balance >= total_fee:
+                        weixin_pay = False
+                    else:
+                        weixin_pay = True
             except MemberDeposit.DoesNotExist as ex:
                 weixin_pay = True
 
@@ -1167,16 +1175,15 @@ class PrintNote(View):
                     print_service = YlyPrint(rpc_client)
                     content = "<FS2><center>**大眼可乐宠物寄养**</center></FS2>"
                     demand = pet.fosterdemand_set.all().first()
-                    content += "<FH>开始时间:{}</FH>\n".format(order.begin_time)
-                    content += "<FH>结束时间:{}</FH>\n".format(order.end_time)
-                    content += "<FH>主人姓名:{}</FH>\n".format(owner.name)
-                    content += "<FH>电    话:{}</FH>\n".format(owner.telephone)
-                    content += "<FH>宠物昵称:{}</FH>\n".format(pet.name)
+                    content += "<FS2>开始时间:{}</FS2>\n".format(order.begin_time)
+                    content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
+                    content += "<FS2>主人姓名:{}</FS2>\n".format(owner.name)
+                    content += "<FS2>电    话:{}</FS2>\n".format(owner.telephone)
+                    content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
                     if demand:
-                        content += "<FH>每天几餐:{}</FH>\n".format(demand.day_meals)
-                        content += "<FH>每餐数量:{}</FH>\n".format(demand.meals_nums)
-                        content += "<FH>加餐情况:{}</FH>\n".format(demand.extra_meal)
-                    content += "<FS><center>*****完****</center></FS>"
+                        content += "<FS2>每天几餐:{}</FS2>\n".format(demand.day_meals)
+                        content += "<FS2>每餐数量:{}</FS2>\n".format(demand.meals_nums)
+                        content += "<FS2>加餐情况:{}</FS2>\n".format(demand.extra_meal)
                     order_id = '{}{}'.format(out_trade_no, pet.id)
                     ret = print_service.index(settings.MACHINECODE, content, order_id)
                     print(ret,'0000000000000')
@@ -1193,16 +1200,15 @@ class PrintNote(View):
                     print_service = YlyPrint(rpc_client)
                     content = "<FS2><center>**大眼可乐宠物托管**</center></FS2>";
                     demand = pet.fosterdemand_set.all().first()
-                    content += "<FH>开始时间:{}</FH>\n".format(order.begin_time)
-                    content += "<FH>结束时间:{}</FH>\n".format(order.end_time)
-                    content += "<FH>主人姓名:{}</FH>\n".format(order.name)
-                    content += "<FH>电    话:{}</FH>\n".format(order.telephone)
-                    content += "<FH>宠物昵称:{}</FH>\n".format(pet.name)
+                    content += "<FS2>开始时间:{}</FS2>\n".format(order.begin_time)
+                    content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
+                    content += "<FS2>主人姓名:{}</FS2>\n".format(order.name)
+                    content += "<FS2>电    话:{}</FS2>\n".format(order.telephone)
+                    content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
                     if demand:
-                        content += "<FH>每天几餐:{}</FH>\n".format(demand.day_meals)
-                        content += "<FH>每餐数量:{}</FH>\n".format(demand.meals_nums)
-                        content += "<FH>加餐情况:{}</FH>\n".format(demand.extra_meal)
-                    content += "<FS><center>*****完****</center></FS>"
+                        content += "<FS2>每天几餐:{}</FS2>\n".format(demand.day_meals)
+                        content += "<FS2>每餐数量:{}</FS2>\n".format(demand.meals_nums)
+                        content += "<FS2>加餐情况:{}</FS2>\n".format(demand.extra_meal)
                     order_id = '{}{}'.format(out_trade_no, pet.id)
                     print_service.index(settings.MACHINECODE, content, order_id)
                     time.sleep(0.5)
