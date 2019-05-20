@@ -215,6 +215,14 @@
                             <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'hosting-contract-detail' %}?contract_id={{ contract_id }}">托管协议</a></p>
                         </div>
                     </div>
+                    {% if request.session.role == 2 or request.session.role == 1 %}
+                     <div class="weui-cell">
+                        <div class="weui-cell__hd"></div>
+                        <div class="weui-cell__bd" >
+                            <p><a id="print_note" class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="javascrpt:void(0)">打印小票</a></p>
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -284,6 +292,33 @@
         $("#pet_send").on("click", function(){
                 window.location.href = "{% url 'hosting-qrcode-show' %}?orderid={{ instance.id }}&flag=send"
          });
+         $("#print_note").on("click", function(){
+
+                var params ={
+                  out_trade_no: '{{ instance.out_trade_no }}',
+                  csrfmiddlewaretoken:'{{ csrf_token }}',
+                  flag: "hosting",
+                }
+
+               $.ajax({
+                  type: 'POST',
+                  url: '{% url "print-note" %}',
+                  dataType: 'json',
+                  data: params,
+                  timeout: 5000,
+                  success: function(data){
+                     if(data.error == 0){
+                         weui.alert("打印成功");
+                     }
+                     else{
+                         weui.alert("打印失败:" + data.error_description);
+                      }
+                  },
+                  error: function(error){
+                      weui.alert("打印失败!");
+                  }
+                });
+            });
 
     })
     </script>

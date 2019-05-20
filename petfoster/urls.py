@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
    FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView, ContractList, \
    FosterPetStop, FosterPetListView, FosterPetDemandDetailView, FosterPetAllListView, FosterQrCodeView, \
-   FosterQrCodeShowView, FosterQrCodeAckView, FosterRenewView
+   FosterQrCodeShowView, FosterQrCodeAckView, FosterRenewView, PrintNote
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView,\
    FosterPetsList, FosterPetCode
@@ -51,5 +51,6 @@ urlpatterns = [
    url(r'^qrcodeack/$', FosterQrCodeAckView.as_view(), name='foster-qrcode-ack'),  # 确认二维码
    url(r'^fosterrenew/$', FosterRenewView.as_view(), name='foster-renew'),  # 寄养续费
    url(r'^fostermessage/$', TemplateView.as_view(template_name="petfoster/message.html"), name='foster-message'),  # 提示
+   url(r'^printnote/$', PrintNote.as_view(), name='print-note'),  # 打印小票
 
 ]

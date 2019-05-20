@@ -1,9 +1,11 @@
 import  datetime,random
 import json
+
+import redis
 from PIL import Image
 import os, base64, time
 from django.contrib.auth.hashers import check_password
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +13,12 @@ from django.views.generic import  View, ListView, DetailView
 from django.db.models import Max, Q
 # Create your views here.
 from io import BytesIO
+
+from pethosting.models import HostingOrder
+from yilianyunsdk.Config.config import Config
+from yilianyunsdk.Oauth.oauth import Oauth
+from yilianyunsdk.Protocol.rpc_client import RpcClient
+from yilianyunsdk.Api.yly_print import YlyPrint
 from wechatpy import WeChatPayException
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.pay import dict_to_xml
@@ -1089,3 +1097,125 @@ class FosterRenewView(View):
 
     def post(self, request, *args, **kwargs):
         pass
+
+
+
+class PrintNote(View):
+    """寄养托管订单打印"""
+    def connect_redis(self):
+        """链接Redis"""
+        pool = redis.ConnectionPool(host=settings.YLY_REDIS_URL, port=6379)
+        try:
+            redis_client = redis.Redis(connection_pool=pool)
+        except Exception as err:
+            raise err
+        return redis_client
+
+    def get_access_token(self, *args, **kwargs):
+        r = self.connect_redis()
+        access_token = r.get(settings.CLIENT_ID)
+        b_expires_at = r.get(settings.CLIENT_SECRET)
+
+        if access_token and b_expires_at:
+            timestamp = time.time()
+            expires_at = int(b_expires_at)
+            if expires_at - timestamp > 3600:
+                res = {
+                    "error": 0,
+                    "error_description": "success",
+                    "access_token": access_token.decode(),
+                }
+                return res
+
+        config = Config(settings.CLIENT_ID, settings.CLIENT_SECRET)
+        oauth_client = Oauth(config)
+        token_data = oauth_client.get_token()
+        result = {}
+        if token_data["error"] == "0":
+            access_token = token_data['body']['access_token']
+            expires_in = token_data['body']['expires_in']
+            r.set(settings.CLIENT_ID, access_token, expires_in)
+            expires_at = int(time.time()) + expires_in
+            r.set(settings.CLIENT_SECRET, expires_at)
+            result["access_token"] = access_token
+
+        result["error"] = token_data["error"]
+        result["error_description"] = token_data["error_description"]
+
+        return access_token
+
+    def post(self, request, *args, **kwargs):
+        out_trade_no = request.POST.get("out_trade_no", None)
+        flag = request.POST.get("flag", None)
+        try:
+            result = self.get_access_token()
+            if result["error"] != 0:
+                return JsonResponse(result)
+
+            access_token = result["access_token"]
+            config = Config(settings.CLIENT_ID, settings.CLIENT_SECRET)
+
+            # 主人姓名。电话。宠物名字。饮食情况 托管和寄养的起始时间
+            if flag =="foster":         # 寄养
+                order = FosterStyleChoose.objects.get(out_trade_no=out_trade_no)
+                owner = PetOwner.objects.get(openid=order.openid)
+                pet_list = order.pet_list
+                pet_id_list = pet_list.split(',') if len(order.pet_list) > 0 else []
+                pet_infos = PetFosterInfo.objects.filter(id__in=pet_id_list)
+                for pet in pet_infos:
+                    rpc_client = RpcClient(config, access_token)
+                    print_service = YlyPrint(rpc_client)
+                    content = "<FS2><center>**大眼可乐宠物寄养**</center></FS2>"
+                    demand = pet.fosterdemand_set.all().first()
+                    content += "<FH>开始时间:{}</FH>\n".format(order.begin_time)
+                    content += "<FH>结束时间:{}</FH>\n".format(order.end_time)
+                    content += "<FH>主人姓名:{}</FH>\n".format(owner.name)
+                    content += "<FH>电    话:{}</FH>\n".format(owner.telephone)
+                    content += "<FH>宠物昵称:{}</FH>\n".format(pet.name)
+                    if demand:
+                        content += "<FH>每天几餐:{}</FH>\n".format(demand.day_meals)
+                        content += "<FH>每餐数量:{}</FH>\n".format(demand.meals_nums)
+                        content += "<FH>加餐情况:{}</FH>\n".format(demand.extra_meal)
+                    content += "<FS><center>*****完****</center></FS>"
+                    order_id = '{}{}'.format(out_trade_no, pet.id)
+                    ret = print_service.index(settings.MACHINECODE, content, order_id)
+                    print(ret,'0000000000000')
+                    time.sleep(0.5)
+
+            elif flag == "hosting":     # 托管
+                order = HostingOrder.objects.get(out_trade_no=out_trade_no)
+                pet_list = order.pet_list
+                pet_id_list = pet_list.split(',') if len(order.pet_list) > 0 else []
+                pet_infos = PetFosterInfo.objects.filter(id__in=pet_id_list)
+
+                for pet in pet_infos:
+                    rpc_client = RpcClient(config, access_token)
+                    print_service = YlyPrint(rpc_client)
+                    content = "<FS2><center>**大眼可乐宠物托管**</center></FS2>";
+                    demand = pet.fosterdemand_set.all().first()
+                    content += "<FH>开始时间:{}</FH>\n".format(order.begin_time)
+                    content += "<FH>结束时间:{}</FH>\n".format(order.end_time)
+                    content += "<FH>主人姓名:{}</FH>\n".format(order.name)
+                    content += "<FH>电    话:{}</FH>\n".format(order.telephone)
+                    content += "<FH>宠物昵称:{}</FH>\n".format(pet.name)
+                    if demand:
+                        content += "<FH>每天几餐:{}</FH>\n".format(demand.day_meals)
+                        content += "<FH>每餐数量:{}</FH>\n".format(demand.meals_nums)
+                        content += "<FH>加餐情况:{}</FH>\n".format(demand.extra_meal)
+                    content += "<FS><center>*****完****</center></FS>"
+                    order_id = '{}{}'.format(out_trade_no, pet.id)
+                    print_service.index(settings.MACHINECODE, content, order_id)
+                    time.sleep(0.5)
+
+        except FosterStyleChoose.DoesNotExist as ex:
+            result = {
+                "error": 99,
+                "error_description": "寄养订单不存在"
+            }
+        except HostingOrder.DoesNotExist as ex:
+            result = {
+                "error": 100,
+                "error_description": "托管订单不存在"
+            }
+
+        return JsonResponse(result)
