@@ -1177,7 +1177,6 @@ class PrintNote(View):
                     demand = pet.fosterdemand_set.all().first()
                     content += "<FS2>开始时间:{}</FS2>\n".format(order.begin_time)
                     content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
-                    content += "<FS2>主人姓名:{}</FS2>\n".format(owner.name)
                     content += "<FS2>电    话:{}</FS2>\n".format(owner.telephone)
                     content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
                     if demand:
@@ -1186,7 +1185,6 @@ class PrintNote(View):
                         content += "<FS2>加餐情况:{}</FS2>\n".format(demand.extra_meal)
                     order_id = '{}{}'.format(out_trade_no, pet.id)
                     ret = print_service.index(settings.MACHINECODE, content, order_id)
-                    print(ret,'0000000000000')
                     time.sleep(0.5)
 
             elif flag == "hosting":     # 托管
@@ -1202,7 +1200,6 @@ class PrintNote(View):
                     demand = pet.fosterdemand_set.all().first()
                     content += "<FS2>开始时间:{}</FS2>\n".format(order.begin_time)
                     content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
-                    content += "<FS2>主人姓名:{}</FS2>\n".format(order.name)
                     content += "<FS2>电    话:{}</FS2>\n".format(order.telephone)
                     content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
                     if demand:

@@ -78,6 +78,9 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['type'].widget.attrs['class'] = 'weui-input'
         self.fields['type'].widget.attrs['placeholder'] = '请输入宠物品种'
 
+        self.fields['category'].widget.attrs['class'] = 'weui-select height'
+        # self.fields['category'].empty_label = '请选择'
+
         self.fields['color'].widget.attrs['class'] = 'weui-input'
         self.fields['color'].widget.attrs['placeholder'] = '请输入宠物毛色'
 
@@ -89,6 +92,7 @@ class PetFosterInfoForm(forms.ModelForm):
 
         self.fields['sterilization'].widget.attrs['class'] = 'weui-select height'
         self.fields['sterilization'].empty_label='请选择'
+
 
         self.fields['vaccine'].widget.attrs['class'] = 'weui-select height'
         self.fields['vaccine'].empty_label='请选择'
@@ -116,7 +120,7 @@ class PetFosterInfoForm(forms.ModelForm):
 
     class Meta:
         model = PetFosterInfo
-        fields = ['name','birthdate','type','color','sex','weight', 'sterilization','vaccine','parasite','illness','infection','owner','picture','telephone','address', 'id_card']
+        fields = ['name','birthdate','type','color','sex','category','weight', 'sterilization','vaccine','parasite','illness','infection','owner','picture','telephone','address', 'id_card']
         # fields ="__all__"
         widgets  = {
             'birthdate': forms.TextInput({'class': 'weui-input', 'type': 'date'}),

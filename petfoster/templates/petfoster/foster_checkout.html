@@ -218,6 +218,14 @@
 {#                        <div class="weui-cell__hd"><label class="weui-label">地址:</label></div>#}
 {#                        <div class="weui-cell__bd">{{ petowner.address }}</div>#}
 {#                    </div>#}
+                    {% if request.session.role == 2 or request.session.role == 1 %}
+                    <div class="weui-cell">
+                        <div class="weui-cell__hd"></div>
+                        <div class="weui-cell__bd" >
+                            <p><a id="print_note" class="weui-btn  weui-btn_plain-primary" href="javascrpt:void(0)">打印小票</a></p>
+                        </div>
+                    </div>
+                  {% endif %}
                 </div>
                 <div class="weui-cells__title">寄养宠物</div>
                 <div class="weui-cells flex_wrap" >
@@ -235,15 +243,8 @@
                             <p><a class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="{% url 'foster-contract-detail' %}?contract_id={{ contract_id }}">寄养协议</a></p>
                         </div>
                     </div>
-                    {% if request.session.role == 2 or request.session.role == 1 %}
-                    <div class="weui-cell">
-                        <div class="weui-cell__hd"></div>
-                        <div class="weui-cell__bd" >
-                            <p><a id="print_note" class="weui-btn  weui-btn_mini weui-btn_plain-primary" href="javascrpt:void(0)">打印小票</a></p>
-                        </div>
-                    </div>
-                    {% endif %}
                 </div>
+
             </div>
         </div>
     </div>
