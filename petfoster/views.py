@@ -256,7 +256,7 @@ class PetFosterInfoListView(ListView):
     queryset = PetFosterInfo.objects.all()
 
     def get_queryset(self):
-        user_id = self.request.session.get('openid',None )
+        user_id = self.request.session.get('openid', None)
         return super(PetFosterInfoListView,self).get_queryset().filter(openid=user_id)
 
 
@@ -432,6 +432,84 @@ class FosterCalculateView(View):
                 # return HttpResponseRedirect(url)        # 跳转到签订合同
                 url = "{0}?orderid={1}".format(reverse("foster-contract"), instance.id)
                 return HttpResponseRedirect(url)        # 跳转到签订合同
+        else:
+            print(form.errors)
+            return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
+
+
+    def calculate_price(self, obj, is_member):
+        begin_time = obj.cleaned_data["begin_time"]
+        end_time = obj.cleaned_data["end_time"]
+        days = (end_time - begin_time).days + 1
+        data = {
+            "is_member": is_member,
+            "big_dog": obj.cleaned_data["big_dog"] or 0,
+            "middle_dog": obj.cleaned_data["middle_dog"] or 0,
+            "small_dog": obj.cleaned_data["small_dog"] or 0,
+            "foster_type": obj.cleaned_data["foster_type"].id,
+            "foster_mode": obj.cleaned_data["foster_mode"].id,
+            "days": days or 0
+        }
+        result_data = foster_calc_price( data )
+        if result_data:
+            result_data["days"] = days
+
+        instance = obj.save(False)
+        instance.big_price = result_data["big_price"] or 0
+        instance.middle_price = result_data["mid_price"] or 0
+        instance.small_price = result_data["sml_price"] or 0
+        instance.total_price = result_data["total_price"] or 0
+        obj.days = days
+        return  obj
+
+class FosterCalcPayView(View):
+
+    def get(self,request):
+        member = request.GET.get("member", None)
+        openid = request.session.get("openid", None)
+        if openid is None:
+            openid = 'oX5Zn04Imn5RlCGlhEVg-aEUCHNs'
+            request.session['openid'] = openid
+
+        form =  FosterStyleChooseForm()
+
+        myPets = PetFosterInfo.objects.filter(openid=openid)
+
+        context={
+            "form": form,
+            "member": member,
+            "pets": myPets,
+        }
+        return render(request, template_name="petfoster/foster_calc_pay.html", context=context )
+
+    def post(self,request):
+        order_id = request.POST.get("id", None)
+        if order_id:
+            order = FosterStyleChoose.objects.get(pk=int(order_id))
+            form = FosterStyleChooseForm(request.POST, instance=order)
+        else:
+            form = FosterStyleChooseForm(request.POST or None)
+        if form.is_valid():
+            # 寄养缴费
+            user_id = request.session.get("openid", None)
+            is_member = request.session.get("is_member", None)
+            pet_list = request.POST.getlist("pet_list", None)
+
+            if pet_list:
+                pet_list_str = ','.join(pet_list)
+                form.instance.pet_list = pet_list_str
+            else:
+                petlist = request.POST.get("petlist")
+                form.instance.pet_list = petlist
+
+            form = self.calculate_price( form, is_member)
+
+            form.instance.openid = user_id
+            instance = form.save()
+            # url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
+            # return HttpResponseRedirect(url)        # 跳转到签订合同
+            url = "{0}?orderid={1}".format(reverse("foster-contract"), instance.id)
+            return HttpResponseRedirect(url)        # 跳转到签订合同
         else:
             print(form.errors)
             return render(request, template_name="petfoster/foster_calc.html", context={"form": form })
@@ -1179,6 +1257,7 @@ class PrintNote(View):
                     content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
                     content += "<FS2>电    话:{}</FS2>\n".format(owner.telephone)
                     content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
+                    content += "<FS2>房    间:{}</FS2>\n".format(pet.room.name)
                     if demand:
                         content += "<FS2>每天几餐:{}</FS2>\n".format(demand.day_meals)
                         content += "<FS2>每餐数量:{}</FS2>\n".format(demand.meals_nums)
@@ -1202,6 +1281,7 @@ class PrintNote(View):
                     content += "<FS2>结束时间:{}</FS2>\n".format(order.end_time)
                     content += "<FS2>电    话:{}</FS2>\n".format(order.telephone)
                     content += "<FS2>宠物昵称:{}</FS2>\n".format(pet.name)
+                    content += "<FS2>房    间:{}</FS2>\n".format(pet.room.name)
                     if demand:
                         content += "<FS2>每天几餐:{}</FS2>\n".format(demand.day_meals)
                         content += "<FS2>每餐数量:{}</FS2>\n".format(demand.meals_nums)

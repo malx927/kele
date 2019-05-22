@@ -49,7 +49,7 @@
                             <div class="weui-flex__item"><span>绝育：</span>{{ object.get_sterilization_display }}</div>
                          </div>
                          <div class="weui-flex">
-                            <div class="weui-flex__item"><span>状态：</span>{% if object.is_end %}<em class="color-danger">正在寄养</em> {% else %}无{% endif %}</div>
+                            <div class="weui-flex__item"><span>状态：</span><em class="color-danger">{{ object.get_is_hosting_display }}</em></div>
                          </div>
                     </div>
                     <div class="weui-cell__ft"></div>
@@ -91,7 +91,7 @@
                 return false;
             }
 
-            window.location.href = "{% url 'foster-style-calc' %}";
+            window.location.href = "{% url 'foster-style-calc-pay' %}";
         })
 
         $("a[id^='code']").on('click',function(){

@@ -4,8 +4,23 @@ from django.db import models
 
 # Create your models here.
 from django.utils import timezone
-from petfoster.models import FosterRoom, TYPE_PAY_STYLE
+from petfoster.models import FosterRoom, TYPE_PAY_STYLE, PetFosterInfo
 from shopping.models import TYPE_SHOPPING_STATUS
+
+
+class HostingInfo(models.Model):
+    """宠物托管信息"""
+    pet = models.OneToOneField(PetFosterInfo, verbose_name="宠物", on_delete=models.CASCADE)
+    begin_time = models.DateField(verbose_name="开始时间", blank=True, null=True)
+    end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
+    create_at = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+    def __str__(self):
+        return self.pet.name
+
+    class Meta:
+        verbose_name = "0.宠物托管信息"
+        verbose_name_plural = verbose_name
 
 
 class HostingOrder(models.Model):

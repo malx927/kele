@@ -8,7 +8,7 @@ from django.views.generic import TemplateView
 from .views import PetInsuranceView, FosterFeeScale, PetFosterInfoView, FosterDemandView, FosterDemandCreateUpdateView, \
    FosterOrderDetailView, FosterRoomUpdateView, ContractView, ContractPageView, FosterPetDetailView, ContractList, \
    FosterPetStop, FosterPetListView, FosterPetDemandDetailView, FosterPetAllListView, FosterQrCodeView, \
-   FosterQrCodeShowView, FosterQrCodeAckView, FosterRenewView, PrintNote
+   FosterQrCodeShowView, FosterQrCodeAckView, FosterRenewView, PrintNote, FosterCalcPayView
 
 from .views import FosterAgreementView, PetFosterInfoListView, FosterCalculateView, FosterOrderView, HandOverListView,\
    FosterPetsList, FosterPetCode
@@ -33,6 +33,7 @@ urlpatterns = [
    url(r'^petagreement/$', FosterAgreementView.as_view(), name='foster-pet-agreement'),
    url(r'^fostercalcnav/$', TemplateView.as_view(template_name="petfoster/foster_calc_nav.html"), name='foster-style-calc-nav'),
    url(r'^fostercalc/$', FosterCalculateView.as_view(), name='foster-style-calc'),
+   url(r'^fostercalcpay/$', FosterCalcPayView.as_view(), name='foster-style-calc-pay'),
    url(r'^fosterorder/$', FosterOrderView.as_view(), name='foster-order'),
    url(r'^fosterorder/(?P<id>\d+)/$', FosterOrderView.as_view(), name='foster-order-detail'),
    url(r'^fosterorderdetail/(?P<out_trade_no>\w+)/$', FosterOrderDetailView.as_view(), name='foster-order-detail-over'),
