@@ -1302,3 +1302,25 @@ class PrintNote(View):
             }
 
         return JsonResponse(result)
+
+
+class PetInfoDeleteView(View):
+
+    def post(self, request, *args, **kwargs):
+        pet_id = request.POST.get("pet_id", None)
+        input_type = request.POST.get("input_type", None)
+        print(pet_id, input_type)
+        # result, nCount = PetFosterInfo.objects.filter(pk=int(pet_id)).delete()
+        nCount,rec = PetFosterInfo.objects.filter(id=int(pet_id)).delete()
+        if nCount > 0:
+            ret = {
+                "return_code": "SUCCESS",
+                "input_type": input_type,
+                "count": nCount,
+            }
+        else:
+            ret = {
+                "return_code": "FAIL",
+                "count": 0,
+            }
+        return JsonResponse(ret)

@@ -20,7 +20,7 @@
     <div class="weui-panel__bd">
         <form action="" method="post" enctype="multipart/form-data" onsubmit="showing()">{% csrf_token %}
         <div class="weui-cells weui-cells_form cells_top" id="uploader">
-            <input type="hidden" name = "input_type" value="{{ input_type|default:'' }}">
+            <input type="hidden" id="input_type" name = "input_type" value="{{ input_type|default:'' }}">
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label class="weui-label">{{ form.name.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.name }}</div>
@@ -119,9 +119,60 @@
         </div>
         <div class="weui-btn-area">
             <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
+            {% if form.instance.id %}
+            <button type="button" id="btn_del" data-item="{{ form.instance.id }}" class="weui-btn  weui-btn_plain-primary" >删除</button>
+            {% endif %}
         </div>
         </form>
     </div>
 </div>
 
 {% endblock container %}
+{% block bottomjs %}
+
+    {{ block.super }}
+    <script type="application/javascript">
+    $(function(){
+        $("#btn_del").on("click", function(){
+            weui.confirm('真的要删除吗？', function() {
+                    var params ={
+                      pet_id: $("#btn_del").attr("data-item"),
+                      input_type: $("#input_type").val(),
+                      csrfmiddlewaretoken:'{{ csrf_token }}',
+                    }
+                    $.ajax({
+                          type: 'POST',
+                          url: '{% url "foster-pet-del" %}',
+                          dataType: 'json',
+                          data: params,
+                          timeout: 5000,
+                          success: function(data){
+                              if(data.return_code == "SUCCESS"){
+                                  if(data.input_type == "hosting")
+                                        window.location.href = "{% url 'hosting-pet-list' %}";
+                                  else {
+                                      window.location.href = "{% url 'foster-pet-list' %}";
+                                  }
+                              }
+                              else{
+                                   weui.alert('删除失败');
+                              }
+
+                          },
+                          error: function(error){
+                                 weui.alert('删除失败');
+                          }
+                    });
+                },
+                function() {
+                        console.log("fail");
+                }
+            );
+
+
+        })
+
+    });
+
+    </script>
+{% endblock bottomjs %}

@@ -12,7 +12,7 @@
     <div class="weui-panel__hd header_bottom">
          <div class="weui-flex">
             <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物托管</span></div>
+            <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">宠物幼儿园</span></div>
             <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shouye2 pink r" ></i></a></div>
         </div>
     </div>
@@ -50,7 +50,7 @@
             </div>
           </div>
 
-        <div class="weui-cells__title">选中托管宠物</div>
+        <div class="weui-cells__title">选中宠物</div>
         <div class="weui-cells weui-cells_checkbox" style="display: flex;flex-wrap: wrap;width:100%">
             {% for pet in pets %}
             <label class="weui-cell weui-check__label" for="checkbox_{{ pet.id }}"style="width: 38%;min-width: 38%;max-width: 38%">

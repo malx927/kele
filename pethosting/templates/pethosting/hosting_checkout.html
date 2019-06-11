@@ -89,7 +89,7 @@
                     if (res.errMsg == "chooseWXPay:ok") {
                         window.location.replace('{% url "foster-success" %}');
                     } else {
-                       weui.alert('宠物托管订单支付失败!');
+                       weui.alert('宠物幼儿园订单支付失败!');
                     }
                   },
                    cancel: function(res) {
@@ -113,7 +113,7 @@
        <div class="weui-panel__hd">
             <div class="weui-flex">
                 <div><a href="javascript:window.history.back(-1)"><i class="icon iconfont icon-jiantou3 gray " ></i></a></div>
-                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 宠物托管详情 {% endif %}</span></div>
+                <div class="weui-flex__item" style="text-align: center;"><span class="detail_title">{% if instance.status == 0 %} 收银台 {% else %} 宠物幼儿园详情 {% endif %}</span></div>
                 <div ><a href="{% url 'dog-index' %}?next={{ request.get_full_path }}"><i class="icon iconfont icon-shangcheng10 pink r" ></i></a></div>
             </div>
        </div>
