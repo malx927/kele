@@ -151,7 +151,7 @@ class PetFosterInfo(models.Model):
     color = models.CharField(verbose_name=u'毛色', max_length=32)
     sex = models.CharField(verbose_name=u'性别', max_length=4, choices=TYPE_SEX_CHOICE, default=0)
     weight = models.CharField(verbose_name='体重', max_length=12, blank=True, null=True)
-    category = models.ForeignKey(PetType, verbose_name='分类', default=1)
+    category = models.ForeignKey(PetType, verbose_name='分类')
     sterilization = models.IntegerField(verbose_name=u'是否绝育',  choices=TYPE_STERILIZATION_CHOICE, default=0)
     vaccine = models.IntegerField(verbose_name=u'完整的疫苗注射记录',  choices=TYPE_HAVEORNOT_STYLE, default=0)
     parasite = models.IntegerField(verbose_name=u'三月内做过体内外驱虫',  choices=TYPE_YESNO_STYLE, default=0)

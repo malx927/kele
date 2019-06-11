@@ -79,7 +79,7 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['type'].widget.attrs['placeholder'] = '请输入宠物品种'
 
         self.fields['category'].widget.attrs['class'] = 'weui-select height'
-        # self.fields['category'].empty_label = '请选择'
+        self.fields['category'].empty_label = ''
 
         self.fields['color'].widget.attrs['class'] = 'weui-input'
         self.fields['color'].widget.attrs['placeholder'] = '请输入宠物毛色'
