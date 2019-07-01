@@ -1,7 +1,8 @@
 from django.contrib import admin
 import datetime
 from .models import Goods, Order, OrderItem, ShopCart, GoodsType, MemberScore, MemberScoreDetail, MemberLimit, MailFee, \
-    MemberRechargeAmount, MemberDeposit, MemberRechargeRecord, MarketPlan, OrderMarketPlan
+    MemberRechargeAmount, MemberDeposit, MemberRechargeRecord, MarketPlan, OrderMarketPlan, MemberRefund
+
 # Register your models here.
 
 
@@ -134,3 +135,27 @@ class MemberRechargeRecordAdmin(admin.ModelAdmin):
     list_display = ['out_trade_no', 'nickname', 'pay_time', 'total_fee' ,'cash_fee','transaction_id', 'status']
     list_per_page = 50
     search_fields = ['out_trade_no', 'nickname']
+
+
+@admin.register(MemberRefund)
+class MemberRefundAdmin(admin.ModelAdmin):
+    list_display = ['user_deposit', 'refund_money', 'op_user', 'confirm_flag' ,'create_at']
+    exclude = ["op_user", "refund_flag"]
+    list_per_page = 50
+    search_fields = ['user_deposit__name']
+
+    def save_model(self, request, obj, form, change):
+        obj.op_user = request.user
+        if obj.confirm_flag and not obj.refund_flag:
+            obj.refund_flag = True
+            obj.user_deposit.total_money = obj.user_deposit.total_money - obj.refund_money
+            obj.user_deposit.save()
+        obj.save()
+
+    def get_readonly_fields(self, request, obj):
+        if obj.confirm_flag:
+            return ['user_deposit', 'refund_money', 'op_user', 'confirm_flag' ,'create_at']
+        else:
+            return super(MemberRefundAdmin, self).get_readonly_fields(request, obj)
+
+

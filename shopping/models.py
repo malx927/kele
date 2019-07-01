@@ -1,4 +1,5 @@
 #coding:utf-8
+from django.contrib.auth.models import User
 from django.db import models
 from django.db.models import Q
 from django.urls import reverse
@@ -437,7 +438,7 @@ class MemberDeposit(models.Model):
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return "{0}-{1}".format(self.nickname, self.total_money)
+        return self.nickname
 
     def balance(self):
         return self.total_money - self.consume_money
@@ -483,4 +484,21 @@ class MemberLimit(models.Model):
         score_limit = ScoresLimit.objects.all().first()
         limitValue = score_limit.limitvalue if score_limit else 20
         return limitValue
+
+
+class MemberRefund(models.Model):
+    """会员退款"""
+    user_deposit = models.ForeignKey(MemberDeposit, verbose_name='储值客户', )
+    refund_money = models.DecimalField(verbose_name='条款金额', decimal_places=2, max_digits=6)
+    op_user = models.ForeignKey(User, verbose_name='操作用户', blank=True, null=True)
+    confirm_flag = models.BooleanField(verbose_name='退款确认', default=False)
+    refund_flag = models.BooleanField(verbose_name='退款标志', default=False)
+    create_at = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+    class Meta:
+        verbose_name = '10.会员退款'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return  self.user_deposit.nickname
 
