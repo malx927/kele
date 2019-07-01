@@ -493,10 +493,11 @@ class MemberRefund(models.Model):
     op_user = models.ForeignKey(User, verbose_name='操作用户', blank=True, null=True)
     confirm_flag = models.BooleanField(verbose_name='退款确认', default=False)
     refund_flag = models.BooleanField(verbose_name='退款标志', default=False)
+    remark = models.CharField(verbose_name='备注', max_length=200, blank=True, null=True)
     create_at = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
     class Meta:
-        verbose_name = '10.会员退款'
+        verbose_name = '11.会员退款'
         verbose_name_plural = verbose_name
 
     def __str__(self):

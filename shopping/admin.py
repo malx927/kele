@@ -153,7 +153,7 @@ class MemberRefundAdmin(admin.ModelAdmin):
         obj.save()
 
     def get_readonly_fields(self, request, obj):
-        if obj.confirm_flag:
+        if obj and obj.confirm_flag:
             return ['user_deposit', 'refund_money', 'op_user', 'confirm_flag' ,'create_at']
         else:
             return super(MemberRefundAdmin, self).get_readonly_fields(request, obj)
