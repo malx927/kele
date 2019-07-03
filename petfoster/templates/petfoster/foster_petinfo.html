@@ -50,10 +50,6 @@
                 <div class="weui-cell__bd">{{ form.color }}</div>
             </div>
             <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.weight.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.weight }}</div>
-            </div>
-            <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.sterilization.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.sterilization }}</div>
             </div>
@@ -61,18 +57,18 @@
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.vaccine.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.vaccine }}</div>
             </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.parasite.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.parasite }}</div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.illness.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.illness }}</div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.infection.label }}:</label></div>
-                <div class="weui-cell__bd">{{ form.infection }}</div>
-            </div>
+{#            <div class="weui-cell">#}
+{#                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.parasite.label }}:</label></div>#}
+{#                <div class="weui-cell__bd">{{ form.parasite }}</div>#}
+{#            </div>#}
+{#            <div class="weui-cell">#}
+{#                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.illness.label }}:</label></div>#}
+{#                <div class="weui-cell__bd">{{ form.illness }}</div>#}
+{#            </div>#}
+{#            <div class="weui-cell">#}
+{#                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.infection.label }}:</label></div>#}
+{#                <div class="weui-cell__bd">{{ form.infection }}</div>#}
+{#            </div>#}
             <div class="weui-cell">
                 <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.owner.label }}:</label></div>
                 <div class="weui-cell__bd">{{ form.owner }}</div>
@@ -104,19 +100,6 @@
                     {{ form.telephone }}
                 </div>
             </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.address.label }}:</label></div>
-                <div class="weui-cell__bd">
-                    {{ form.address }}
-                </div>
-            </div>
-            <div class="weui-cell">
-                <div class="weui-cell__hd"><label for="" class="weui-label">{{ form.id_card.label }}:</label></div>
-                <div class="weui-cell__bd">
-                    {{ form.id_card }}
-                </div>
-            </div>
-        </div>
         <div class="weui-btn-area">
             <button type="submit" name="submit" class="weui-btn weui-btn_primary" >提交</button>
             {% if form.instance.id %}
