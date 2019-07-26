@@ -42,7 +42,7 @@ class HostingOrder(models.Model):
         (12, '12个月'),
     )
     name = models.CharField(verbose_name="姓名", max_length=20)
-    telephone = models.CharField(verbose_name='电话', max_length=24, default='')
+    telephone = models.CharField(verbose_name='电话', max_length=24)
     begin_time = models.DateField(verbose_name="开始时间")
     end_time = models.DateField(verbose_name="结束时间")
     months = models.IntegerField(verbose_name="托管月数", choices=CHOICES_MONTHS ,default=1)

@@ -22,7 +22,7 @@ class HostingOrderForm(forms.ModelForm):
 
         self.fields["begin_time"].initial = datetime.date.today()
 
-        # self.fields["end_time"].widget.attrs['readonly'] = 'true'
+        self.fields["end_time"].widget.attrs['readonly'] = 'true'
 
         self.fields['months'].widget.attrs['class'] = 'weui-select'
         self.fields['months'].empty_label='托管月数'

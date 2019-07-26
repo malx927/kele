@@ -87,8 +87,8 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['sex'].widget.attrs['class'] = 'weui-select height'
         self.fields['sex'].empty_label='请选择性别'
 
-        self.fields['weight'].widget.attrs['class'] = 'weui-input'
-        self.fields['weight'].widget.attrs['placeholder'] = '请输入体重'
+        # self.fields['weight'].widget.attrs['class'] = 'weui-input'
+        # self.fields['weight'].widget.attrs['placeholder'] = '请输入体重'
 
         self.fields['sterilization'].widget.attrs['class'] = 'weui-select height'
         self.fields['sterilization'].empty_label='请选择'
@@ -97,14 +97,14 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['vaccine'].widget.attrs['class'] = 'weui-select height'
         self.fields['vaccine'].empty_label='请选择'
 
-        self.fields['parasite'].widget.attrs['class'] = 'weui-select height'
-        self.fields['parasite'].empty_label='请选择'
+        # self.fields['parasite'].widget.attrs['class'] = 'weui-select height'
+        # self.fields['parasite'].empty_label='请选择'
 
-        self.fields['illness'].widget.attrs['class'] = 'weui-select height'
-        self.fields['illness'].empty_label='请选择'
-
-        self.fields['infection'].widget.attrs['class'] = 'weui-select height'
-        self.fields['infection'].empty_label='请选择'
+        # self.fields['illness'].widget.attrs['class'] = 'weui-select height'
+        # self.fields['illness'].empty_label='请选择'
+        #
+        # self.fields['infection'].widget.attrs['class'] = 'weui-select height'
+        # self.fields['infection'].empty_label='请选择'
 
         self.fields['owner'].widget.attrs['class'] = 'weui-input'
         self.fields['owner'].widget.attrs['placeholder'] = '请输入姓名'
@@ -112,15 +112,15 @@ class PetFosterInfoForm(forms.ModelForm):
         self.fields['picture'].widget.attrs['class'] = 'weui-uploader__input'
         self.fields['picture'].widget.attrs['accept'] = 'image/*'
 
-        self.fields['address'].widget.attrs['class'] = 'weui-input'
-        self.fields['address'].widget.attrs['placeholder'] = '请输入地址'
-
-        self.fields['id_card'].widget.attrs['class'] = 'weui-input'
-        self.fields['id_card'].widget.attrs['placeholder'] = '请输入身份证号码'
+        # self.fields['address'].widget.attrs['class'] = 'weui-input'
+        # self.fields['address'].widget.attrs['placeholder'] = '请输入地址'
+        #
+        # self.fields['id_card'].widget.attrs['class'] = 'weui-input'
+        # self.fields['id_card'].widget.attrs['placeholder'] = '请输入身份证号码'
 
     class Meta:
         model = PetFosterInfo
-        fields = ['name','birthdate','type','color','sex','category','weight', 'sterilization','vaccine','parasite','illness','infection','owner','picture','telephone','address', 'id_card']
+        fields = ['name','birthdate','type','color','sex','category','sterilization','vaccine','owner','picture','telephone']
         # fields ="__all__"
         widgets  = {
             'birthdate': forms.TextInput({'class': 'weui-input', 'type': 'date'}),

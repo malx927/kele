@@ -276,8 +276,8 @@ class PetFosterInfoView(View):
                 owner = PetOwner.objects.get(openid=user_id)
                 form["owner"].field.initial = owner.name
                 form["telephone"].field.initial = owner.telephone
-                form["address"].field.initial = owner.address
-                form["id_card"].field.initial = owner.id_card
+                # form["address"].field.initial = owner.address
+                # form["id_card"].field.initial = owner.id_card
             except PetOwner.DoesNotExist as ex:
                 pass
         return render(request, template_name="petfoster/foster_petinfo.html", context={"form": form, "input_type": input_type})

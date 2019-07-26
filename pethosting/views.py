@@ -50,14 +50,17 @@ class HostingOrderView(View):
         try:
             user_id = request.session.get("openid", None)
             owner = PetOwner.objects.get(openid=user_id)
+        except PetOwner.DoesNotExist as ex:
+            owner = None
+
+        if owner:
             form["name"].field.initial = owner.name
             form["telephone"].field.initial = owner.telephone
-            months = form["months"].field.initial
-            begin_time = form["begin_time"].field.initial
-            day = begin_time.day
-            form["end_time"].field.initial = begin_time + relativedelta(months=+months, days=-day)
-        except PetOwner.DoesNotExist as ex:
-            pass
+
+        months = form["months"].field.initial
+        begin_time = form["begin_time"].field.initial
+        day = begin_time.day
+        form["end_time"].field.initial = begin_time + relativedelta(months=+months, days=-day)
 
         pet_counts = myPets.count()
         day = datetime.now().day
@@ -96,7 +99,13 @@ class HostingOrderView(View):
             url = "{0}?orderid={1}".format(reverse("hosting-contract"), instance.id)
             return HttpResponseRedirect(url)        # 跳转到签订合同
         else:
-            return render(request, template_name="pethosting/my_pet_list.html")
+            user_id = request.session.get("openid", None)
+            myPets = PetFosterInfo.objects.filter(openid=user_id)
+            context = {
+                "form": form,
+                "pets": myPets,
+            }
+            return render(request, template_name="pethosting/hosting_form.html", context=context)
 
 class HostingCalcPrice(View):
     """
