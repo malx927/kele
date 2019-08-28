@@ -6,6 +6,7 @@ from django.urls import reverse
 from ckeditor_uploader.fields import RichTextUploadingField
 import  datetime
 # Create your models here.
+from petfoster.models import PetOwner
 from wxchat.models import WxUserinfo
 
 TYPE_DOG_CHOICE=(
@@ -443,6 +444,14 @@ class MemberDeposit(models.Model):
     def balance(self):
         return self.total_money - self.consume_money
     balance.short_description = "余额"
+
+    def name(self):
+        try:
+            owner = PetOwner.objects.get(openid=self.openid)
+            return owner.name if owner.name is not None else "无"
+        except PetOwner.DoesNotExist as ex:
+            return "无"
+    name.short_description = "真实姓名"
 
 
 # 会员充值明细

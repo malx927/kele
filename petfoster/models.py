@@ -441,6 +441,13 @@ class FosterStyleChoose(models.Model):
         self.pay_time = pay_time
         self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
 
+    def user_name(self):
+        try:
+            user = WxUserinfo.objects.get(openid=self.openid)
+            return user.nickname
+        except WxUserinfo.DoesNotExist as ex:
+            return self.openid
+    user_name.short_description = '客户昵称'
 
 #交接记录
 class HandOverList(models.Model):

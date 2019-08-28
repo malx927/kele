@@ -580,8 +580,10 @@ class FosterPayView(View):
             petList = pet_ids.split(',')
 
             pets = PetFosterInfo.objects.filter(id__in=petList)
-            petOwner = PetOwner.objects.get(openid=openid)
-
+            try:
+                petOwner = PetOwner.objects.get(openid=openid)
+            except PetOwner.DoesNotExist as ex:
+                petOwner = None
             # 合同内容
             try:
                 contract = ContractInfo.objects.get(order=order_id)
@@ -824,24 +826,16 @@ class FosterBalancePayView(View):
             return HttpResponseRedirect(reverse("foster-pet-list"))
 
     def post(self, request, *args, **kwargs):
+        result = {
+            "success": "false",
+        }
         try:
             id = request.POST.get("id", None)
-            password = request.POST.get("password", None)
-            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
             openid = request.session.get('openid', None)
-            if not password:
-                error_msg = u'支付密码不能为空'
-                return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
-            else:
-                user = MemberDeposit.objects.get(openid=openid)
-                bFlag = check_password(password, user.password)
-                if not bFlag:
-                    error_msg = u'支付密码错误'
-                    return render(request, template_name="wxchat/pay_confirm.html", context={ "instance": instance, "error": error_msg } )
 
             #生成订单号
             out_trade_no = '{0}{1}{2}'.format('F', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
-            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            instance = FosterStyleChoose.objects.get(pk=id, status=0)
             pet_ids = instance.pet_list
             pet_list = pet_ids.split(',')
             PetFosterInfo.objects.filter(id__in=pet_list).update(begin_time=instance.begin_time, end_time=instance.end_time)
@@ -859,12 +853,12 @@ class FosterBalancePayView(View):
             instance.save()
             deposit.save()
             sendTemplateMesToKf(instance, 1)
-            return render(request, template_name="petfoster/message.html")
+            result["success"] = "true"
+            return JsonResponse(result)
         except FosterStyleChoose.DoesNotExist as ex:
-            return HttpResponseRedirect(reverse("foster-pet-list"))
+            return JsonResponse(result)
         except MemberDeposit.DoesNotExist as ex:
-
-            return HttpResponseRedirect(reverse("foster-pet-list"))
+            return JsonResponse(result)
 
 
 #寄养合同

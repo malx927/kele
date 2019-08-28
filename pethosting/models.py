@@ -6,6 +6,7 @@ from django.db import models
 from django.utils import timezone
 from petfoster.models import FosterRoom, TYPE_PAY_STYLE, PetFosterInfo
 from shopping.models import TYPE_SHOPPING_STATUS
+from wxchat.models import WxUserinfo
 
 
 class HostingInfo(models.Model):
@@ -21,6 +22,7 @@ class HostingInfo(models.Model):
     class Meta:
         verbose_name = "0.宠物托管信息"
         verbose_name_plural = verbose_name
+
 
 
 class HostingOrder(models.Model):
@@ -77,6 +79,12 @@ class HostingOrder(models.Model):
         pet_ids = self.pet_list.split(',')
         return len(pet_ids)
 
+    def nick_name(self):
+        try:
+            user = WxUserinfo.objects.get(openid=self.openid)
+            return user.nickname
+        except HostingOrder.DoesNotExist as ex:
+            return "无"
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
         self.status = status
