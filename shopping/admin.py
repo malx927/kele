@@ -29,7 +29,6 @@ class GoodsAdmin(admin.ModelAdmin):
         queryset.update(is_show=True)
     make_goods_show.short_description = "商品上架"
 
-
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
     readonly_fields = ['goods','price','benefits','quantity']
@@ -127,7 +126,6 @@ class MemberDepositAdmin(admin.ModelAdmin):
     list_display = ['openid', 'name', 'nickname', 'total_money', 'consume_money', 'prev_money' ,'add_time', 'balance']
     list_per_page = 50
     search_fields = ['openid', 'nickname']
-
 
 
 @admin.register(MemberRechargeRecord)

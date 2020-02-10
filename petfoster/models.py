@@ -62,6 +62,7 @@ class FosterType(models.Model):
         verbose_name = u"02.寄养类型"
         verbose_name_plural = verbose_name
 
+
 class FosterMode(models.Model):
     name = models.CharField(verbose_name='寄养方式', max_length=32)
     comment = models.CharField(verbose_name='备注', max_length=64, blank=True, null=True)
@@ -107,7 +108,7 @@ class FosterNotice(models.Model):
     create_time = models.DateTimeField(verbose_name='创建时间', auto_now=True)
 
     def __str__(self):
-        return  self.title
+        return self.title
 
     class Meta:
         verbose_name = u"04.寄养注意事项"
@@ -127,7 +128,6 @@ class FosterRoom(models.Model):
         verbose_name_plural = verbose_name
 
 
-
 class FosterStandard(models.Model):
     foster_type = models.ForeignKey(FosterType, verbose_name='寄养类型', on_delete=models.SET_NULL, blank=True, null=True)
     pet_type = models.ForeignKey(PetType, verbose_name='宠物类型', on_delete=models.SET_NULL, blank=True, null=True)
@@ -143,7 +143,8 @@ class FosterStandard(models.Model):
         verbose_name_plural = verbose_name
         ordering=['foster_type', 'pet_type']
 
-#寄养宠物信息
+
+# 寄养宠物信息
 class PetFosterInfo(models.Model):
     name = models.CharField(verbose_name=u'宠物昵称', max_length=24 )
     birthdate = models.DateField(verbose_name=u'出生日期', default=timezone.now)
@@ -172,7 +173,6 @@ class PetFosterInfo(models.Model):
     end_time = models.DateField(verbose_name="结束时间", blank=True, null=True)
     set_time = models.DateTimeField(verbose_name=u'分配时间', null=True, blank=True )
     is_end = models.BooleanField(verbose_name="寄养(托管)结束",default=False)    # 寄养结束标志 1为正在寄养，0为寄养结束
-
 
     class Meta:
         verbose_name = u"06.寄养宠物信息"
@@ -205,7 +205,6 @@ class FosterDemand(models.Model):
     create_time = models.DateTimeField(verbose_name='添加时间', auto_now=True)
     openid = models.CharField(verbose_name='微信标识', max_length=120, null=True, blank=True)
 
-
     def __str__(self):
         return  self.pet.name
 
@@ -213,7 +212,8 @@ class FosterDemand(models.Model):
         verbose_name = u"寄养要求"
         verbose_name_plural = verbose_name
 
-#寄养协议
+
+# 寄养协议
 class FosterAgreement(models.Model):
     title = models.CharField( verbose_name='标题', max_length=64 )
     content = RichTextUploadingField(verbose_name=u'内容')
@@ -264,6 +264,8 @@ class PetGameNote(models.Model):
 def next_year_day():
     now = datetime.date.today()
     return now + relativedelta(months=+12, days=-1)
+
+
 #宠物保险
 class PetInsurance(models.Model):
     INSURANCE_COPIES = (
@@ -364,6 +366,7 @@ class PetOwner(models.Model):
 
 # 寄养订单
 class FosterStyleChoose(models.Model):
+
     big_dog = models.IntegerField(verbose_name="大型犬数量",  blank=True, null=True)
     middle_dog = models.IntegerField(verbose_name="中型犬数量",  blank=True, null=True)
     small_dog = models.IntegerField(verbose_name="小型犬数量",  blank=True, null=True)
@@ -388,10 +391,9 @@ class FosterStyleChoose(models.Model):
     create_time = models.DateTimeField(verbose_name="创建时间", auto_now=True)
     code = models.CharField(verbose_name='提取宠物码', max_length=12, default='', blank=True)
 
-
     def __str__(self):
         if self.out_trade_no:
-            return  self.out_trade_no
+            return self.out_trade_no
         else:
             return '{0}-{1}'.format(self.foster_type.name, self.foster_mode.name)
 
@@ -424,7 +426,7 @@ class FosterStyleChoose(models.Model):
 
     def big_total_cost(self):
         days = self.get_days()
-        return self.big_price  * days
+        return self.big_price * days
 
     def middle_total_cost(self):
         days = self.get_days()
@@ -434,13 +436,6 @@ class FosterStyleChoose(models.Model):
         days = self.get_days()
         return self.small_price  * days
 
-    def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
-        self.status = status
-        self.transaction_id = transaction_id
-        self.cash_fee = cash_fee
-        self.pay_time = pay_time
-        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
-
     def user_name(self):
         try:
             user = WxUserinfo.objects.get(openid=self.openid)
@@ -448,6 +443,15 @@ class FosterStyleChoose(models.Model):
         except WxUserinfo.DoesNotExist as ex:
             return self.openid
     user_name.short_description = '客户昵称'
+
+
+    def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
+        self.status = status
+        self.transaction_id = transaction_id
+        self.cash_fee = cash_fee
+        self.pay_time = pay_time
+        self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
 
 #交接记录
 class HandOverList(models.Model):

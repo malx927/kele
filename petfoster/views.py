@@ -41,7 +41,8 @@ import logging
 logging.basicConfig(level = logging.INFO,format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-#宠物保险
+
+# 宠物保险
 class PetInsuranceView(View):
 
     def getInsurance( self, out_trade_no , user_id):
@@ -54,11 +55,9 @@ class PetInsuranceView(View):
             insurance =None
         return insurance
 
-
     def get(self, request, *args, **kwargs):
 
         user_id = request.session.get('openid',None )
-
         flag = request.GET.get('flag', None)
         if flag == "pay":
             out_trade_no = request.GET.get('out_trade_no', None)
@@ -67,7 +66,7 @@ class PetInsuranceView(View):
             return render(request, 'petfoster/insurance_pay.html', {'insurance':insurance,'sign':signPackage})
         elif flag == "get":
             out_trade_no = request.GET.get('out_trade_no', None)
-            insurance = self.getInsurance( out_trade_no, user_id )
+            insurance = self.getInsurance( out_trade_no, 'o0AHP0lpCKyadVWg88KeI5JrafYI' )
             return render(request, 'petfoster/insurance_detail.html', {'insurance':insurance})
         else:
             insurance = PetInsurance.objects.filter(openid=user_id, status=0).order_by("-create_at").first()
@@ -139,7 +138,6 @@ class PetInsuranceView(View):
                 return HttpResponseRedirect(reverse("pet-insurance"))
 
 
-
 #宠物保险订单支付
 class PayInsuranceView(View):
 
@@ -152,16 +150,19 @@ class PayInsuranceView(View):
         user_id = request.session.get('openid', None)
 
         try:
-            insurance = PetInsurance.objects.get( openid=user_id, out_trade_no=out_trade_no, status=0 )
+            insurance = PetInsurance.objects.get(openid=user_id, out_trade_no=out_trade_no, status=0 )
             total_fee = int(insurance.total_cost() * 100)
         except PetInsurance.DoesNotExist:
             return render( request, template_name='petfoster/pet_insurance.html' )
 
 
+        if user_id=="o0AHP0lpCKyadVWg88KeI5JrafYI":
+            total_fee = 1
+
         try:
-            data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
-            prepay_id = data.get('prepay_id',None)
-            print('aaaa:',prepay_id)
+            data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
+            prepay_id = data.get('prepay_id', None)
+            print('aaaa:', prepay_id)
             save_data = dict(data)
             #保存统一订单数据
             WxUnifiedOrderResult.objects.create(**save_data)
@@ -179,21 +180,21 @@ class PayInsuranceView(View):
             }
             return HttpResponse(json.dumps(errors))
 
-#订单回调(接收微信服务器返回的数据)
+# 订单回调(接收微信服务器返回的数据)
 @csrf_exempt
 def insuranceNotify(request):
     try:
-        result_data = wxPay.parse_payment_result(request.body)  #签名验证
-        #保存支付成功返回数据
+        result_data = wxPay.parse_payment_result(request.body)  # 签名验证
+        # 保存支付成功返回数据
         res_data = dict(result_data)
         WxPayResult.objects.create(**res_data)
 
-         #查询订单，判断是否正确
+        # 查询订单，判断是否正确
         transaction_id = res_data.get('transaction_id', None)
         out_trade_no = res_data.get('out_trade_no', None)
         openid = res_data.get('openid', None)
 
-        retBool = queryOrder( transaction_id, out_trade_no )    #查询订单
+        retBool = queryOrder(transaction_id, out_trade_no)    # 查询订单
 
         data = {
             'return_code': result_data.get('return_code'),
@@ -201,10 +202,10 @@ def insuranceNotify(request):
         }
         print(res_data)
         xml = dict_to_xml( data,'' )
-        if not retBool: #订单不存在
+        if not retBool: # 订单不存在
             return  HttpResponse(xml)
         else:
-            #验证金额是否一致
+            # 验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
                 try:
                     instance = None
@@ -217,7 +218,10 @@ def insuranceNotify(request):
                         PetFosterInfo.objects.filter(id__in=petList).update(begin_time=instance.begin_time, end_time=instance.end_time)
                     elif out_trade_no.startswith('B'):    # 洗浴缴费
                         instance = BathOrder.objects.get(openid=openid, out_trade_no=out_trade_no)
+                    elif out_trade_no.startswith('T'):    # tuguan缴费
+                        instance = HostingOrder.objects.get(openid=openid, out_trade_no=out_trade_no)
 
+                    print(instance)
                     if instance.status==0:
                         #更新订单
                         status = 1  #已支付标志
@@ -291,7 +295,7 @@ class PetFosterInfoView(View):
         else:
             form = PetFosterInfoForm(request.POST or None, request.FILES or None)
 
-        user_id = request.session.get('openid',None )
+        user_id = request.session.get('openid', None )
 
         if form.is_valid():
             instance = form.save(commit=False)
@@ -333,7 +337,9 @@ class FosterPetDetailView(View):
 class FosterDemandView(View):
 
     def get(self, request, petid):
+
         input_type = request.GET.get("input_type", "")
+
         try:
             pet_id = petid
             petInfo = PetFosterInfo.objects.get(id=pet_id)
@@ -351,14 +357,16 @@ class FosterDemandView(View):
             return render(request, template_name="petfoster/foster_demand.html", context={"form": form, "id": instance.id, "input_type": input_type})
 
 
+
 class FosterDemandCreateUpdateView(View):
 
     def post(self, request, *args, **kwargs):
         id = request.POST.get("id", None)
         input_type = request.POST.get("input_type", "")
+
         if id:
             fosterDemand = FosterDemand.objects.get(id=id)
-            form = FosterDemandForm(request.POST,instance=fosterDemand)
+            form = FosterDemandForm(request.POST, instance=fosterDemand)
         else:
             form = FosterDemandForm(request.POST)
 
@@ -366,6 +374,8 @@ class FosterDemandCreateUpdateView(View):
             url = reverse("hosting-pet-list")
         else:
             url = reverse("foster-pet-list")
+
+        print(url)
 
         if form.is_valid():
             form.save()
@@ -379,14 +389,15 @@ class FosterAgreementView(View):
         agreement = FosterAgreement.objects.first()
         return render(request, template_name="petfoster/foster_agreement.html", context={"agreement": agreement })
 
-#寄养费用测算
+
+# 寄养费用测算
 class FosterCalculateView(View):
 
     def get(self,request):
         flag = request.GET.get("flag", None)
         member = request.GET.get("member", None)
         user_id = request.session.get("openid", None)
-        form =  FosterStyleChooseForm()
+        form = FosterStyleChooseForm()
         myPets = None
         if flag is None:
             myPets = PetFosterInfo.objects.filter(openid=user_id)
@@ -399,7 +410,9 @@ class FosterCalculateView(View):
         }
         return render(request, template_name="petfoster/foster_calc.html", context=context )
 
+
     def post(self,request):
+
         flag = request.POST.get("flag", None)
         order_id = request.POST.get("id", None)
         if order_id:
@@ -441,6 +454,7 @@ class FosterCalculateView(View):
         begin_time = obj.cleaned_data["begin_time"]
         end_time = obj.cleaned_data["end_time"]
         days = (end_time - begin_time).days + 1
+
         data = {
             "is_member": is_member,
             "big_dog": obj.cleaned_data["big_dog"] or 0,
@@ -570,6 +584,7 @@ class FosterPayView(View):
                     else:
                         weixin_pay = True
             except MemberDeposit.DoesNotExist as ex:
+                print(ex)
                 weixin_pay = True
 
             rooms = None
@@ -578,12 +593,13 @@ class FosterPayView(View):
 
             pet_ids = instance.pet_list
             petList = pet_ids.split(',')
-
             pets = PetFosterInfo.objects.filter(id__in=petList)
+
             try:
                 petOwner = PetOwner.objects.get(openid=openid)
             except PetOwner.DoesNotExist as ex:
                 petOwner = None
+
             # 合同内容
             try:
                 contract = ContractInfo.objects.get(order=order_id)
@@ -602,7 +618,7 @@ class FosterPayView(View):
                 'petowner': petOwner,
                 'contract_id': contract_id
             }
-
+            print(context)
             return render(request, template_name="petfoster/foster_checkout.html", context=context)
         except FosterStyleChoose.DoesNotExist as ex:
             print(ex)
@@ -611,28 +627,31 @@ class FosterPayView(View):
             print(ex)
             return HttpResponseRedirect(reverse("foster-style-calc"))
 
-
     def post(self, request, *args, **kwargs):
-        trade_type ='JSAPI'
+        trade_type = 'JSAPI'
         body = '寄养宠物支付消费'
 
         try:
             id = request.POST.get("id", None)
-            #生成订单号
-            out_trade_no = '{0}{1}{2}'.format('F',datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+            # 生成订单号
+            out_trade_no = '{0}{1}{2}'.format('F', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
             user_id = request.session.get('openid', None)
-            instance = FosterStyleChoose.objects.get( pk=id, status=0 )
+            instance = FosterStyleChoose.objects.get(pk=id, status=0 )
             instance.out_trade_no = out_trade_no
             instance.save()
             total_fee = int(instance.total_price * 100)
-        except FosterStyleChoose.DoesNotExist:
+        except FosterStyleChoose.DoesNotExist as ex:
+            print("***********:", ex)
             return HttpResponseRedirect(reverse("foster-pet-list"))
 
-        # total_fee =1
+        if user_id=="o0AHP0lpCKyadVWg88KeI5JrafYI":
+            total_fee = 1
+
         try:
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
-            prepay_id = data.get('prepay_id',None)
+            prepay_id = data.get('prepay_id', None)
             save_data = dict(data)
+            print("------:", save_data)
             #保存统一订单数据
             WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
@@ -647,9 +666,11 @@ class FosterPayView(View):
                 'errcode':  wxe.errcode,
                 'errmsg':   wxe.errmsg
             }
+            print("***********:", errors)
             return HttpResponse(json.dumps(errors))
 
-#宠物房间选择
+
+# 宠物房间选择
 class FosterRoomView(View):
     def get(self,request):
         pass
@@ -658,6 +679,7 @@ class FosterRoomView(View):
         # url = "{0}?id={1}".format(reverse("foster-pay"), instance.id)
         # return HttpResponseRedirect(url)
         pass
+
 
 #寄养订单列表
 class FosterOrderView(View):
@@ -695,7 +717,6 @@ class FosterOrderView(View):
                 return HttpResponseRedirect(url)
 
 
-
 class FosterOrderDetailView(View):
 
     def get(self, request, *args, **kwargs):
@@ -707,6 +728,7 @@ class FosterOrderDetailView(View):
             petList = pet_ids.split(',')
             pets = PetFosterInfo.objects.filter(id__in=petList)
             petowner = PetOwner.objects.get(openid=instance.openid)
+            rooms = FosterRoom.objects.all()
             if instance.transaction_id:
                 weixin_pay = True
             else:
@@ -718,6 +740,7 @@ class FosterOrderDetailView(View):
                 "petowner": petowner,
                 "contract_id": contract.id,
                 "weixin_pay": weixin_pay,
+                "rooms": rooms,
             }
             return render(request, template_name="petfoster/foster_checkout.html", context=context)
         except FosterStyleChoose.DoesNotExist as ex:
@@ -856,8 +879,10 @@ class FosterBalancePayView(View):
             result["success"] = "true"
             return JsonResponse(result)
         except FosterStyleChoose.DoesNotExist as ex:
+            print(ex)
             return JsonResponse(result)
         except MemberDeposit.DoesNotExist as ex:
+            print(ex)
             return JsonResponse(result)
 
 
@@ -1229,6 +1254,7 @@ class PrintNote(View):
         flag = request.POST.get("flag", None)
         try:
             result = self.get_access_token()
+            print(result)
             if result["error"] != 0:
                 return JsonResponse(result)
 

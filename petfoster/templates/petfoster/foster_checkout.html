@@ -5,7 +5,7 @@
     <script type="text/javascript">
     wx.ready(function () {
 
-        $('#pay_now_balance').on('click',function(){
+         $('#pay_now_balance').on('click',function(){
                 var params ={
                       id: $("#id").text(),
                       csrfmiddlewaretoken:'{{ csrf_token }}',
@@ -49,6 +49,7 @@
               id: $("#id").text(),
               csrfmiddlewaretoken:'{{ csrf_token }}',
             }
+
            var ts = sessionStorage.getItem('checkout');
            if(ts==null) {
                sessionStorage.setItem('checkout', new Date().getTime());
@@ -61,6 +62,7 @@
                }
                sessionStorage.setItem('checkout', cur_ts);
            }
+
            $.ajax({
               type: 'POST',
               url: '{% url "foster-pay" %}',
@@ -73,6 +75,7 @@
                   }
               },
               error: function(error){
+
                   window.location.href = "{% url 'dog-index' %}";
               }
             });
@@ -86,6 +89,7 @@
                   signType: data.signType,
                   paySign:  data.paySign,
                   success: function(res){
+
                     if (res.errMsg == "chooseWXPay:ok") {
                         window.location.replace('{% url "foster-success" %}');
                     } else {
@@ -139,7 +143,7 @@
                     </div>
                      {% endif %}
                 </div>
-                {% endif %}
+              {% endif %}
                 <div class="weui-cells  cells_top">
                     {% if instance.status == 1 %}
 
@@ -198,6 +202,7 @@
                         </div>
                     </div>
                 </div>
+
 {#                 {% if instance.big_dog %}#}
 {#                <div class="weui-cells weui-cells_form cells_top flex" >#}
 {#                    <div class="weui-cell" style="width:35%">#}
@@ -226,6 +231,7 @@
 {#                    </div>#}
 {#                 </div>#}
 {#               {% endif %}#}
+
 {#                {% if instance.small_dog %}#}
 {#                 <div class="weui-cells weui-cells_form cells_top flex">#}
 {#                    <div class="weui-cell" style="width:35%">#}
@@ -370,7 +376,6 @@
                   success: function(data){
                       if(data.success=="true"){
                           weui.alert("宠物提取码:" + data.code);
-
                       }
                       else{
                           weui.alert("提取失败！");
@@ -395,7 +400,7 @@
                   url: '{% url "print-note" %}',
                   dataType: 'json',
                   data: params,
-                  timeout: 5000,
+                  timeout: 10000,
                   success: function(data){
                       if(data.error == 0){
                             weui.alert("打印成功");

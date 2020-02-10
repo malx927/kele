@@ -123,10 +123,11 @@ class Goods(models.Model):
         return self.name
 
     def diff_price(self):
+
         if self.benefits == 0:
             return 0
-
         diff_price = self.price - self.benefits
+
         if diff_price > 0 :
             return  diff_price
         else:

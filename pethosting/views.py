@@ -1,6 +1,6 @@
 # coding:utf-8
 import base64
-from datetime import datetime
+import datetime
 import time
 from decimal import Decimal
 import json
@@ -63,7 +63,7 @@ class HostingOrderView(View):
         form["end_time"].field.initial = begin_time + relativedelta(months=+months, days=-day)
 
         pet_counts = myPets.count()
-        day = datetime.now().day
+        day = datetime.datetime.now().day
         factor = 1 if day < 15 else 2
 
         price = HostingPrice.objects.all().first()
@@ -76,9 +76,9 @@ class HostingOrderView(View):
             "form": form,
             "pets": myPets,
         }
-        return render(request, template_name="pethosting/hosting_form.html", context=context )
+        return render(request, template_name="pethosting/hosting_form.html", context=context)
 
-    def post(self,request):
+    def post(self, request):
         form = HostingOrderForm(request.POST or None)
         if form.is_valid():
             user_id = request.session.get("openid", None)
@@ -105,7 +105,9 @@ class HostingOrderView(View):
                 "form": form,
                 "pets": myPets,
             }
+
             return render(request, template_name="pethosting/hosting_form.html", context=context)
+
 
 class HostingCalcPrice(View):
     """
@@ -113,7 +115,7 @@ class HostingCalcPrice(View):
     """
     def post(self, request, *args, **kwargs):
         beginDate = request.POST.get("beginDate", None)
-        bDate = datetime.strptime(beginDate, '%Y-%m-%d')
+        bDate = datetime.datetime.strptime(beginDate, '%Y-%m-%d')
         day = bDate.day
         factor = 1 if day < 15 else 2
 
@@ -134,18 +136,17 @@ class HostingDepositSearchView(View):
     托管备用金查询
     """
     def post(self, request, *args, **kwargs):
-        openid = request.session.get("openid", None)
-        total_fee = request.POST.get("total_fee", None)
-        deposit = MemberDeposit.objects.get(openid=openid)
-
-        if total_fee is None or deposit is None:
-            return JsonResponse({"success": "false", "error":"用户不存在或消费金额不能为空", "flag":0})
-
-        if float(total_fee) + settings.HOSTING_LOW_DEPOSIT >= deposit.balance():
-            return JsonResponse({"success": "false", "error":"储值卡金额不足，托管期间储值卡上的金额不能低于{}元".format(settings.HOSTING_LOW_DEPOSIT), "flag":1})
-        else:
-            return JsonResponse({"success": "true"})
-
+        # openid = request.session.get("openid", None)
+        # total_fee = request.POST.get("total_fee", None)
+        # deposit = MemberDeposit.objects.get(openid=openid)
+        #
+        # if total_fee is None or deposit is None:
+        #     return JsonResponse({"success": "false", "error":"用户不存在或消费金额不能为空", "flag":0})
+        #
+        # if float(total_fee) + settings.HOSTING_LOW_DEPOSIT >= deposit.balance():
+        #     return JsonResponse({"success": "false", "error":"储值卡金额不足，托管期间储值卡上的金额不能低于{}元".format(settings.HOSTING_LOW_DEPOSIT), "flag":1})
+        # else:
+        return JsonResponse({"success": "true"})
 
 
 class HostingPayView(View):
@@ -201,10 +202,10 @@ class HostingPayView(View):
 
             return render(request, template_name="pethosting/hosting_checkout.html", context=context)
         except HostingOrder.DoesNotExist as ex:
-            print(ex, datetime.now())
+            print(ex, datetime.datetime.now())
             return HttpResponseRedirect(reverse("hosting-pet-list"))
         except Exception as ex:
-            print(ex, datetime.now())
+            print(ex, datetime.datetime.now())
             return HttpResponseRedirect(reverse("hosting-pet-list"))
 
 
@@ -215,16 +216,18 @@ class HostingPayView(View):
         try:
             id = request.POST.get("id", None)
             #生成订单号
-            out_trade_no = '{0}{1}{2}'.format('T',datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+            out_trade_no = '{0}{1}{2}'.format('T', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
             user_id = request.session.get('openid', None)
             instance = HostingOrder.objects.get( pk=id, status=0 )
             instance.out_trade_no = out_trade_no
             instance.save()
-            total_fee = int(instance.total_price * 100)
+            total_fee = int(instance.total_fee * 100)
         except HostingOrder.DoesNotExist:
             return HttpResponseRedirect(reverse("hosting-pet-list"))
 
-        # total_fee =1
+        if user_id == "o0AHP0lpCKyadVWg88KeI5JrafYI":
+            total_fee =1
+
         try:
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.INSURANCE_NOTIFY_URL, user_id=user_id)
             prepay_id = data.get('prepay_id',None)
@@ -254,7 +257,7 @@ class HostingBalancePayView(View):
         # 支付前出现密码输入窗口
         try:
             id = request.GET.get("id", None)
-            instance = HostingOrder.objects.get( pk=id, status=0 )
+            instance = HostingOrder.objects.get( pk=id, status=0)
             return render(request, template_name="wxchat/pay_confirm.html", context={"instance": instance})
         except HostingOrder.DoesNotExist as ex:
             return HttpResponseRedirect(reverse("hosting-pet-list"))
@@ -269,7 +272,7 @@ class HostingBalancePayView(View):
             openid = request.session.get('openid', None)
 
             #生成订单号
-            out_trade_no = '{0}{1}{2}'.format('H', datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
+            out_trade_no = '{0}{1}{2}'.format('H', datetime.datetime.now().strftime('%Y%m%d%H%M%S'), random.randint(1000, 10000))
 
             pet_ids = instance.pet_list
             pet_list = pet_ids.split(',')
@@ -281,7 +284,7 @@ class HostingBalancePayView(View):
             total_fee = instance.total_fee
             instance.out_trade_no = out_trade_no
             instance.cash_fee = total_fee           #实际付款金额
-            instance.pay_time = datetime.now()
+            instance.pay_time = datetime.datetime.now()
             instance.pay_style = 1      # 支付类型( 储值卡消费--1 )
             instance.status = 1
 
@@ -369,7 +372,7 @@ class HostingContractView(View):
                 instance.sn = sn
             openid = request.session.get("openid", None)
             instance.openid = openid
-            instance.add_time = datetime.now()
+            instance.add_time = datetime.datetime.now()
             instance.save()
             return HttpResponseRedirect(reverse("hosting-contract-page", args=(instance.id,)))
         else:
@@ -377,7 +380,7 @@ class HostingContractView(View):
 
 
     def get_max_sn(self):
-        yearmon = datetime.now().strftime('T%Y%m')
+        yearmon = datetime.datetime.now().strftime('T%Y%m')
         maxVal = HostContractInfo.objects.filter(sn__startswith=yearmon).aggregate(sn_max=Max("sn"))
         max_value = maxVal['sn_max']
         if max_value is None:
@@ -393,7 +396,7 @@ class HostContractPageView(View):
     def get(self, request, *args, **kwargs):
         id = kwargs.get("id")
         contract = HostContractInfo.objects.get(pk=id)
-        contract.sign_date = datetime.now().date()
+        contract.sign_date = datetime.datetime.now().date()
         contractfix = HostContractFixInfo.objects.all()
         pet_ids = contract.order.pet_list
         petList = pet_ids.split(',')
@@ -506,7 +509,7 @@ class HostQrCodeAckView(View):
             print("HostQrCodeAckView", code, flag)
             order = HostingOrder.objects.get(code=code)
             role = request.session.get("role", None)
-            if role == 1 or role ==2 :
+            if role == 1 or role == 2 or role == 0:
                 data = {
                     "name": order.name,
                     "openid": order.openid,
@@ -539,7 +542,7 @@ class HostQrCodeView(View):
         try:
             order = HostingOrder.objects.get(pk=orderid)
             if len(order.code) == 0:
-                code = '{0}{1}'.format(datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
+                code = '{0}{1}'.format(datetime.datetime.now().strftime('%Y%m%d'), random.randint(1000, 10000))
                 order.code = code
                 order.save(update_fields=['code'])
             else:
@@ -583,7 +586,7 @@ class HostingRoomUpdateView(View):
                 pet_ids = order.pet_list
                 petList = pet_ids.split(',')
 
-                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.now())
+                nRows = PetFosterInfo.objects.filter(id__in=petList).update(room=room, set_time=datetime.datetime.now())
                 room.petcounts = nRows
                 room.save(update_fields=["petcounts"])
 

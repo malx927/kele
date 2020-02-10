@@ -10,13 +10,16 @@ from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 from django.views.generic import DetailView,ListView, View
+
 from wechatpy import WeChatClient
 from wechatpy.client.api import WeChatCustomService
 from doginfo.models import DogOrder
+
 from kele import settings
 from .models import Goods, Order, OrderItem, ShopCart, MemberScore ,MemberScoreDetail, ScoresLimit, MailFee, \
     MemberRechargeAmount, MemberRechargeRecord, MemberDeposit, MarketPlan
 from petfoster.models import FosterStyleChoose
+from wxchat.decorators import weixin_decorator
 from wxchat.utils import random_number
 from wxchat.views import getJsApiSign, sendTempMessageToUser, sendPasswordTemplateMesToUser, sendChargeSuccessToUser
 from wechatpy.pay import WeChatPay
@@ -25,6 +28,7 @@ from wxchat.models import WxUserinfo,WxUnifiedOrderResult,WxPayResult, WxIntrodu
 from wechatpy.exceptions import WeChatPayException, InvalidSignatureException
 
 from django.db.models import Sum,F, FloatField,Count, Q
+
 
 wxPay = WeChatPay(appid=settings.WECHAT_APPID,api_key=settings.MCH_KEY,mch_id=settings.MCH_ID)
 
@@ -118,12 +122,14 @@ def getShopCartTotals(user_id, is_member):
     return count
 
 
+@weixin_decorator
 def index(request):
     return render(request,template_name='shopping/goods_list.html')
 
 
 def goodList(request):
     pass
+
 
 # 宠物食品详情
 class GoodsDetailView(DetailView):
@@ -343,7 +349,7 @@ class CreateOrderView(View):
                 benefits_totals = 0
                 scores_used = 0
 
-            if total_cost <=0:
+            if total_cost < 0:
                 raise Exception
 
             items = order.items.all()
@@ -361,7 +367,7 @@ class CreateOrderView(View):
             'out_trade_no': out_trade_no,
             'sign': signPackage
         }
-        return render(request,template_name='shopping/goods_checkout.html',context=context )
+        return render(request, template_name='shopping/goods_checkout.html', context=context )
 
 #订单支付
 class PayOrderView(View):
@@ -372,18 +378,23 @@ class PayOrderView(View):
 
         #获得订单信息
         out_trade_no = request.POST.get('out_trade_no', None)
+
         user_id = request.session.get('openid', None)
         is_member = request.session.get('is_member', None)
 
         order =getShoppingOrder(user_id, out_trade_no)
-
+        print(user_id,out_trade_no,order)
         if order:
             if is_member ==1:
                 total_fee = int(order.get_member_total_cost() * 100)
             else:
                 total_fee = int(order.get_total_cost() * 100)
         else:
-            return render( request, template_name='shopping/goods_list.html' )
+            return render( request, template_name='shopping/goods_list.html')
+
+        print("PayOrderView:", total_fee, type(total_fee))
+        # if total_fee > 1 and user_id =='o0AHP0lpCKyadVWg88KeI5JrafYI':
+        #     total_fee =1
 
         try:
             data = wxPay.order.create(trade_type=trade_type,body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
@@ -407,6 +418,7 @@ class PayOrderView(View):
                 'errcode':  wxe.errcode,
                 'errmsg':   wxe.errmsg
             }
+            print(errors)
             return HttpResponse(json.dumps(errors))
 
 @csrf_exempt
@@ -434,10 +446,10 @@ def payNotify(request):
         else:
             #验证金额是否一致
             if 'return_code' in res_data and 'result_code' in res_data and res_data['return_code'] == 'SUCCESS' and res_data['result_code'] == 'SUCCESS':
-
                 if out_trade_no.startswith('M'):    # 会员充值
                     time_end = res_data['time_end']
                     pay_time = datetime.strptime(time_end,"%Y%m%d%H%M%S")
+
                     try:
                         user = WxUserinfo.objects.get(openid=openid)
                         nickname = user.nickname
@@ -460,7 +472,8 @@ def payNotify(request):
                     try:
                         deposit = MemberDeposit.objects.get(openid=openid)
                         if deposit.add_time != pay_time:
-                            deposit.total_money += cash_fee
+                            from decimal import Decimal
+                            deposit.total_money = deposit.total_money + Decimal(cash_fee)
                             deposit.prev_money = cash_fee
                             deposit.add_time = pay_time
                             deposit.save()
@@ -472,6 +485,7 @@ def payNotify(request):
                             "prev_money": cash_fee,
                             "add_time": pay_time
                         }
+
                         deposit = MemberDeposit.objects.create(**values)
 
                     #更新储值卡
@@ -498,7 +512,7 @@ def payNotify(request):
                         if openid:
                             sendTempMessageToUser( order )
 
-        return  HttpResponse(xml)
+        return HttpResponse(xml)
     except InvalidSignatureException as error:
         pass
 
@@ -525,7 +539,7 @@ def getShoppingOrder(user_id, out_trade_no):
 #设置会员积分
 def setMemberScores( order ):
     user_id = order.user_id
-    userinf = WxUserinfo.objects.get(user_id=user_id)
+    userinf = WxUserinfo.objects.get(openid=user_id)
     total_scores = order.get_total_scores()
     scores_used = order.scores_used if order.scores_used is not None else 0
 
@@ -534,7 +548,6 @@ def setMemberScores( order ):
         'total_scores': total_scores,
     }
     #使用积分，先减掉使用的积分，并保存记录
-
     memberScore, created = MemberScore.objects.get_or_create(user_id=user_id, defaults=defaults)
     if not created:
         memberScore.total_scores -= scores_used  #减掉使用的积分
@@ -544,7 +557,7 @@ def setMemberScores( order ):
     if scores_used > 0:
         MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = -1*scores_used)
     #本人增加积分
-    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores = total_scores)
+    MemberScoreDetail.objects.create(member=memberScore, user_id=user_id, scores=total_scores)
     #推荐人增加积分
     try:
         intro_user = WxIntroduce.objects.get(openid=user_id)
@@ -562,6 +575,7 @@ def setMemberScores( order ):
 
     except WxIntroduce.DoesNotExist as ex:
         print(ex)
+
 
 #订单列表[my-order-list]
 class OrderView(View):
@@ -607,6 +621,7 @@ class OrderView(View):
         context = {
             "success":"false"
         }
+
         user_id = request.session.get('openid', None)
         action = request.POST.get("action", None)
 
@@ -672,7 +687,7 @@ class RechargeAmountView(View):
     def post(self, request, *args, **kwargs):
         trade_type ='JSAPI'
         body = '会员充值'
-
+        print("RechargeAmountView:post----------------")
         try:
             id = request.POST.get("id", None)
             user_id = request.session.get("openid", None)
@@ -688,9 +703,11 @@ class RechargeAmountView(View):
             total_fee =1
 
         try:
+            print("RechargeAmountView:pos+++++++")
             data = wxPay.order.create(trade_type=trade_type, body=body, total_fee=total_fee, out_trade_no=out_trade_no, notify_url=settings.NOTIFY_URL, user_id=user_id)
             prepay_id = data.get('prepay_id',None)
             save_data = dict(data)
+            print(save_data)
             #保存统一订单数据
             WxUnifiedOrderResult.objects.create(**save_data)
             if prepay_id:
@@ -705,6 +722,7 @@ class RechargeAmountView(View):
                 'errcode':  wxe.errcode,
                 'errmsg':   wxe.errmsg
             }
+            print(errors)
             return HttpResponse(json.dumps(errors))
 
 
@@ -729,10 +747,11 @@ class MemberHostingCondition(View):
 
         openid = request.session.get("openid", None)
         counts = MemberRechargeRecord.objects.filter(openid=openid, status=1, cash_fee__gte=1000).count()
+
         if counts == 0:
             context = {
                 "success": "false",
-                "counts": 0 ,
+                "counts": 0,
             }
             return JsonResponse(context)
 
@@ -760,7 +779,6 @@ class MemberHostingCondition(View):
         }
 
         return JsonResponse(context)
-
 
 
 # 消费明细

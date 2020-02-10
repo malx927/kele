@@ -24,7 +24,6 @@ class HostingInfo(models.Model):
         verbose_name_plural = verbose_name
 
 
-
 class HostingOrder(models.Model):
     """
     托管订单
@@ -44,6 +43,7 @@ class HostingOrder(models.Model):
         (12, '12个月'),
     )
     name = models.CharField(verbose_name="姓名", max_length=20)
+
     telephone = models.CharField(verbose_name='电话', max_length=24)
     begin_time = models.DateField(verbose_name="开始时间")
     end_time = models.DateField(verbose_name="结束时间")
@@ -79,12 +79,6 @@ class HostingOrder(models.Model):
         pet_ids = self.pet_list.split(',')
         return len(pet_ids)
 
-    def nick_name(self):
-        try:
-            user = WxUserinfo.objects.get(openid=self.openid)
-            return user.nickname
-        except HostingOrder.DoesNotExist as ex:
-            return "无"
 
     def update_status_transaction_id(self,status,transaction_id, cash_fee, pay_time):
         self.status = status
@@ -92,6 +86,13 @@ class HostingOrder(models.Model):
         self.cash_fee = cash_fee
         self.pay_time = pay_time
         self.save(update_fields=['status','transaction_id','cash_fee','pay_time'])
+
+    def nick_name(self):
+        try:
+            user = WxUserinfo.objects.get(openid=self.openid)
+            return user.nickname
+        except HostingOrder.DoesNotExist as ex:
+            return "无"
 
 
 class HostingPrice(models.Model):

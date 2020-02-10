@@ -15,7 +15,7 @@
               url: '{% url "member-recharge-amount" %}',
               dataType: 'json',
               data: params,
-              timeout: 5000,
+              timeout: 15000,
               success: function(data){
 
                   if(data.package !=undefined){
@@ -26,7 +26,8 @@
                   }
               },
               error: function(error){
-                  window.location.href = "{% url 'dog-index' %}";
+                  weui.alert(JSON.stringify(error));
+
               }
             });
         });

@@ -235,7 +235,7 @@
     </div>
     {% if instance.status == 0 %}
     <div class="weui-tabbar">
-        {% if weixin_pay %}fee
+        {% if weixin_pay %}
          <a href="#" id="pay_now" class="weui-tabbar__item tabbar_item bg-primary" >
             <p class="weui-tabbar__label " style="font-size:18px;"> 立即支付 <span id="total_cost_bottom"> ¥ {{ instance.total_fee }}</span></p>
         </a>
@@ -275,7 +275,6 @@
                   data: params,
                   timeout: 5000,
                   success: function(data){
-
                       if(data.success=="true"){
                           weui.alert("设置成功！");
                       }

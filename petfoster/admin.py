@@ -97,6 +97,7 @@ class PetGameNoteAdmin(admin.ModelAdmin):
 @admin.register(PetInsurance)
 class PetInsuranceAdmin(admin.ModelAdmin):
     list_display = ('name', 'type','status', 'time_limit', 'money','license','immune','immune_image','id_card','telephone','email' )
+
     list_display_links = ('name','type')
     list_per_page = 50
 
@@ -117,7 +118,7 @@ class ClaimProcessAdmin(admin.ModelAdmin):
 class FosterStyleChooseAdmin(admin.ModelAdmin):
     list_display = ('user_name', 'foster_type', 'big_dog','big_price','middle_dog','middle_price','small_dog','small_price', 'begin_time','end_time','total_price','room','balance_fee','cash_fee','status','out_trade_no' )
     list_display_links = ('foster_type',)
-    list_filter = ['foster_type','foster_mode', ]
+    list_filter = ['foster_type','foster_mode', 'status']
     search_fields = ['out_trade_no']
     date_hierarchy = 'begin_time'
     list_per_page = 50
