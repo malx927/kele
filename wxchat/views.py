@@ -1508,7 +1508,7 @@ def myQRCode(user):
     ret = client.qrcode.show(res)
     f = BytesIO(ret.content)
     image = Image.open(f)
-    logo = Image.open(os.path.join(settings.STATIC_ROOT, 'wxchat\images\wx_logo.png'))
+    logo = Image.open(os.path.join(settings.STATIC_ROOT, 'wxchat/images/wx_logo.png'))
 
     image = mergeImage(image, logo)
 
