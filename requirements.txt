@@ -1,6 +1,6 @@
 django==1.11.20
 djangorestframework==3.8.2
-Pillow==5.1.0
+Pillow==9.0.1
 wechatpy==1.7.0
 easy-thumbnails==2.5
 django-jet==1.0.7
